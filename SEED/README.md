@@ -1,6 +1,6 @@
 # SEED
 
-The SEmantic dEscriptor & Designer is a web-based creator for independent analysis processes, using semantic and ontological aspects.
+The SEmantic dEscriptor & Designer is a web-based creator for independent analysis processes (IAP), using semantic and ontological aspects.
 
 SEED belongs to the CAPTEN ecosystem, referenced under the CAPTEN-SEED appellation.
 
