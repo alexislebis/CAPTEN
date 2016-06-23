@@ -1,0 +1,25 @@
+<link rel="import" href="../wrapper/vis-element.html">
+<dom-module id="main-rte">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <!--<h1>RTE<span style="color:blue">#[[name]]</span></h1>-->
+    <vis-element></vis-element>
+  </template>
+  <script>
+    Polymer({
+      is: 'main-rte',
+
+      properties: {
+        name :{
+          type: String,
+          notify: true,
+          value: "455577781"
+        },
+      }
+    });
+  </script>
+</dom-module>

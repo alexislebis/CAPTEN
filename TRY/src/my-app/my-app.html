@@ -1,0 +1,33 @@
+<dom-module id="my-app">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h1>
+      Test n°<span style="color:red">[[name]]</span>
+    </h1>
+  </template>
+  <script>
+    Polymer({
+      is: 'my-app',
+
+      properties: {
+
+        /**
+         * Useless var.
+         *
+         * @attribute name
+         * @type String
+         */
+        name: {
+          type: String,
+          notify: true,
+          value: ""
+        },
+
+      }
+    });
+  </script>
+</dom-module>

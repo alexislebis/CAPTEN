@@ -1,0 +1,37 @@
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+
+<dom-module id="alpha-ape">
+  <template>
+    <app-location route="APE"></app-location>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <h1>
+      APE n°<span style="color:green">[[name]]</span>
+    </h1>
+  </template>
+  <script>
+    Polymer({
+      is: 'alpha-ape',
+
+      properties: {
+
+        /**
+         * Useless var.
+         *
+         * @attribute name
+         * @type String
+         */
+        name: {
+          type: String,
+          notify: true,
+          value: "78795685"
+        },
+
+      }
+    });
+  </script>
+</dom-module>
