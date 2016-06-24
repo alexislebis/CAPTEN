@@ -65,6 +65,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="/bower_components/paper-tabs/paper-tabs.html">
   <link rel="import" href="/bower_components/paper-menu/paper-submenu.html">
   <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
+  <link rel="import" href="/bower_components/app-route/app-route.html">
+  <link rel="import" href="/bower_components/app-route/app-location.html">
 
   <style>
 
@@ -118,6 +120,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </head>
 <body>
 
+
+
         <!-- ////////////// -->
         <!-- HEADER SECTION -->
         <!-- ////////////// -->
@@ -152,19 +156,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             <!-- HEADER's TABS SECTION -->
             <!-- ///////////////////// -->
 
-    <paper-tabs selected=0  fit-container>
+    <!--<paper-tabs selected=0  fit-container>
             <paper-tab>RTE</paper-tab>
             <paper-tab>VOOG</paper-tab>
             <paper-tab>APE</paper-tab>
-    </paper-tabs>
+    </paper-tabs>-->
   <app-header-layout>
 </app-drawer-layout>
 
-<iron-pages selected="0">
+<main-seed></main-seed>
+<!--<iron-pages selected="{{data}}">
   <div><main-rte></main-rte></div>
   <div><main-voog></main-voog></div>
   <div><alpha-ape></alpha-ape></div>
-</iron-pages>
+</iron-pages>-->
 
       <my-app name="001"></my-app>
       <my-app name="001"></my-app>
@@ -195,9 +200,9 @@ var tabs = document.querySelector('paper-tabs');
 var menu = document.querySelector('paper-menu');
 var submenu1 = document.getElementById('submenu1');//this.$.submenu1
 
-tabs.addEventListener('iron-select', function() {
+/*tabs.addEventListener('iron-select', function() {
     pages.selected = tabs.selected;
-  });
+  });*/
 
 menu.addEventListener('iron-select', function(){
   console.log(menu.selected);
