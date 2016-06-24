@@ -18,7 +18,7 @@ CAPTEN is a composition of several scientific works:
 These different works are strongly bound. For instance, in the elaboration of an IAP in CAPTEN-SEED, the system *MUST* infere information, the CAPTEN vocabularies and ontologies *MUST* evolve according to users.
 
 ## CAPTEN-TRY
-CAPTEN-TRY, for *Capitalization of Analysis Processes for Technology Enhanced learNing - Test RepositorY* is a test subproject where different ideas and techno are tested for understanding. Since these elements are not developed with specific means, they cannot be integrated inside other CAPTEN declination. 
+CAPTEN-TRY, for *Capitalization of Analysis Processes for Technology Enhanced learNing - Test RepositorY* is a test subproject where different ideas and techno are tested for understanding. Since these elements are not developed with specific means, they cannot be integrated inside other CAPTEN declination.
 
 ## CAPTEN-SEED
 
@@ -30,8 +30,19 @@ This formalism is based on relational vocabularies and ontologies.
 See tutorials and examples for using CAPTEN-SEED for more information.
 
 ### Install
+Download the CAPTEN project:
 ```bash
 git clone https://github.com/alexislebis/CAPTEN.git
+```
+Then, run the bower_dependencies script in order to build all the dependencies in the different sub repositories:
+```bash
+./bower_dependencies.sh
+```
+
+CAPTEN-SEED rely on **[Polymer](https://www.polymer-project.org/1.0/)**. Thus, in order to render and use correctly the web project, you have to create an HTML server listening a specific port (here, the 3000).
+```bash
+cd ./SEED/
+python -m SimpleHTTPServer -3000
 ```
 
 ## Thanks
