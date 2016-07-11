@@ -30,6 +30,7 @@
         {id: 5, label: 'Node 5'}
     ]);
 
+
     // create an array with edges
     var edges = new vis.DataSet([
         {from: 1, to: 3},
@@ -50,7 +51,39 @@
 
     // initialize your network!
     var network = new vis.Network(container, data, options);
-  }
+  },
+
+    setNodes : function(nbNodes)
+    {
+      if(!Number.isNaN(nbNodes))
+      {
+
+        var dataSetSpec = [];
+
+        for(i = 0; i < nbNodes; i++)
+        {
+          dataSetSpec.push({
+            id: i+1,
+            label: 'Node '+(i+1)
+          });
+
+        }
+
+        var dataEdge = [];
+
+        var data = {
+          nodes: dataSetSpec,
+          edges: dataEdge
+        }
+
+        var options={};
+        var container = this.$.mynetwork;
+
+        var network = new vis.Network(container, data, options);
+      }
+    }
+
+
 
 });
   </script>
