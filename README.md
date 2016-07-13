@@ -42,7 +42,7 @@ Then, run the bower_dependencies script in order to build all the dependencies i
 CAPTEN-SEED rely on **[Polymer](https://www.polymer-project.org/1.0/)**. Thus, in order to render and use correctly the web project, you have to create an HTML server listening a specific port (here, the 3000).
 ```bash
 cd ./SEED/
-python -m SimpleHTTPServer -3000
+python -m SimpleHTTPServer 3000
 ```
 Finally, open your web-browser at `http://localhost:3000/` (assuming that 3000 was the port used during the python command line).
 
