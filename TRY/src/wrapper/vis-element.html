@@ -36,6 +36,9 @@
         edges: {
           type: Object
         },
+        options: {
+          type: Object
+        },
         networkOptions: {
           type: Object
         },
@@ -72,10 +75,10 @@
         nodes: nodes,
         edges: edges
     };
-    var options = {configure: true};
+    this.options = {configure: true};
 
     // initialize your network!
-    this.network = new vis.Network(container, data, options);
+    this.network = new vis.Network(container, data, this.options);
   },
 
     setNodes : function(nbNodes)
@@ -107,8 +110,8 @@
         this.network = new vis.Network(container, data, options);
 
         //this.createEdgeBetween(1,2,'testdeloeuf');
-        //this.completeNetwork();
-        this.renameNode(1, 'wesh');
+        this.completeNetwork();
+        //this.renameNode(1, 'wesh');
       }
     },
 
@@ -161,6 +164,8 @@
     */
 completeNetwork: function()
     {
+      if (this.options === undefined)
+        return;
 
       for(k = 0; k < (this.nodes.length - 1); k++)
       {
@@ -175,6 +180,9 @@ completeNetwork: function()
       }};
 
       //@TODO : Ajouter aux options !
+      console.log(this.options.layout);
+      this.options.layout = "{improvedLayout: false}";
+      console.log(this.options.layout);
       this.network.setOptions(this.options);
     },
 
@@ -218,8 +226,48 @@ enableConfiguration: function(enabled)
     {
       //@TODO : Editer les options de vis. Utiliser : setOptions()
       this.configurationEnabled = enabled;
+      this.options.configure = enabled;
+
+      this.network.setOptions(this.options);
+      this.network.redraw();
     },
 
+
+/**
+* .
+*
+* @param {!required} jsonObj {String} The JSON used for search.
+*
+* @param {!required} key {String} the key of the json in which to put the new value .
+*
+* @param {!required} newValue {object} the new value to put inside the key
+*
+* @method addReplaceJSONKeyedValue
+*
+* @return The old value of the key contained in the JSON, or undefined if the key wasn't contained inside the JSON
+*/
+addReplaceJSONKeyedValue: function(jsonObj, key, newValue)
+{
+  /*var old;
+  var found = false;
+
+  found = Object.keys(jsonObj).some(function(k,ijson)
+  {
+    if(k === key)
+    {
+      old = Object.values(jsonObj)[ijson];
+      Object.values(jsonObj)[ijson] = newValue;
+      return true;
+    }
+  });
+
+  if(found)
+    return old;
+  else
+  {
+
+  }*/
+},
 
 
 });
