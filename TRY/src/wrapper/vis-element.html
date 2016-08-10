@@ -181,7 +181,7 @@ completeNetwork: function()
 
       //@TODO : Ajouter aux options !
       console.log(this.options.layout);
-      this.options.layout = "{improvedLayout: false}";
+      this.options = this.networkOptions;
       console.log(this.options.layout);
       this.network.setOptions(this.options);
     },

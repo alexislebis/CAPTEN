@@ -1,4 +1,5 @@
 <link rel="import" href="../wrapper/vis-element.html">
+<link rel="import" href="../wrapper/rdflib-element.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <dom-module id="main-rte">
   <template>
@@ -11,6 +12,7 @@
     <paper-input label="Number of nodes" type="number" value="{{valNbNodes}}">
     </paper-input>
     <vis-element id="truc"></vis-element>
+    <rdflib-element id="chouette"></rdflib-element>
   </template>
   <script>
     Polymer({
@@ -33,6 +35,7 @@
       updateNbNodes: function(){
 
         this.$.truc.setNodes(this.valNbNodes);
+
       }
     });
   </script>
