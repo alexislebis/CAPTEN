@@ -1,0 +1,65 @@
+<link rel="import" href="../wrapper/rdflib-element.html">
+<link rel="import" href="../../bower_components/file-reader/file-reader.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="rdf-data-store-reader-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      h2{
+        text-align: center;
+      }
+    </style>
+
+    <file-reader id="fileReaderElement"></file-reader>
+    <h2>OR</h2>
+    <paper-input label="Fetch data from the Web" disabled char-counter maxlength="2048"></paper-input>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'rdf-data-store-reader-element',
+
+      properties: {
+        dataStore: {
+          type: Object,
+          notify: true
+        }
+      },
+
+      ready: function(){
+        var that = this;
+        this.$.fileReaderElement.returnFunction = function(){
+
+          var body;
+          var callback = {
+                  onload: function(e){ that.loadDataStore(e.target.result);},
+                  onprogress: function(){},
+                  onerror: function(){}
+                }
+
+          this.getSlice(0,1,callback);
+
+        }
+      },
+
+      loadDataStore: function(fileContent)
+      {
+        // console.log(fileContent);
+        var uri = 'https://example.org/resource.ttl'
+        // var body = '<a> <b> <c> .'
+        var mimeType = 'application/rdf+xml'
+        var store = $rdf.graph()
+
+        try {
+            $rdf.parse(fileContent, store, uri, mimeType);
+            console.log(store);
+        } catch (err) {
+            console.log(err)
+        }
+      },
+    });
+  </script>
+</dom-module>

@@ -1,6 +1,8 @@
 <link rel="import" href="../wrapper/vis-element.html">
 <link rel="import" href="../wrapper/rdflib-element.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../rdf-data-store/rdf-data-store-reader-element.html">
+<link rel="import" href="../rdf-data-store/rdf-data-store-parser-element.html">
 <dom-module id="main-rte">
   <template>
     <style>
@@ -9,6 +11,8 @@
       }
     </style>
     <!--<h1>RTE<span style="color:blue">#[[name]]</span></h1>-->
+    <rdf-data-store-reader-element id="FRE"></rdf-data-store-reader-element>
+    <rdf-data-store-parser-element id="rdsp"></rdf-data-store-parser-element>
     <paper-input label="Number of nodes" type="number" value="{{valNbNodes}}">
     </paper-input>
     <vis-element id="truc"></vis-element>
@@ -31,12 +35,16 @@
           observer: "updateNbNodes"
         },
       },
-
+      ready: function(){
+        this.$.FRE.returnFunction = function(){
+          console.log("Wesh");
+        }
+      },
       updateNbNodes: function(){
 
         this.$.truc.setNodes(this.valNbNodes);
 
-      }
+      },
     });
   </script>
 </dom-module>
