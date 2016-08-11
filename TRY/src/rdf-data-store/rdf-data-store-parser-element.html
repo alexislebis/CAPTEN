@@ -1,0 +1,32 @@
+<link rel="import" href="../wrapper/rdflib-element.html">
+
+<dom-module id="rdf-data-store-parser-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+  </template>
+  <script>
+    Polymer({
+      is: 'rdf-data-store-parser-element',
+
+      properties:
+      {
+        dataStore:{
+          type: Object,
+          notify: true
+        },
+        classes: {
+          type: Object,
+          notify: true
+        },
+        properties: {
+          type: Object,
+          notify: true
+        }
+      },
+    });
+  </script>
+</dom-module>
