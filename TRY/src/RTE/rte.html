@@ -11,8 +11,8 @@
       }
     </style>
     <!--<h1>RTE<span style="color:blue">#[[name]]</span></h1>-->
-    <rdf-data-store-reader-element id="FRE"></rdf-data-store-reader-element>
-    <rdf-data-store-parser-element id="rdsp"></rdf-data-store-parser-element>
+    <rdf-data-store-reader-element id="FRE" store="{{rdfStore}}"></rdf-data-store-reader-element>
+    <rdf-data-store-parser-element id="rdsp" store="{{rdfStore}}"></rdf-data-store-parser-element>
     <paper-input label="Number of nodes" type="number" value="{{valNbNodes}}">
     </paper-input>
     <vis-element id="truc"></vis-element>
@@ -34,11 +34,23 @@
           notify: true,
           observer: "updateNbNodes"
         },
+        rdfStore: {
+          type: Object,
+          value: function(){return {};},
+          observer: "_dataStoreChanged",
+        },
       },
       ready: function(){
         this.$.FRE.returnFunction = function(){
           console.log("Wesh");
         }
+      },
+      _dataStoreChanged: function(e)
+      {
+        if(Object.keys(this.rdfStore).length === 0 && this.rdfStore.constructor === Object)
+          return;
+
+        this.$.rdsp.createClassesProperties();
       },
       updateNbNodes: function(){
 

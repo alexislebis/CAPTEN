@@ -23,13 +23,14 @@
       is: 'rdf-data-store-reader-element',
 
       properties: {
-        dataStore: {
-          type: Object,
+        store: {
+          value: function(){return {};},
           notify: true
-        }
+       }
       },
 
       ready: function(){
+
         var that = this;
         this.$.fileReaderElement.returnFunction = function(){
 
@@ -42,7 +43,7 @@
 
           this.getSlice(0,1,callback);
 
-        }
+        };
       },
 
       loadDataStore: function(fileContent)
@@ -51,11 +52,13 @@
         var uri = 'https://example.org/resource.ttl'
         // var body = '<a> <b> <c> .'
         var mimeType = 'application/rdf+xml'
-        var store = $rdf.graph()
+        this.store = $rdf.graph()
 
         try {
-            $rdf.parse(fileContent, store, uri, mimeType);
-            console.log(store);
+            $rdf.parse(fileContent, this.store, uri, mimeType);
+            console.log(this.store);
+            console.log(this.store.index[0]);
+            //console.log(store.statementsMatching("http://www.w3.org/2002/07/owl#ObjectProperty", "http://www.w3.org/1999/02/22-rdf-syntax-ns#type", undefined).length);
         } catch (err) {
             console.log(err)
         }
