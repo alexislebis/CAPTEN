@@ -1,0 +1,95 @@
+<link rel="import" href="../wrapper/rdfstore-element.html">
+<link rel="import" href="../../bower_components/file-reader/file-reader.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="rdf-store-reader-element">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+
+            h2 {
+                text-align: center;
+            }
+        </style>
+
+        <file-reader id="fileReaderElement"></file-reader>
+        <h2>OR</h2>
+        <paper-input label="Fetch data from the Web" disabled char-counter maxlength="2048"></paper-input>
+
+    </template>
+    <script>
+        Polymer(
+        {
+            is: 'rdf-store-reader-element',
+
+            properties:
+            {
+                store:
+                {
+                  type: Object,
+                    value: function()
+                    {
+                        return {};
+                    },
+                    notify: true
+                },
+                graphuri:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return {};
+                    },
+                    notify: true
+                }
+            },
+
+            ready: function()
+            {
+
+                var that = this;
+                this.$.fileReaderElement.returnFunction = function()
+                {
+
+                    var body;
+                    var callback = {
+                        onload: function(e)
+                        {
+                            that.loadDataStore(e.target.result);
+                        },
+                        onprogress: function() {},
+                        onerror: function() {}
+                    }
+
+                    this.getSlice(0, 1, callback);
+
+                };
+            },
+
+            loadDataStore: function(fileContent)
+            {
+                rdfstore.create(function(err, stor)
+                {
+                    this.store = stor;
+                    //this.store.registerParser("application/rdf+xml", TabulatorRDFXMLParser);
+                    this.graphuri = "name";
+                    this.store.load('text/turtle', fileContent, this.graphuri, function(s, d)
+                    {
+                        console.log(this.store);
+                        this.store.execute("SELECT * WHERE { ?s ?p ?o }", function(success, results)
+                        {
+                            console.log(success, results);
+                        });
+
+                        this.store.graph(this.graphuri, function(err, graph)
+                        {
+                            console.log(graph);
+                        });
+                    });
+                });
+            },
+        });
+    </script>
+</dom-module>

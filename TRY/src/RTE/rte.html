@@ -1,8 +1,7 @@
 <link rel="import" href="../wrapper/vis-element.html">
 <link rel="import" href="../wrapper/rdflib-element.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
-<link rel="import" href="../rdf-data-store/rdf-data-store-reader-element.html">
-<link rel="import" href="../rdf-data-store/rdf-data-store-parser-element.html">
+<link rel="import" href="../rdf-data-store/rdf-store-reader-element.html">
 <dom-module id="main-rte">
   <template>
     <style>
@@ -11,8 +10,7 @@
       }
     </style>
     <!--<h1>RTE<span style="color:blue">#[[name]]</span></h1>-->
-    <rdf-data-store-reader-element id="FRE" store="{{rdfStore}}"></rdf-data-store-reader-element>
-    <rdf-data-store-parser-element id="rdsp" store="{{rdfStore}}"></rdf-data-store-parser-element>
+    <rdf-store-reader-element id="FRE" store="{{rdfStore}}" graphuri="{{graph}}"></rdf-store-reader-element>
     <paper-input label="Number of nodes" type="number" value="{{valNbNodes}}">
     </paper-input>
     <vis-element id="truc"></vis-element>
@@ -38,6 +36,14 @@
           type: Object,
           value: function(){return {};},
           observer: "_dataStoreChanged",
+          notify: true,
+        },
+        graph:
+        {
+          type: Object,
+          value: function(){return {};},
+          observer: "_graphChanged",
+          notify: true,
         },
       },
       ready: function(){
@@ -50,13 +56,21 @@
         if(Object.keys(this.rdfStore).length === 0 && this.rdfStore.constructor === Object)
           return;
 
-        this.$.rdsp.createClassesProperties();
+        //this.$.rdsp.createClassesProperties();
+        console.log("Oh");
       },
       updateNbNodes: function(){
 
         this.$.truc.setNodes(this.valNbNodes);
 
       },
+      _graphChanged: function(e)
+      {
+        // if(Object.keys(this.rdfStore).length === 0 && this.rdfStore.constructor === Object)
+        //   return;
+
+        console.log("Hey");
+      }
     });
   </script>
 </dom-module>
