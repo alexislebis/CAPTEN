@@ -1,5 +1,4 @@
 <link rel="import" href="../wrapper/vis-element.html">
-<link rel="import" href="../wrapper/rdflib-element.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../rdf-data-store/rdf-store-reader-element.html">
 <dom-module id="main-rte">
@@ -10,11 +9,12 @@
       }
     </style>
     <!--<h1>RTE<span style="color:blue">#[[name]]</span></h1>-->
-    <rdf-store-reader-element id="FRE" store="{{rdfStore}}" graphuri="{{graph}}"></rdf-store-reader-element>
+    <rdf-store-reader-element id="FRE" graph="{{graph}}"></rdf-store-reader-element>
     <paper-input label="Number of nodes" type="number" value="{{valNbNodes}}">
     </paper-input>
+    <div id="ttest" on-tap="tapFunc">DisplayRDFGraphValue</div>
     <vis-element id="truc"></vis-element>
-    <rdflib-element id="chouette"></rdflib-element>
+    <!-- <rdflib-element id="chouette"></rdflib-element> -->
   </template>
   <script>
     Polymer({
@@ -35,23 +35,31 @@
         rdfStore: {
           type: Object,
           value: function(){return {};},
-          observer: "_dataStoreChanged",
-          notify: true,
+          // observer: "_rdfStoreChanged",
         },
         graph:
         {
           type: Object,
           value: function(){return {};},
-          observer: "_graphChanged",
+          reflectToAttribute: true,
+          observer: "_onGraphChanged",
           notify: true,
         },
       },
+
+      // observers: [
+      //   '_onGraphChanged(graph)'
+      // ],
+
       ready: function(){
-        this.$.FRE.returnFunction = function(){
-          console.log("Wesh");
-        }
+        // this.$.FRE.returnFunction = function(){
+        //   console.log("Wesh");
+        // }
       },
-      _dataStoreChanged: function(e)
+      tapFunc: function(){
+        console.log(this.graph);
+      },
+      _rdfStoreChanged: function(e)
       {
         if(Object.keys(this.rdfStore).length === 0 && this.rdfStore.constructor === Object)
           return;
@@ -64,12 +72,14 @@
         this.$.truc.setNodes(this.valNbNodes);
 
       },
-      _graphChanged: function(e)
+      _onGraphChanged: function(n,o)
       {
-        // if(Object.keys(this.rdfStore).length === 0 && this.rdfStore.constructor === Object)
-        //   return;
+        if(Object.keys(this.graph).length === 0 && this.graph.constructor === Object)
+          return;
 
-        console.log("Hey");
+        console.log("CALL:_graphChanged("+n+","+o+")");
+        console.log(o);
+        console.log(n);
       }
     });
   </script>

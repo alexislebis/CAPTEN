@@ -26,25 +26,41 @@
 
             properties:
             {
+              valtest:
+              {
+                type: Number,
+                notify: true
+              },
                 store:
                 {
                   type: Object,
+                  notify: true,
                     value: function()
                     {
                         return {};
                     },
-                    notify: true
                 },
                 graphuri:
                 {
                     type: Object,
+                    notify: true,
                     value: function()
                     {
                         return {};
                     },
-                    notify: true
+                },
+                graph:
+                {
+                  type: Object,
+                  notify: true,
+                  value : function(){return {};},
                 }
             },
+
+            // Used for two-ways binding debug
+              // observers: [
+              //   '_onGraphChanged(graphuri)'
+              // ],
 
             ready: function()
             {
@@ -68,24 +84,34 @@
                 };
             },
 
+            // _onGraphChanged: function(n,o)
+            // {
+            //   // if(Object.keys(this.rdfStore).length === 0 && this.rdfStore.constructor === Object)
+            //   //   return;
+            //
+            //   console.log("CALL:_onGraphChanged("+n+","+o+")");
+            // },
+
             loadDataStore: function(fileContent)
             {
+              var that = this;
                 rdfstore.create(function(err, stor)
                 {
-                    this.store = stor;
+                    that.store = stor;
                     //this.store.registerParser("application/rdf+xml", TabulatorRDFXMLParser);
-                    this.graphuri = "name";
-                    this.store.load('text/turtle', fileContent, this.graphuri, function(s, d)
+                    that.graphuri = "DEFAULT_GRAPH_URI";//@TODO: Dynamic Graph URI
+                    that.store.load('text/turtle', fileContent, that.graphuri, function(s, d)
                     {
-                        console.log(this.store);
-                        this.store.execute("SELECT * WHERE { ?s ?p ?o }", function(success, results)
+                        that.store.execute("SELECT * WHERE { ?s ?p ?o }", function(success, results)
                         {
                             console.log(success, results);
                         });
 
-                        this.store.graph(this.graphuri, function(err, graph)
+                        that.store.graph(that.graphuri, function(err, graph)
                         {
-                            console.log(graph);
+                          that.graph = graph;
+
+                          console.log(graph.triples[0].object);
                         });
                     });
                 });
