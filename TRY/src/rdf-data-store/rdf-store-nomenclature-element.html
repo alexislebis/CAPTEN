@@ -1,0 +1,126 @@
+<link rel="import" href="../wrapper/rdfstore-element.html">
+
+<dom-module id="rdf-store-reader-element">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+    </template>
+    <script>
+        Polymer(
+        {
+            is: 'rdf-store-nomenclature-element',
+
+            properties:
+            {
+                store:
+                {
+                    type: Object,
+                    notify: true,
+                    value: function()
+                    {
+                        return {};
+                    },
+                },
+                graphuri:
+                {
+                    type: Object,
+                    notify: true,
+                    value: function()
+                    {
+                        return {};
+                    },
+                },
+                graph:
+                {
+                    type: Object,
+                    notify: true,
+                    value: function()
+                    {
+                        return {};
+                    },
+                },
+                classes:
+                {
+                    type: Array,
+                    value: function()
+                    {
+                        return [];
+                    },
+                },
+                props:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return [];
+                    },
+                },
+            },
+
+            //Génère la nomenclature du graph rdf sous forme de classes et de propriétés
+            execute: function()
+            {
+                if (Object.keys(this.graph).length === 0 && this.graph.constructor === Object)
+                    return;
+
+                var that = this;
+
+                this.graph.forEach(function(e, i)
+                {
+
+                    //otherwise check if it's a owl property
+                    if (e.object.nominalValue == "http://www.w3.org/2002/07/owl#ObjectProperty")
+                    {
+                        that.props.push(e.subject.nominalValue);
+                    }
+                    //check if it's a owl class
+                    else if (e.object.nominalValue == "http://www.w3.org/2002/07/owl#Class")
+                    {
+                        if ((e.subject + "").match(/[_].*/)) //if the subject is a _blanknode (pattern seems to start with _XXXXX )
+                        {
+                            console.log(e);
+                        }
+                        that.classes.push(e.subject.nominalValue);
+                    }
+                    //@QUESTION: else ntd - or potential error ?
+                });
+
+                // console.log(this.classes);
+                // console.log(this.props);
+
+                this.store.node(this.classes[0], this.graphuri, function(err, node) {
+                  console.log(node);
+                });
+
+                // console.log(this.classes[0]);
+
+                var query = "SELECT ?p { <"+this.classes[0]+"> ?p ?o }";
+                // var q2  = "CONSTRUCT { <"+this.classes[0]+"> ?p ?o } \
+                //            WHERE { <"+this.classes[0]+"> ?p ?o  }";
+
+                var defaultGraph = [];
+                var namedGraphs  = [{'token':'uri', 'value': this.graphuri}];
+
+                this.store.execute(query, function(err, results)
+                {
+                  console.log("BEFORE");
+                    if (!err)
+                    {
+                      console.log(results);
+                        // process results
+                        if (results[0].s.token === 'uri')
+                        {
+                            console.log(results);
+                        }
+                    }
+                    else {
+                      console.log(err);
+                    }
+                });
+            },
+        });
+    </script>
+</dom-module>
