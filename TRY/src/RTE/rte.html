@@ -1,5 +1,6 @@
 <link rel="import" href="../wrapper/vis-element.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../rdf-data-store/rdf-store-nomenclature-element.html">
 <link rel="import" href="../rdf-data-store/rdf-store-reader-element.html">
 <dom-module id="main-rte">
   <template>
@@ -9,7 +10,8 @@
       }
     </style>
     <!--<h1>RTE<span style="color:blue">#[[name]]</span></h1>-->
-    <rdf-store-reader-element id="FRE" graph="{{graph}}"></rdf-store-reader-element>
+    <rdf-store-reader-element id="FRE" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}"></rdf-store-reader-element>
+    <rdf-store-nomenclature-element id="rdn" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}"></rdf-store-nomenclature-element>
     <paper-input label="Number of nodes" type="number" value="{{valNbNodes}}">
     </paper-input>
     <div id="ttest" on-tap="tapFunc">DisplayRDFGraphValue</div>
@@ -19,7 +21,6 @@
   <script>
     Polymer({
       is: 'main-rte',
-
       properties: {
         name :{
           type: String,
@@ -35,22 +36,27 @@
         rdfStore: {
           type: Object,
           value: function(){return {};},
+          notify: true,
           // observer: "_rdfStoreChanged",
         },
         graph:
         {
           type: Object,
           value: function(){return {};},
-          reflectToAttribute: true,
+          // reflectToAttribute: true,
           observer: "_onGraphChanged",
           notify: true,
         },
+        graphuri://@REMOVE
+        {
+          type: Object,
+          value: function(){return {};},
+          notify: true,
+        }
       },
-
       // observers: [
       //   '_onGraphChanged(graph)'
       // ],
-
       ready: function(){
         // this.$.FRE.returnFunction = function(){
         //   console.log("Wesh");
@@ -63,23 +69,21 @@
       {
         if(Object.keys(this.rdfStore).length === 0 && this.rdfStore.constructor === Object)
           return;
-
         //this.$.rdsp.createClassesProperties();
         console.log("Oh");
       },
       updateNbNodes: function(){
-
         this.$.truc.setNodes(this.valNbNodes);
-
       },
       _onGraphChanged: function(n,o)
       {
         if(Object.keys(this.graph).length === 0 && this.graph.constructor === Object)
           return;
-
         console.log("CALL:_graphChanged("+n+","+o+")");
         console.log(o);
         console.log(n);
+        console.log(this.rdfStore);
+        this.$.rdn.execute();
       }
     });
   </script>
