@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../rdf-data-store/rdf-store-nomenclature-element.html">
 <link rel="import" href="../rdf-data-store/rdf-store-reader-element.html">
+<link rel="import" href="../rdf-data-store/rdf-store-lister-element.html">
 <dom-module id="main-rte">
   <template>
     <style>
@@ -11,7 +12,9 @@
     </style>
     <!--<h1>RTE<span style="color:blue">#[[name]]</span></h1>-->
     <rdf-store-reader-element id="FRE" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}"></rdf-store-reader-element>
-    <rdf-store-nomenclature-element id="rdn" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}"></rdf-store-nomenclature-element>
+    <rdf-store-nomenclature-element id="rdn" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}" classes="{{rdfcls}}" props="{{rdfprops}}"></rdf-store-nomenclature-element>
+    <rdf-store-lister-element id="lister" rdfclasses="{{rdfcls}}" rdfprops="{{rdfprops}}"></rdf-store-lister-element>
+
     <paper-input label="Number of nodes" type="number" value="{{valNbNodes}}">
     </paper-input>
     <div id="ttest" on-tap="tapFunc">DisplayRDFGraphValue</div>
@@ -51,6 +54,17 @@
         {
           type: Object,
           value: function(){return {};},
+          notify: true,
+        },
+        rdfcls:
+        {
+          type: Array,
+          //value: function(){return {};},
+          notify: true,
+        },
+        rdfprops:
+        {
+          type: Array,
           notify: true,
         }
       },

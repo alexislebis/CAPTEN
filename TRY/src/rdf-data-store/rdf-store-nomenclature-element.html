@@ -45,18 +45,16 @@
                 classes:
                 {
                     type: Array,
-                    value: function()
-                    {
-                        return [];
-                    },
+                    notify: true,
+                    // value: function()
+                    // {
+                    //     return {};
+                    // },
                 },
                 props:
                 {
-                    type: Object,
-                    value: function()
-                    {
-                        return [];
-                    },
+                    type: Array,
+                    notify: true,
                 },
             },
 
@@ -66,6 +64,8 @@
                 if (Object.keys(this.graph).length === 0 && this.graph.constructor === Object)
                     return;
 
+                this.classes = [];
+                this.props = [];
                 var that = this;
 
                 this.graph.forEach(function(e, i)
@@ -74,16 +74,19 @@
                     //otherwise check if it's a owl property
                     if (e.object.nominalValue == "http://www.w3.org/2002/07/owl#ObjectProperty")
                     {
-                        that.props.push(e.subject.nominalValue);
+                        that.push('props', e.subject.nominalValue);
                     }
                     //check if it's a owl class
                     else if (e.object.nominalValue == "http://www.w3.org/2002/07/owl#Class")
                     {
-                        if ((e.subject + "").match(/[_].*/)) //if the subject is a _blanknode (pattern seems to start with _XXXXX )
+                        if (!(e.subject + "").match(/[_].*/)) //if the subject is a _blanknode (pattern seems to start with _XXXXX )
                         {
-                            console.log(e);
+
+                          that.push('classes',  e.subject.nominalValue);
+                          // that.classes.push(e.subject.nominalValue);
+
                         }
-                        that.classes.push(e.subject.nominalValue);
+
                     }
                     //@QUESTION: else ntd - or potential error ?
                 });
@@ -111,7 +114,7 @@
                     {
                       console.log(results);
                         // process results
-                        if (results[0].s.token === 'uri')
+                        if (results[0].p.token === 'uri')
                         {
                             console.log(results);
                         }
