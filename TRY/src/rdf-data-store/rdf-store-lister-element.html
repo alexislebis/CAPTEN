@@ -1,21 +1,90 @@
 <link rel="import" href="../wrapper/rdfstore-element.html">
+<link rel="import" href="../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
 <dom-module id="rdf-store-lister-element">
     <template>
         <style>
             :host {
-                display: block;
+                font-family: sans-serif;
+            }
+
+            .content {
+                @apply(--layout-vertical);
+                height: 100%;
+            }
+
+            .pad {
+                @apply(--layout-flex);
+                @apply(--layout-vertical);
+                padding: 0 16px;
+            }
+
+            .item {
+                @apply(--layout-horizontal);
+                cursor: pointer;
+                padding: 16px 22px;
+                border-bottom: 1px solid #DDD;
+            }
+
+            .item:focus,
+            .item.selected:focus {
+                outline: 0;
+                background-color: #ddd;
+            }
+
+            .item.selected .star {
+                color: var(--paper-blue-600);
+            }
+
+            .item .star {
+                color: var(--paper-blue-600);
+            }
+
+            .star {
+                width: 24px;
+                height: 24px;
+            }
+
+            iron-list {
+                @apply(--layout-flex);
             }
         </style>
         <div id="rdflister">
-          <div>
-            <h2>Available Classes</h2>
-            <ul id="rdfClasses"></ul>
-          </div>
-          <div>
-            <h2>Availablle Properties</h2>
-            <ul id="rdfProperties"></ul>
-          </div>
-        </div>
+            <div>
+                <h2>Available Classes</h2>
+                <!-- <ul id="rdfClasses"></ul> -->
+                <iron-list id="ilRDFC" items="[[rdfclasses]]" as="item" class="flex" selection-enabled>
+                    <template>
+                        <div>
+                            <div class$="[[_computeClass(selected)]]" on-tap="_rdfcTapped">
+                                <div class="primary pad" tabindex$="[[tabIndex]]">[[item]]</div>
+                                <div class="selectedItem">
+                                    <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+                                </div>
+                            </div>
+                            <div class="border"></div>
+                            <div>
+                    </template>
+                </iron-list>
+                </div>
+                <div>
+                    <h2>Availablle Properties</h2>
+                    <iron-list id="ilRDFP" items="[[rdfprops]]" as="item" class="flex" selection-enabled>
+                        <template>
+                            <div>
+                                <div class$="[[_computeClass(selected)]]" on-tap="_rdfpTapped">
+                                    <div class="primary pad" tabindex$="[[tabIndex]]">[[item]]</div>
+                                    <div class="selectedItem">
+                                        <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+                                    </div>
+                                </div>
+                                <div class="border"></div>
+                                <div>
+                        </template>
+                    </iron-list>
+                    </div>
+                    </div>
     </template>
     <script>
         Polymer(
@@ -24,39 +93,39 @@
 
             properties:
             {
-              rdfclasses:
-              {
-                type: Array,
-                notify: true,
-                //value: function(){return[];},
-                //observer: "_onRdfclassesChanged",
-              },
+                rdfclasses:
+                {
+                    type: Array,
+                    notify: true,
+                    //value: function(){return[];},
+                    //observer: "_onRdfclassesChanged",
+                },
 
-              rdfprops:
-              {
-                type: Array,
-                notify: true,
-              }
+                rdfprops:
+                {
+                    type: Array,
+                    notify: true,
+                }
             },
 
             observers: [
-              "_onRdfclassesChanged(rdfclasses.splices)",
-              "_onRdfpropertiesChanged(rdfprops.splices)",
+                "_onRdfclassesChanged(rdfclasses.splices)",
+                "_onRdfpropertiesChanged(rdfprops.splices)",
             ],
 
             _onRdfclassesChanged: function(change)
             {
 
-              if(Object.keys(this.rdfclasses).length === 0 && this.rdfclasses.constructor === Object)
-                return;
+                if (Object.keys(this.rdfclasses).length === 0 && this.rdfclasses.constructor === Object)
+                    return;
 
                 console.log("CALL: _onRdfclassesChanged");
+                //console.log(this.rdfclasses);
+                if (!change)
+                    return;
 
-                if(!change)
-                  return;
-
-                  var items ='';
-                  //var that = this;
+                //  var items ='';
+                //var that = this;
                 //@IMPORTANT: Polymer splice function for array browsing
                 // change.indexSplices.forEach(function(s){
                 //   for (var i=0; i<s.addedCount; i++){
@@ -70,36 +139,60 @@
                 //  }
                 //});
 
-                for(var i = 0; i < this.rdfclasses.length; i++)
-                {
-                  items += '<li>'+this.rdfclasses[i]+'</li>';
-                }
+                // for(var i = 0; i < this.rdfclasses.length; i++)
+                // {
+                //   items += '<li on-tap="_onRdfclassesClicked">'+this.rdfclasses[i]+'</li>';
+                // }
+                //
+                // Polymer.dom(this.$.rdfClasses).innerHTML = items;
+                // var that = this;
+                // console.log(Polymer.dom(that.root).querySelector(".rdfClasses"));
+                // console.log(n.path+" |||"+n.value);
 
-                Polymer.dom(this.$.rdfClasses).innerHTML = items;
-              // var that = this;
-              // console.log(Polymer.dom(that.root).querySelector(".rdfClasses"));
-              // console.log(n.path+" |||"+n.value);
+                // this.rdfclasses.forEach(function(e,i){
+                //   console.log(e);
+                // });
 
-              // this.rdfclasses.forEach(function(e,i){
-              //   console.log(e);
-              // });
+                Polymer.dom(this.root).querySelector('#ilRDFC').notifyResize();
+                //document.querySelector('iron-list').notifyResize();
             },
+
+            iconForItem: function(isSelected)
+            {
+                return isSelected ? 'check-circle' : 'radio-button-unchecked';
+            },
+
+            _computeClass: function(isSelected)
+            {
+                return isSelected ? 'item selected' : 'item';
+            },
+
+            _rdfcTapped: function(e)
+            {
+                console.log(e.model.item);
+            },
+            _rdfpTapped: function(e)
+            {
+                console.log(e.model.item);
+            },
+
             _onRdfpropertiesChanged: function(change)
             {
-              if(Object.keys(this.rdfprops).length === 0 && this.rdfprops.constructor === Object)
-                return;
+                if (Object.keys(this.rdfprops).length === 0 && this.rdfprops.constructor === Object)
+                    return;
 
-                if(!change)
-                  return;
+                if (!change)
+                    return;
 
-                  var items ='';
-
-                  for(var i = 0; i < this.rdfprops.length; i++)
-                  {
-                    items += '<li>'+this.rdfprops[i]+'</li>';
-                  }
-
-                  Polymer.dom(this.$.rdfProperties).innerHTML = items;
+                // var items ='';
+                //
+                // for(var i = 0; i < this.rdfprops.length; i++)
+                // {
+                //   items += '<li>'+this.rdfprops[i]+'</li>';
+                // }
+                //
+                // Polymer.dom(this.$.rdfProperties).innerHTML = items;
+                Polymer.dom(this.root).querySelector('#ilRDFP').notifyResize();
             }
         });
     </script>
