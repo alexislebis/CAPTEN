@@ -1,0 +1,59 @@
+<link rel="import" href="../wrapper/rdfstore-element.html">
+<link rel="import" href="../wrapper/vis-element.html">
+
+<dom-module id="rdf-store-displayer-element">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+    <vis-element id="rdfDisplay"></vis-element>
+  </template>
+  <script>
+  Polymer(
+  {
+      is: 'rdf-store-displayer-element',
+
+      properties:
+      {
+        rdfclasses: {
+          type: Array,
+          notify: true,
+        },
+
+        rdfproperties: {
+          type: Array,
+          notify: true,
+        },
+        store:
+        {
+            type: Object,
+            notify: true,
+            value: function()
+            {
+                return {};
+            },
+        },
+        graphuri:
+        {
+            type: Object,
+            notify: true,
+            value: function()
+            {
+                return {};
+            },
+        },
+        graph:
+        {
+            type: Object,
+            notify: true,
+            value: function()
+            {
+                return {};
+            },
+        },
+      },
+  });
+  </script>
+</dom-module>
