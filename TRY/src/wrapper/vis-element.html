@@ -128,12 +128,17 @@
       if(this.network === undefined || nodeID === undefined || nodeLabel === undefined)
         return;
 
-      this.nodes.push({id: nodeID, label: nodeLabel});
+      this.nodes.push({id: nodeID, label: nodeLabel, /*shape: "circle"*/});
 
       this.network.setData({
         nodes: this.nodes,
         edges: this.edges,
       });
+    },
+
+    addNodeWithRedraw: function(nodeID, nodeLabel)
+    {
+      this.addNode(nodeID, nodeLabel);
 
       this.network.redraw();
     },
@@ -167,6 +172,7 @@
       this.edges.push({
         from: node1,
         to: node2,
+        arrows: 'to',
         label: edgeLabel
       });
 
@@ -174,9 +180,18 @@
         nodes: this.nodes,
         edges: this.edges
       });
+    },
+
+    createEdgeBetweenWithRedraw: function(node1, node2, edgeLabel)
+    {
+      this.createEdgeBetween(node1, node2, edgeLabel);
 
       this.network.redraw();
+    },
 
+    redrawNetwork: function()
+    {
+      this.network.redraw();
     },
 
     /**
