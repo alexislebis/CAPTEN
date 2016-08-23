@@ -135,8 +135,6 @@
         edges: this.edges,
       });
 
-      console.log(this.nodes[5]);
-
       this.network.redraw();
     },
 
@@ -166,7 +164,6 @@
       }
 
 
-      console.log(this.edges);
       this.edges.push({
         from: node1,
         to: node2,
@@ -205,9 +202,9 @@ completeNetwork: function()
       }};
 
       //@TODO : Ajouter aux options !
-      console.log(this.options.layout);
+      // console.log(this.options.layout);
       this.options = this.networkOptions;
-      console.log(this.options.layout);
+      // console.log(this.options.layout);
       this.network.setOptions(this.options);
     },
 
