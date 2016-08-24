@@ -16,233 +16,274 @@
             {
                 var domainURI = ["http://www.w3.org/2000/01/rdf-schema#domain"];
                 var rangeURI = ["http://www.w3.org/2000/01/rdf-schema#range"];
+                var unionURI = ["https://www.w3.org/2002/07/owl#unionOf",
+                                  "http://www.w3.org/2002/07/owl#unionOf"];
+                var classURI = ["http://www.w3.org/2002/07/owl#Class"];
                 var dumpedURI = ["http://www.w3.org/2002/07/owl#Class",
                     "http://www.w3.org/2002/07/owl#ObjectProperty",
-                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"
                 ];
 
                 Polymer(
-                {
-                    is: 'rdf-store-displayer-element',
-
-                    properties:
                     {
-                        rdfclasses:
-                        {
-                            type: Array,
-                            notify: true,
-                        },
+                        is: 'rdf-store-displayer-element',
 
-                        rdfprops:
+                        properties:
                         {
-                            type: Array,
-                            notify: true,
-                        },
-                        store:
-                        {
-                            type: Object,
-                            notify: true,
-                            value: function()
+                            rdfclasses:
                             {
-                                return {};
+                                type: Array,
+                                notify: true,
+                            },
+
+                            rdfprops:
+                            {
+                                type: Array,
+                                notify: true,
+                            },
+                            store:
+                            {
+                                type: Object,
+                                notify: true,
+                                value: function()
+                                {
+                                    return {};
+                                },
+                            },
+                            graphuri:
+                            {
+                                type: Object,
+                                notify: true,
+                                value: function()
+                                {
+                                    return {};
+                                },
+                            },
+                            graph:
+                            {
+                                type: Object,
+                                notify: true,
+                                value: function()
+                                {
+                                    return {};
+                                },
                             },
                         },
-                        graphuri:
+
+                        generateGraph: function()
                         {
-                            type: Object,
-                            notify: true,
-                            value: function()
+                            var headQuery = "SELECT ?s ?o { ?s '<";
+                            var tailQuery = ">' ?o }";
+                            // var q2  = "CONSTRUCT { <"+this.classes[0]+"> ?p ?o } \
+                            //            WHERE { <"+this.classes[0]+"> ?p ?o  }";
+
+                            var defaultGraph = [];
+                            var namedGraphs = [
                             {
-                                return {};
-                            },
-                        },
-                        graph:
-                        {
-                            type: Object,
-                            notify: true,
-                            value: function()
+                                'token': 'uri',
+                                'value': this.graphuri
+                            }];
+                            var visDisplay = this.$.rdfDisplay;
+
+                            var properties = []; //[[][]]
+                            var blkNodes = []; // [][];
+                            var listObjBlkNodes = []; //[] representing the triple having a blanknodehas object
+
+                            var that = this;
+
+                            this.graph.triples.forEach(function(elm)
                             {
-                                return {};
-                            },
-                        },
-                    },
+                                if (this.rdfprops.includes(elm.subject.nominalValue))
+                                {
 
-                    generateGraph: function()
-                    {
-                        var headQuery = "SELECT ?s ?o { ?s '<";
-                        var tailQuery = ">' ?o }";
-                        // var q2  = "CONSTRUCT { <"+this.classes[0]+"> ?p ?o } \
-                        //            WHERE { <"+this.classes[0]+"> ?p ?o  }";
+                                    if (!this.propertieIsParsed(elm.subject.nominalValue, properties))
+                                    {
+                                        properties[elm.subject.nominalValue] = [
+                                            [],
+                                            []
+                                        ];
+                                    }
 
-                        var defaultGraph = [];
-                        var namedGraphs = [
-                        {
-                            'token': 'uri',
-                            'value': this.graphuri
-                        }];
-                        var visDisplay = this.$.rdfDisplay;
-
-                        var properties = [];
-
-                        var that = this;
-
-                        this.graph.triples.forEach(function(elm)
-                        {
-                            if (!this.propertieIsParsed(elm.subject.nominalValue, properties))
-                            {
-                                properties[elm.subject.nominalValue] = [
-                                    [],
-                                    []
-                                ];
-                            }
-                            if (this.rdfprops.includes(elm.subject.nominalValue))
-                            {
-                                //console.log(elm.subject.nominalValue + "----" + elm.predicate.nominalValue + "--->" + elm.object.nominalValue);
-                                // if (!this.propertieIsParsed(elm.subject.nominalValue, properties))
-                                // {
-                                //     properties[elm.subject.nominalValue] = [
-                                //         [],
-                                //         []
-                                //     ];
+                                    if (this.isDomain(elm.predicate.nominalValue))
+                                    {
+                                        if (this.rdfclasses.includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
+                                            properties[elm.subject.nominalValue][0].push(elm.object.nominalValue);
+                                    }
+                                    else if (this.isRange(elm.predicate.nominalValue))
+                                    {
+                                        if (this.rdfclasses.includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
+                                            properties[elm.subject.nominalValue][1].push(elm.object.nominalValue);
+                                    }
+                                    //   if(!this.belongsToForbiden(elm.predicate.nominalValue) && !this.belongsToForbiden(elm.object.nominalValue))
+                                    //   {
+                                    //     console.log();
+                                    //     visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, elm.predicate.nominalValue);
+                                    //   }
+                                }
+                                else if (this.rdfclasses.includes(elm.subject.nominalValue)) {
+                                  if(!this.belongsToForbiden(elm.predicate.nominalValue))
+                                    visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, elm.predicate.nominalValue);
+                                }
+                                //
+                                // else if (elm.subject.nominalValue.match(/[_].*/)) {
+                                //
+                                //   var isMatched = elm.object.nominalValue.match(/[_].*/);
+                                //
+                                //   if(!isMatched /*&&
+                                //       !this.belongsToForbiden(elm.object.nominalValue)*/) //If the object is not a blanknode
+                                //   {
+                                //     blkNodes[elm.subject.nominalValue] = [];
+                                //     blkNodes[elm.subject.nominalValue].push(elm.object.nominalValue);
+                                //   }
+                                //
+                                //   else if (isMatched) { //two blanknode -> need to resolve interlink
+                                //     if(blkNodes[elm.subject.nominalValue] != undefined && blkNodes[elm.object.nominalValue] != undefined)
+                                //     {
+                                //       blkNodes[elm.object.nominalValue].forEach(function(obj){
+                                //         blkNodes[elm.subject.nominalValue].push(obj);
+                                //       });
+                                //     }
+                                //   }
                                 // }
 
-                                if (this.isDomain(elm.predicate.nominalValue))
+                            }.bind(this));
+
+                            console.log(properties);
+
+                            this._addNodes(this.rdfclasses);
+                            this._addEdges(properties);
+                            // console.log(blkNodes);
+
+                            //visDisplay.redrawNetwork();
+
+
+                        },
+
+                        _addNodes: function(classes)
+                        {
+                            var visDisplay = this.$.rdfDisplay;
+                            classes.forEach(function(elm)
+                            {
+                                visDisplay.addNode(elm, elm);
+                            });
+                        },
+                        _addEdges: function(properties)
+                        {
+                            var visDisplay = this.$.rdfDisplay;
+
+                            for (var label in properties)
+                            {
+                                if (properties[label][0] != undefined && properties[label][1] != undefined)
                                 {
-                                    if (this.rdfclasses.includes(elm.object.nominalValue))
-                                        properties[elm.subject.nominalValue][0].push(elm.object.nominalValue);
+                                    if (properties[label][0][0].match(/[_].*/))
+                                    {
+                                        var nodeID = this._resolve(properties[label][0][0]);
+                                        for(var x in nodeID)
+                                        {
+                                          visDisplay.createEdgeBetween(x, properties[label][1][0], label);
+                                        }
+                                    }
+                                    else if (properties[label][1][0].match(/[_].*/))
+                                    {
+                                        var nodeID = this._resolve(properties[label][1][0]);
+                                        for(var x in nodeID)
+                                        {
+                                          visDisplay.createEdgeBetween(properties[label][0][0], x, label);
+                                        }
+                                    }
+
+                                    else
+                                    {
+                                        properties[label][0].forEach(function(p0)
+                                        {
+                                            properties[label][1].forEach(function(p1)
+                                            {
+                                                visDisplay.createEdgeBetween(p0, p1, label);
+                                            });
+                                        });
+                                    }
                                 }
-                                else if (this.isRange(elm.predicate.nominalValue))
-                                {
-                                  if (this.rdfclasses.includes(elm.object.nominalValue))
-                                      properties[elm.subject.nominalValue][1].push(elm.object.nominalValue);
-                                }
-                                //   if(!this.belongsToForbiden(elm.predicate.nominalValue) && !this.belongsToForbiden(elm.object.nominalValue))
-                                //   {
-                                //     console.log();
-                                //     visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, elm.predicate.nominalValue);
-                                //   }
                             }
-                            else if (this.rdfclasses.includes(elm.subject.nominalValue)) {
-                              if(!this.belongsToForbiden(elm.predicate.nominalValue))
-                                visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, elm.predicate.nominalValue);
+                        },
+                        _resolve: function(label)
+                        {
+                            var isClass = false; //If isClass is true, then the blank node will be considered as a node
+                            var isUnion = false; //If Union is set to true && isClass is set to true, then its a union class, otherwise (isUnion = false && isClass = true) its an intersection
+                            var labelIndex = this._findIndexOf(label);
+                            var nodeID = [];
+                            var visDisplay = this.$.rdfDisplay;
+
+                            console.log(label);
+
+                            labelIndex.forEach(function(elm, i)
+                                {
+                                    var triple = this.graph.triples[elm];
+
+                                      console.log(triple.subject.nominalValue + " - " +triple.predicate.nominalValue + " - " +triple.object.nominalValue);
+
+                                    if (classURI.includes(triple.object.nominalValue)) //if it's a class
+                                        isClass = true;
+                                    else if (triple.object.nominalValue.match(/[_].*/)) //recursively retrieve other nodes pointed out by the current blank node
+                                    {
+                                        var tmpNodeID = this._resolve(triple.object.nominalValue);
+
+                                        for (var elmt in tmpNodeID)
+                                        {
+                                            nodeID[elmt] = true;
+                                        }
+
+                                }
+                                else if (this.rdfclasses.includes(triple.object.nominalValue))
+                                {
+                                    nodeID[triple.object.nominalValue] = true;
+                                }
+
+                                if (unionURI.includes(triple.predicate.nominalValue))
+                                {
+                                    isUnion = true;
+                                }
+
+                            }.bind(this));
+
+                        if (isClass && isUnion)
+                        {
+
+                            visDisplay.addNode(label, "∪");
+
+                            for (var x in nodeID)
+                            {
+                                visDisplay.createEdgeBetween(label, x, "UnionOf");
                             }
 
+                            nodeID = [];
+                            nodeID[label] = true;
+                        }
+                        else if (isClass && !isUnion) {
+                          visDisplay.addNode(label, "∩");
+
+                          for (var x in nodeID)
+                          {
+                              visDisplay.createEdgeBetween(label, x, "IntersectionOf");
+                          }
+
+                          nodeID = [];
+                          nodeID[label] = true;
+                        }
+
+                        return nodeID;
+                    },
+                    _findIndexOf: function(label)
+                    {
+                        var idx = [];
+
+                        this.graph.triples.forEach(function(elm, i)
+                        {
+                            if (elm.subject.nominalValue == label)
+                                idx.push(i);
                         }.bind(this));
 
-                        this._addNodes(this.rdfclasses);
-                        this._addEdges(properties);
-
-                        visDisplay.redrawNetwork();
-
-                        // this.rdfclasses.forEach(function(elm)
-                        // {
-                        //     visDisplay.addNode(elm, elm);
-                        // });
-                        //
-                        //
-                        // // this.rdfprops.forEach(function(elm)
-                        // // {
-                        // elm = this.rdfprops[0];
-                        //     var query = headQuery + elm + tailQuery;
-                        //
-                        //     //visDisplay.addNode(elm, elm);
-                        //
-                        //     console.log(query);
-                        //     that.store.execute(query, function(err, results)
-                        //     {
-                        //         if (!err)
-                        //         {
-                        //             var fromCls;
-                        //             var toCls;
-                        //             var fromToArray = [];
-                        //
-                        //             console.log(results);
-                        //             results.forEach(function(element)
-                        //             {
-                        //
-                        //                 if (element.o.token === 'uri' && element.s.token === 'uri')
-                        //                 {
-                        //                     // console.log(element.s.value + " ---->" + element.o.value);
-                        //                     //   visDisplay.createEdgeBetween(element.s.value, element.o.value, elm);
-                        //
-                        //                     if (that.rdfclasses.includes(element.s.value))
-                        //                     {
-                        //                         fromCls = element.s.value;
-                        //                         console.log(fromCls);
-                        //                     }
-                        //                     if (that.rdfclasses.includes(element.o.value))
-                        //                     {
-                        //                         toCls = element.o.value;
-                        //                         console.log(toCls);
-                        //                     }
-                        //
-                        //                 }
-                        //
-                        //                 if (fromCls != undefined && toCls != undefined)
-                        //                 {
-                        //                     fromToArray.push(
-                        //                     {
-                        //                         from: fromCls,
-                        //                         to: toCls
-                        //                     });
-                        //                     fromCls = undefined;
-                        //                     toCls = undefined;
-                        //                 }
-                        //                 //   if(!that.belongsToForbiden(element.o.value))
-                        //                 //   {
-                        //                 //     console.log(element.o.value);
-                        //                 //     visDisplay.addNode(element.o.value);
-                        //                 //   }
-                        //                 //
-                        //                 // if(element.p.token === 'uri')
-                        //                 // if(!that.belongsToForbiden(element.p.value))
-                        //                 // {
-                        //                 //   console.log(element.p.value);
-                        //                 //   console.log(elm);
-                        //                 //   visDisplay.createEdgeBetween(elm, element.o.value, element.p.value);
-                        //                 // }
-                        //             });
-                        //
-                        //             console.log(fromToArray);
-                        //             // console.log(results);
-                        //             //   // process results
-                        //             //   if (results[0].p.token === 'uri')
-                        //             //   {
-                        //             //       console.log(results);
-                        //             //   }
-                        //         }
-                        //         else
-                        //         {
-                        //             console.log(err);
-                        //         }
-                        //      });
-                        //     visDisplay.redrawNetwork();
-                        // //});
-                    },
-
-                    _addNodes: function(classes)
-                    {
-                      var visDisplay = this.$.rdfDisplay;
-                      classes.forEach(function(elm)
-                      {
-                          visDisplay.addNode(elm, elm);
-                      });
-                    },
-                    _addEdges: function(properties)
-                    {
-                      var visDisplay = this.$.rdfDisplay;
-
-                      for(var label in properties)
-                      {
-                        if(properties[label][0] != undefined && properties[label][1] != undefined)
-                        {
-                          properties[label][0].forEach(function(p0){
-                            properties[label][1].forEach(function(p1){
-                              visDisplay.createEdgeBetween(p0,p1,label);
-                            });
-                          });
-                        }
-                      }
+                        return idx;
                     },
                     belongsToForbiden: function(elmt)
                     {
@@ -266,6 +307,6 @@
                         return false
                     },
                 });
-            })();
+        })();
     </script>
 </dom-module>
