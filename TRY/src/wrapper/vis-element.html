@@ -8,8 +8,8 @@
       }
 
       #mynetwork {
-            width: 600px;
-            height: 400px;
+            width: 1000px;
+            height: 600px;
             border: 1px solid lightgray;
         }
 
@@ -83,8 +83,8 @@
         nodes: this.nodes,
         edges: this.edges
     };
-    this.options = {configure: true};
-
+    //this.options = {configure: true};
+    this.options = {};
     // initialize your network!
     this.network = new vis.Network(container, data, this.options);
   },
@@ -129,11 +129,6 @@
         return;
 
       this.nodes.push({id: nodeID, label: nodeLabel, /*shape: "circle"*/});
-
-      this.network.setData({
-        nodes: this.nodes,
-        edges: this.edges,
-      });
     },
 
     addNodeWithRedraw: function(nodeID, nodeLabel)
@@ -168,7 +163,6 @@
             }
       }
 
-
       this.edges.push({
         from: node1,
         to: node2,
@@ -176,10 +170,6 @@
         label: edgeLabel
       });
 
-      this.network.setData({
-        nodes: this.nodes,
-        edges: this.edges
-      });
     },
 
     createEdgeBetweenWithRedraw: function(node1, node2, edgeLabel)
@@ -191,7 +181,26 @@
 
     redrawNetwork: function()
     {
-      this.network.redraw();
+      console.log("REDRAWING...");
+      // this.network.setData({
+      //   nodes: this.nodes,
+      //   edges: this.edges
+      // });
+      // this.network.setOptions(this.options);
+      //
+      // this.network.redraw();
+      var data = {
+        nodes: this.nodes,
+        edges: this.edges
+      }
+
+      var container = this.$.mynetwork;
+
+      this.network = new vis.Network(container, data, this.options);
+
+      //this.createEdgeBetween(1,2,'testdeloeuf');
+      this.completeNetwork();
+      console.log("DONE.");
     },
 
     /**
