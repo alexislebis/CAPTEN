@@ -7,6 +7,10 @@
             :host {
                 display: block;
             }
+
+            #rdfDisplay{
+
+            }
         </style>
         <vis-element id="rdfDisplay"></vis-element>
     </template>
@@ -123,7 +127,7 @@
                                 }
                                 else if (this.rdfclasses.includes(elm.subject.nominalValue)) {
                                   if(!this.belongsToForbiden(elm.predicate.nominalValue))
-                                    visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, elm.predicate.nominalValue);
+                                    visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, this._truncateURI(elm.predicate.nominalValue));
                                 }
                                 //
                                 // else if (elm.subject.nominalValue.match(/[_].*/)) {
@@ -149,13 +153,13 @@
 
                             }.bind(this));
 
-                            console.log(properties);
+                            //console.log(properties);
 
                             this._addNodes(this.rdfclasses);
                             this._addEdges(properties);
                             // console.log(blkNodes);
 
-                            //visDisplay.redrawNetwork();
+                            visDisplay.redrawNetwork();
 
 
                         },
@@ -165,8 +169,8 @@
                             var visDisplay = this.$.rdfDisplay;
                             classes.forEach(function(elm)
                             {
-                                visDisplay.addNode(elm, elm);
-                            });
+                                visDisplay.addNode(elm, this._truncateURI(elm));
+                            }.bind(this));
                         },
                         _addEdges: function(properties)
                         {
@@ -181,7 +185,7 @@
                                         var nodeID = this._resolve(properties[label][0][0]);
                                         for(var x in nodeID)
                                         {
-                                          visDisplay.createEdgeBetween(x, properties[label][1][0], label);
+                                          visDisplay.createEdgeBetween(x, properties[label][1][0], this._truncateURI(label));
                                         }
                                     }
                                     else if (properties[label][1][0].match(/[_].*/))
@@ -189,7 +193,7 @@
                                         var nodeID = this._resolve(properties[label][1][0]);
                                         for(var x in nodeID)
                                         {
-                                          visDisplay.createEdgeBetween(properties[label][0][0], x, label);
+                                          visDisplay.createEdgeBetween(properties[label][0][0], x, this._truncateURI(label));
                                         }
                                     }
 
@@ -199,9 +203,9 @@
                                         {
                                             properties[label][1].forEach(function(p1)
                                             {
-                                                visDisplay.createEdgeBetween(p0, p1, label);
-                                            });
-                                        });
+                                                visDisplay.createEdgeBetween(p0, p1, this._truncateURI(label));
+                                            }.bind(this));
+                                        }.bind(this));
                                     }
                                 }
                             }
@@ -214,13 +218,13 @@
                             var nodeID = [];
                             var visDisplay = this.$.rdfDisplay;
 
-                            console.log(label);
+                            //console.log(label);
 
                             labelIndex.forEach(function(elm, i)
                                 {
                                     var triple = this.graph.triples[elm];
 
-                                      console.log(triple.subject.nominalValue + " - " +triple.predicate.nominalValue + " - " +triple.object.nominalValue);
+                                      //console.log(triple.subject.nominalValue + " - " +triple.predicate.nominalValue + " - " +triple.object.nominalValue);
 
                                     if (classURI.includes(triple.object.nominalValue)) //if it's a class
                                         isClass = true;
@@ -284,6 +288,12 @@
                         }.bind(this));
 
                         return idx;
+                    },
+                    _truncateURI: function(uri)
+                    {
+                      var result = uri.split('#');
+
+                      return result[result.length-1];
                     },
                     belongsToForbiden: function(elmt)
                     {
