@@ -155,6 +155,8 @@
 
                             //console.log(properties);
 
+                            //visDisplay.reset();
+
                             this._addNodes(this.rdfclasses);
                             this._addEdges(properties);
                             // console.log(blkNodes);
@@ -180,7 +182,7 @@
                             {
                                 if (properties[label][0] != undefined && properties[label][1] != undefined)
                                 {
-                                    if (properties[label][0][0].match(/[_].*/))
+                                    if (properties[label][0][0] != undefined && properties[label][0][0].match(/[_].*/))
                                     {
                                         var nodeID = this._resolve(properties[label][0][0]);
                                         for(var x in nodeID)
@@ -188,7 +190,7 @@
                                           visDisplay.createEdgeBetween(x, properties[label][1][0], this._truncateURI(label));
                                         }
                                     }
-                                    else if (properties[label][1][0].match(/[_].*/))
+                                    else if (properties[label][1][0] != undefined && properties[label][1][0].match(/[_].*/))
                                     {
                                         var nodeID = this._resolve(properties[label][1][0]);
                                         for(var x in nodeID)

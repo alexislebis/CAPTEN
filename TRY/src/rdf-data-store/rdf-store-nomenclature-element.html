@@ -9,118 +9,231 @@
         </style>
     </template>
     <script>
-        Polymer(
-        {
-            is: 'rdf-store-nomenclature-element',
-
-            properties:
+        (
+            function()
             {
-                store:
+                var domainURI = ["http://www.w3.org/2000/01/rdf-schema#domain"];
+                var rangeURI = ["http://www.w3.org/2000/01/rdf-schema#range"];
+                var unionURI = ["https://www.w3.org/2002/07/owl#unionOf",
+                    "http://www.w3.org/2002/07/owl#unionOf"
+                ];
+                var classURI = ["http://www.w3.org/2002/07/owl#Class"];
+                var propURI = ["http://www.w3.org/2002/07/owl#ObjectProperty"];
+                var dumpedURI = ["http://www.w3.org/2002/07/owl#Class",
+                    "http://www.w3.org/2002/07/owl#ObjectProperty",
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                    "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil"
+                ];
+                Polymer(
                 {
-                    type: Object,
-                    notify: true,
-                    value: function()
-                    {
-                        return {};
-                    },
-                },
-                graphuri:
-                {
-                    type: Object,
-                    notify: true,
-                    value: function()
-                    {
-                        return {};
-                    },
-                },
-                graph:
-                {
-                    type: Object,
-                    notify: true,
-                    value: function()
-                    {
-                        return {};
-                    },
-                },
-                classes:
-                {
-                    type: Array,
-                    notify: true,
+                    is: 'rdf-store-nomenclature-element',
 
-                },
-                props:
-                {
-                    type: Array,
-                    notify: true,
-                },
-            },
-
-            //Génère la nomenclature du graph rdf sous forme de classes et de propriétés
-            execute: function()
-            {
-                if (Object.keys(this.graph).length === 0 && this.graph.constructor === Object)
-                    return;
-
-                this.classes = [];
-                this.props = [];
-                var that = this;
-
-                this.graph.forEach(function(e, i)
-                {
-
-                    //otherwise check if it's a owl property
-                    if (e.object.nominalValue == "http://www.w3.org/2002/07/owl#ObjectProperty")
+                    properties:
                     {
-                        that.push('props', e.subject.nominalValue);
-                    }
-                    //check if it's a owl class
-                    else if (e.object.nominalValue == "http://www.w3.org/2002/07/owl#Class")
-                    {
-                        if (!(e.subject + "").match(/[_].*/)) //if the subject is a _blanknode (pattern seems to start with _XXXXX )
+                        store:
                         {
-
-                          that.push('classes',  e.subject.nominalValue);
-                          // that.classes.push(e.subject.nominalValue);
-
-                        }
-
-                    }
-                    //@QUESTION: else ntd - or potential error ?
-                });
-
-                // console.log(this.classes);
-                // console.log(this.props);
-
-                this.store.node(this.classes[0], this.graphuri, function(err, node) {
-                  console.log(node);
-                });
-
-                // console.log(this.classes[0]);
-
-                var query = "SELECT ?p { <"+this.classes[0]+"> ?p ?o }";
-                // var q2  = "CONSTRUCT { <"+this.classes[0]+"> ?p ?o } \
-                //            WHERE { <"+this.classes[0]+"> ?p ?o  }";
-
-                var defaultGraph = [];
-                var namedGraphs  = [{'token':'uri', 'value': this.graphuri}];
-
-                this.store.execute(query, function(err, results)
-                {
-                  console.log("BEFORE");
-                    if (!err)
-                    {
-                      console.log(results);
-                        // process results
-                        if (results[0].p.token === 'uri')
+                            type: Object,
+                            notify: true,
+                            value: function()
+                            {
+                                return {};
+                            },
+                        },
+                        graphuri:
                         {
-                            console.log(results);
-                        }
-                    }
-                    else {
-                      console.log(err);
-                    }
+                            type: Object,
+                            notify: true,
+                            value: function()
+                            {
+                                return {};
+                            },
+                        },
+                        graph:
+                        {
+                            type: Object,
+                            notify: true,
+                            value: function()
+                            {
+                                return {};
+                            },
+                        },
+                        classes:
+                        {
+                            type: Array,
+                            notify: true,
+
+                        },
+                        props:
+                        {
+                            type: Array,
+                            notify: true,
+                        },
+                    },
+
+                    //Génère la nomenclature du graph rdf sous forme de classes et de propriétés
+                    execute: function()
+                    {
+                        if (Object.keys(this.graph).length === 0 && this.graph.constructor === Object)
+                            return;
+
+                        this.classes = [];
+                        this.props = [];
+                        //var that = this;
+
+                        this.store.execute("SELECT distinct ?class { ?class <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> }", function(err, results)
+                        {
+                            if (!err)
+                            {
+                                console.log(results);
+                                results.forEach(function(r)
+                                {
+                                    if (!this.classes.includes(r.class.value))
+                                        if (!r.class.value.match(/[_].*/))
+                                            this.push('classes', r.class.value);
+                                }.bind(this));
+                            }
+                            else
+                            {
+                                console.log(err);
+                            }
+                        }.bind(this));
+
+                        this.store.execute("SELECT distinct ?prop { ?prop <http://www.w3.org/2000/01/rdf-schema#domain> ?osef }", function(err, results)
+                        {
+                            if (!err)
+                            {
+                                console.log(results);
+                                results.forEach(function(r)
+                                {
+                                    if (!this.classes.includes(r.prop.value))
+                                        this.push('props', r.prop.value);
+                                }.bind(this));
+                            }
+                            else
+                            {
+                                console.log(err);
+                            }
+                        }.bind(this));
+
+
+                        this.store.execute("SELECT distinct * { ?s <http://www.w3.org/2000/01/rdf-schema#range> ?o }", function(err, results)
+                        {
+                            if (!err)
+                            {
+                                console.log(results);
+                                results.forEach(function(r)
+                                {
+                                    if (!this.classes.includes(r.o.value))
+                                      if (!r.o.value.match(/[_].*/))
+                                        this.push('classes', r.o.value);
+                                    if(!this.props.includes(r.s.value))
+                                      this.push('props', r.s.value);
+                                }.bind(this));
+                            }
+                            else
+                            {
+                                console.log(err);
+                            }
+                        }.bind(this));
+
+
+                        this.graph.forEach(function(e, i)
+                        {
+                            if (e.subject.nominalValue.indexOf('Scient') != -1 || e.predicate.nominalValue.indexOf('Scient') != -1 || e.object.nominalValue.indexOf('Scient') != -1)
+                                console.log(e);
+                        });
+                        //
+                        //     //otherwise check if it's a owl property
+                        //     // if (!dumpedURI.includes(e.subject.nominalValue))
+                        //     // {
+                        //     //   if(propURI.includes(e.object.nominalValue) && !that.props.includes(e.subject.nominalValue))
+                        //     //     that.push('props', e.subject.nominalValue);
+                        //     //   else if(classURI.includes(e.object.nominalValue) && !(e.subject + "").match(/[_].*/) && !that.classes.includes(e.subject.nominalValue))//test blank node
+                        //     //     that.push('classes', e.subject.nominalValue);
+                        //     // }
+                        //     //
+                        //     // if (!dumpedURI.includes(e.object.nominalValue))
+                        //     // {
+                        //     //   if(classURI.includes(e.subject.nominalValue) && !(e.object + "").match(/[_].*/) && !that.classes.includes(e.object.nominalValue))//test blank node
+                        //     //     that.push('classes', e.object.nominalValue);
+                        //     //   else if(propURI.includes(e.subject.nominalValue) && !that.props.includes(e.object.nominalValue))
+                        //     //     that.push('props', e.object.nominalValue);
+                        //     // }
+                        //
+                        //     if (propURI.includes(e.subject.nominalValue) || propURI.includes(e.object.nominalValue))
+                        //     {
+                        //         if (!dumpedURI.includes(e.subject.nominalValue) && !that.props.includes(e.subject.nominalValue))
+                        //             that.push('props', e.subject.nominalValue);
+                        //         if (!dumpedURI.includes(e.object.nominalValue) && !that.props.includes(e.object.nominalValue))
+                        //             that.push('props', e.object.nominalValue);
+                        //     }
+                        //     else {
+                        //       if(!dumpedURI.includes(e.subject.nominalValue) && !(e.subject + "").match(/[_].*/) && !that.classes.includes(e.subject.nominalValue))
+                        //         that.push('classes', e.subject.nominalValue);
+                        //       if(!dumpedURI.includes(e.object.nominalValue) && !(e.object + "").match(/[_].*/) && !that.classes.includes(e.object.nominalValue))
+                        //         that.push('classes', e.object.nominalValue);
+                        //     }
+                        //
+                        //
+                        //
+                        //     if (e.subject.nominalValue.indexOf('Scient') != -1 || e.predicate.nominalValue.indexOf('Scient') != -1 || e.object.nominalValue.indexOf('Scient') != -1)
+                        //         console.log(e);
+                        //
+                        //     //check if it's a owl class
+                        //     // else if (e.object.nominalValue == "http://www.w3.org/2002/07/owl#Class")
+                        //     // {
+                        //     //     if (!(e.subject + "").match(/[_].*/)) //if the subject is a _blanknode (pattern seems to start with _XXXXX )
+                        //     //     {
+                        //     //
+                        //     //         that.push('classes', e.subject.nominalValue);
+                        //     //         // that.classes.push(e.subject.nominalValue);
+                        //     //
+                        //     //     }
+                        //     //
+                        //     // }
+                        //     //@QUESTION: else ntd - or potential error ?
+                        // });
+
+                        // console.log(this.classes);
+                        // console.log(this.props);
+
+                        // this.store.node(this.classes[0], this.graphuri, function(err, node)
+                        // {
+                        //     console.log(node);
+                        // });
+                        //
+                        // // console.log(this.classes[0]);
+                        //
+                        // var query = "SELECT ?p { <" + this.classes[0] + "> ?p ?o }";
+                        // // var q2  = "CONSTRUCT { <"+this.classes[0]+"> ?p ?o } \
+                        // //            WHERE { <"+this.classes[0]+"> ?p ?o  }";
+                        //
+                        // var defaultGraph = [];
+                        // var namedGraphs = [
+                        // {
+                        //     'token': 'uri',
+                        //     'value': this.graphuri
+                        // }];
+                        //
+                        // this.store.execute(query, function(err, results)
+                        // {
+                        //     console.log("BEFORE");
+                        //     if (!err)
+                        //     {
+                        //         console.log(results);
+                        //         // process results
+                        //         if (results[0].p.token === 'uri')
+                        //         {
+                        //             console.log(results);
+                        //         }
+                        //     }
+                        //     else
+                        //     {
+                        //         console.log(err);
+                        //     }
+                        // });
+                    },
                 });
-            },
-        });
+            })();
     </script>
 </dom-module>
