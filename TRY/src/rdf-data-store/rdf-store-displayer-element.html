@@ -96,6 +96,8 @@
 
                             var that = this;
 
+                            visDisplay.resetGraphStructure();
+
                             this.graph.triples.forEach(function(elm)
                             {
                                 if (this.rdfprops.includes(elm.subject.nominalValue))
@@ -154,8 +156,6 @@
                             }.bind(this));
 
                             //console.log(properties);
-
-                            //visDisplay.reset();
 
                             this._addNodes(this.rdfclasses);
                             this._addEdges(properties);

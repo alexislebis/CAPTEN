@@ -179,6 +179,12 @@
       this.network.redraw();
     },
 
+    resetGraphStructure: function()
+    {
+      this.nodes = [];
+      this.edges = [];
+    },
+
     redrawNetwork: function()
     {
       console.log("REDRAWING...");
@@ -193,6 +199,7 @@
         nodes: this.nodes,
         edges: this.edges
       }
+
 
       var container = this.$.mynetwork;
 
