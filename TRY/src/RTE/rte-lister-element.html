@@ -1,86 +1,89 @@
 <link rel="import" href="../rdf-data-store/rdf-store-lister-element.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="./rte-formulaire-element.html">
 
 
 <dom-module id="rte-lister-element">
     <template>
         <style>
-        :host {
-            font-family: sans-serif;
-        }
+            :host {
+                font-family: sans-serif;
+            }
 
-        .content {
-            @apply(--layout-vertical);
-            height: 100%;
-        }
+            .content {
+                @apply(--layout-vertical);
+                height: 100%;
+            }
 
-        .pad {
-            @apply(--layout-flex);
-            @apply(--layout-vertical);
-            padding: 0 16px;
-        }
+            .pad {
+                @apply(--layout-flex);
+                @apply(--layout-vertical);
+                padding: 0 16px;
+            }
 
-        .item {
-            @apply(--layout-horizontal);
-            cursor: pointer;
-            padding: 16px 22px;
-            border-bottom: 1px solid #DDD;
-        }
+            .item {
+                @apply(--layout-horizontal);
+                cursor: pointer;
+                padding: 16px 22px;
+                border-bottom: 1px solid #DDD;
+            }
 
-        .item:focus,
-        .item.selected:focus {
-            outline: 0;
-            background-color: #ddd;
-        }
+            .item:focus,
+            .item.selected:focus {
+                outline: 0;
+                background-color: #ddd;
+            }
 
-        .item.selected .star {
-            color: var(--paper-blue-600);
-        }
+            .item.selected .star {
+                color: var(--paper-blue-600);
+            }
 
-        .item .star {
-            color: var(--paper-blue-600);
-        }
+            .item .star {
+                color: var(--paper-blue-600);
+            }
 
-        .star {
-            width: 24px;
-            height: 24px;
-        }
+            .star {
+                width: 24px;
+                height: 24px;
+            }
 
-        .removeElmt {
-          color: var(--paper-red-600);
-          width: 26px;
-          height: 26px;
-        }
+            .removeElmt {
+                color: var(--paper-red-600);
+                width: 26px;
+                height: 26px;
+            }
 
-        .removeElmt:hover {
-          background-color: var(--paper-red-600);
-          color: white;
-        }
+            .removeElmt:hover {
+                background-color: var(--paper-red-600);
+                color: white;
+            }
 
-        iron-list {
-            @apply(--layout-flex);
-        }
+            iron-list {
+                @apply(--layout-flex);
+            }
         </style>
 
+        <rte-formulaire-element id="rteform" classes="{{mergedCls}}" props="{{mergedProps}}"></rte-formulaire-element>
+
         <div>
-        <h2>Custom Classes</h2>
-        <!-- <ul id="rdfClasses"></ul> -->
-        <iron-list id="ilCUSTCLS" items="[[customcls]]" as="item" class="flex" selection-enabled>
-            <template>
-                <div>
-                    <div class$="[[_computeClass(selected)]]" on-tap="_custcTapped">
-                        <div class="primary pad" tabindex$="[[tabIndex]]">[[item]]</div>
-                        <div class="selectedItem">
-                            <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+            <h2>Custom Classes</h2>
+            <!-- <ul id="rdfClasses"></ul> -->
+            <iron-list id="ilCUSTCLS" items="[[customcls]]" as="item" class="flex" selection-enabled>
+                <template>
+                    <div>
+                        <div class$="[[_computeClass(selected)]]" on-tap="_custcTapped">
+                            <div class="primary pad" tabindex$="[[tabIndex]]">[[item]]</div>
+                            <div class="selectedItem">
+                                <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+                            </div>
                         </div>
+                        <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomCLS"></iron-icon>
+                        <div class="border"></div>
                     </div>
-                    <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomCLS"></iron-icon>
-                    <div class="border"></div>
-                </div>
-            </template>
-        </iron-list>
-      </div>
+                </template>
+            </iron-list>
+        </div>
 
         <div>
             <h2>Custom Properties</h2>
@@ -103,71 +106,88 @@
 
         <rdf-store-lister-element id="lister" rdfclasses="{{rdfcls}}" rdfprops="{{rdfprops}}"></rdf-store-lister-element>
 
-      </template>
-      <script>
+    </template>
+    <script>
         Polymer(
         {
             is: 'rte-lister-element',
 
-            properties:{
-              store:
-              {
-                  type: Object,
-                  value: function()
-                  {
-                      return {};
-                  },
-                  notify: true,
-                  // observer: "_rdfStoreChanged",
-              },
-              graph:
-              {
-                  type: Object,
-                  value: function()
-                  {
-                      return {};
-                  },
-                  // reflectToAttribute: true,
-                  //observer: "_onGraphChanged",
-                  notify: true,
-              },
-              graphuri: //@REMOVE
-              {
-                  type: Object,
-                  value: function()
-                  {
-                      return {};
-                  },
-                  notify: true,
-              },
-              customcls:
-              {
-                type: Array,
-                notify: true,
-                value: function(){return[];},
-              },
-              customprops:
-              {
-                type: Array,
-                notify: true,
-                value: function(){return[];},
-              },
-              rdfcls:
-              {
-                  type: Array,
-                  //value: function(){return {};},
-                  notify: true,
-              },
-              rdfprops:
-              {
-                  type: Array,
-                  notify: true,
-              }
+            properties:
+            {
+                store:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return {};
+                    },
+                    notify: true,
+                    // observer: "_rdfStoreChanged",
+                },
+                graph:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return {};
+                    },
+                    // reflectToAttribute: true,
+                    //observer: "_onGraphChanged",
+                    notify: true,
+                },
+                graphuri: //@REMOVE
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return {};
+                    },
+                    notify: true,
+                },
+                customcls:
+                {
+                    type: Array,
+                    notify: true,
+                    value: function()
+                    {
+                        return [];
+                    },
+                },
+                customprops:
+                {
+                    type: Array,
+                    notify: true,
+                    value: function()
+                    {
+                        return [];
+                    },
+                },
+                rdfcls:
+                {
+                    type: Array,
+                    //value: function(){return {};},
+                    notify: true,
+                },
+                rdfprops:
+                {
+                    type: Array,
+                    notify: true,
+                },
+                mergedCls:
+                {
+                    type: Array,
+                    notify: true,
+                },
+                mergedProps:
+                {
+                    type: Array,
+                    notify: true,
+                }
             },
 
-            observers:[
-              "_onCustomClsChanged(customcls.splices)",
-              "_onCustomPropsChanged(customprops.splices)"
+            observers: [
+                "_onCustomClsChanged(customcls.splices)",
+                "_onCustomPropsChanged(customprops.splices)"
             ],
 
             // ready: function()
@@ -179,20 +199,41 @@
             //
             // },
 
+            attached: function()
+            {
+                this.$.rteform.addEventListener('newElementToAdd', function(e)
+                {
+                    this._parseNewElement(e);
+                }.bind(this));
+            },
 
+            _parseNewElement: function(e)
+            {
+                if (e.detail.type === "CLASS") //Si il s'agit d'une classe
+                {
+                    if (!this.customcls.includes(e.detail.value) && !this.rdfcls.includes(e.detail.value))
+                        this.addCustomClass(e.detail.value);
+                }
+                else if (e.detail.type === "PROPERTY")
+                {
+                    if (!this.customprops.includes(e.detail.value) && !this.rdfprops.includes(e.detail.value))
+                        this.addCustomProperty(e.detail.value);
+                }
+
+            },
             addCustomClass: function(cClass)
             {
-              if (cClass == undefined && Object.keys(cClass).length === 0 && cClass.constructor === Object)
-                  return;
+                if (cClass == undefined && Object.keys(cClass).length === 0 && cClass.constructor === Object)
+                    return;
 
-              this.push('customcls', cClass);
+                this.push('customcls', cClass);
             },
             addCustomProperty: function(cProp)
             {
-              if (cProp == undefined && Object.keys(cProp).length === 0 && cProp.constructor === Object)
-                return;
+                if (cProp == undefined && Object.keys(cProp).length === 0 && cProp.constructor === Object)
+                    return;
 
-              this.push('customprops', cProp);
+                this.push('customprops', cProp);
             },
 
             iconForItem: function(isSelected)
@@ -217,15 +258,15 @@
             _onCustomClsChanged: function(change)
             {
 
-              if (Object.keys(this.customcls).length === 0 && this.customcls.constructor === Object)
-                  return;
+                if (Object.keys(this.customcls).length === 0 && this.customcls.constructor === Object)
+                    return;
 
-              if (!change)
-                  return;
+                if (!change)
+                    return;
 
-              console.log("loulCLS");
-              console.log(this.customcls);
-              Polymer.dom(this.root).querySelector('#ilCUSTCLS').notifyResize();
+                this._mergingCls();
+
+                Polymer.dom(this.root).querySelector('#ilCUSTCLS').notifyResize();
             },
             _onCustomPropsChanged: function(change)
             {
@@ -235,20 +276,56 @@
                 if (!change)
                     return;
 
+                this._mergingProps();
+
                 Polymer.dom(this.root).querySelector('#ilCUSTPROPS').notifyResize();
             },
             _removeCustomCLS: function(e)
             {
-              var index = this.customcls.indexOf(e.model.item);
-              this.splice('customcls', index, 1);
-              Polymer.dom(this.root).querySelector('#ilCUSTCLS').notifyResize();
+                var index = this.customcls.indexOf(e.model.item);
+                this.splice('customcls', index, 1);
+
+                // this._mergingCls();
+                //
+                // Polymer.dom(this.root).querySelector('#ilCUSTCLS').notifyResize();
             },
             _removeCustomProp: function(e)
             {
-              var index = this.customprops.indexOf(e.model.item);
-              this.splice('customprops', index, 1);
-              Polymer.dom(this.root).querySelector('#ilCUSTPROPS').notifyResize();
+                var index = this.customprops.indexOf(e.model.item);
+                this.splice('customprops', index, 1);
+
+                // this._mergingProps();
+                //
+                // Polymer.dom(this.root).querySelector('#ilCUSTPROPS').notifyResize();
             },
+
+            //RTE formulaire isn't specialized, thus rte fom expect only one array for classes to check the inclusion, IDEM for props.
+            _mergingCls: function()
+            {
+                this.mergedCls = [];
+
+                this.rdfcls.forEach(function(e){
+                  this.push('mergedCls', e);
+                }.bind(this));
+
+                this.customcls.forEach(function(e)
+                {
+                    this.push('mergedCls', e);
+                }.bind(this));
+            },
+            _mergingProps: function()
+            {
+                this.mergedProps = [];
+
+                this.rdfprops.forEach(function(e){
+                  this.push('mergedProps', e);
+                }.bind(this));
+
+                this.customprops.forEach(function(e)
+                {
+                    this.push('mergedProps', e);
+                }.bind(this));
+            }
         });
-      </script>
-    </dom-module>
+    </script>
+</dom-module>

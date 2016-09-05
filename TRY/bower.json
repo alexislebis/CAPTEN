@@ -37,6 +37,8 @@
     "paper-input": "PolymerElements/paper-input#^1.1.14",
     "file-reader": "git://github.com/TaaabsElements/file-reader.git#ae9cc8a",
     "rdfstore": "git://github.com/antoniogarrote/rdfstore-js.git#^0.9.15",
-    "iron-list": "PolymerElements/iron-list#^1.3.6"
+    "iron-list": "PolymerElements/iron-list#^1.3.6",
+    "iron-form": "PolymerElements/iron-form#^1.1.4",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.3.5"
   }
 }

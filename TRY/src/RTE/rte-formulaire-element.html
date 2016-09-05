@@ -1,0 +1,119 @@
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<dom-module id="rte-formulaire-element">
+    <template>
+        <style>
+            :host {
+                font-family: sans-serif;
+            }
+        </style>
+
+        <form is="iron-form" method="get" action="/" id="rteForm" on-iron-form-submit="submitForm">
+            <paper-input id="newElem" name="name" label="Name" required></paper-input>
+            <paper-dropdown-menu label="Type" name="type" required>
+                <paper-menu class="dropdown-content" id="typeDropdown">
+                    <paper-item value="Class">Class (Node)</paper-item>
+                    <paper-item value="Property">Property (Edge)</paper-item>
+                </paper-menu>
+            </paper-dropdown-menu>
+            <paper-button raised on-click="submit">Submit</paper-button>
+            <paper-button raised on-click="reset">Reset</paper-button>
+            <div class="output"></div>
+        </form>
+
+    </template>
+    <script>
+        Polymer(
+        {
+            is: 'rte-formulaire-element',
+
+            properties:
+            {
+                classes:
+                {
+                    type: Array,
+                    notify: true,
+                    value: function()
+                    {
+                        return [];
+                    },
+                },
+                props:
+                {
+                    type: Array,
+                    notify: true,
+                    value: function()
+                    {
+                        return [];
+                    },
+                },
+                typeElm:
+                {
+                  type: String,
+                },
+            },
+
+            observers:[
+              "_onClassesChanged(classes.splices)",
+              "_onPropsChanged(props.splices)",
+            ],
+
+            _onClassesChanged: function(e)
+            {},
+
+            _onPropsChanged: function(e)
+            {},
+
+            submit: function(event)
+            {
+              // console.log(this.classes);
+              // console.log(this.props);
+
+                if (this.$.typeDropdown.selected === 0)
+                {
+                    if (this.classes.includes(this.$.newElem.value))
+                    {
+                        var form = Polymer.dom(event).localTarget.parentElement;
+                        form.querySelector('.output').innerHTML = "The class name already exists";
+                        return;
+                    }
+                    else {
+                      this.typeElm = "CLASS";
+                    }
+                  }
+                    else if (this.$.typeDropdown.selected === 1){
+                    if (this.props.includes(this.$.newElem.value))
+                    {
+                        var form = Polymer.dom(event).localTarget.parentElement;
+                        form.querySelector('.output').innerHTML = "The property name already exists";
+                        return;
+                    }
+                    else{
+                      this.typeElm = "PROPERTY";
+                    }
+                  }
+                Polymer.dom(event).localTarget.parentElement.submit();
+            },
+
+            reset: function(event)
+            {
+                var form = Polymer.dom(event).localTarget.parentElement;
+                form.reset();
+                form.querySelector('.output').innerHTML = 'yo';
+            },
+
+            submitForm: function(event)
+            {
+                var form = Polymer.dom(event).localTarget;
+                this.fire('newElementToAdd', {type:this.typeElm, value:this.$.newElem.value});
+                form.querySelector('.output').innerHTML = "Successfully added";//JSON.stringify(event.detail);
+            },
+
+        });
+    </script>
+</dom-module>
