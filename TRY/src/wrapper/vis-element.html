@@ -128,7 +128,7 @@
       if(this.network === undefined || nodeID === undefined || nodeLabel === undefined)
         return;
 
-      this.nodes.push({id: nodeID, label: nodeLabel, /*shape: "circle"*/});
+      this.nodes.push({id: nodeID, label: nodeLabel, shape: "dot", size: 30});
     },
 
     addNodeWithRedraw: function(nodeID, nodeLabel)
