@@ -165,6 +165,17 @@
                 return isSelected ? 'check-circle' : 'radio-button-unchecked';
             },
 
+
+            getClassListing: function()
+            {
+              return Polymer.dom(this.root).querySelector('#ilRDFC');
+            },
+
+            getPropsListing: function()
+            {
+              return Polymer.dom(this.root).querySelector('#ilRDFP');
+            },
+
             _computeClass: function(isSelected)
             {
                 return isSelected ? 'item selected' : 'item';
