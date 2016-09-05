@@ -108,7 +108,18 @@
                     type: Array,
                     notify: true,
                     value: function(){return[];},
-                }
+                },
+
+                // selectedcls:
+                // {
+                //   type: Object,
+                //   notify: true,
+                // },
+                // selectedprop:
+                // {
+                //   type: Object,
+                //   notify: true,
+                // },
             },
 
             observers: [
@@ -184,10 +195,22 @@
             _rdfcTapped: function(e)
             {
                 console.log(e.model.item);
+
+                if(!e.model.selected)//If the item is selected
+                  this.fire("ClassSelected", {element: e});
+                  else {
+                    this.fire("ClassDeselected", {});
+                  }
             },
             _rdfpTapped: function(e)
             {
                 console.log(e.model.item);
+
+                if(!e.model.selected)//If the item is selected
+                  this.fire("PropSelected", {element: e});
+                  else {
+                    this.fire("PropDeselected", {});
+                  }
             },
 
             _onRdfpropertiesChanged: function(change)
@@ -207,6 +230,15 @@
                 //
                 // Polymer.dom(this.$.rdfProperties).innerHTML = items;
                 Polymer.dom(this.root).querySelector('#ilRDFP').notifyResize();
+            },
+
+            clearClsSelection: function()
+            {
+              this.$.ilRDFC.clearSelection();
+            },
+            clearPropSelection: function()
+            {
+              this.$.ilRDFP.clearSelection();
             }
         });
     </script>

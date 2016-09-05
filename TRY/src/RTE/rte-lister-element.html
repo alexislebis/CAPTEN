@@ -59,12 +59,37 @@
                 color: white;
             }
 
+            .addToRTE{
+              color: var(--paper-blue-600);
+              width: 24px;
+              height: 24px;
+              -webkit-transition: all 0.5s ease; /* For Safari 3.1 to 6.0 */
+              transition: all 0.5s ease;
+            }
+
+            .addToRTE:hover{
+              -ms-transform: rotate(90deg); /* IE 9 */
+              -webkit-transform: rotate(90deg); /* Chrome, Safari, Opera */
+              transform: rotate(90deg);
+            }
+
+            .hidden{
+              display: none;s
+            }
+
             iron-list {
                 @apply(--layout-flex);
             }
         </style>
 
         <rte-formulaire-element id="rteform" classes="{{mergedCls}}" props="{{mergedProps}}"></rte-formulaire-element>
+
+        <div class$="[[_isCLSSelected(selectedcls)]]">
+          <p>Selected class (node): [[selectedcls]]<iron-icon icon="add-circle" class="addToRTE">add-circle</iron-icon></p>
+        </div>
+        <div class$="[[_isPROPSelected(selectedprop)]]">
+          <p>Selected property (edge): [[selectedcls]]<iron-icon icon="add-circle" class="addToRTE">add-circle</iron-icon></p>
+        </div>
 
         <div>
             <h2>Custom Classes</h2>
@@ -182,6 +207,18 @@
                 {
                     type: Array,
                     notify: true,
+                },
+                selectedcls://Class selected
+                {
+                  type: Object,
+                  notify: true,
+                  value: null,
+                },
+                selectedprop:
+                {
+                  type: Object,
+                  notify: true,
+                  value: null,
                 }
             },
 
@@ -204,6 +241,24 @@
                 this.$.rteform.addEventListener('newElementToAdd', function(e)
                 {
                     this._parseNewElement(e);
+                }.bind(this));
+
+                this.$.lister.addEventListener('ClassSelected', function(e){
+                  this._manageSelectedClass(e)
+                }.bind(this));
+
+                this.$.lister.addEventListener('PropSelected', function(e){
+                  this._manageSelectedProp(e);
+                }.bind(this));
+
+                this.$.lister.addEventListener('ClassDeselected', function(e){
+                  //this.$.ilCUSTCLS.clearSelection();
+                  this.selectedcls = null;
+                }.bind(this));
+
+                this.$.lister.addEventListener('PropSelected', function(e){
+                  //this.$.ilCUSTPROPS.clearSelection();
+                  this.selectedprop = null;
                 }.bind(this));
             },
 
@@ -248,11 +303,22 @@
 
             _custcTapped: function(e)
             {
-                console.log(e.model.item);
+                this.$.lister.clearClsSelection();
+
+                if(!e.model.selected)
+                  this.selectedcls = e.model.item;
+                else
+                  this.selectedcls = null;
             },
             _custpTapped: function(e)
             {
-                console.log(e.model.item);
+                this.$.lister.clearPropSelection();
+
+                if(!e.model.selected)
+                  this.selectedprop = e.model.item;
+                else {
+                  this.selectedprop = null;
+                }
             },
 
             _onCustomClsChanged: function(change)
@@ -283,6 +349,10 @@
             _removeCustomCLS: function(e)
             {
                 var index = this.customcls.indexOf(e.model.item);
+
+                if(this.selectedcls === this.customcls[index])
+                  this.selectedcls = null;
+
                 this.splice('customcls', index, 1);
 
                 // this._mergingCls();
@@ -292,11 +362,25 @@
             _removeCustomProp: function(e)
             {
                 var index = this.customprops.indexOf(e.model.item);
+                
+                if(this.selectedprops === this.customprops[index])
+                  this.selectedprops = null;
+
                 this.splice('customprops', index, 1);
 
                 // this._mergingProps();
                 //
                 // Polymer.dom(this.root).querySelector('#ilCUSTPROPS').notifyResize();
+            },
+
+            _isCLSSelected: function(cls)
+            {
+              return (cls === undefined || cls === null) ? "hidden":"noHidden";
+            },
+
+            _isPROPSelected: function(prop)
+            {
+              return (prop === undefined || prop === null) ? "hidden":"noHidden";
             },
 
             //RTE formulaire isn't specialized, thus rte fom expect only one array for classes to check the inclusion, IDEM for props.
@@ -325,7 +409,22 @@
                 {
                     this.push('mergedProps', e);
                 }.bind(this));
-            }
+            },
+            _manageSelectedClass: function(e)
+            {
+              this.$.ilCUSTCLS.clearSelection();
+
+              if(!e.detail.element.model.selected)
+                this.selectedcls = e.detail.element.model.item;
+
+            },
+            _manageSelectedProp: function(e)
+            {
+              this.$.ilCUSTPROPS.clearSelection();
+
+              if(!e.detail.element.model.selected)
+              this.selectedprop = e.detail.element.model.item;
+            },
         });
     </script>
 </dom-module>
