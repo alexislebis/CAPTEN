@@ -1,8 +1,8 @@
 <link rel="import" href="../wrapper/vis-element.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../RTE/rte-lister-element.html">
 <link rel="import" href="../rdf-data-store/rdf-store-nomenclature-element.html">
 <link rel="import" href="../rdf-data-store/rdf-store-reader-element.html">
-<link rel="import" href="../rdf-data-store/rdf-store-lister-element.html">
 <link rel="import" href="../rdf-data-store/rdf-store-displayer-element.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
@@ -16,8 +16,9 @@
         <!--<h1>RTE<span style="color:blue">#[[name]]</span></h1>-->
         <rdf-store-reader-element id="FRE" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}"></rdf-store-reader-element>
         <rdf-store-nomenclature-element id="rdn" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}" classes="{{rdfcls}}" props="{{rdfprops}}"></rdf-store-nomenclature-element>
-        <rdf-store-lister-element id="lister" rdfclasses="{{rdfcls}}" rdfprops="{{rdfprops}}"></rdf-store-lister-element>
+        <rte-lister-element id="rteList" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}" rdfcls="{{rdfcls}}" rdfprops="{{rdfprops}}"></rte-lister-element>
         <rdf-store-displayer-element id="displayer" rdfclasses="{{rdfcls}}" rdfprops="{{rdfprops}}" store="{{rdfStore}}" graph="{{graph}}"></rdf-store-displayer-element>
+
 
         <paper-button raised on-tap="generateRDFGraphDisplay">Generate RDF Graph Display</paper-button>
 
@@ -88,9 +89,7 @@
                     notify: true,
                 }
             },
-            // observers: [
-            //   '_onGraphChanged(graph)'
-            // ],
+
             ready: function()
             {
                 // this.$.FRE.returnFunction = function(){
@@ -125,6 +124,8 @@
             },
 
             generateRDFGraphDisplay: function() {
+              this.$.rteList.addCustomClass("Coucou");
+              this.$.rteList.addCustomProperty("Tu veux...");
               this.$.displayer.generateGraph();
             },
         });
