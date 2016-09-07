@@ -1,0 +1,91 @@
+<!-- Relation Graph of Traced Element -->
+
+<link rel="import" href="../wrapper/vis-element.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="rgte-element">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+        <vis-element id="rgte" network="{{network}}", nodes="{{nodes}}" edges="{{edges}}"></vis-element>
+
+        <paper-dialog id="propertyModal">
+  <h2>Bind the property</h2>
+  <p>Please choose the two nodes that will be linked with the selected property. First is the domain, the second the range.</p>
+  <div class="buttons">
+    <paper-button dialog-dismiss>Decline</paper-button>
+    <paper-button dialog-confirm autofocus>Accept</paper-button>
+  </div>
+</paper-dialog>
+
+      </template>
+      <script>
+        Polymer({
+          is: 'rgte-element',
+
+          properties: {
+            network: {
+              type: Object,
+              notify: true,
+            },
+            nodes: {
+              type: Object,
+              value: function(){return [];},
+              notify: true,
+            },
+            edges: {
+              type: Object,
+              value: function(){return [];},
+              notify: true,
+            },
+            options: {
+              type: Object,
+              value: function(){return [];},
+              notify: true,
+            },
+            networkOptions: {
+              type: Object,
+              value: function(){return {};},
+              notify: true,
+            },
+          },
+
+          observers:[
+            "_onNodesChange(nodes.splice)",
+          ],
+
+          addClass: function(cls)
+          {
+            if(this.nodes.includes(cls))
+              {
+                //@TODO: RENAME THE NODE, not RETURN;
+                return;
+              }
+            this.$.rgte.addNode(cls, cls);
+            this.$.rgte.redrawNetwork();
+          },
+
+          addProp: function(prop)
+          {
+            this.$.propertyModal.open();
+          },
+
+          _onNodesChange: function(change)
+          {
+            if (Object.keys(this.nodes).length === 0 && this.nodes.constructor === Object)
+                return;
+
+            if (!change)
+                return;
+
+                console.log(this.nodes);
+          },
+
+        });
+      </script>
+    </dom-module>

@@ -85,10 +85,10 @@
         <rte-formulaire-element id="rteform" classes="{{mergedCls}}" props="{{mergedProps}}"></rte-formulaire-element>
 
         <div class$="[[_isCLSSelected(selectedcls)]]">
-          <p>Selected class (node): [[selectedcls]]<iron-icon icon="add-circle" class="addToRTE">add-circle</iron-icon></p>
+          <p>Selected class (node): [[selectedcls]]<iron-icon icon="add-circle" on-tap="_addClassToRGTE" class="addToRTE">add-circle</iron-icon></p>
         </div>
         <div class$="[[_isPROPSelected(selectedprop)]]">
-          <p>Selected property (edge): [[selectedcls]]<iron-icon icon="add-circle" class="addToRTE">add-circle</iron-icon></p>
+          <p>Selected property (edge): [[selectedcls]]<iron-icon icon="add-circle" on-tap="_addPropToRGTE" id="propRGTE" class="addToRTE">add-circle</iron-icon></p>
         </div>
 
         <div>
@@ -262,6 +262,16 @@
                 }.bind(this));
             },
 
+            _addClassToRGTE: function(e)
+            {
+              this.fire("-ClassAddedToRGTE", {val:this.selectedcls});
+            },
+
+            _addPropToRGTE: function(e)
+            {
+              this.fire("-PropAddedToRGTE", {val:this.selectedprop});
+            },
+
             _parseNewElement: function(e)
             {
                 if (e.detail.type === "CLASS") //Si il s'agit d'une classe
@@ -362,7 +372,7 @@
             _removeCustomProp: function(e)
             {
                 var index = this.customprops.indexOf(e.model.item);
-                
+
                 if(this.selectedprops === this.customprops[index])
                   this.selectedprops = null;
 

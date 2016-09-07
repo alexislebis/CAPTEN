@@ -1,0 +1,82 @@
+<link rel="import" href="../RTE/rte-lister-element.html">
+<link rel="import" href="../RTE/rgte-element.html">
+
+<dom-module id="rgte-workzone-element">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+
+        <rte-lister-element id="rteList" store="{{rdfstore}}" graph="{{graph}}" graphuri="{{graphuri}}" rdfcls="{{rdfcls}}" rdfprops="{{rdfprops}}"></rte-lister-element>
+        <rgte-element id="rgte"></rgte-element>
+
+      </template>
+      <script>
+        Polymer({
+          is: 'rgte-workzone-element',
+
+          properties:
+          {
+            rdfstore:
+            {
+                type: Object,
+                value: function()
+                {
+                    return {};
+                },
+                notify: true,
+                // observer: "_rdfStoreChanged",
+            },
+            graph:
+            {
+                type: Object,
+                value: function()
+                {
+                    return {};
+                },
+                // reflectToAttribute: true,
+                notify: true,
+            },
+            graphuri: //@REMOVE
+            {
+                type: Object,
+                value: function()
+                {
+                    return {};
+                },
+                notify: true,
+            },
+            rdfcls:
+            {
+                type: Array,
+                //value: function(){return {};},
+                notify: true,
+            },
+            rdfprops:
+            {
+                type: Array,
+                notify: true,
+            }
+          },
+
+          attached: function()
+          {
+            this.$.rteList.addEventListener('-ClassAddedToRGTE', function(e){
+                this.$.rgte.addClass(e.detail.val);
+            }.bind(this));
+
+            this.$.rteList.addEventListener('-PropAddedToRGTE', function(e){
+                console.log('lol"');
+                this.$.rgte.addProp(e.detail.val);
+            }.bind(this));
+
+          },
+
+
+        });
+      </script>
+
+    </dom-module>
