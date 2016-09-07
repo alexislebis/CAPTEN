@@ -12,80 +12,201 @@
             }
         </style>
 
-        <vis-element id="rgte" network="{{network}}", nodes="{{nodes}}" edges="{{edges}}"></vis-element>
+        <vis-element id="rgte" network="{{network}}" , nodes="{{nodes}}" edges="{{edges}}"></vis-element>
 
-        <paper-dialog id="propertyModal">
-  <h2>Bind the property</h2>
-  <p>Please choose the two nodes that will be linked with the selected property. First is the domain, the second the range.</p>
-  <div class="buttons">
-    <paper-button dialog-dismiss>Decline</paper-button>
-    <paper-button dialog-confirm autofocus>Accept</paper-button>
-  </div>
-</paper-dialog>
+        <paper-dialog on-iron-overlay-closed="_isAddPropertyConfirmed" id="propertyModal" modal>
+            <h2>Bind the property</h2>
+            <p>Please choose the two nodes that will be linked with the selected property. First is the domain, the second the range.</p>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Decline</paper-button>
+                <paper-button dialog-confirm autofocus>Accept</paper-button>
+            </div>
+        </paper-dialog>
 
-      </template>
-      <script>
-        Polymer({
-          is: 'rgte-element',
+        <paper-dialog id="propertyIsWaiting" modal>
+            <h2>Property is waiting</h2>
+            <p>A property is currently waiting to be bound. Please select the remaining nodes.</p>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus>Ok</paper-button>
+            </div>
+        </paper-dialog>
 
-          properties: {
-            network: {
-              type: Object,
-              notify: true,
-            },
-            nodes: {
-              type: Object,
-              value: function(){return [];},
-              notify: true,
-            },
-            edges: {
-              type: Object,
-              value: function(){return [];},
-              notify: true,
-            },
-            options: {
-              type: Object,
-              value: function(){return [];},
-              notify: true,
-            },
-            networkOptions: {
-              type: Object,
-              value: function(){return {};},
-              notify: true,
-            },
-          },
+        <paper-dialog id="NotEnoughNodes" modal>
+            <h2>More nodes are needed</h2>
+            <p>You don't have enough nodes in your RGTE in order to applying this property. First, add more nodes.</p>
+            <div class="buttons">
+                <paper-button dialog-confirm autofocus>Ok :'(</paper-button>
+            </div>
+        </paper-dialog>
 
-          observers:[
-            "_onNodesChange(nodes.splice)",
-          ],
+    </template>
+    <script>
+        Polymer(
+        {
+            is: 'rgte-element',
 
-          addClass: function(cls)
-          {
-            if(this.nodes.includes(cls))
+            properties:
+            {
+                isWaitingPropertyBinding:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                  observer: '_oniWPBChanged',
+                },
+                nodeDomain:
+                {
+                  type: Object,
+                  value: null,
+                },
+                nodeRange:
+                {
+                  type: Object,
+                  value: null,
+                },
+                propertyToBind:
+                {
+                  type: Object,
+                  value: null,
+                },
+                network:
+                {
+                    type: Object,
+                    notify: true,
+                },
+                nodes:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return [];
+                    },
+                    notify: true,
+                },
+                edges:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return [];
+                    },
+                    notify: true,
+                },
+                options:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return [];
+                    },
+                    notify: true,
+                },
+                networkOptions:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return {};
+                    },
+                    notify: true,
+                },
+            },
+
+            observers: [
+                "_onNodesChange(nodes.splice)",
+            ],
+
+            addClass: function(cls)
+            {
+                if (this.nodes.includes(cls))
+                {
+                    //@TODO: RENAME THE NODE, not RETURN;
+                    return;
+                }
+                this.$.rgte.addNode(cls, cls);
+                this.$.rgte.redrawNetwork();
+            },
+
+            addProp: function(prop)
+            {
+              if(this.isWaitingPropertyBinding)
               {
-                //@TODO: RENAME THE NODE, not RETURN;
+                this.$.propertyIsWaiting.open();
                 return;
               }
-            this.$.rgte.addNode(cls, cls);
-            this.$.rgte.redrawNetwork();
-          },
 
-          addProp: function(prop)
-          {
-            this.$.propertyModal.open();
-          },
-
-          _onNodesChange: function(change)
-          {
-            if (Object.keys(this.nodes).length === 0 && this.nodes.constructor === Object)
+              if(this.nodes.length < 2)
+              {
+                this.$.NotEnoughNodes.open();
                 return;
+              }
 
-            if (!change)
-                return;
+                this.propertyToBind = prop;
+                this.$.propertyModal.open();
+            },
+
+            _onNodesChange: function(change)
+            {
+                if (Object.keys(this.nodes).length === 0 && this.nodes.constructor === Object)
+                    return;
+
+                if (!change)
+                    return;
 
                 console.log(this.nodes);
-          },
+            },
+
+            _oniWPBChanged: function(change)
+            {
+              /*Notifing that the current state is to select nodes */
+            },
+
+            _isAddPropertyConfirmed: function(e)
+            {
+              if(e.detail.confirmed)
+              {
+                this.isWaitingPropertyBinding = true;
+                //Alowing click nodes
+                this.network.on("click", function (params){
+
+                  console.log(this.isWaitingPropertyBinding);
+
+                  if(params.nodes.length != 0)//il y a au moins un noeud de sélectionné
+                  {
+                    if(this.nodeDomain === null)//Si l'user n'a pas encore sélectionner le nodeDomain
+                    {
+                      this.nodeDomain = params.nodes[0];
+                      console.log("DOMAIN IS :"+this.nodeDomain);
+                    }
+                    else if(this.nodeRange === null)//Sinon, c'est le deuxième choix, on lie les deux noeuds
+                    {
+                      this.nodeRange = params.nodes[0];
+                      console.log("RANGE is :"+this.nodeRange);
+                      this.$.rgte.createEdgeBetween(this.nodeDomain, this.nodeRange, this.propertyToBind);
+                      this.$.rgte.redrawNetwork();
+
+                      this.nodeDomain = null;
+                      this.nodeRange = null;
+                      this.isWaitingPropertyBinding = false;
+                      this.propertyToBind = null;
+                      this.network.on("click", function (params){});
+                    }
+                    else {//On s'assure de retirer l'état si jamais on n'est pas dans une bonne situation
+                      this.nodeDomain = null;
+                      this.nodeRange = null;
+                      this.isWaitingPropertyBinding = false;
+                      this.propertyToBind = null;
+                      this.network.on("click", function (params){});
+                    }
+                  }
+
+                }.bind(this));
+              }
+              else { //Otherwise the user don't want to bind prop, thus it has to be reset
+                this.propertyToBind = null;
+              }
+            },
 
         });
-      </script>
-    </dom-module>
+    </script>
+</dom-module>
