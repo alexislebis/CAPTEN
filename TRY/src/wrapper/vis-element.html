@@ -28,26 +28,32 @@
 
       properties: {
         network: {
-          type: Object
+          type: Object,
+          notify: true,
         },
         nodes: {
           type: Object,
           value: function(){return [];},
+          notify: true,
         },
         edges: {
           type: Object,
           value: function(){return [];},
+          notify: true,
         },
         options: {
           type: Object,
           value: function(){return [];},
+          notify: true,
         },
         networkOptions: {
           type: Object,
           value: function(){return {};},
+          notify: true,
         },
         configurationEnabled: {
           type: Boolean,
+          notify: true,
         }
 
       },
@@ -128,7 +134,7 @@
       if(this.network === undefined || nodeID === undefined || nodeLabel === undefined)
         return;
 
-      this.nodes.push({id: nodeID, label: nodeLabel, shape: "dot", size: 30});
+      this.push('nodes', {id: nodeID, label: nodeLabel, shape: "dot", size: 30});
     },
 
     addNodeWithRedraw: function(nodeID, nodeLabel)
@@ -206,7 +212,7 @@
       this.network = new vis.Network(container, data, this.options);
 
       //this.createEdgeBetween(1,2,'testdeloeuf');
-      this.completeNetwork();
+      //this.completeNetwork();
       console.log("DONE.");
     },
 
