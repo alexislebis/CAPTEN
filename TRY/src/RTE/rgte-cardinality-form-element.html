@@ -1,0 +1,104 @@
+<link rel="import" href="../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+
+<dom-module id="rgte-cardinality-form-element">
+    <template>
+        <style>
+            :host {
+                font-family: sans-serif;
+            }
+
+            .newCardinality:
+            {
+              color: var(--paper-blue-600);
+              width: 24px;
+              height: 24px;
+            }
+        </style>
+
+        <p>Select the cardinality for {{edge.val}}: </p>
+        <form is="iron-form" method="get" action="/" id="cardForm" on-iron-form-submit="submitForm">
+            <!-- <paper-input id="newElem" name="name" label="Name" required></paper-input> -->
+            <paper-dropdown-menu label="Domain" name="type" required>
+                <paper-menu class="dropdown-content" id="DomainDropdown">
+                  <template is="dom-repeat" items="[[cardinalitiesAvailable]]" as="item">
+                    <paper-item value$="[[item]]">[[item]]</paper-item>
+                  </template>
+                    <paper-item value="newCardinality"><iron-icon icon="add-circle" class="newCardinality"></iron-icon></paper-item>
+                </paper-menu>
+            </paper-dropdown-menu>
+            <paper-dropdown-menu label="Range" name="type" required>
+              <paper-menu class="dropdown-content" id="RangeDropdown">
+                <template is="dom-repeat" items="[[cardinalitiesAvailable]]" as="item">
+                  <paper-item value$="[[item]]">[[item]]</paper-item>
+                </template>
+                  <paper-item value="newCardinality"><iron-icon icon="add-circle" class="newCardinality"></iron-icon></paper-item>
+              </paper-menu>
+            </paper-dropdown-menu>
+            <paper-button raised on-click="submit">Submit</paper-button>
+            <paper-button raised on-click="reset">Reset</paper-button>
+            <div class="output"></div>
+        </form>
+
+    </template>
+    <script>
+    Polymer({
+      is: "rgte-cardinality-form-element",
+
+      properties:
+      {
+        edge:
+        {
+          type: Object,
+          notify: true,
+          value: null,
+        },
+        edgesCardinality:{
+          type: Object,
+          notify: true,
+          value: function()
+          {
+              return {};
+          },
+        },
+        cardinalitiesAvailable:{
+          type: Array,
+          notify: true,
+          value: function(){
+            return [];
+          },
+        },
+      },
+
+      observers: [
+          "_onEdgesCardinalityChanged(edgesCardinality.*)", //!!Attention, change propagation is not recursive
+      ],
+
+
+
+      _onEdgesCardinalityChanged: function(e)
+      {
+        console.log("calculating card");
+      },
+
+      submit: function(event)
+      {
+        if(this.edge === null)//prevent to submit new card
+          return;
+      },
+      reset: function(event)
+      {
+
+      },
+      submitForm: function(event)
+      {
+
+      },
+    });
+    </script>
+</dom-module>

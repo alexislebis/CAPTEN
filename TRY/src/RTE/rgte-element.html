@@ -3,6 +3,7 @@
 <link rel="import" href="../wrapper/vis-element.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../RTE/rgte-cardinality-form-element.html">
 
 <dom-module id="rgte-element">
     <template>
@@ -38,6 +39,10 @@
                 <paper-button dialog-confirm autofocus>Ok :'(</paper-button>
             </div>
         </paper-dialog>
+
+
+
+        <rgte-cardinality-form-element id="rgteCard" edge="{{rgteEdgeSelected}}" edges-cardinality="{{edgesCardinality}}"></rgte-cardinality-form-element>
 
     </template>
     <script>
@@ -296,8 +301,9 @@
                   return;
                 }
                 else if(params.edges.length != 0){
-                  console.log("EDGE CLICKED");
-                  console.log(params);
+
+                  this.rgteEdgeSelected = {id :params.edges[0], val : this.network.body.edges[params.edges[0]].options.label};
+
                 }
             },
 
