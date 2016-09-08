@@ -209,7 +209,15 @@
 
       var container = this.$.mynetwork;
 
-      this.network = new vis.Network(container, data, this.options);
+      this.network.setData({
+        nodes: this.nodes,
+        edges: this.edges,
+      });
+
+      this.network.setOptions(this.options);
+
+      this.network.redraw();
+      //this.network = new vis.Network(container, data, this.options);
 
       //this.createEdgeBetween(1,2,'testdeloeuf');
       //this.completeNetwork();
