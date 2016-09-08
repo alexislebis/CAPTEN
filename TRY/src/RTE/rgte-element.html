@@ -92,6 +92,12 @@
                     },
                     notify: true,
                 },
+                edgesCardinality:
+                {
+                  type: Object,
+                  value: function(){return {};},
+                  notify: true,
+                },
                 options:
                 {
                     type: Object,
@@ -110,11 +116,29 @@
                     },
                     notify: true,
                 },
+                rgteNodeSelected:{
+                  type: Object,
+                  value: null,
+                  notify: true,
+                },
+                rgteEdgeSelected:{
+                  type: Object,
+                  value: null,
+                  notify: true,
+                },
             },
 
             observers: [
                 "_onNodesChange(nodes.splice)",
+                "_onEdgesCardinalityChanged(edgesCardinality.*)", //!!Attention, change propagation is not recursive
             ],
+
+            attached: function()
+            {
+              this.network.addEventListener('click', function(p){
+                this._behaviorSelector(p);
+              }.bind(this));
+            },
 
             addClass: function(cls)
             {
@@ -161,50 +185,120 @@
               /*Notifing that the current state is to select nodes */
             },
 
-            _isAddPropertyConfirmed: function(e)
+            _onEdgesCardinalityChanged: function(change)
+            {
+              console.log("EdgesCardinalityChanges");
+            },
+
+            _isAddPropertyConfirmed: function(e) //Modifying RGTE behavior
             {
               if(e.detail.confirmed)
               {
                 this.isWaitingPropertyBinding = true;
                 //Alowing click nodes
-                this.network.on("click", function (params){
-
-                  console.log(this.isWaitingPropertyBinding);
-
-                  if(params.nodes.length != 0)//il y a au moins un noeud de sélectionné
-                  {
-                    if(this.nodeDomain === null)//Si l'user n'a pas encore sélectionner le nodeDomain
-                    {
-                      this.nodeDomain = params.nodes[0];
-                      console.log("DOMAIN IS :"+this.nodeDomain);
-                    }
-                    else if(this.nodeRange === null)//Sinon, c'est le deuxième choix, on lie les deux noeuds
-                    {
-                      this.nodeRange = params.nodes[0];
-                      console.log("RANGE is :"+this.nodeRange);
-                      this.$.rgte.createEdgeBetween(this.nodeDomain, this.nodeRange, this.propertyToBind);
-                      this.$.rgte.redrawNetwork();
-
-                      this.nodeDomain = null;
-                      this.nodeRange = null;
-                      this.isWaitingPropertyBinding = false;
-                      this.propertyToBind = null;
-                      this.network.on("click", function (params){});
-                    }
-                    else {//On s'assure de retirer l'état si jamais on n'est pas dans une bonne situation
-                      this.nodeDomain = null;
-                      this.nodeRange = null;
-                      this.isWaitingPropertyBinding = false;
-                      this.propertyToBind = null;
-                      this.network.on("click", function (params){});
-                    }
-                  }
-
-                }.bind(this));
+                // this.network.on("click", function (params){
+                //
+                //   console.log(this.isWaitingPropertyBinding);
+                //
+                //   if(params.nodes.length != 0)//il y a au moins un noeud de sélectionné
+                //   {
+                //     if(this.nodeDomain === null)//Si l'user n'a pas encore sélectionner le nodeDomain
+                //     {
+                //       this.nodeDomain = params.nodes[0];
+                //       console.log("DOMAIN IS :"+this.nodeDomain);
+                //     }
+                //     else if(this.nodeRange === null)//Sinon, c'est le deuxième choix, on lie les deux noeuds
+                //     {
+                //       this.nodeRange = params.nodes[0];
+                //       console.log("RANGE is :"+this.nodeRange);
+                //       this.$.rgte.createEdgeBetween(this.nodeDomain, this.nodeRange, this.propertyToBind);
+                //       this.$.rgte.redrawNetwork();
+                //
+                //       this.nodeDomain = null;
+                //       this.nodeRange = null;
+                //       this.isWaitingPropertyBinding = false;
+                //       this.propertyToBind = null;
+                //       this.network.on("click", function (params){}.bind(this));
+                //     }
+                //     else {//On s'assure de retirer l'état si jamais on n'est pas dans une bonne situation
+                //       this.nodeDomain = null;
+                //       this.nodeRange = null;
+                //       this.isWaitingPropertyBinding = false;
+                //       this.propertyToBind = null;
+                //       this.network.on("click", function (params){}.bind(this));
+                //     }
+                //   }
+                //
+                // }.bind(this));
               }
               else { //Otherwise the user don't want to bind prop, thus it has to be reset
                 this.propertyToBind = null;
+                this.isWaitingPropertyBinding = null;
+                this.nodeDomain = null;
+                this.nodeRange = null;
               }
+            },
+
+            //Define the behavior of the RGTE on click
+            _behaviorSelector: function(params)
+            {
+              if(this.isWaitingPropertyBinding)
+              {
+                this._linkingNodesBehavior(params);
+              }
+              else {
+                this._defaultRGTEBehavior(params);
+              }
+
+            },
+
+            //Link the selected property (edge) with two classes (nodes)
+            _linkingNodesBehavior: function(params)
+            {
+              if(params.nodes.length != 0)//il y a au moins un noeud de sélectionné
+              {
+                if(this.nodeDomain === null)//Si l'user n'a pas encore sélectionner le nodeDomain
+                {
+                  this.nodeDomain = params.nodes[0];
+                  console.log("DOMAIN IS :"+this.nodeDomain);
+                }
+                else if(this.nodeRange === null)//Sinon, c'est le deuxième choix, on lie les deux noeuds
+                {
+                  this.nodeRange = params.nodes[0];
+                  console.log("RANGE is :"+this.nodeRange);
+                  this.$.rgte.createEdgeBetween(this.nodeDomain, this.nodeRange, this.propertyToBind);
+                  this.$.rgte.redrawNetwork();
+
+                  this.nodeDomain = null;
+                  this.nodeRange = null;
+                  this.isWaitingPropertyBinding = false;
+                  this.propertyToBind = null;
+                  // this.network.on("click", function (params){}.bind(this));
+                }
+                else {//On s'assure de retirer l'état si jamais on n'est pas dans une bonne situation
+                  this.nodeDomain = null;
+                  this.nodeRange = null;
+                  this.isWaitingPropertyBinding = false;
+                  this.propertyToBind = null;
+                  // this.network.on("click", function (params){}.bind(this));
+                }
+              }
+            },
+
+            //Default RGTE behavior is reactivty on edge to allow setting cardinality, discarding. Reactivity on node to allow discarding
+            _defaultRGTEBehavior: function(params){
+              if(this.isWaitingPropertyBinding)//Don't chant the behavior
+                return;
+
+                if(params.nodes.length != 0)
+                {
+                  console.log("NODE CLICKED");
+                  return;
+                }
+                else if(params.edges.length != 0){
+                  console.log("EDGE CLICKED");
+                  console.log(params);
+                }
             },
 
         });
