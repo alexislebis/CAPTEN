@@ -29,7 +29,7 @@
                   <template is="dom-repeat" items="[[cardinalitiesAvailable]]" as="item">
                     <paper-item value$="[[item]]">[[item]]</paper-item>
                   </template>
-                    <paper-item value="newCardinality"><iron-icon icon="add-circle" class="newCardinality"></iron-icon></paper-item>
+                    <paper-item on-tap="_newCardinalityValue" value="newCardinality"><iron-icon icon="add-circle" class="newCardinality"></iron-icon></paper-item>
                 </paper-menu>
             </paper-dropdown-menu>
             <paper-dropdown-menu label="Range" name="type" required>
@@ -37,7 +37,7 @@
                 <template is="dom-repeat" items="[[cardinalitiesAvailable]]" as="item">
                   <paper-item value$="[[item]]">[[item]]</paper-item>
                 </template>
-                  <paper-item value="newCardinality"><iron-icon icon="add-circle" class="newCardinality"></iron-icon></paper-item>
+                  <paper-item on-tap="_newCardinalityValue" value="newCardinality"><iron-icon icon="add-circle" class="newCardinality"></iron-icon></paper-item>
               </paper-menu>
             </paper-dropdown-menu>
             <paper-button raised on-click="submit">Submit</paper-button>
@@ -63,16 +63,19 @@
           notify: true,
           value: function()
           {
-              return {};
+              return [];
           },
         },
         cardinalitiesAvailable:{
           type: Array,
           notify: true,
-          value: function(){
-            return [];
-          },
+          value: function(){return ['1']},
         },
+        rootVal:{
+          type:String,
+          value: 'a',
+          notify: true,
+        }
       },
 
       observers: [
@@ -83,13 +86,42 @@
 
       _onEdgesCardinalityChanged: function(e)
       {
-        console.log("calculating card");
+        this._calculatingCardinalitiesAvailable();
+      },
+
+      //@WARNING : after z, not correctly handled
+      _newCardinalityValue: function()
+      {
+        this.rootVal = (parseInt(this.rootVal,36)+1).toString(36);
+        console.log("Adding :"+this.rootVal);
+        this.push("cardinalitiesAvailable", this.rootVal);
+      },
+
+      _calculatingCardinalitiesAvailable: function()
+      {
+        // if (this.cardinalitiesAvailable == null)
+        //     return;
+
+        this.edgesCardinality.forEach(function(e){
+          console.log(e);
+          if(!this.cardinalitiesAvailable.includes(e.from))
+          {
+            this.push("cardinalitiesAvailable", e.from);
+          }
+          if(!this.cardinalitiesAvailable.includes(e.to))
+          {
+            this.push("cardinalitiesAvailable", e.to);
+          }
+        }.bind(this));
+
       },
 
       submit: function(event)
       {
         if(this.edge === null)//prevent to submit new card
           return;
+
+          Polymer.dom(event).localTarget.parentElement.submit();
       },
       reset: function(event)
       {
@@ -97,6 +129,21 @@
       },
       submitForm: function(event)
       {
+        var notInclude = true;
+
+        this.edgesCardinality.forEach(function(e,i){
+          if(e.id === this.edge.id)
+          {
+            this.edgesCardinality[i] = {id : e.id, from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"), to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")};
+            notInclude = false;
+          }
+        }.bind(this));
+
+        if(notInclude)
+          this.push('edgesCardinality',{id : this.edge.id, from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"), to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")});
+
+          console.log(this.edgesCardinality);
+        //fire selectedProp has updated card
 
       },
     });
