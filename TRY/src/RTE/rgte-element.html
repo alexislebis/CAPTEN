@@ -159,7 +159,7 @@
                     return;
                 }
                 this.$.rgte.addNode(cls, cls);
-                this.$.rgte.redrawWithCardinality(this.edgesCardinality);
+                this._redrawEdgesWithCardinilities();
             },
 
             addProp: function(prop)
@@ -203,36 +203,72 @@
                     return;
 
                 // this._redrawEdgesWithCardinilities();
-                this.$.rgte.redrawWithCardinality(this.edgesCardinality);
+                this._redrawEdgesWithCardinilities();
             },
 
             _redrawEdgesWithCardinilities: function()
             {
-                var modifHappening = false;
-                console.log("_redrawEdgesWithCardinilities");
+                //INSURING THAT RGTE-ELEMENT's model is sync with VIS-ELEMENT's model embedded
+                this._syncModel();
 
-                this.edgesCardinality.forEach(function(e)
-                {
-                    var currentEdge = this.network.edgesHandler.body.edges[e.id]
-                    if (currentEdge != null && currentEdge != undefined)
+                //Parsing all edges for dectecting which ones need a specifc display
+                // this.edges.forEach(function(e, i){
+                //   this.edgesCardinality.forEach(function(c){
+                //     if(e.id === c.id)
+                //     {
+                //       this.edges[i] = {
+                //         from: e.from,
+                //         to: e.to,
+                //         arrows: { enabled: true, from: true, middle: true, to: true },
+                //         label: e.label
+                //       };
+                //     }
+                //   }.bind(this));
+                // }.bind(this));
+                //
+                // console.log("BEFORE UPDATE");
+                // console.log(this.network);
+                // //Updating network
+                // this.network.setData({
+                //   nodes: this.nodes,
+                //   edges: this.edges,
+                // });
+                //
+                // console.log("AFTER UPDATE");
+                // console.log(this.network);
+                // this.network.setOptions(this.options);
+
+                this.network.setData({
+                  nodes: this.nodes,
+                  edges: this.edges,
+                });
+
+                this.network.setOptions(this.options);
+
+                this.edgesCardinality.forEach(function(e,i){
+                  var focusEdge = this.network.edgesHandler.body.edges[e.id];
+                  console.log(e.id);
+                  console.log(focusEdge);
+                  if( focusEdge != null)//If the network has a node focusEdge
+                  {
+                    focusEdge.options.arrows.from.enabled = true;
+                    focusEdge.options.arrows.to.enabled = true;
+
+                    var that = this;
+                    focusEdge.drawArrows = function drawArrows(ctx, arrowData)
                     {
-                        // console.log(this.edges);
-                        // currentEdge = this._getEdgeFromID(e.id);
-                        // modifHappening = true;
-                        // currentEdge.arrows = {
-                        //     enabled: true,
-                        //     from: true,
-                        //     to: true
-                        // };
-                        this._drawCardiArrows(e);
-
-                        console.log(this.network);
-                        //this._replaceEdge(currentEdge.id, currentEdge);
-
-                    }
+                        if (this.options.arrows.from.enabled === true)
+                        {
+                            that._drawCardinalityFrom(ctx, this.selected, this.hover, arrowData.from, e.from);
+                        }
+                        if (this.options.arrows.to.enabled === true)
+                        {;
+                            that._drawCardinalityTo(ctx, this.selected, this.hover, arrowData.to, e.to);
+                        }
+                    };
+                  }
                 }.bind(this));
 
-                //this.$.rgte.redrawNetwork();
             },
 
             _getEdgeFromID: function(id)
@@ -250,6 +286,14 @@
                 }.bind(this));
 
                 return res;
+            },
+
+            _syncModel: function()//SYNC RGTE-ELEMENT's model with VIS-ELEMENT's model embedded
+            {
+              this.network = this.$.rgte.getNetwork();
+              this.edges = this.$.rgte.getEdges();
+              this.nodes = this.$.rgte.getNodes();
+              this.options = this.$.rgte.getOptions();
             },
 
             _drawCardiArrows: function(edge)
@@ -277,7 +321,7 @@
                 };
             },
 
-            _drawCardinalityFrom: function(ctx, selected, hover, arrowData)
+            _drawCardinalityFrom: function(ctx, selected, hover, arrowData, fromCard)
             {
                 if (selected)
                 {
@@ -287,14 +331,13 @@
                 {
                     ctx.font = '12px sans-serif';
                 }
-                console.log(arrowData.point);
                 ctx.fillStyle = '#000000';
-                ctx.fillText('1..∞',
+                ctx.fillText(fromCard,
                     arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
                     arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
             },
 
-            _drawCardinalityTo: function(ctx, selected, hover, arrowData)
+            _drawCardinalityTo: function(ctx, selected, hover, arrowData, toCard)
             {
                 if (selected)
                 {
@@ -305,7 +348,7 @@
                     ctx.font = '12px sans-serif';
                 }
                 ctx.fillStyle = '#000000';
-                ctx.fillText('0..∞',
+                ctx.fillText(toCard,
                     arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
                     arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
             },
@@ -359,7 +402,7 @@
                         // this.push("edgesCardinality", {id: idVal, from: '1', to:'3'});//Set to default cardinality for the new edge
                         // console.log(this.edgesCardinality);
 
-                        this.$.rgte.redrawWithCardinality(this.edgesCardinality);
+                        this._redrawEdgesWithCardinilities();
 
                         this.nodeDomain = null;
                         this.nodeRange = null;
@@ -393,7 +436,9 @@
             //Default RGTE behavior is reactivty on edge to allow setting cardinality, discarding. Reactivity on node to allow discarding
             _defaultRGTEBehavior: function(params)
             {
-                if (this.isWaitingPropertyBinding) //Don't chant the behavior
+              console.log(params);
+              console.log(this.network.getSelectedEdges());
+                if (this.isWaitingPropertyBinding) //Don't change the behavior
                     return;
 
                 if (params.nodes.length != 0)

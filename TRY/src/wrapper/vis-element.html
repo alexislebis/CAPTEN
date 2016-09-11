@@ -223,137 +223,7 @@
       //this.completeNetwork();
       console.log("DONE.");
     },
-
-    redrawWithCardinality: function(edgesCard)//Array [{id, from, to}, {id, from, to}]
-    {
-
-      //TEST
-      var newEdges = [];
-
-      edgesCard.forEach(function(e){
-        var tmpE = this._getEdgeFromID(e.id);
-
-        console.log(this.edges);
-        console.log(e);
-
-        newEdges.push({
-          from: tmpE.from,
-          to: tmpE.to,
-          arrows: { enabled: true, from: true, middle: true, to: true },
-          label: tmpE.label
-        });
-
-      }.bind(this));
-
-      this.edges.forEach(function(e){
-        if(!edgesCard.includes(e))
-        {
-          newEdges.push({
-            from: e.from,
-            to: e.to,
-            arrows: 'to',
-            label: e.label
-          });
-        }
-      }.bind(this));
-
-      this.edges = newEdges;
-        //
-
-
-      var data = {
-        nodes: this.nodes,
-        edges: this.edges
-      }
-
-      var container = this.$.mynetwork;
-
-      this.network.setData({
-        nodes: this.nodes,
-        edges: this.edges,
-      });
-
-      this.network.setOptions(this.options);
-
-      edgesCard.forEach(function(e,i){
-        var focusEdge = this.network.edgesHandler.body.edges[e.id];
-        console.log(focusEdge);
-        if( focusEdge != null)//If the network has a node focusEdge
-        {
-
-          // focusEdge.options.arrows = {
-          //     enabled: true,
-          //     from: true,
-          //     to: true
-          // };
-
-          var that = this;
-          focusEdge.drawArrows = function drawArrows(ctx, arrowData)
-          {
-              if (this.options.arrows.from.enabled === true)
-              {
-                  that._drawCardinalityFrom(ctx, this.selected, this.hover, arrowData.from);
-              }
-              if (this.options.arrows.to.enabled === true)
-              {
-                  that._drawCardinalityTo(ctx, this.selected, this.hover, arrowData.to);
-              }
-          };
-        }
-      }.bind(this));
-
-    },
-
-    _drawCardinalityFrom: function(ctx, selected, hover, arrowData)
-    {
-        if (selected)
-        {
-            ctx.font = 'bold 12px sans-serif';
-        }
-        else
-        {
-            ctx.font = '12px sans-serif';
-        }
-        console.log(arrowData.point);
-        ctx.fillStyle = '#000000';
-        ctx.fillText('1..∞',
-            arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
-            arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
-    },
-
-    _drawCardinalityTo: function(ctx, selected, hover, arrowData)
-    {
-        if (selected)
-        {
-            ctx.font = 'bold 12px sans-serif';
-        }
-        else
-        {
-            ctx.font = '12px sans-serif';
-        }
-        ctx.fillStyle = '#000000';
-        ctx.fillText('0..∞',
-            arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
-            arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
-    },
-
-    _getEdgeFromID: function(id)
-    {
-        var res = null;
-        //getEDges in order to prevent desynchro with vis
-        this.edges.forEach(function(p, i)
-        {
-
-            if (p.id === id)
-            {
-                res = this.edges[i];
-                return;
-            }
-        }.bind(this));
-
-        return res;
-    },
-
+    
     getEdges: function()
     {
       return this.edges;
@@ -362,6 +232,16 @@
     getNetwork: function()
     {
       return this.network;
+    },
+
+    getNodes: function()
+    {
+      return this.nodes;
+    },
+
+    getOptions: function()
+    {
+      return this.options;
     },
     /**
     * Complete the network, ie. draw all the edges between each nodes. The lowest id goes to the highest. Non-oriented graph
