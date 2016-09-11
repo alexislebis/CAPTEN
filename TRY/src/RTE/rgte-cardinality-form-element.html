@@ -9,15 +9,14 @@
 <dom-module id="rgte-cardinality-form-element">
     <template>
         <style>
-            :host {
+             :host {
                 font-family: sans-serif;
             }
 
-            .newCardinality:
-            {
-              color: var(--paper-blue-600);
-              width: 24px;
-              height: 24px;
+            .newCardinality : {
+                color: var(--paper-blue-600);
+                width: 24px;
+                height: 24px;
             }
         </style>
 
@@ -26,19 +25,23 @@
             <!-- <paper-input id="newElem" name="name" label="Name" required></paper-input> -->
             <paper-dropdown-menu label="Domain" name="type" required>
                 <paper-menu class="dropdown-content" id="DomainDropdown">
-                  <template is="dom-repeat" items="[[cardinalitiesAvailable]]" as="item">
-                    <paper-item value$="[[item]]">[[item]]</paper-item>
-                  </template>
-                    <paper-item on-tap="_newCardinalityValue" value="newCardinality"><iron-icon icon="add-circle" class="newCardinality"></iron-icon></paper-item>
+                    <template is="dom-repeat" items="[[cardinalitiesAvailable]]" as="item">
+                        <paper-item value$="[[item]]">[[item]]</paper-item>
+                    </template>
+                    <paper-item on-tap="_newCardinalityValue" value="newCardinality">
+                        <iron-icon icon="add-circle" class="newCardinality"></iron-icon>
+                    </paper-item>
                 </paper-menu>
             </paper-dropdown-menu>
             <paper-dropdown-menu label="Range" name="type" required>
-              <paper-menu class="dropdown-content" id="RangeDropdown">
-                <template is="dom-repeat" items="[[cardinalitiesAvailable]]" as="item">
-                  <paper-item value$="[[item]]">[[item]]</paper-item>
-                </template>
-                  <paper-item on-tap="_newCardinalityValue" value="newCardinality"><iron-icon icon="add-circle" class="newCardinality"></iron-icon></paper-item>
-              </paper-menu>
+                <paper-menu class="dropdown-content" id="RangeDropdown">
+                    <template is="dom-repeat" items="[[cardinalitiesAvailable]]" as="item">
+                        <paper-item value$="[[item]]">[[item]]</paper-item>
+                    </template>
+                    <paper-item on-tap="_newCardinalityValue" value="newCardinality">
+                        <iron-icon icon="add-circle" class="newCardinality"></iron-icon>
+                    </paper-item>
+                </paper-menu>
             </paper-dropdown-menu>
             <paper-button raised on-click="submit">Submit</paper-button>
             <paper-button raised on-click="reset">Reset</paper-button>
@@ -47,105 +50,107 @@
 
     </template>
     <script>
-    Polymer({
-      is: "rgte-cardinality-form-element",
+        Polymer({
+            is: "rgte-cardinality-form-element",
 
-      properties:
-      {
-        edge:
-        {
-          type: Object,
-          notify: true,
-          value: null,
-        },
-        edgesCardinality:{
-          type: Object,
-          notify: true,
-          value: function()
-          {
-              return [];
-          },
-        },
-        cardinalitiesAvailable:{
-          type: Array,
-          notify: true,
-          value: function(){return ['1']},
-        },
-        rootVal:{
-          type:String,
-          value: 'a',
-          notify: true,
-        }
-      },
+            properties: {
+                edge: {
+                    type: Object,
+                    notify: true,
+                    value: null,
+                },
+                edgesCardinality: {
+                    type: Object,
+                    notify: true,
+                    value: function() {
+                        return [];
+                    },
+                },
+                cardinalitiesAvailable: {
+                    type: Array,
+                    notify: true,
+                    value: function() {
+                        return ['1']
+                    },
+                },
+                rootVal: {
+                    type: String,
+                    value: 'a',
+                    notify: true,
+                }
+            },
 
-      observers: [
-          "_onEdgesCardinalityChanged(edgesCardinality.*)", //!!Attention, change propagation is not recursive
-      ],
-
+            observers: [
+                "_onEdgesCardinalityChanged(edgesCardinality.*)", //!!Attention, change propagation is not recursive
+            ],
 
 
-      _onEdgesCardinalityChanged: function(e)
-      {
-        this._calculatingCardinalitiesAvailable();
-      },
 
-      //@WARNING : after z, not correctly handled
-      _newCardinalityValue: function()
-      {
-        this.rootVal = (parseInt(this.rootVal,36)+1).toString(36);
-        console.log("Adding :"+this.rootVal);
-        this.push("cardinalitiesAvailable", this.rootVal);
-      },
+            _onEdgesCardinalityChanged: function(e) {
+                this._calculatingCardinalitiesAvailable();
+            },
 
-      _calculatingCardinalitiesAvailable: function()
-      {
-        // if (this.cardinalitiesAvailable == null)
-        //     return;
+            //@WARNING : after z, not correctly handled
+            _newCardinalityValue: function() {
+                this.rootVal = (parseInt(this.rootVal, 36) + 1).toString(36);
+                console.log("Adding :" + this.rootVal);
+                this.push("cardinalitiesAvailable", this.rootVal);
+            },
 
-        this.edgesCardinality.forEach(function(e){
-          console.log(e);
-          if(!this.cardinalitiesAvailable.includes(e.from))
-          {
-            this.push("cardinalitiesAvailable", e.from);
-          }
-          if(!this.cardinalitiesAvailable.includes(e.to))
-          {
-            this.push("cardinalitiesAvailable", e.to);
-          }
-        }.bind(this));
+            _calculatingCardinalitiesAvailable: function() {
+                // if (this.cardinalitiesAvailable == null)
+                //     return;
 
-      },
+                this.edgesCardinality.forEach(function(e) {
+                    console.log(e);
+                    if (!this.cardinalitiesAvailable.includes(e.from)) {
+                        this.push("cardinalitiesAvailable", e.from);
+                    }
+                    if (!this.cardinalitiesAvailable.includes(e.to)) {
+                        this.push("cardinalitiesAvailable", e.to);
+                    }
+                }.bind(this));
 
-      submit: function(event)
-      {
-        if(this.edge === null)//prevent to submit new card
-          return;
+            },
 
-          Polymer.dom(event).localTarget.parentElement.submit();
-      },
-      reset: function(event)
-      {
+            submit: function(event) {
+                if (this.edge === null) //prevent to submit new card
+                    return;
 
-      },
-      submitForm: function(event)
-      {
-        var notInclude = true;
+                Polymer.dom(event).localTarget.parentElement.submit();
+            },
+            reset: function(event) {
 
-        this.edgesCardinality.forEach(function(e,i){
-          if(e.id === this.edge.id)
-          {
-            this.edgesCardinality[i] = {id : e.id, from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"), to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")};
-            notInclude = false;
-          }
-        }.bind(this));
+            },
+            submitForm: function(event) {
+                var notInclude = true;
+                var index = -1;
 
-        if(notInclude)
-          this.push('edgesCardinality',{id : this.edge.id, from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"), to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")});
+                this.edgesCardinality.forEach(function(e, i) {
+                    if (e.id === this.edge.id) {
+                        notInclude = false;
+                        index = i;
+                    }
+                }.bind(this));
 
-          console.log(this.edgesCardinality);
-        //fire selectedProp has updated card
+                if (notInclude)
+                    this.push('edgesCardinality', {
+                        id: this.edge.id,
+                        from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
+                        to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
+                    });
+                else { //Remove & re-add for notifying polymer listener...
+                    this.splice('edgesCardinality', index, 1);
+                    this.push('edgesCardinality', {
+                        id: this.edge.id,
+                        from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
+                        to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
+                    });
+                }
+                console.log(this.edgesCardinality);
+                //fire selectedProp has updated card
 
-      },
-    });
+            },
+        });
     </script>
 </dom-module>

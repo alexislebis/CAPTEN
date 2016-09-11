@@ -1,361 +1,353 @@
 <link rel="import" href="../import/vis-import.html">
 
 <dom-module id="vis-element">
-  <template>
-    <style>
-      :host {
-        display: block;
-      }
-
-      #mynetwork {
-            width: 1000px;
-            height: 600px;
-            border: 1px solid lightgray;
-        }
-
-      #config {
-
-          width: 400px;
-          height: 600px;
-        }
-    </style>
-
-    <div id="mynetwork"></div>
-  </template>
-  <script>
-    Polymer({
-      is: 'vis-element',
-
-      properties: {
-        network: {
-          type: Object,
-          notify: true,
-        },
-        nodes: {
-          type: Object,
-          value: function(){return [];},
-          notify: true,
-        },
-        edges: {
-          type: Object,
-          value: function(){return [];},
-          notify: true,
-        },
-        options: {
-          type: Object,
-          value: function(){return [];},
-          notify: true,
-        },
-        networkOptions: {
-          type: Object,
-          value: function(){return {};},
-          notify: true,
-        },
-        configurationEnabled: {
-          type: Boolean,
-          notify: true,
-        }
-
-      },
-
-    attached : function(){
-    // create an array with nodes
-    // var nodes = new vis.DataSet([
-    //     {id: 1, label: 'Node 1'},
-    //     {id: 2, label: 'Node 2'},
-    //     {id: 3, label: 'Node 3'},
-    //     {id: 4, label: 'Node 4'},
-    //     {id: 5, label: 'Node 5'}
-    // ]);
-
-    this.nodes = [];
-
-
-    // create an array with edges
-    // var edges = new vis.DataSet([
-    //     {from: 1, to: 3},
-    //     {from: 1, to: 2},
-    //     {from: 2, to: 4},
-    //     {from: 2, to: 5}
-    // ]);
-
-    this.edges = [];
-
-    // create a network
-    var container = this.$.mynetwork;
-
-    // provide the data in the vis format
-    var data = {
-        nodes: this.nodes,
-        edges: this.edges
-    };
-    //this.options = {configure: true};
-    this.options = {};
-    // initialize your network!
-    this.network = new vis.Network(container, data, this.options);
-  },
-
-    setNodes : function(nbNodes)
-    {
-      if(!Number.isNaN(nbNodes))
-      {
-
-        this.nodes = [];
-
-        for(i = 0; i < nbNodes; i++)
-        {
-          this.nodes.push({
-            id: i+1,
-            label: 'Node '+(i+1)
-          });
-
-        }
-
-        this.edges = [];
-
-        var data = {
-          nodes: this.nodes,
-          edges: this.edges
-        }
-
-        var options={};
-        var container = this.$.mynetwork;
-
-        this.network = new vis.Network(container, data, options);
-
-        //this.createEdgeBetween(1,2,'testdeloeuf');
-        this.completeNetwork();
-        //this.renameNode(1, 'wesh');
-      }
-    },
-
-    addNode: function(nodeID, nodeLabel)
-    {
-      if(this.network === undefined || nodeID === undefined || nodeLabel === undefined)
-        return;
-
-      this.push('nodes', {id: nodeID, label: nodeLabel, shape: "dot", size: 30});
-    },
-
-    addNodeWithRedraw: function(nodeID, nodeLabel)
-    {
-      this.addNode(nodeID, nodeLabel);
-
-      this.network.redraw();
-    },
-
-    /**
-    * .createEdgeBetween creates an edge between two given nodes. If the link already exists, then nothing is done.
-    * From the node1 to the node2
-    *
-    * @param {!required} node1 {String} First idnode to be linked, corresponding to the from.
-    *
-    * @param {!required} node2 {String} Second idnode to be linked, corresponding to the "to"
-    *
-    * @param {!required} edgeLabel {String} The label of the edge to be displayed .
-    *
-    * @method createLinkBetween
-    */
-    createEdgeBetween: function(node1, node2, edgeLabel)
-    {
-      //console.log(this.edges.length);
-      for(i = 0; i < this.edges.length; i++)//If an edge already exists, it will not be recreated & the network must not be redraw
-      {
-        if( ((this.edges[i].to.localeCompare(node1) == 0) && (this.edges[i].from.localeCompare(node2) == 0) ) ||
-            ((this.edges[i].to.localeCompare(node2) ==0) && (this.edges[i].from.localeCompare(node1) == 0) ) )
-            {
-              //console.log('returning');
-              return;
+    <template>
+        <style>
+             :host {
+                display: block;
             }
-      }
 
-      this.edges.push({
-        from: node1,
-        to: node2,
-        arrows: 'to',
-        label: edgeLabel
-      });
+            #mynetwork {
+                width: 1000px;
+                height: 600px;
+                border: 1px solid lightgray;
+            }
 
-    },
+            #config {
+                width: 400px;
+                height: 600px;
+            }
+        </style>
 
-    createEdgeBetweenWithRedraw: function(node1, node2, edgeLabel)
-    {
-      this.createEdgeBetween(node1, node2, edgeLabel);
+        <div id="mynetwork"></div>
+    </template>
+    <script>
+        Polymer({
+            is: 'vis-element',
 
-      this.network.redraw();
-    },
+            properties: {
+                network: {
+                    type: Object,
+                    notify: true,
+                },
+                nodes: {
+                    type: Object,
+                    value: function() {
+                        return [];
+                    },
+                    notify: true,
+                },
+                edges: {
+                    type: Object,
+                    value: function() {
+                        return [];
+                    },
+                    notify: true,
+                },
+                options: {
+                    type: Object,
+                    value: function() {
+                        return [];
+                    },
+                    notify: true,
+                },
+                networkOptions: {
+                    type: Object,
+                    value: function() {
+                        return {};
+                    },
+                    notify: true,
+                },
+                configurationEnabled: {
+                    type: Boolean,
+                    notify: true,
+                }
 
-    resetGraphStructure: function()
-    {
-      this.nodes = [];
-      this.edges = [];
-    },
+            },
 
-    redrawNetwork: function()
-    {
-      console.log("REDRAWING...");
-      // this.network.setData({
-      //   nodes: this.nodes,
-      //   edges: this.edges
-      // });
-      // this.network.setOptions(this.options);
-      //
-      // this.network.redraw();
-      var data = {
-        nodes: this.nodes,
-        edges: this.edges
-      }
+            attached: function() {
+                // create an array with nodes
+                // var nodes = new vis.DataSet([
+                //     {id: 1, label: 'Node 1'},
+                //     {id: 2, label: 'Node 2'},
+                //     {id: 3, label: 'Node 3'},
+                //     {id: 4, label: 'Node 4'},
+                //     {id: 5, label: 'Node 5'}
+                // ]);
 
-
-      var container = this.$.mynetwork;
-
-      this.network.setData({
-        nodes: this.nodes,
-        edges: this.edges,
-      });
-
-      this.network.setOptions(this.options);
-
-      this.network.redraw();
-      //this.network = new vis.Network(container, data, this.options);
-
-      //this.createEdgeBetween(1,2,'testdeloeuf');
-      //this.completeNetwork();
-      console.log("DONE.");
-    },
-    
-    getEdges: function()
-    {
-      return this.edges;
-    },
-
-    getNetwork: function()
-    {
-      return this.network;
-    },
-
-    getNodes: function()
-    {
-      return this.nodes;
-    },
-
-    getOptions: function()
-    {
-      return this.options;
-    },
-    /**
-    * Complete the network, ie. draw all the edges between each nodes. The lowest id goes to the highest. Non-oriented graph
-    *
-    * @method completeNetwork
-    */
-completeNetwork: function()
-    {
-      if (this.options === undefined)
-        return;
-
-      for(k = 0; k < (this.nodes.length - 1); k++)
-      {
-        for(j = k+1; j < this.nodes.length; j++)
-        {
-          this.createEdgeBetween(this.nodes[k].id+"", this.nodes[j].id+"", "");
-        }
-      }
-
-      this.networkOptions = {layout: {
-        improvedLayout: false
-      }};
-
-      //@TODO : Ajouter aux options !
-      // console.log(this.options.layout);
-      this.options = this.networkOptions;
-      // console.log(this.options.layout);
-      this.network.setOptions(this.options);
-    },
-
- /**
- * Rename a node with the name provided..
- *
- * @param {!required} node {String} The id of the node to be rename.
- *
- * @param {!required} name {String} The new name of the node..
- *
- * @method renameNode
- */
-renameNode: function(node, name)
- {
-   for(var i = 0; i < this.nodes.length; i++)
-   {
-     if(this.nodes[i].id == node)
-     {
-       this.nodes[i].label = name;
-
-       this.network.setData({
-         nodes: this.nodes,
-         edges: this.edges
-       });
-
-       this.network.redraw();
-
-       return;
-     }
-   }
- },
-
-    /**
-    * .
-    *
-    * @param {!required} enabled {String} If the configuration panel has to be enabled.
-    *
-    * @method enableConfiguration
-    */
-enableConfiguration: function(enabled)
-    {
-      //@TODO : Editer les options de vis. Utiliser : setOptions()
-      this.configurationEnabled = enabled;
-      this.options.configure = enabled;
-
-      this.network.setOptions(this.options);
-      this.network.redraw();
-    },
+                this.nodes = [];
 
 
-/**
-* .
-*
-* @param {!required} jsonObj {String} The JSON used for search.
-*
-* @param {!required} key {String} the key of the json in which to put the new value .
-*
-* @param {!required} newValue {object} the new value to put inside the key
-*
-* @method addReplaceJSONKeyedValue
-*
-* @return The old value of the key contained in the JSON, or undefined if the key wasn't contained inside the JSON
-*/
-addReplaceJSONKeyedValue: function(jsonObj, key, newValue)
-{
-  /*var old;
-  var found = false;
+                // create an array with edges
+                // var edges = new vis.DataSet([
+                //     {from: 1, to: 3},
+                //     {from: 1, to: 2},
+                //     {from: 2, to: 4},
+                //     {from: 2, to: 5}
+                // ]);
 
-  found = Object.keys(jsonObj).some(function(k,ijson)
-  {
-    if(k === key)
-    {
-      old = Object.values(jsonObj)[ijson];
-      Object.values(jsonObj)[ijson] = newValue;
-      return true;
-    }
-  });
+                this.edges = [];
 
-  if(found)
-    return old;
-  else
-  {
+                // create a network
+                var container = this.$.mynetwork;
 
-  }*/
-},
+                // provide the data in the vis format
+                var data = {
+                    nodes: this.nodes,
+                    edges: this.edges
+                };
+                //this.options = {configure: true};
+                this.options = {};
+                // initialize your network!
+                this.network = new vis.Network(container, data, this.options);
+            },
+
+            setNodes: function(nbNodes) {
+                if (!Number.isNaN(nbNodes)) {
+
+                    this.nodes = [];
+
+                    for (i = 0; i < nbNodes; i++) {
+                        this.nodes.push({
+                            id: i + 1,
+                            label: 'Node ' + (i + 1)
+                        });
+
+                    }
+
+                    this.edges = [];
+
+                    var data = {
+                        nodes: this.nodes,
+                        edges: this.edges
+                    }
+
+                    var options = {};
+                    var container = this.$.mynetwork;
+
+                    this.network = new vis.Network(container, data, options);
+
+                    //this.createEdgeBetween(1,2,'testdeloeuf');
+                    this.completeNetwork();
+                    //this.renameNode(1, 'wesh');
+                }
+            },
+
+            addNode: function(nodeID, nodeLabel) {
+                if (this.network === undefined || nodeID === undefined || nodeLabel === undefined)
+                    return;
+
+                this.push('nodes', {
+                    id: nodeID,
+                    label: nodeLabel,
+                    shape: "dot",
+                    size: 30
+                });
+            },
+
+            addNodeWithRedraw: function(nodeID, nodeLabel) {
+                this.addNode(nodeID, nodeLabel);
+
+                this.network.redraw();
+            },
+
+            /**
+             * .createEdgeBetween creates an edge between two given nodes. If the link already exists, then nothing is done.
+             * From the node1 to the node2
+             *
+             * @param {!required} node1 {String} First idnode to be linked, corresponding to the from.
+             *
+             * @param {!required} node2 {String} Second idnode to be linked, corresponding to the "to"
+             *
+             * @param {!required} edgeLabel {String} The label of the edge to be displayed .
+             *
+             * @method createLinkBetween
+             */
+            createEdgeBetween: function(node1, node2, edgeLabel) {
+                //console.log(this.edges.length);
+                for (i = 0; i < this.edges.length; i++) //If an edge already exists, it will not be recreated & the network must not be redraw
+                {
+                    if (((this.edges[i].to.localeCompare(node1) == 0) && (this.edges[i].from.localeCompare(node2) == 0)) ||
+                        ((this.edges[i].to.localeCompare(node2) == 0) && (this.edges[i].from.localeCompare(node1) == 0))) {
+                        //console.log('returning');
+                        return;
+                    }
+                }
+
+                this.edges.push({
+                    from: node1,
+                    to: node2,
+                    arrows: 'to',
+                    label: edgeLabel
+                });
+
+            },
+
+            createEdgeBetweenWithRedraw: function(node1, node2, edgeLabel) {
+                this.createEdgeBetween(node1, node2, edgeLabel);
+
+                this.network.redraw();
+            },
+
+            resetGraphStructure: function() {
+                this.nodes = [];
+                this.edges = [];
+            },
+
+            redrawNetwork: function() {
+                console.log("REDRAWING...");
+                // this.network.setData({
+                //   nodes: this.nodes,
+                //   edges: this.edges
+                // });
+                // this.network.setOptions(this.options);
+                //
+                // this.network.redraw();
+                var data = {
+                    nodes: this.nodes,
+                    edges: this.edges
+                }
 
 
-});
-  </script>
+                var container = this.$.mynetwork;
+
+                this.network.setData({
+                    nodes: this.nodes,
+                    edges: this.edges,
+                });
+
+                this.network.setOptions(this.options);
+
+                this.network.redraw();
+                //this.network = new vis.Network(container, data, this.options);
+
+                //this.createEdgeBetween(1,2,'testdeloeuf');
+                //this.completeNetwork();
+                console.log("DONE.");
+            },
+
+            getEdges: function() {
+                return this.edges;
+            },
+
+            getNetwork: function() {
+                return this.network;
+            },
+
+            getNodes: function() {
+                return this.nodes;
+            },
+
+            getOptions: function() {
+                return this.options;
+            },
+            /**
+             * Complete the network, ie. draw all the edges between each nodes. The lowest id goes to the highest. Non-oriented graph
+             *
+             * @method completeNetwork
+             */
+            completeNetwork: function() {
+                if (this.options === undefined)
+                    return;
+
+                for (k = 0; k < (this.nodes.length - 1); k++) {
+                    for (j = k + 1; j < this.nodes.length; j++) {
+                        this.createEdgeBetween(this.nodes[k].id + "", this.nodes[j].id + "", "");
+                    }
+                }
+
+                this.networkOptions = {
+                    layout: {
+                        improvedLayout: false
+                    }
+                };
+
+                //@TODO : Ajouter aux options !
+                // console.log(this.options.layout);
+                this.options = this.networkOptions;
+                // console.log(this.options.layout);
+                this.network.setOptions(this.options);
+            },
+
+            /**
+             * Rename a node with the name provided..
+             *
+             * @param {!required} node {String} The id of the node to be rename.
+             *
+             * @param {!required} name {String} The new name of the node..
+             *
+             * @method renameNode
+             */
+            renameNode: function(node, name) {
+                for (var i = 0; i < this.nodes.length; i++) {
+                    if (this.nodes[i].id == node) {
+                        this.nodes[i].label = name;
+
+                        this.network.setData({
+                            nodes: this.nodes,
+                            edges: this.edges
+                        });
+
+                        this.network.redraw();
+
+                        return;
+                    }
+                }
+            },
+
+            /**
+             * .
+             *
+             * @param {!required} enabled {String} If the configuration panel has to be enabled.
+             *
+             * @method enableConfiguration
+             */
+            enableConfiguration: function(enabled) {
+                //@TODO : Editer les options de vis. Utiliser : setOptions()
+                this.configurationEnabled = enabled;
+                this.options.configure = enabled;
+
+                this.network.setOptions(this.options);
+                this.network.redraw();
+            },
+
+
+            /**
+             * .
+             *
+             * @param {!required} jsonObj {String} The JSON used for search.
+             *
+             * @param {!required} key {String} the key of the json in which to put the new value .
+             *
+             * @param {!required} newValue {object} the new value to put inside the key
+             *
+             * @method addReplaceJSONKeyedValue
+             *
+             * @return The old value of the key contained in the JSON, or undefined if the key wasn't contained inside the JSON
+             */
+            addReplaceJSONKeyedValue: function(jsonObj, key, newValue) {
+                /*var old;
+                var found = false;
+
+                found = Object.keys(jsonObj).some(function(k,ijson)
+                {
+                  if(k === key)
+                  {
+                    old = Object.values(jsonObj)[ijson];
+                    Object.values(jsonObj)[ijson] = newValue;
+                    return true;
+                  }
+                });
+
+                if(found)
+                  return old;
+                else
+                {
+
+                }*/
+            },
+
+
+        });
+    </script>
 </dom-module>
