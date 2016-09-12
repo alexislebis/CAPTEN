@@ -161,7 +161,6 @@
                 if (!change)
                     return;
 
-                console.log(this.nodes);
             },
 
             _oniWPBChanged: function(change) {
@@ -197,8 +196,6 @@
                 //be kept synch with this.edgesCardinality
                 this.edgesCardinality.forEach(function(e, i) {
                     var focusEdge = this.network.edgesHandler.body.edges[e.id];
-                    console.log(e.id);
-                    console.log(focusEdge);
                     if (focusEdge != null) //If the network has a node focusEdge
                     {
                         focusEdge.options.arrows.from.enabled = true;
@@ -263,11 +260,11 @@
 
             _drawCardinalityFrom: function(ctx, selected, hover, arrowData, fromCard) {
                 if (selected) {
-                    ctx.font = 'bold 12px sans-serif';
+                    ctx.font = 'bold 16px sans-serif';
                 } else {
-                    ctx.font = '12px sans-serif';
+                    ctx.font = 'bold 16px sans-serif';
                 }
-                ctx.fillStyle = '#000000';
+                ctx.fillStyle = '#2A8F09';
                 ctx.fillText(fromCard,
                     arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
                     arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
@@ -275,11 +272,11 @@
 
             _drawCardinalityTo: function(ctx, selected, hover, arrowData, toCard) {
                 if (selected) {
-                    ctx.font = 'bold 12px sans-serif';
+                    ctx.font = 'bold 16px sans-serif';
                 } else {
-                    ctx.font = '12px sans-serif';
+                    ctx.font = 'bold 16px sans-serif';
                 }
-                ctx.fillStyle = '#000000';
+                ctx.fillStyle = '#2A8F09';
                 ctx.fillText(toCard,
                     arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
                     arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
@@ -354,8 +351,6 @@
 
             //Default RGTE behavior is reactivty on edge to allow setting cardinality, discarding. Reactivity on node to allow discarding
             _defaultRGTEBehavior: function(params) {
-                console.log(params);
-                console.log(this.network.getSelectedEdges());
                 if (this.isWaitingPropertyBinding) //Don't change the behavior
                     return;
 
