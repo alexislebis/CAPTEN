@@ -4,7 +4,7 @@ class ScientificStatement extends CAPTENClass
 {
   constructor()
   {
-
+    this.content = null;//Equivalent to description in CAPTEN-ONTO-After_REU_29/08/16
   }
 }
 

@@ -1,6 +1,8 @@
 class IndependentOperator extends CAPTENClass{
   constructor(name){
     this.name = name;
+    this.uriConceptConvoyed = null; //Allow to have a dictionary of the different concept of operation
+
     this.annotation = null;//Annotation regarding the IndpOp
     this.inputPatterns = null;//Inputs RGTE pattern needed
     this.outputPatterns = null;//Output pattern. FIXME: can be infered by behaviors(inputPatterns)

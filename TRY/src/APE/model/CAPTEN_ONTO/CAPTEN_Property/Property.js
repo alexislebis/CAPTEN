@@ -8,8 +8,20 @@ class Property{
   constructor(name, uri, From, to, additionalConstraints)
   {
     this.name = name;
+    this.uri = uri;
+
     this.from = From;
     this.to = to;
     this.constraints = additionalConstraints;
+  }
+
+  static getCAPTENProperty(){
+    return [  "{name: hasPreviousVersion, uri: NAU}", //*0*
+              "{name: hasPreviousStep, uri: NAU}",
+              "{name: require, uri: NAU}",
+              "{name: useCase, uri: NAU}",
+              "{name: hasScientificHaeccity, uri: NAU}",
+              "{name: subpartOf, uri: NAU}", //*5*
+              "{name: hasTerminology, uri: NAU}"]
   }
 }

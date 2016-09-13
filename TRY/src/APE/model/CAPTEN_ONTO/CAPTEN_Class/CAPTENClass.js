@@ -7,6 +7,7 @@
 class CAPTENClass
 {
   constructor(uri, properties){
-    this.properties = null; //[Property]
+    this.uri = uri;
+    this.properties = this.properties; //[Property]
   }
 }

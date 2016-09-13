@@ -1,7 +1,7 @@
 class Step extends CAPTENClass{
   constructor()
   {
-    this.previousStep = null;
+    //this.previousStep = null;//FIXME PreviousStep est pointée par la propriété hasPrevious. Si elle existe
 
     //this.annotation = null;//FIXME needed ?
     this.objective = null;
