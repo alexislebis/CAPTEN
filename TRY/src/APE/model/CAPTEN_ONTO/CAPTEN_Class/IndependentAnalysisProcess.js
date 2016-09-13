@@ -3,7 +3,7 @@ class IndependentAnalysisProcess extends IndependentOperator {
   {
     this.operators = []; //Associative array : [RelationOrder]:[ListOfOperations]
 
-    
+    this.exploitableOutput = null;
 
   }
 }
