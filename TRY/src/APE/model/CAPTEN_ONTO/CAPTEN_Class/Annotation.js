@@ -1,5 +1,7 @@
-class Annotation{
-  constructor(){}
+class Annotation extends CAPTENClass{
+  constructor(){
+    this.uri = "https://www.w3.org/ns/oa#Annotation";
+  }
 }
 
 class Description extends Annotation{
