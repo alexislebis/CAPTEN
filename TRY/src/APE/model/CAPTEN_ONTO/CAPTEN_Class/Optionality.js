@@ -1,7 +1,6 @@
-class Optionality extends CAPTENClass
+function Optionality()
 {
-  constructor()
-  {
-    
-  }
+ CAPTENClass.call(this);
 }
+
+Optionality.prototype = Object.create(CAPTENClass.prototype);

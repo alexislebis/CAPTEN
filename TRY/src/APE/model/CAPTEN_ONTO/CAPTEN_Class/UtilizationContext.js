@@ -1,7 +1,9 @@
 /**
  * Define the utilization contexte of something.
  */
-class UtilizationContext extends CAPTENClass
+function UtilizationContext()
 {
-  constructor(){}
+  CAPTENClass.call(this);
 }
+
+UtilizationContext.prototype = Object.create(CAPTENClass.prototype);

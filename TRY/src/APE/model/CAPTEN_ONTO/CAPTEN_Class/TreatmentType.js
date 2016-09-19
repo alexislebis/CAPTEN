@@ -1,22 +1,12 @@
-class TreatmentType extends CAPTENClass
+function TreatmentType()
 {
-  constructor()
-  {
+  CAPTENClass.call(this);
 
-  }
+  this.subClasses = [
+    {subClasses:{}, name: 'Analysis', uri: 'NAU'},
+    {subClasses:{}, name: 'Preprocess', uri: 'NAU'},
+    {subClasses:{}, name: 'Postprocess', uri: 'NAU'},
+  ];
 }
 
-class Analysis extends TreatmentType
-{
-
-}
-
-class Preprocess extends TreatmentType
-{
-
-}
-
-class Postprocess extends TreatmentType
-{
-  
-}
+TreatmentType.prototype = Object.create(CAPTENClass.prototype);

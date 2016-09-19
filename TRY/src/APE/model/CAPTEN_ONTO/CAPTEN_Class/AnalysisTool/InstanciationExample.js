@@ -1,6 +1,6 @@
-class InstanciationExample extends CAPTENClass{
-  constructor()
+function InstanciationExample()
   {
-
+    CAPTENClass.call(this);
   }
-}
+
+  InstanciationExample.prototype = Object.create(CAPTENClass.prototype);

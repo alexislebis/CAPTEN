@@ -1,14 +1,11 @@
-class Objective extends CAPTENClass
+function Objective ()
 {
+  CAPTENClass.call(this);
 
+  this.subClasses= [
+    {subClasses:{}, name: 'Monitoring', uri: 'NAU'},
+    {subClasses:{}, name: 'Adaptation', uri: 'NAU'},
+  ];
 }
 
-class Monitoring extends Objective
-{
-
-}
-
-class Adaptation extends Objective
-{
-
-}
+Objective.prototype = Object.create(CAPTENClass.prototype);

@@ -1,17 +1,28 @@
-class Annotation extends CAPTENClass{
-  constructor(){
-    this.uri = "https://www.w3.org/ns/oa#Annotation";
-  }
+function Annotation()
+{
+  CAPTENClass.call(this);
+  this.uri = "https://www.w3.org/ns/oa#Annotation";
 }
 
-class Description extends Annotation{
-  constructor(){}
+Annotation.prototype = Object.create(CAPTENClass.prototype);
+
+function Description(){
+  Annotation.call(this);
+  this.uri = "NAU";
 }
 
-class ReadingInstruction extends Annotation{
-  constructor(){}
+Description.prototype = Object.create(Annotation.prototype);
+
+function ReadingInstruction(){
+    Annotation.call(this);
+    this.uri = "NAU";
 }
 
-class ExampleOfUse extends Annotation{
-  constructor(){}
+ReadingInstruction.prototype = Object.create(Annotation.prototype);
+
+function ExampleOfUse(){
+  Annotation.call(this);
+  this.uri = "NAU";
 }
+
+ExampleOfUse.prototype = Object.create(Annotation.prototype);

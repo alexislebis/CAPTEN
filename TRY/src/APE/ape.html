@@ -1,3 +1,6 @@
+<link rel="import" href="../wrapper/ape-model-element.html">
+<link rel="import" href="../import/ape-model-import.html">
+
 <dom-module id="alpha-ape">
   <template>
     <style>
@@ -5,6 +8,8 @@
         display: block;
       }
     </style>
+
+    <ape-model-element></ape-model-element>
     <h1>
       APE n°<span style="color:green">[[name]]</span>
     </h1>
@@ -27,6 +32,12 @@
           value: "78795685"
         },
 
+        ready: function()
+        {
+          console.log('yo');
+          var test = new ScientificHaecceity();
+          test.is("discusses");
+        }
       }
     });
   </script>

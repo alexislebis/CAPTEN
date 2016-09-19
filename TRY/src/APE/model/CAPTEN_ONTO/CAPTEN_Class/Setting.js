@@ -1,20 +1,22 @@
-class Setting extends CAPTENClass{
-  constructor()
-  {
-    this.scientificeStatement = null;
-  }
+
+function Setting(){
+  CAPTENClass.call(this);
+
+  this.scientificeStatement = null;
 }
 
-class SettingInputRGTE extends Setting{
-  constructor()
-  {
+Setting.prototype = Object.create(CAPTENClass.prototype);
 
-  }
+function SettingInputRGTE(){
+  Setting.call(this);
+
 }
 
-class SettingParameter extends Setting{
-    constructor()
-    {
-      this.value = null;//If the parameter is valuable, then a property isValuable exists, pointing to a Value object
-    }
+SettingInputRGTE.prototype = Object.create(Setting.prototype);
+
+function SettingParameter(){
+  Setting.call(this);
+
+  this.value = null;
 }
+SettingParameter.prototype = Object.create(Setting.prototype);

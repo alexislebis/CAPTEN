@@ -3,7 +3,9 @@
  * utilization context i.e. where something is applicable.
  */
 
- class context extends CAPTENClass
+ function Context()
 {
-  constructor(){}
+  CAPTENClass.call(this);
 }
+
+Context.prototype = Object.create(CAPTENClass.prototype);

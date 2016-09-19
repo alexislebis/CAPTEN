@@ -1,24 +1,13 @@
-class AnalyticType extends CAPTENClass
+function AnalyticType()
 {
+  CAPTENClass.call(this);
 
+  this.subClasses = [
+    {subClasses:{}, uri:"NAU", name: 'PredictiveAnalytic'},
+    {subClasses:{}, uri:"NAU", name: 'DescriptiveAnalytic'},
+    {subClasses:{}, uri:"NAU", name: 'DiagnosticAnalytic'},
+    {subClasses:{}, uri:"NAU", name: 'PrescriptiveAnalytic'},
+  ];
 }
 
-class PredictiveAnalytic extends AnalyticType
-{
-
-}
-
-class DescriptiveAnalytic extends AnalyticType
-{
-
-}
-
-class DiagnosticAnalytic extends AnalyticType
-{
-
-}
-
-class PrescriptiveAnalytic extends AnalyticType
-{
-
-}
+AnalyticType.prototype = Object.create(CAPTENClass.prototype);

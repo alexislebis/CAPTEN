@@ -1,9 +1,10 @@
-class IndependentAnalysisProcess extends IndependentOperator {
-  constructor()
-  {
-    this.operators = []; //Associative array : [RelationOrder]:[ListOfOperations]
+function IndependentAnalysisProcess() {
 
-    this.exploitableOutput = null;
+  IndependentOperator.call(this);
 
-  }
+  this.operators = []; //Associative array : [RelationOrder]:[ListOfOperations]
+  this.exploitableOutput = null;
+
 }
+
+IndependentAnalysisProcess.prototype = Object.create(IndependentOperator.prototype);
