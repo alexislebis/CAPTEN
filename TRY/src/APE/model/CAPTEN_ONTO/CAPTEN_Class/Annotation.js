@@ -2,6 +2,7 @@ function Annotation()
 {
   CAPTENClass.call(this);
   this.uri = "https://www.w3.org/ns/oa#Annotation";
+  this.content = null;
 }
 
 Annotation.prototype = Object.create(CAPTENClass.prototype);

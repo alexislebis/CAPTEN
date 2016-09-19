@@ -1,0 +1,78 @@
+<!-- Used to preload pre configurated operator in order to have some materials in the start for creating an AP -->
+<link rel="import" href="../../wrapper/ape-model-element.html">
+
+<dom-module id="operator-bootstrap-element">
+    <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+
+    <ape-model-element id="apeModel"></ape-model-element>
+
+  </template>
+    <script>
+        Polymer(
+        {
+            is: 'operator-bootstrap-element',
+
+            properties:
+            {
+                operators:
+                {
+                    type: Array,
+                    value: function()
+                    {
+                        return []
+                    },
+                },
+            },
+
+            /**
+             * FIXME: complete the declaration of OP by defining pattern & behaviors
+             *
+             * Create an IndepOp representing : a time range, a filter, a tmpFilter, a 4Each & count
+             */
+            _createOperators: function()
+            {
+                this.operators = [];
+
+                var Op = new IndependentOperator("Time Range");
+                Op.annotation = new Description();
+                Op.annotation.content = "Build a time range.";
+
+                this.push('operators', Op);
+
+                Op = new IndependentOperator("For Each");
+                Op.annotation = new Description();
+                Op.annotation.content = "Considering each element of the selected node. Change the context.";
+
+                this.push('operators', Op);
+
+                Op = new IndependentOperator("Filter");
+                Op.annotation = new Description();
+                Op.annotation.content = "Filter the selected node.";
+
+                this.push('operators', Op);
+
+                Op = new IndependentOperator("Time Filter");
+                Op.annotation = new Description();
+                Op.annotation.content = "Time filter. Only concerns nodes which are time-related";
+
+                this.push('operators', Op);
+
+                Op = new IndependentOperator("Distinctive Count");
+                Op.annotation = new Description();
+                Op.annotation.content = "Distinct count of the conceptual elements in the selected node. Produce a new node related";
+
+                this.push('operators', Op);
+            },
+
+            getOperators: function() {
+              this._createOperators();
+              return this.operators;
+            },
+        });
+    </script>
+</dom-module>

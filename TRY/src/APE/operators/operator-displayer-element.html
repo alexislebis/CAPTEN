@@ -1,0 +1,65 @@
+<!--NOTE Display parent & child relations, linked concept & linked production with others operators
+Display expected input pattern, some example, description, review, etc... -->
+<!--IDEA Display parent & child relations, linked concept & linked production with others operators
+Display expected input pattern, some example, description, review, etc... -->
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-card/paper-card.html">
+
+
+<dom-module id="operator-displayer-element">
+  <template>
+  <style>
+    :host {
+      display: block;
+    }
+  </style>
+
+  <paper-card image="./donuts.png" alt="Donuts">
+    <div class="card-content">
+      <div class="cafe-header">Cafe Basilico
+        <div class="cafe-location cafe-light">
+          <iron-icon icon="communication:location-on"></iron-icon>
+          <span>250ft</span>
+        </div>
+      </div>
+      <div class="cafe-rating">
+        <iron-icon class="star" icon="star"></iron-icon>
+        <iron-icon class="star" icon="star"></iron-icon>
+        <iron-icon class="star" icon="star"></iron-icon>
+        <iron-icon class="star" icon="star"></iron-icon>
+        <iron-icon class="star" icon="star"></iron-icon>
+      </div>
+      <p>$・Italian, Cafe</p>
+      <p class="cafe-light">Small plates, salads &amp; sandwiches in an intimate setting with 12 indoor seats plus patio seating.</p>
+    </div>
+    <div class="card-actions">
+      <p>Tonight's availability</p>
+      <div class="horizontal justified">
+        <paper-icon-button icon="icons:event"></paper-icon-button>
+        <paper-button>5:30PM</paper-button>
+        <paper-button>7:30PM</paper-button>
+        <paper-button>9:00PM</paper-button>
+      </div>
+      <paper-button class="cafe-reserve">Reserve</paper-button>
+    </div>
+  </paper-card>
+
+</template>
+<script>
+Polymer({
+  is: 'operator-displayer-element',
+
+  properties:
+  {
+    operator:
+    {
+      type: Object,
+      notify: true,
+      value: function(){return {}},
+    }
+  },
+});
+
+</script>
+</dom-module>

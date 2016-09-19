@@ -1,7 +1,8 @@
 function IndependentOperator(usualName) {
 
     CAPTENClass.call(this);
-    this.name = usualName;
+
+    this.usualName = usualName;
     this.uriConceptConvoyed = null; //Allow to have a dictionary of the different concept of operation
 
     this.annotation = null; //Annotation regarding the IndpOp
