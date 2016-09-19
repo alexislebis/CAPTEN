@@ -6,7 +6,6 @@
 <link rel="import" href="../rdf-data-store/rdf-store-reader-element.html">
 <link rel="import" href="../rdf-data-store/rdf-store-displayer-element.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../wrapper/ape-model-element.html">
 
 <dom-module id="main-rte">
     <template>
@@ -15,7 +14,6 @@
                 display: block;
             }
         </style>
-        <ape-model-element></ape-model-element>
         <!-- <rgte-element id="rgte"></rgte-element> -->
         <!--<h1>RTE<span style="color:blue">#[[name]]</span></h1>-->
         <rdf-store-reader-element id="FRE" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}"></rdf-store-reader-element>
@@ -99,10 +97,6 @@
 
             ready: function()
             {
-              var test = new ScientificStatement();
-              console.log(test);
-              test.is('Hypothesis'); console.log(test);
-
               // console.log("plopdelol");
               // var test = new Objective();
               // console.log(test.inheritanceArray);

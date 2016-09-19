@@ -1,7 +1,6 @@
 <link rel="import" href="../wrapper/ape-model-element.html">
-<link rel="import" href="../import/ape-model-import.html">
 
-<dom-module id="alpha-ape">
+<dom-module id="ape-element">
   <template>
     <style>
       :host {
@@ -16,7 +15,7 @@
   </template>
   <script>
     Polymer({
-      is: 'alpha-ape',
+      is: 'ape-element',
 
       properties: {
 
@@ -31,14 +30,13 @@
           notify: true,
           value: "78795685"
         },
+      },
 
-        ready: function()
-        {
-          console.log('yo');
-          var test = new ScientificHaecceity();
-          test.is("discusses");
-        }
-      }
+      ready: function()
+      {
+
+      },
+
     });
   </script>
 </dom-module>
