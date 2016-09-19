@@ -28,9 +28,9 @@
     </paper-tabs>
 
     <iron-pages selected='{{data.tabName}}' attr-for-selected="name">
-      <div name="rte"><main-rte></main-rte></div>
+      <div name="rte"><main-rte id="rteElem"></main-rte></div>
       <div name="voog"><main-voog></main-voog></div>
-      <div name="ape"><ape-element></ape-element></div>
+      <div name="ape"><ape-element id="apeElem" rgtes="{{rgtes}}"></ape-element></div>
     </iron-pages>
 
     <h1>{{data.page}}</h1>
@@ -44,8 +44,26 @@
       {
         data: String,
         tabsRoute: String,
-        tabsActive: String
-      }
+        tabsActive: String,
+
+        rgtes:{
+          type: Array,
+          notify: true,
+          value: function(){return [];},
+        },
+
+      },
+
+      attached: function()
+      {
+        this.$.rteElem.addEventListener("-RGTEAddedToTheBag", function(e)
+        {
+          console.log("WARNING: Currently, only one RGTE can be used simultaneously.");//TODO
+          this.rgtes = [];
+          this.push('rgtes', e.detail);
+          console.log(this.rgtes);
+        }.bind(this));
+      },
     });
   </script>
 </dom-module>

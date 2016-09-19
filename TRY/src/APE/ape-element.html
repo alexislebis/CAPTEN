@@ -30,11 +30,30 @@
           notify: true,
           value: "78795685"
         },
+
+        //RGTEs is an Array of RGTE. AN RGTE is a vis network associated with its edgesCardinality like:
+        //[{network: network, card: edgesCardinality},]
+        rgtes:{
+          type: Array,
+          notify: true,
+          value: function(){return [];},
+        },
       },
+
+      observers:
+      [
+        "_onRGTESChanged(rgtes.splices)",
+      ],
 
       ready: function()
       {
 
+      },
+
+      _onRGTESChanged: function(change)
+      {
+        if(change == null)
+          return;
       },
 
     });

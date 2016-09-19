@@ -13,6 +13,17 @@
         <rte-lister-element id="rteList" store="{{rdfstore}}" graph="{{graph}}" graphuri="{{graphuri}}" rdfcls="{{rdfcls}}" rdfprops="{{rdfprops}}"></rte-lister-element>
         <rgte-element id="rgte"></rgte-element>
 
+        <paper-button raised disabled>Save current RGTE for later</paper-button>
+        <paper-button raised on-click="_generateAddRGTE">Add current RGTE to the "bag"</paper-button>
+
+        <paper-dialog on-iron-overlay-closed="_isAccepted" id="OnlyOneRGTEATM" modal>
+            <h2>Only one RGTE in the bag</h2>
+            <p>Currently, you cannot use more than one RGTE simultaneously in the description of an AP. Try to complete your RGTE instead.</p>
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>Abort</paper-button>
+                <paper-button dialog-confirm autofocus>Replace :'(</paper-button>
+            </div>
+        </paper-dialog>
 
       </template>
       <script>
@@ -75,6 +86,20 @@
 
           },
 
+          _generateAddRGTE: function()
+          {
+            this.$.OnlyOneRGTEATM.open();
+
+          },
+
+          _isAccepted: function(e)
+          {
+            if(!e.detail.confirmed)
+              return;
+
+            var RGTE = {network: this.$.rgte.getNetwork(), cardinality: this.$.rgte.getEdgesCardinality()};
+            this.fire("-RGTEAddedToTheBag", RGTE);
+          }
 
         });
       </script>
