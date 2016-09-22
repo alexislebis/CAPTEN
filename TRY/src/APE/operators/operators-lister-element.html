@@ -1,0 +1,87 @@
+<link rel="import" href="./operator-displayer-element.html">
+<link rel="import" href="../../../bower_components/iron-list/iron-list.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+
+<dom-module id="operators-lister-element">
+    <template>
+    <style>
+    :host {
+        font-family: sans-serif;
+    }
+    </style>
+
+    <div>
+        <h2>Operations available</h2>
+        <!-- <ul id="rdfClasses"></ul> -->
+        <!-- <iron-list id="ilOperations" items="[[operators]]" as="item" class="flex" selection-enabled> -->
+        <template id="templateCards" is="dom-repeat" items="[[operators]]" index-as="index">
+          <div>
+              <div class$="[[_computeClass(selected)]]">
+                  <div class="primary pad" tabindex$="[[tabIndex]]">
+                    <operator-displayer-element class="displayer" on-cardselected="_cardSelected" operator="[[item]]" is-selected="[[selected]]" is-use-section-available="true"></operator-displayer-element>
+                  </div>
+                  <div class="selectedItem">
+                      <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+                  </div>
+              </div>
+          </div>
+        </template>
+    </div>
+
+    </template>
+    <script>
+        Polymer(
+        {
+            is: 'operators-lister-element',
+
+            properties:
+            {
+                operators:
+                {
+                    type: Array,
+                    notify: true,
+                    value: function()
+                    {
+                        return [];
+                    },
+                },
+            },
+
+            observers: [
+                "_onOperatorsChanged(operators.splices)",
+            ],
+
+
+            _onOperatorsChanged: function(change)
+            {
+                //console.log(this.operators);
+            },
+
+
+            //manage focus on html
+            _computeClass: function(isSelected)
+            {
+                return isSelected ? 'item selected' : 'item';
+            },
+
+            _cardSelected: function(change)
+            {
+              //TODO Handle selection behavior. Currently, other non selected cards are not set to false.
+              var op = change.detail.operator;
+
+              this.operators.forEach(function(e){
+                if(op === e)
+                {
+                  //NTD
+                }
+                else {
+                  // e.setSelection(false);
+                }
+              });
+            },
+
+        });
+    </script>
+
+
+</dom-module>

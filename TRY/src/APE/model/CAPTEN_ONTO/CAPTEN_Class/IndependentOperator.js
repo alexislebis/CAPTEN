@@ -14,6 +14,8 @@ function IndependentOperator(usualName) {
 
     this.creationDate = null;
     this.author = null;
+
+    // this.notation = null; //NOTE notation of the operation. Don't forget for future version
 }
 
 /**

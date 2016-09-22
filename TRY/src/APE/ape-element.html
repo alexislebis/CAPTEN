@@ -1,8 +1,7 @@
 <link rel="import" href="../wrapper/ape-model-element.html">
 
-<!-- DEBUG delete import. Doit être placé dans la workzone -->
-<link rel="import" href="./bootstrapFiles/operator-boostrap-element.html">
-<link rel="import" href="./operators/operator-displayer-element.html">
+<link rel="import" href="./operators/operators-workzone-element.html">
+
 
 <dom-module id="ape-element">
   <template>
@@ -13,8 +12,9 @@
     </style>
 
     <ape-model-element></ape-model-element>
-    <operator-bootstrap-element id="bootstrap"></operator-bootstrap-element>
-    <operator-displayer-element id="displayer"></operator-displayer-element>
+
+    <operators-workzone-element id="opWorkzone"></operators-workzone-element>
+
     <h1>
       APE n°<span style="color:green">[[name]]</span>
     </h1>
@@ -44,12 +44,13 @@
           notify: true,
           value: function(){return [];},
         },
+        // 
+        // operators:{
+        //   type: Array,
+        //   notify: true,
+        //   value: function(){return [];},
+        // },
 
-        operators:{
-          type: Array,
-          notify: true,
-          value: function(){return [];},
-        }
       },
 
       observers:
@@ -67,8 +68,6 @@
         if(change == null)
           return;
 
-        //DEBUG
-        console.log(this.$.bootstrap.getOperators());
       },
 
     });

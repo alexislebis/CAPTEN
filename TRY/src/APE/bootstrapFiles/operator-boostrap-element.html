@@ -42,11 +42,21 @@
                 Op.annotation = new Description();
                 Op.annotation.content = "Build a time range.";
 
+                Op.author = new Author();
+                  Op.author.authorName = "Alex";
+
+                Op.creationDate = new Date(Date.now());
+
                 this.push('operators', Op);
 
                 Op = new IndependentOperator("For Each");
                 Op.annotation = new Description();
                 Op.annotation.content = "Considering each element of the selected node. Change the context.";
+
+                Op.author = new Author();
+                  Op.author.authorName = "Alex";
+
+                Op.creationDate = new Date();
 
                 this.push('operators', Op);
 
@@ -54,17 +64,32 @@
                 Op.annotation = new Description();
                 Op.annotation.content = "Filter the selected node.";
 
+                Op.author = new Author();
+                  Op.author.authorName = "Alex";
+
+                Op.creationDate = new Date();
+
                 this.push('operators', Op);
 
                 Op = new IndependentOperator("Time Filter");
                 Op.annotation = new Description();
                 Op.annotation.content = "Time filter. Only concerns nodes which are time-related";
 
+                Op.author = new Author();
+                  Op.author.authorName = "Alex";
+
+                Op.creationDate = new Date();
+
                 this.push('operators', Op);
 
                 Op = new IndependentOperator("Distinctive Count");
                 Op.annotation = new Description();
                 Op.annotation.content = "Distinct count of the conceptual elements in the selected node. Produce a new node related";
+
+                Op.author = new Author();
+                  Op.author.authorName = "Alex";
+
+                Op.creationDate = new Date();
 
                 this.push('operators', Op);
             },

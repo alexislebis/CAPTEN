@@ -1,0 +1,117 @@
+<!-- FIXME autoload from serv. IOP & IAP -->
+<link rel="import" href="../bootstrapFiles/operator-boostrap-element.html">
+
+<link rel="import" href="./operator-displayer-element.html">
+<link rel="import" href="./operators-lister-element.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="operators-workzone-element">
+    <template>
+    <style>
+    :host {
+        font-family: sans-serif;
+    }
+    </style>
+
+    <p on-tap="_createNewOperation">
+      Create a new operation concept <iron-icon icon="add-box"></iron-icon>
+    </p>
+    <operator-bootstrap-element id="bootstrap"></operator-bootstrap-element>
+    <operators-lister-element id="lister" operators="{{operators}}" on-usecard="_useOperation"></operators-lister-element>
+
+    <div hidden$="{{isCurrentCardHidden}}">
+        <operator-displayer-element class="displayer"  operator="{{currentoperator}}" is-use-section-available="false"></operator-displayer-element>
+    </div>
+
+    <paper-dialog on-iron-overlay-closed="_isAccepted" id="OnlyOneRGTEATM" modal>
+        <h2>Only one RGTE in the bag</h2>
+        <p>Currently, you cannot use more than one RGTE simultaneously in the description of an AP. Try to complete your RGTE instead.</p>
+        <div class="buttons">
+            <paper-button dialog-dismiss autofocus>Abort</paper-button>
+            <paper-button dialog-confirm autofocus>Replace :'(</paper-button>
+        </div>
+    </paper-dialog>
+
+  </template>
+    <script>
+        Polymer(
+        {
+            is: 'operators-workzone-element',
+
+            properties:
+            {
+                operators:
+                {
+                    type: Array,
+                    notify: true,
+                    value: function()
+                    {
+                        return [];
+                    },
+                },
+
+                isCurrentCardHidden:
+                {
+                  type: Boolean,
+                  value: true,
+                },
+
+                currentoperator:
+                {
+                  type: Object,
+                  notify: true,
+                  value: function(){return {};},
+                  observer: '_currentOperatorOnChanged',
+                },
+            },
+
+            observers: [
+                "_onOperatorsChanged(operators.splices)",
+            ],
+
+            attached: function()
+            {
+                this.set('operators', this.$.bootstrap.getOperators());
+            },
+
+            _onOperatorsChanged: function(change)
+            {
+
+            },
+
+            _createNewOperation: function(e)
+            {
+              console.log(e);
+            },
+
+            //Catch event useCard
+            _useOperation: function(change)
+            {
+              if(this.currentoperator != null)
+
+              this.currentoperator = change.detail.operator;
+            },
+
+            _currentOperatorOnChanged: function(change)
+            {
+              if(this.currentoperator == null)
+                this.isCurrentCardHidden = true;
+              else {
+                this.isCurrentCardHidden = false;
+              }
+              console.log('current operator changed');
+            },
+
+            //Check if current operator exist for DOM IF
+            _currenOperatorExists: function()
+            {
+              return this.currentoperator == null ? false : true;
+            },
+
+        });
+    </script>
+
+
+</dom-module>
