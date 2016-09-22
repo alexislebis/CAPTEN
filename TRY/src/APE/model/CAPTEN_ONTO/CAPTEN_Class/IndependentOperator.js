@@ -5,6 +5,9 @@ function IndependentOperator(usualName) {
     this.usualName = usualName;
     this.uriConceptConvoyed = null; //Allow to have a dictionary of the different concept of operation
 
+    //UPDATE from 22/09/216 : operators[] remove from IAP & become a part of an IOP
+    this.operators = []; //Associative array : [RelationOrder]:[ListOfOperations]
+
     this.annotation = null; //Annotation regarding the IndpOp
     this.inputPatterns = null; //Inputs RGTE pattern needed
     this.outputPatterns = null; //Output pattern. FIXME: can be infered by behaviors(inputPatterns)

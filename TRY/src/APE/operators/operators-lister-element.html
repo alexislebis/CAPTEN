@@ -16,9 +16,9 @@
         <!-- <iron-list id="ilOperations" items="[[operators]]" as="item" class="flex" selection-enabled> -->
         <template id="templateCards" is="dom-repeat" items="[[operators]]" index-as="index">
           <div>
-              <div class$="[[_computeClass(selected)]]">
+              <div class$="card [[_computeClass(selected)]]">
                   <div class="primary pad" tabindex$="[[tabIndex]]">
-                    <operator-displayer-element class="displayer" on-cardselected="_cardSelected" operator="[[item]]" is-selected="[[selected]]" is-use-section-available="true"></operator-displayer-element>
+                    <operator-displayer-element class="displayer" on-cardselected="_cardSelected" operator="[[item]]" is-selected="[[selected]]" is-use-section-available></operator-displayer-element>
                   </div>
                   <div class="selectedItem">
                       <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>

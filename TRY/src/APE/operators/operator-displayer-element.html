@@ -33,9 +33,9 @@ Display expected input pattern, some example, description, review, etc... -->
     <div class="card-actions">
       <template is="dom-if" if="{{isUseSectionAvailable}}" restamp="true">
         <p>
-          USE IT
+          SELECT IT
           <paper-icon-button icon$="[[_computeSelection(isSelected)]]" class="icon" on-tap="_useCard"></paper-icon-button>
-        </p>  
+        </p>
       </template>
 
       <div class="horizontal justified">
@@ -84,6 +84,7 @@ Polymer({
     {
       type: Boolean,
       value: false,
+      notify: true,
     },
   },
 
@@ -131,7 +132,7 @@ Polymer({
 
   _useCard: function(change)
   {
-    this.fire("usecard", {operator: this.operator});
+    this.fire("addcard", {operator: this.operator});
   },
 });
 
