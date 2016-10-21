@@ -3,7 +3,7 @@ function IndependentOperator(usualName) {
     CAPTENClass.call(this);
 
     this.usualName = usualName;
-    this.uriConceptConvoyed = null; //Allow to have a dictionary of the different concept of operation
+    this.uriConceptConvoyed = null; //Allow to have a dictionary of the different concept of operation. Comme *Find* et *Correlation*
 
     //UPDATE from 22/09/216 : operators[] remove from IAP & become a part of an IOP
     this.operators = []; //Associative array : [RelationOrder]:[ListOfOperations]

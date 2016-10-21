@@ -7,6 +7,7 @@ function IndependentAnalysisProcess() {
   this.exploitableOutput = null;
 
   //TODO Add specific element such as context application & description, etc..
+  this.utilisabilityContext = null;
 
 }
 

@@ -46,73 +46,92 @@
 
     </template>
     <script>
-        Polymer({
+        Polymer(
+        {
             is: 'rgte-element',
 
-            properties: {
-                isWaitingPropertyBinding: {
+            properties:
+            {
+                isWaitingPropertyBinding:
+                {
                     type: Boolean,
                     value: false,
                     notify: true,
                     observer: '_oniWPBChanged',
                 },
-                nodeDomain: {
+                nodeDomain:
+                {
                     type: Object,
                     value: null,
                 },
-                nodeRange: {
+                nodeRange:
+                {
                     type: Object,
                     value: null,
                 },
-                propertyToBind: {
+                propertyToBind:
+                {
                     type: Object,
                     value: null,
                 },
-                network: {
+                network:
+                {
                     type: Object,
                     notify: true,
                 },
-                nodes: {
+                nodes:
+                {
                     type: Object,
-                    value: function() {
+                    value: function()
+                    {
                         return [];
                     },
                     notify: true,
                 },
-                edges: {
+                edges:
+                {
                     type: Object,
-                    value: function() {
+                    value: function()
+                    {
                         return [];
                     },
                     notify: true,
                 },
-                edgesCardinality: {
+                edgesCardinality:
+                {
                     type: Object,
                     notify: true,
-                    value: function() {
+                    value: function()
+                    {
                         return [];
                     },
                 },
-                options: {
+                options:
+                {
                     type: Object,
-                    value: function() {
+                    value: function()
+                    {
                         return [];
                     },
                     notify: true,
                 },
-                networkOptions: {
+                networkOptions:
+                {
                     type: Object,
-                    value: function() {
+                    value: function()
+                    {
                         return {};
                     },
                     notify: true,
                 },
-                rgteNodeSelected: {
+                rgteNodeSelected:
+                {
                     type: Object,
                     value: null,
                     notify: true,
                 },
-                rgteEdgeSelected: {
+                rgteEdgeSelected:
+                {
                     type: Object,
                     value: null,
                     notify: true,
@@ -124,14 +143,18 @@
                 "_onEdgesCardinalityChanged(edgesCardinality.*)", //!!Attention, change propagation is not recursive
             ],
 
-            attached: function() {
-                this.network.addEventListener('click', function(p) {
+            attached: function()
+            {
+                this.network.addEventListener('click', function(p)
+                {
                     this._behaviorSelector(p);
                 }.bind(this));
             },
 
-            addClass: function(cls) {
-                if (this.nodes.includes(cls)) {
+            addClass: function(cls)
+            {
+                if (this.nodes.includes(cls))
+                {
                     //@TODO: RENAME THE NODE, not RETURN;
                     return;
                 }
@@ -139,13 +162,16 @@
                 this._redrawEdgesWithCardinilities();
             },
 
-            addProp: function(prop) {
-                if (this.isWaitingPropertyBinding) {
+            addProp: function(prop)
+            {
+                if (this.isWaitingPropertyBinding)
+                {
                     this.$.propertyIsWaiting.open();
                     return;
                 }
 
-                if (this.nodes.length < 2) {
+                if (this.nodes.length < 2)
+                {
                     this.$.NotEnoughNodes.open();
                     return;
                 }
@@ -154,7 +180,8 @@
                 this.$.propertyModal.open();
             },
 
-            _onNodesChange: function(change) {
+            _onNodesChange: function(change)
+            {
                 if (Object.keys(this.nodes).length === 0 && this.nodes.constructor === Object)
                     return;
 
@@ -163,11 +190,13 @@
 
             },
 
-            _oniWPBChanged: function(change) {
+            _oniWPBChanged: function(change)
+            {
                 /*Notifing that the current state is to select nodes */
             },
 
-            _onEdgesCardinalityChanged: function(change) {
+            _onEdgesCardinalityChanged: function(change)
+            {
                 console.log("_onEdgesCardinalityChanged");
                 if (this.network === null || this.network === undefined)
                     return;
@@ -176,13 +205,15 @@
                 this._redrawEdgesWithCardinilities();
             },
 
-            _redrawEdgesWithCardinilities: function() {
+            _redrawEdgesWithCardinilities: function()
+            {
                 //INSURING THAT RGTE-ELEMENT's model is sync with VIS-ELEMENT's model embedded
                 this._syncModel();
 
                 //UPDATING NETWORK WITH NEW NODES.
                 //Update the node will no change ID of already existing (and identical) elements
-                this.network.setData({
+                this.network.setData(
+                {
                     nodes: this.nodes,
                     edges: this.edges,
                 });
@@ -194,7 +225,8 @@
                 //Since the modification of arrows is directly applied in the network, the edges affected
                 //Will NOT be changed nor they ID. It is important because this.edges=this.network.edgesHandler.edges must
                 //be kept synch with this.edgesCardinality
-                this.edgesCardinality.forEach(function(e, i) {
+                this.edgesCardinality.forEach(function(e, i)
+                {
                     var focusEdge = this.network.edgesHandler.body.edges[e.id];
                     if (focusEdge != null) //If the network has a node focusEdge
                     {
@@ -202,12 +234,16 @@
                         focusEdge.options.arrows.to.enabled = true;
 
                         var that = this;
-                        focusEdge.drawArrows = function drawArrows(ctx, arrowData) {
-                            if (this.options.arrows.from.enabled === true) {
+                        focusEdge.drawArrows = function drawArrows(ctx, arrowData)
+                        {
+                            if (this.options.arrows.from.enabled === true)
+                            {
                                 that._drawCardinalityFrom(ctx, this.selected, this.hover, arrowData.from, e.from);
                             }
-                            if (this.options.arrows.to.enabled === true) {;
+                            if (this.options.arrows.to.enabled === true)
+                            {
                                 that._drawCardinalityTo(ctx, this.selected, this.hover, arrowData.to, e.to);
+                                this.edgeType.drawArrowHead(ctx, this.selected, this.hover, arrowData.to);
                             }
                         };
                     }
@@ -215,12 +251,15 @@
 
             },
 
-            _getEdgeFromID: function(id) {
+            _getEdgeFromID: function(id)
+            {
                 var res = null;
                 //getEDges in order to prevent desynchro with vis
-                this.$.rgte.getEdges().forEach(function(p, i) {
+                this.$.rgte.getEdges().forEach(function(p, i)
+                {
 
-                    if (p.id === id) {
+                    if (p.id === id)
+                    {
                         res = this.$.rgte.getEdges()[i];
                         return;
                     }
@@ -237,7 +276,8 @@
                     this.options = this.$.rgte.getOptions();
                 },
 
-            _drawCardiArrows: function(edge) {
+            _drawCardiArrows: function(edge)
+            {
                 var that = this;
 
                 var currentEdge = this.$.rgte.getNetwork().edgesHandler.body.edges[edge.id];
@@ -248,20 +288,27 @@
                 };
 
                 //Using this.$.rgte in order to prevent any desynchro woith the model of this.network
-                currentEdge.drawArrows = function drawArrows(ctx, arrowData) {
-                    if (this.options.arrows.from.enabled === true) {
+                currentEdge.drawArrows = function drawArrows(ctx, arrowData)
+                {
+                    if (this.options.arrows.from.enabled === true)
+                    {
                         that._drawCardinalityFrom(ctx, this.selected, this.hover, arrowData.from);
                     }
-                    if (this.options.arrows.to.enabled === true) {
+                    if (this.options.arrows.to.enabled === true)
+                    {
                         that._drawCardinalityTo(ctx, this.selected, this.hover, arrowData.to);
                     }
                 };
             },
 
-            _drawCardinalityFrom: function(ctx, selected, hover, arrowData, fromCard) {
-                if (selected) {
+            _drawCardinalityFrom: function(ctx, selected, hover, arrowData, fromCard)
+            {
+                if (selected)
+                {
                     ctx.font = 'bold 16px sans-serif';
-                } else {
+                }
+                else
+                {
                     ctx.font = 'bold 16px sans-serif';
                 }
                 ctx.fillStyle = '#2A8F09';
@@ -270,23 +317,44 @@
                     arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
             },
 
-            _drawCardinalityTo: function(ctx, selected, hover, arrowData, toCard) {
-                if (selected) {
+            _drawCardinalityTo: function(ctx, selected, hover, arrowData, toCard)
+            {
+                var oldStyle = ctx.strokeStyle;
+                if (selected)
+                {
                     ctx.font = 'bold 16px sans-serif';
-                } else {
+                }
+                else
+                {
                     ctx.font = 'bold 16px sans-serif';
                 }
                 ctx.fillStyle = '#2A8F09';
                 ctx.fillText(toCard,
                     arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
                     arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
+
+                  ctx.strokeStyle = oldStyle;
+                  ctx.fillStyle = ctx.strokeStyle;
+                  // ctx.lineWidth = this.getLineWidth(selected, hover);
+
+                  // // draw arrow at the end of the line
+                  ctx.arrow(arrowData.point.x, arrowData.point.y, arrowData.angle, arrowData.length);
+                  //
+                  // // draw shadow if enabled
+                  // this.enableShadow(ctx);
+                  // ctx.fill();
+                  // // disable shadows for other elements.
+                  // this.disableShadow(ctx);
             },
 
             _isAddPropertyConfirmed: function(e) //Modifying RGTE behavior
                 {
-                    if (e.detail.confirmed) {
+                    if (e.detail.confirmed)
+                    {
                         this.isWaitingPropertyBinding = true;
-                    } else { //Otherwise the user don't want to bind prop, thus it has to be reset
+                    }
+                    else
+                    { //Otherwise the user don't want to bind prop, thus it has to be reset
                         this.propertyToBind = null;
                         this.isWaitingPropertyBinding = null;
                         this.nodeDomain = null;
@@ -295,24 +363,30 @@
                 },
 
             //Define the behavior of the RGTE on click
-            _behaviorSelector: function(params) {
-                if (this.isWaitingPropertyBinding) {
+            _behaviorSelector: function(params)
+            {
+                if (this.isWaitingPropertyBinding)
+                {
                     this._linkingNodesBehavior(params);
-                } else {
+                }
+                else
+                {
                     this._defaultRGTEBehavior(params);
                 }
 
             },
 
             //Link the selected property (edge) with two classes (nodes)
-            _linkingNodesBehavior: function(params) {
+            _linkingNodesBehavior: function(params)
+            {
                 if (params.nodes.length != 0) //il y a au moins un noeud de sélectionné
                 {
                     if (this.nodeDomain === null) //Si l'user n'a pas encore sélectionner le nodeDomain
                     {
                         this.nodeDomain = params.nodes[0];
                         console.log("DOMAIN IS :" + this.nodeDomain);
-                    } else if (this.nodeRange === null) //Sinon, c'est le deuxième choix, on lie les deux noeuds
+                    }
+                    else if (this.nodeRange === null) //Sinon, c'est le deuxième choix, on lie les deux noeuds
                     {
                         this.nodeRange = params.nodes[0];
                         console.log("RANGE is :" + this.nodeRange);
@@ -329,7 +403,9 @@
                         this.isWaitingPropertyBinding = false;
                         this.propertyToBind = null;
                         // this.network.on("click", function (params){}.bind(this));
-                    } else { //On s'assure de retirer l'état si jamais on n'est pas dans une bonne situation
+                    }
+                    else
+                    { //On s'assure de retirer l'état si jamais on n'est pas dans une bonne situation
                         this.nodeDomain = null;
                         this.nodeRange = null;
                         this.isWaitingPropertyBinding = false;
@@ -339,9 +415,11 @@
                 }
             },
 
-            _findEdgeIDByLabel: function(label) {
+            _findEdgeIDByLabel: function(label)
+            {
 
-                this.edges.forEach(function(e) {
+                this.edges.forEach(function(e)
+                {
                     if (e.label === label)
                         return e.id;
                 });
@@ -350,14 +428,18 @@
             },
 
             //Default RGTE behavior is reactivty on edge to allow setting cardinality, discarding. Reactivity on node to allow discarding
-            _defaultRGTEBehavior: function(params) {
+            _defaultRGTEBehavior: function(params)
+            {
                 if (this.isWaitingPropertyBinding) //Don't change the behavior
                     return;
 
-                if (params.nodes.length != 0) {
+                if (params.nodes.length != 0)
+                {
                     console.log("NODE CLICKED");
                     return;
-                } else if (params.edges.length != 0) {
+                }
+                else if (params.edges.length != 0)
+                {
 
                     this.rgteEdgeSelected = {
                         id: params.edges[0],
@@ -369,12 +451,12 @@
 
             getNetwork: function()
             {
-              return this.network;
+                return this.network;
             },
 
             getEdgesCardinality: function()
             {
-              return this.edgesCardinality;
+                return this.edgesCardinality;
             },
 
         });

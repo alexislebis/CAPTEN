@@ -1,0 +1,196 @@
+<import rel="import" href="../../bower_components/paper-input/paper-input.html">
+<import rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+  <<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="rgte-saver-xml-element">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+        </style>
+
+        <paper-input id="fileName" label="File name" value="{{fname}}"><iron-icon icon="icons:description" prefix></iron-icon></paper-input>
+        <paper-input id="prefixName" label="Prefix name" value="{{pname}}" on-keypress="_disableAutoFillPrefix"><iron-icon icon="icons:announcement" prefix></iron-icon></paper-input>
+        <paper-input label="Username@email.com" value="{{uname}}" id="userName">
+          <iron-icon icon="icons:account-circle" prefix></iron-icon>
+        </paper-input>
+
+        <paper-button raised on-tap="save" ><iron-icon icon="icons:save"></iron-icon> Save!</paper-button>
+
+    </template>
+    <script>
+        (
+            function()
+            {
+                var customPrefix = ["@prefix : <http://www.CAPTEN.org/SEED/ontologies/custom/"]
+                var typeURI = ["http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                                "http://www.w3.org/2000/01/rdf-schema#domain",
+                                "http://www.w3.org/2000/01/rdf-schema#range"];
+                var classURI = ["http://www.w3.org/2002/07/owl#Class",
+                                "http://www.w3.org/2002/07/owl#ObjectProperty"];
+
+                Polymer(
+                {
+                    is: 'rgte-saver-xml-element',
+
+                    properties:
+                    {
+                        network:
+                        {
+                            type: Object,
+                            value: function()
+                            {
+                                return {};
+                            },
+                            notify: true,
+                        },
+                        fname:
+                        {
+                          type: String,
+                          value: "",
+                          notify: true,
+                          observer: "_onFnameChange",
+                        },
+                        pname:
+                        {
+                          type: String,
+                          value: "",
+                          notify: true,
+                        },
+                        uname:
+                        {
+                          type: String,
+                          value: "",
+                            notify: true,
+                        },
+                        isUserPrefix:
+                        {
+                          type: Boolean,
+                          notify: true,
+                          value: false,
+                        },
+                    },
+
+                    // observers:
+                    // [
+                    //   "_onNetworkChanged(network.*)",
+                    // ],
+
+
+                    //TODO: Change the name of the XML file.
+                    //TODO: Rename the name node ? Use the RGTE editor instead ?
+                    //TODO: Add meta data such as name, date, etc...
+                    //TODO: Save context ?
+
+                    _onFnameChange: function(change)
+                    {
+                      if(!this.isUserPrefix)
+                        this.pname = this.fname;
+                    },
+
+                    _disableAutoFillPrefix: function(change)
+                    {
+                      this.isUserPrefix = true;
+                    },
+
+                    save: function()
+                    {
+                        // this.network = net; //pointer, pas juste var
+
+                        console.log(this.network);
+
+                        var ntwNodes = this._cleanNodes(this.network);
+                        var ntwEdges = this.network.body.edges;
+
+                        var turtleResult = "##### Designed by "+this.uname+"\n\n";
+
+                        turtleResult += "######################\n#\tPREFIXES\n######################\n\n"+customPrefix[0]+""+this.pname+"#> .\n\n\n"; //TODO the ontology prefix must be in function of the user or the name
+
+                        var nodeParsed = [];
+
+
+                        turtleResult += "\n######################\n#\tCLASSES\n######################\n\n";
+                        ntwNodes.forEach(function(n)
+                        {
+                            if (n.id.substr(0, 4).indexOf("http") !== -1)
+                                turtleResult += "<" + n.id + "> ";
+                            else
+                              turtleResult += ":"+n.id+" ";
+
+                            turtleResult += "<"+typeURI[0]+"> <"+classURI[0]+"> .\n\n";
+                        });
+
+
+
+                        turtleResult += "\n\n######################\n#\tPROPERTIES\n######################\n\n";
+
+                        for(var eID in ntwEdges)
+                        {
+                          var e = ntwEdges[eID];
+
+
+                          //PROPERTY
+                          if (e.options.label.substr(0, 4).indexOf("http") !== -1)
+                              turtleResult += "<" + e.options.label + "> ";
+                          else
+                            turtleResult += ":"+e.options.label+" ";
+
+                          turtleResult += "<"+typeURI[0]+"> <"+classURI[1]+"> ;\n";
+
+                          //FROM
+                          turtleResult += "<"+typeURI[1]+"> "
+                          if (e.fromId.substr(0, 4).indexOf("http") !== -1)
+                              turtleResult += "<" + e.fromId + "> ";
+                          else
+                            turtleResult += ":"+e.fromId+" ";
+
+
+                            turtleResult+=";\n <"+typeURI[2]+'> ';
+                              //TO
+                              if (e.toId.substr(0, 4).indexOf("http") !== -1)
+                                  turtleResult += "<" + e.toId + "> ";
+                              else
+                                turtleResult += ":"+e.toId+" ";
+
+                            turtleResult += '.\n\n';
+                        };
+
+                        turtleResult += "###  Generated by the CAPTEN (version 0.0.1.20161020-1625) https://github.com/alexislebis/CAPTEN"
+
+
+                        var element = document.createElement('a');
+                        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(turtleResult));
+                        element.setAttribute('download', this.fname);
+
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+
+                        element.click();
+
+                        document.body.removeChild(element);
+
+                    },
+
+                    //prevent to use the "node edge" structure of vis.js
+                    //in nodes[], vis save both edges and nodes, thus for having a well structured array, nodes must be cleaned up
+                    _cleanNodes: function(network)
+                    {
+                        var newNodes = [];
+
+                        for (var nameNode in network.nodesHandler.body.nodes)
+                        {
+                            network.nodesHandler.body.nodeIndices.forEach(function(n)
+                            {
+                                if (nameNode == n)
+                                    newNodes.push(network.nodesHandler.body.nodes[nameNode]);
+                            });
+                        }
+
+                        return newNodes;
+                    },
+
+                });
+            })();
+    </script>
+</dom-module>
