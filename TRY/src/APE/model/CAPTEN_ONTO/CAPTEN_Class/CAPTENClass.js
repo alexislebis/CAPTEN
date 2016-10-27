@@ -18,9 +18,9 @@ function CAPTENClass(uri, properties) {
 
 CAPTENClass.prototype = {
 
-    /** The is function give the possibility to this (ScientificHaecceity) to evolve according to the need of the user.
+    /** The is function give the possibility to this to evolve according to the need of the user.
      * Thus, by choosing a specific subclass, the object will evolve. Note the nested evolving possibility with the subClasses value.
-     * if newName does not belong to the subClass possibilities of this (ScientificHaecceity), then is throw an exception.
+     * if newName does not belong to the subClass possibilities of this, then is throw an exception.
      * Moreover, specialization cannot be redone a second time, otherwise an exception is throw.
      **/
     is: function(newName) {

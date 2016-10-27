@@ -6,13 +6,17 @@ function NarratedOperator(usualName) {
     this.uriConceptConvoyed = null; //Allow to have a dictionary of the different concept of operation. Comme *Find* et *Correlation*
 
     //UPDATE from 22/09/216 : operators[] remove from IAP & become a part of an IOP
-    this.operators = []; //Associative array : [RelationOrder]:[ListOfOperations]
+    this.steps = null; //Associative array : [RelationOrder]:[ListOfSteps]
 
     this.annotation = null; //Annotation regarding the IndpOp
-    this.inputPatterns = null; //Inputs RGTE pattern needed
-    this.outputPatterns = null; //Output pattern. FIXME: can be infered by behaviors(inputPatterns)
-    this.specificSettings = null; //Specific settings needed to this Indp. Op. such as _node1_ > 5
-    this.behaviors = null; //The behaviors of a specific NarratedOperator. It is tightly bound with patterns
+
+    //Behavoural Patterns
+    // this.inputPatterns = null; //Inputs RGTE pattern needed
+    // this.outputPatterns = null; //Output pattern. : can be infered by behaviors(inputPatterns)
+    // this.specificSettings = null; //Specific settings needed to this Indp. Op. such as _node1_ > 5
+    this.behaviors = null; //BehavioralPattern. The behaviors of a specific NarratedOperator.
+
+    //Analysis tools links
     this.implementedByOperation = null; //For each tool : [T1:[OperatorList], T2:[OperatorList], ...]
 
     this.creationDate = null;
