@@ -38,7 +38,7 @@
             {
                 this.operators = [];
 
-                var Op = new IndependentOperator("Time Range");
+                var Op = new NarratedOperator("Time Range");
                 Op.annotation = new Description();
                 Op.annotation.content = "Build a time range.";
 
@@ -49,7 +49,7 @@
 
                 this.push('operators', Op);
 
-                Op = new IndependentOperator("For Each");
+                Op = new NarratedOperator("For Each");
                 Op.annotation = new Description();
                 Op.annotation.content = "Considering each element of the selected node. Change the context.";
 
@@ -60,7 +60,7 @@
 
                 this.push('operators', Op);
 
-                Op = new IndependentOperator("Filter");
+                Op = new NarratedOperator("Filter");
                 Op.annotation = new Description();
                 Op.annotation.content = "Filter the selected node.";
 
@@ -71,7 +71,7 @@
 
                 this.push('operators', Op);
 
-                Op = new IndependentOperator("Time Filter");
+                Op = new NarratedOperator("Time Filter");
                 Op.annotation = new Description();
                 Op.annotation.content = "Time filter. Only concerns nodes which are time-related";
 
@@ -82,7 +82,7 @@
 
                 this.push('operators', Op);
 
-                Op = new IndependentOperator("Distinctive Count");
+                Op = new NarratedOperator("Distinctive Count");
                 Op.annotation = new Description();
                 Op.annotation.content = "Distinct count of the conceptual elements in the selected node. Produce a new node related";
 

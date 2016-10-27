@@ -1,6 +1,6 @@
-function IndependentAnalysisProcess() {
+function NarratedAnalysisProcess() {
 
-  IndependentOperator.call(this);
+  NarratedOperator.call(this);
 
   //UPDATE 22/09/2016
   //this.operators = []; //Associative array : [RelationOrder]:[ListOfOperations]
@@ -11,4 +11,4 @@ function IndependentAnalysisProcess() {
 
 }
 
-IndependentAnalysisProcess.prototype = Object.create(IndependentOperator.prototype);
+NarratedAnalysisProcess.prototype = Object.create(NarratedOperator.prototype);
