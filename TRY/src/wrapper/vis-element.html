@@ -66,25 +66,7 @@
             },
 
             attached: function() {
-                // create an array with nodes
-                // var nodes = new vis.DataSet([
-                //     {id: 1, label: 'Node 1'},
-                //     {id: 2, label: 'Node 2'},
-                //     {id: 3, label: 'Node 3'},
-                //     {id: 4, label: 'Node 4'},
-                //     {id: 5, label: 'Node 5'}
-                // ]);
-
-                this.nodes = [];
-
-
-                // create an array with edges
-                // var edges = new vis.DataSet([
-                //     {from: 1, to: 3},
-                //     {from: 1, to: 2},
-                //     {from: 2, to: 4},
-                //     {from: 2, to: 5}
-                // ]);
+              this.nodes = [];
 
                 this.edges = [];
 
@@ -100,37 +82,44 @@
                 this.options = {};
                 // initialize your network!
                 this.network = new vis.Network(container, data, this.options);
+              //
+                this.network.addEventListener('click', function(p)
+                {
+                  console.log(p);
+                    this.fire('NETWORK_CLICKED', p);
+                }.bind(this));
+
             },
 
             setNodes: function(nbNodes) {
-                if (!Number.isNaN(nbNodes)) {
-
-                    this.nodes = [];
-
-                    for (i = 0; i < nbNodes; i++) {
-                        this.nodes.push({
-                            id: i + 1,
-                            label: 'Node ' + (i + 1)
-                        });
-
-                    }
-
-                    this.edges = [];
-
-                    var data = {
-                        nodes: this.nodes,
-                        edges: this.edges
-                    }
-
-                    var options = {};
-                    var container = this.$.mynetwork;
-
-                    this.network = new vis.Network(container, data, options);
-
-                    //this.createEdgeBetween(1,2,'testdeloeuf');
-                    this.completeNetwork();
-                    //this.renameNode(1, 'wesh');
-                }
+                // if (!Number.isNaN(nbNodes)) {
+                //
+                //     this.nodes = [];
+                //
+                //     for (i = 0; i < nbNodes; i++) {
+                //         this.nodes.push({
+                //             id: i + 1,
+                //             label: 'Node ' + (i + 1)
+                //         });
+                //
+                //     }
+                //
+                //     this.edges = [];
+                //
+                //     var data = {
+                //         nodes: this.nodes,
+                //         edges: this.edges
+                //     }
+                //
+                //     var options = {};
+                //     var container = this.$.mynetwork;
+                //
+                //     this.network = new vis.Network(container, data, options);
+                //
+                //     //this.createEdgeBetween(1,2,'testdeloeuf');
+                //     this.completeNetwork();
+                //     //this.renameNode(1, 'wesh');
+                // }
             },
 
             addNode: function(nodeID, nodeLabel) {

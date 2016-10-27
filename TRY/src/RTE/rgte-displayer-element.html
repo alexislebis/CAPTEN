@@ -1,0 +1,132 @@
+<link rel="import" href="../wrapper/vis-element.html">
+<link rel="import" href="../wrapper/rgte-model-element.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="rgte-displayer-element">
+    <template>
+        <style>
+             :host {
+                display: block;
+            }
+        </style>
+
+        <vis-element id="rgteview"></vis-element>
+      </template>
+      <script>
+        Polymer(
+          {
+            is: 'rgte-displayer-element',
+
+            properties:
+            {
+              rgte:
+              {
+                type: Object,
+                value: function(){
+                  return {};
+                },
+                notify: true,
+              },
+
+            },
+
+            delme: function(rgte)
+          {
+            this.rgte = rgte;
+          },
+
+            draw: function()
+            {
+                var network = this.$.rgteview.getNetwork();
+                //UPDATING NETWORK WITH NEW NODES.
+                //Update the node will no change ID of already existing (and identical) elements
+                network.setData(
+                {
+                    nodes: this.rgte.getNodes(),
+                    edges: this.rgte.getEdges(),
+                });
+
+                // this.network.setOptions(this.options);
+
+                //DRAW CARDINALITY
+                //Associate, for each edges notified in edgesCardinality{id,from,to}, its cardinality
+                //Since the modification of arrows is directly applied in the network, the edges affected
+                //Will NOT be changed nor they ID. It is important because this.edges=this.network.edgesHandler.edges must
+                //be kept synch with this.edgesCardinality
+                this.rgte.getEdgesCardinality().forEach(function(e, i)
+                {
+                    var focusEdge = network.edgesHandler.body.edges[e.id];
+                    if (focusEdge != null) //If the network has a node focusEdge
+                    {
+                        focusEdge.options.arrows.from.enabled = true;
+                        focusEdge.options.arrows.to.enabled = true;
+
+                        var that = this;
+                        focusEdge.drawArrows = function drawArrows(ctx, arrowData)
+                        {
+                            if (this.options.arrows.from.enabled === true)
+                            {
+                                that._drawCardinalityFrom(ctx, this.selected, this.hover, arrowData.from, e.fromCardinality);
+                            }
+                            if (this.options.arrows.to.enabled === true)
+                            {
+                                that._drawCardinalityTo(ctx, this.selected, this.hover, arrowData.to, e.toCardinality);
+                                this.edgeType.drawArrowHead(ctx, this.selected, this.hover, arrowData.to);
+                            }
+                        };
+                    }
+                }.bind(this));
+
+            },
+
+            _drawCardinalityFrom: function(ctx, selected, hover, arrowData, fromCard)
+            {
+                if (selected)
+                {
+                    ctx.font = 'bold 16px sans-serif';
+                }
+                else
+                {
+                    ctx.font = 'bold 16px sans-serif';
+                }
+                ctx.fillStyle = '#2A8F09';
+                ctx.fillText(fromCard,
+                    arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
+                    arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
+            },
+
+            _drawCardinalityTo: function(ctx, selected, hover, arrowData, toCard)
+            {
+                var oldStyle = ctx.strokeStyle;
+                if (selected)
+                {
+                    ctx.font = 'bold 16px sans-serif';
+                }
+                else
+                {
+                    ctx.font = 'bold 16px sans-serif';
+                }
+                ctx.fillStyle = '#2A8F09';
+                ctx.fillText(toCard,
+                    arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
+                    arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
+
+                  ctx.strokeStyle = oldStyle;
+                  ctx.fillStyle = ctx.strokeStyle;
+                  // ctx.lineWidth = this.getLineWidth(selected, hover);
+
+                  // // draw arrow at the end of the line
+                  ctx.arrow(arrowData.point.x, arrowData.point.y, arrowData.angle, arrowData.length);
+                  //
+                  // // draw shadow if enabled
+                  // this.enableShadow(ctx);
+                  // ctx.fill();
+                  // // disable shadows for other elements.
+                  // this.disableShadow(ctx);
+            },
+
+
+          });
+      </script>
+    </dom-module>

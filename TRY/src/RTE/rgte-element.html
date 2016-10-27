@@ -3,6 +3,7 @@
 <link rel="import" href="../wrapper/vis-element.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../RTE/rgte-displayer-element.html">
 <link rel="import" href="../RTE/rgte-cardinality-form-element.html">
 
 <dom-module id="rgte-element">
@@ -14,6 +15,7 @@
         </style>
 
         <vis-element id="rgte" network="{{network}}" , nodes="{{nodes}}" edges="{{edges}}"></vis-element>
+        <rgte-displayer-element id="rgteview"></rgte-displayer-element>
 
         <paper-dialog on-iron-overlay-closed="_isAddPropertyConfirmed" id="propertyModal" modal>
             <h2>Bind the property</h2>
@@ -145,9 +147,13 @@
 
             attached: function()
             {
-                this.network.addEventListener('click', function(p)
+                // this.network.addEventListener('click', function(p)
+                // {
+                //     this._behaviorSelector(p);
+                // }.bind(this));
+                this.$.rgteview.addEventListener('NETWORK_CLICKED', function(p)
                 {
-                    this._behaviorSelector(p);
+                    this._behaviorSelector(p.detail);
                 }.bind(this));
             },
 
@@ -219,6 +225,15 @@
                 });
 
                 this.network.setOptions(this.options);
+
+
+                var rgtetest = new RGTE();
+                rgtetest.nodes = this.nodes;
+                rgtetest.edges = this.edges;
+                rgtetest.edgesCardinality = this.edgesCardinality;
+
+                this.$.rgteview.delme(rgtetest);
+                this.$.rgteview.draw();
 
                 //DRAW CARDINALITY
                 //Associate, for each edges notified in edgesCardinality{id,from,to}, its cardinality
@@ -365,6 +380,7 @@
             //Define the behavior of the RGTE on click
             _behaviorSelector: function(params)
             {
+              console.log(params);
                 if (this.isWaitingPropertyBinding)
                 {
                     this._linkingNodesBehavior(params);
