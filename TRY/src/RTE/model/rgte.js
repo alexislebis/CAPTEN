@@ -7,9 +7,9 @@
 function RGTE(){
 
 
-  this.nodes = null;
-  this.edges = null;
-  this.edgesCardinality = null; //Array of edge (currently based on vis edge).
+  this.nodes = [];
+  this.edges = [];
+  this.edgesCardinality = []; //Array of edge (currently based on vis edge).
 
   this.context = null;
 }

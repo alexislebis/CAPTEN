@@ -31,6 +31,16 @@
 
             },
 
+            observers: [
+              "_onRgteChanged(rgte.*)", //TODO rendre sensible au changement de RGTE
+            ],
+
+            _onRgteChanged: function(change)
+            {
+              console.log("rgteChange");
+              this.draw();
+            },
+
             delme: function(rgte)
           {
             this.rgte = rgte;
@@ -39,6 +49,10 @@
             draw: function()
             {
                 var network = this.$.rgteview.getNetwork();
+
+                if(network == null)
+                  return;
+
                 //UPDATING NETWORK WITH NEW NODES.
                 //Update the node will no change ID of already existing (and identical) elements
                 network.setData(
