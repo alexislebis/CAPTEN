@@ -85,7 +85,6 @@
               //
                 this.network.addEventListener('click', function(p)
                 {
-                  console.log(p);
                     this.fire('NETWORK_CLICKED', p);
                 }.bind(this));
 
@@ -132,7 +131,44 @@
                     shape: "dot",
                     size: 30
                 });
+                console.log(this.nodes);
             },
+
+            //An array of nodes in json format accepted by vis
+            addNodes: function(visJSONArray)
+            {
+              this.nodes = visJSONArray;
+              console.log(this.nodes);
+
+              this.network.setData(
+              {
+                  nodes: this.nodes,
+                  edges: this.edges,
+              });
+            },
+
+            //An array of edges in json format accepted by vis. Their to & from are assumed to be ok with the nodes
+            addEdges: function(visJSONArray)
+            {
+              this.edges = visJSONArray;
+
+              this.network.setData(
+              {
+                  nodes: this.nodes,
+                  edges: this.edges,
+              });
+            },
+
+            redraw: function()
+            {
+              // this.network.setOptions(this.options);
+
+              this.network.redraw();
+
+              console.log(this.network);
+            },
+
+
 
             addNodeWithRedraw: function(nodeID, nodeLabel) {
                 this.addNode(nodeID, nodeLabel);

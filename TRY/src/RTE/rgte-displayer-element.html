@@ -13,64 +13,64 @@
 
         <vis-element id="rgteview"></vis-element>
       </template>
-      <script>
+    <script>
         Polymer(
-          {
+        {
             is: 'rgte-displayer-element',
 
             properties:
             {
-              rgte:
-              {
-                type: Object,
-                value: function(){
-                  return {};
+                rgte:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return {};
+                    },
+                    notify: true,
                 },
-                notify: true,
-              },
 
             },
 
             observers: [
-              "_onRgteChanged(rgte.*)", //TODO rendre sensible au changement de RGTE
+                "_onRgteChanged(rgte.*)", //TODO rendre sensible au changement de RGTE
             ],
+
+            attached: function()
+            {
+              this.$.rgteview.addEventListener('NETWORK_CLICKED', function(p)
+              {
+                  this._eventDispatcher(p.detail);
+              }.bind(this));
+            },
 
             _onRgteChanged: function(change)
             {
-              console.log("rgteChange");
-              this.draw();
+                console.log(this.rgte);
+                this.draw();
             },
-
-            delme: function(rgte)
-          {
-            this.rgte = rgte;
-          },
 
             draw: function()
             {
-                var network = this.$.rgteview.getNetwork();
+                var rgteView = this.$.rgteview;
 
-                if(network == null)
-                  return;
+                if (rgteView.getNetwork() == null)
+                    return;
 
                 //UPDATING NETWORK WITH NEW NODES.
-                //Update the node will no change ID of already existing (and identical) elements
-                network.setData(
-                {
-                    nodes: this.rgte.getNodes(),
-                    edges: this.rgte.getEdges(),
-                });
-
-                // this.network.setOptions(this.options);
+                //Update the node will not change ID of already existing (and identical) elements
+                rgteView.addNodes(this.rgte.getNodes());
+                rgteView.addEdges(this.rgte.getEdges());
 
                 //DRAW CARDINALITY
                 //Associate, for each edges notified in edgesCardinality{id,from,to}, its cardinality
                 //Since the modification of arrows is directly applied in the network, the edges affected
                 //Will NOT be changed nor they ID. It is important because this.edges=this.network.edgesHandler.edges must
                 //be kept synch with this.edgesCardinality
+
                 this.rgte.getEdgesCardinality().forEach(function(e, i)
                 {
-                    var focusEdge = network.edgesHandler.body.edges[e.id];
+                    var focusEdge = this.$.rgteview.getNetwork().edgesHandler.body.edges[e.id];
                     if (focusEdge != null) //If the network has a node focusEdge
                     {
                         focusEdge.options.arrows.from.enabled = true;
@@ -92,6 +92,7 @@
                     }
                 }.bind(this));
 
+                rgteView.redraw();
             },
 
             _drawCardinalityFrom: function(ctx, selected, hover, arrowData, fromCard)
@@ -126,21 +127,33 @@
                     arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
                     arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
 
-                  ctx.strokeStyle = oldStyle;
-                  ctx.fillStyle = ctx.strokeStyle;
-                  // ctx.lineWidth = this.getLineWidth(selected, hover);
+                ctx.strokeStyle = oldStyle;
+                ctx.fillStyle = ctx.strokeStyle;
+                // ctx.lineWidth = this.getLineWidth(selected, hover);
 
-                  // // draw arrow at the end of the line
-                  ctx.arrow(arrowData.point.x, arrowData.point.y, arrowData.angle, arrowData.length);
-                  //
-                  // // draw shadow if enabled
-                  // this.enableShadow(ctx);
-                  // ctx.fill();
-                  // // disable shadows for other elements.
-                  // this.disableShadow(ctx);
+                // // draw arrow at the end of the line
+                ctx.arrow(arrowData.point.x, arrowData.point.y, arrowData.angle, arrowData.length);
+                //
+                // // draw shadow if enabled
+                // this.enableShadow(ctx);
+                // ctx.fill();
+                // // disable shadows for other elements.
+                // this.disableShadow(ctx);
+            },
+
+            _eventDispatcher: function(params)
+            {
+              if(params.nodes.length != 0)
+              {
+                this.fire('NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0]});
+              }
+              else if(params.edges.length != 0)
+              {
+                this.fire('EDGE_SELECTED', {'id':params.edges[0], 'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label});
+              }
             },
 
 
-          });
-      </script>
-    </dom-module>
+        });
+    </script>
+</dom-module>

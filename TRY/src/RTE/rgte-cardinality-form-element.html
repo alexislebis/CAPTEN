@@ -77,7 +77,20 @@
                     type: String,
                     value: 'a',
                     notify: true,
-                }
+                },
+                rgte: {
+                  type: Object,
+                  value: function()
+                  {
+                    return new RGTE();
+                  },
+                  notify: true,
+                },
+                edgeID: {
+                  type: Number,
+                  value: -1,
+                  notiy: true,
+                },
             },
 
             observers: [
@@ -87,7 +100,10 @@
 
 
             _onEdgesCardinalityChanged: function(e) {
-                this._calculatingCardinalitiesAvailable();
+              if(this.rgte == null)
+                return;
+                // this._calculatingCardinalitiesAvailable();
+                this.cardinalitiesAvailable = this.rgte.getUsedCardinality();
             },
 
             //@WARNING : after z, not correctly handled
@@ -97,24 +113,25 @@
                 this.push("cardinalitiesAvailable", this.rootVal);
             },
 
-            _calculatingCardinalitiesAvailable: function() {
-                // if (this.cardinalitiesAvailable == null)
-                //     return;
-
-                this.edgesCardinality.forEach(function(e) {
-                    console.log(e);
-                    if (!this.cardinalitiesAvailable.includes(e.from)) {
-                        this.push("cardinalitiesAvailable", e.from);
-                    }
-                    if (!this.cardinalitiesAvailable.includes(e.to)) {
-                        this.push("cardinalitiesAvailable", e.to);
-                    }
-                }.bind(this));
-
-            },
+            // _calculatingCardinalitiesAvailable: function() {
+            //     // if (this.cardinalitiesAvailable == null)
+            //     //     return;
+            //
+            //     this.edgesCardinality.forEach(function(e) {
+            //         console.log(e);
+            //         if (!this.cardinalitiesAvailable.includes(e.from)) {
+            //             this.push("cardinalitiesAvailable", e.from);
+            //         }
+            //         if (!this.cardinalitiesAvailable.includes(e.to)) {
+            //             this.push("cardinalitiesAvailable", e.to);
+            //         }
+            //     }.bind(this));
+            //
+            // },
 
             submit: function(event) {
-                if (this.edge === null) //prevent to submit new card
+              console.log(this.edge);
+                if (this.edgeID === -1) //prevent to submit new card
                     return;
 
                 Polymer.dom(event).localTarget.parentElement.submit();
@@ -123,32 +140,56 @@
 
             },
             submitForm: function(event) {
-                var notInclude = true;
-                var index = -1;
 
-                this.edgesCardinality.forEach(function(e, i) {
-                    if (e.id === this.edge.id) {
-                        notInclude = false;
-                        index = i;
-                    }
-                }.bind(this));
+              var edgeCrdConcerned = this.rgte.findCardinalityForEdge(this.edgeID);
 
-                if (notInclude)
-                    this.push('edgesCardinality', {
-                        id: this.edge.id,
-                        from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
-                        to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
-                    });
-                else { //Remove & re-add for notifying polymer listener...
-                    this.splice('edgesCardinality', index, 1);
-                    this.push('edgesCardinality', {
-                        id: this.edge.id,
-                        from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
-                        to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
-                    });
-                }
-                console.log(this.edgesCardinality);
-                //fire selectedProp has updated card
+              if(edgeCrdConcerned.length === 0)
+              {
+                this.rgte.addEdgesCardinality(this.edgeID,
+                                              this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
+                                              this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
+                                            );
+              }
+              else if(edgeCrdConcerned.length === 1)
+              {
+                this.rgte.updateEdgeCardinality(edgeCrdConcerned[0].id,
+                                                this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
+                                                this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
+                                              );
+              }
+              else {
+                console.log("Unexpected behavior");
+                //TODO
+              }
+
+              console.log(this.rgte.getEdgesCardinality());
+
+                // var notInclude = true;
+                // var index = -1;
+                //
+                // this.edgesCardinality.forEach(function(e, i) {
+                //     if (e.id === this.edge.id) {
+                //         notInclude = false;
+                //         index = i;
+                //     }
+                // }.bind(this));
+                //
+                // if (notInclude)
+                //     this.push('edgesCardinality', {
+                //         id: this.edge.id,
+                //         from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
+                //         to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
+                //     });
+                // else { //Remove & re-add for notifying polymer listener...
+                //     this.splice('edgesCardinality', index, 1);
+                //     this.push('edgesCardinality', {
+                //         id: this.edge.id,
+                //         from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
+                //         to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
+                //     });
+                // }
+                // console.log(this.edgesCardinality);
+                // //fire selectedProp has updated card
 
             },
         });
