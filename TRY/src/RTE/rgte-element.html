@@ -44,7 +44,7 @@
 
 
 
-        <rgte-cardinality-form-element id="rgteCard" edge="{{rgteEdgeSelected}}" edges-cardinality="{{edgesCardinality}}"></rgte-cardinality-form-element>
+        <rgte-cardinality-form-element id="rgteCard" rgte="{{rgte}}" edgeid="{{edgeIDSelected}}"></rgte-cardinality-form-element>
 
     </template>
     <script>
@@ -152,7 +152,15 @@
                     return new RGTE();
                   },
                   notify: true,
-                }
+                  // observer: "_test"
+                },
+
+                edgeIDSelected:
+                {
+                  type: Number,
+                  value: -1,
+                  notify: true,
+                },
             },
 
             observers: [
@@ -169,14 +177,15 @@
                 this.$.rgteview.addEventListener('EDGE_CLICKED', function(p)
               {
                 this._behaviorSelector(p.detail, EDGE);
-              });
+              }.bind(this));
             },
 
 
             addClass: function(cls) //From rte-lister-element redirected by rgte-workzone-element
             {
                 this.rgte.addVisNode(cls);
-                this.$.rgteview._onRgteChanged(null);
+                // this.$.rgteview._onRgteChanged(null);
+                this.notifySplices('rgte.nodes');
             },
 
 
@@ -261,7 +270,8 @@
                         var prop = this.rgte.createVisProperty(this.nodeDomain, this.nodeRange, this.propertyToBind);
                         this.rgte.addVisProperty(prop.from, prop.to, prop.label, prop.arrows);
 
-                        this.$.rgteview.draw();
+                        //this.$.rgteview.draw();
+                        this.notifySplices('rgte.*');
 
                         this.nodeDomain = null;
                         this.nodeRange = null;
@@ -283,6 +293,7 @@
             //Default RGTE behavior is reactivty on edge to allow setting cardinality, discarding. Reactivity on node to allow discarding
             _defaultRGTEBehavior: function(params, type)
             {
+                console.log("dRB");
                 if (this.isWaitingPropertyBinding) //Don't change the behavior
                     return;
 
@@ -292,6 +303,8 @@
                 }
                 else if (type === EDGE)
                 {
+                  console.log("EDGE "+params.id+" selected");
+                  this.edgeIDSelected = params.id;
                   this.rgteEdgeSelected = {"id": params.id, "val": params.edgeLabel};
                 }
             },

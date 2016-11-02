@@ -33,7 +33,7 @@
             },
 
             observers: [
-                "_onRgteChanged(rgte.*)", //TODO rendre sensible au changement de RGTE
+                "_onRgteChanged(rgte.*)",
             ],
 
             attached: function()
@@ -149,7 +149,7 @@
               }
               else if(params.edges.length != 0)
               {
-                this.fire('EDGE_SELECTED', {'id':params.edges[0], 'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label});
+                this.fire('EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label});
               }
             },
 

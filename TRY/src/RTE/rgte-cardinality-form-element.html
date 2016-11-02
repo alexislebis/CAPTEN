@@ -54,18 +54,6 @@
             is: "rgte-cardinality-form-element",
 
             properties: {
-                edge: {
-                    type: Object,
-                    notify: true,
-                    value: null,
-                },
-                edgesCardinality: {
-                    type: Object,
-                    notify: true,
-                    value: function() {
-                        return [];
-                    },
-                },
                 cardinalitiesAvailable: {
                     type: Array,
                     notify: true,
@@ -86,25 +74,27 @@
                   },
                   notify: true,
                 },
-                edgeID: {
+                edgeid: {
                   type: Number,
                   value: -1,
                   notiy: true,
+                  observer: '_onEdgeIDChange'
                 },
             },
 
-            observers: [
-                "_onEdgesCardinalityChanged(edgesCardinality.*)", //!!Attention, change propagation is not recursive
-            ],
 
+// === EVENT ===
 
-
-            _onEdgesCardinalityChanged: function(e) {
-              if(this.rgte == null)
+            _onEdgeIDChange: function(change)
+            {
+              if(this.edgeid === -1)
                 return;
-                // this._calculatingCardinalitiesAvailable();
-                this.cardinalitiesAvailable = this.rgte.getUsedCardinality();
+
+              this.cardinalitiesAvailable.push(this.rgte.getUsedCardinality());
+              console.log("Cardinality loaded");
             },
+
+// === END EVENT ===
 
             //@WARNING : after z, not correctly handled
             _newCardinalityValue: function() {
@@ -130,8 +120,7 @@
             // },
 
             submit: function(event) {
-              console.log(this.edge);
-                if (this.edgeID === -1) //prevent to submit new card
+                if (this.edgeid === -1) //prevent to submit new card
                     return;
 
                 Polymer.dom(event).localTarget.parentElement.submit();
@@ -141,11 +130,11 @@
             },
             submitForm: function(event) {
 
-              var edgeCrdConcerned = this.rgte.findCardinalityForEdge(this.edgeID);
+              var edgeCrdConcerned = this.rgte.findCardinalityForEdge(this.edgeid);
 
               if(edgeCrdConcerned.length === 0)
               {
-                this.rgte.addEdgesCardinality(this.edgeID,
+                this.rgte.addEdgesCardinality(this.edgeid,
                                               this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
                                               this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
                                             );
@@ -162,6 +151,7 @@
                 //TODO
               }
 
+              this.notifySplices('rgte.edgesCardinality');
               console.log(this.rgte.getEdgesCardinality());
 
                 // var notInclude = true;
