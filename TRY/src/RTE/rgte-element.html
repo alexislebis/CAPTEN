@@ -184,8 +184,6 @@
             addClass: function(cls) //From rte-lister-element redirected by rgte-workzone-element
             {
                 this.rgte.addVisNode(cls);
-                // this.$.rgteview._onRgteChanged(null);
-                this.notifySplices('rgte.nodes');
             },
 
 
@@ -269,9 +267,6 @@
                         //this.$.rgte.createEdgeBetween(this.nodeDomain, this.nodeRange, this.propertyToBind);
                         var prop = this.rgte.createVisProperty(this.nodeDomain, this.nodeRange, this.propertyToBind);
                         this.rgte.addVisProperty(prop.from, prop.to, prop.label, prop.arrows);
-
-                        //this.$.rgteview.draw();
-                        this.notifySplices('rgte.*');
 
                         this.nodeDomain = null;
                         this.nodeRange = null;

@@ -80,7 +80,14 @@
                   notiy: true,
                   observer: '_onEdgeIDChange'
                 },
+                domainSelected:
+                {
+                  type: String,
+                  value: 0,
+                  notify: true,
+                },
             },
+
 
 
 // === EVENT ===
@@ -90,11 +97,39 @@
               if(this.edgeid === -1)
                 return;
 
-              this.cardinalitiesAvailable.push(this.rgte.getUsedCardinality());
-              console.log("Cardinality loaded");
+                this._loadCardinality();
             },
 
 // === END EVENT ===
+
+            _loadCardinality: function()
+            {
+              // Load dropdown elements
+              this.cardinalitiesAvailable = this.rgte.getSortedUsedCardinality();
+
+
+              // Select appropriate element in the list
+              var edgeCrdConcerned = this.rgte.findCardinalityForEdge(this.edgeid);
+
+              if(edgeCrdConcerned.length >= 1)
+              {
+                console.log(this.cardinalitiesAvailable);
+                this.$.DomainDropdown.selected = this.cardinalitiesAvailable.indexOf(edgeCrdConcerned[0].fromCardinality);
+                console.log(this.$.DomainDropdown.selected);
+                this.$.RangeDropdown.selected = this.cardinalitiesAvailable.indexOf(edgeCrdConcerned[0].toCardinality);
+                // for(var i = 0; i < this.cardinalitiesAvailable.length; i++)
+                // {
+                //   if(edgeCrdConcerned[0].fromCardinality === this.cardinalitiesAvailable[i])
+                //     {this.$.DomainDropdown.selected = i; console.log(this.cardinalitiesAvailable[i]);console.log(i);}
+                //   if(edgeCrdConcerned[0].toCardinality === this.cardinalitiesAvailable[i])
+                //     this.$.RangeDropdown.selected = i;
+                // }
+              }
+              else {
+                this.$.DomainDropdown.selected = '0';
+                this.$.RangeDropdown.selected = '0';
+              }
+            },
 
             //@WARNING : after z, not correctly handled
             _newCardinalityValue: function() {
@@ -130,7 +165,11 @@
             },
             submitForm: function(event) {
 
+              console.log((this.rgte.edgesCardinality));
+
               var edgeCrdConcerned = this.rgte.findCardinalityForEdge(this.edgeid);
+
+              console.log(edgeCrdConcerned);
 
               if(edgeCrdConcerned.length === 0)
               {
@@ -151,7 +190,6 @@
                 //TODO
               }
 
-              this.notifySplices('rgte.edgesCardinality');
               console.log(this.rgte.getEdgesCardinality());
 
                 // var notInclude = true;

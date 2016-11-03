@@ -32,9 +32,9 @@
 
             },
 
-            observers: [
-                "_onRgteChanged(rgte.*)",
-            ],
+            // observers: [
+            //     "_onRgteChanged(rgte.*)",
+            // ],
 
             attached: function()
             {
@@ -42,13 +42,22 @@
               {
                   this._eventDispatcher(p.detail);
               }.bind(this));
+
+              this.rgte.registerObserverCallbackOnChange(this, this._callbackOnRGTEChanged);
             },
 
-            _onRgteChanged: function(change)
+            // _onRgteChanged: function(change)
+            // {
+            //     console.log(this.rgte);
+            //     this.draw();
+            // },
+
+// === OBSERVATION METHODS
+            _callbackOnRGTEChanged: function()
             {
-                console.log(this.rgte);
-                this.draw();
+              this.draw();
             },
+// ===
 
             draw: function()
             {
@@ -70,7 +79,7 @@
 
                 this.rgte.getEdgesCardinality().forEach(function(e, i)
                 {
-                    var focusEdge = this.$.rgteview.getNetwork().edgesHandler.body.edges[e.id];
+                    var focusEdge = this.$.rgteview.getNetwork().edgesHandler.body.edges[e.edgeId];
                     if (focusEdge != null) //If the network has a node focusEdge
                     {
                         focusEdge.options.arrows.from.enabled = true;

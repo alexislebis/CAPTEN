@@ -6,7 +6,7 @@
 
 function RGTE(){
 
-
+  this.observers = [];
   this.nodes = [];
   this.edges = [];
   this.edgesCardinality = []; //Array of edge (currently based on vis edge).
@@ -20,19 +20,45 @@ RGTE.cardiID = 0;
 
 RGTE.prototype = {
 
+// === ADDING METHODS ===
   addVisNode: function(nodeLabel){
     this.nodes.push({"id": RGTE.nodeID++, "label": nodeLabel, "shape": "dot", "size":30});
+    this.notifyChange();
   },
 
   addVisProperty: function(fromID, toID, edgeLabel)
   {
     this.edges.push({"id": RGTE.edgeID++, "from":fromID, "to":toID, "label":edgeLabel, "arrows": "to"});
+    this.notifyChange();
   },
 
   addEdgesCardinality: function(eid, fromCardinality, toCardinality)
   {
     this.edgesCardinality.push({"id": RGTE.cardiID++, "edgeId": eid, "fromCardinality":fromCardinality, "toCardinality": toCardinality});
+    this.notifyChange();
   },
+// ===
+
+// === OBSERVATION
+  registerObserverCallbackOnChange: function(objCallback, callback)
+  {
+    this.observers.push([objCallback,callback]);
+  },
+
+    // === NOTIFICATION
+    notifyChange: function()
+    {
+      this.observers.forEach(function(e)
+      {
+        console.log(e);
+          if (typeof e[1] === "function") {
+            e[1].call(e[0]);//e[0] define the `this` context for e[1]
+          }
+      });
+    },
+
+// ===
+
 
   /**
    * For extension and more complex perspective, return an array. However, in the current version (2/Nov/2016)
@@ -78,14 +104,16 @@ RGTE.prototype = {
     var index = this.edgeCardinalityExists(id)
     if(index != -1)
     {
-      this.edgesCardinality[index].from = fromC;
-      this.edgesCardinality[index].to = toC;
+      this.edgesCardinality[index].fromCardinality = fromC;
+      this.edgesCardinality[index].toCardinality = toC;
+
+      this.notifyChange();
     }
   },
 
 // === EXISTENCE METHODS ===
 
-edgesCardinalityExists: function(id){
+edgeCardinalityExists: function(id){
   for(var i = 0; i < this.edgesCardinality.length; i++)
   {
     if(this.edgesCardinality[i].id === id)
@@ -102,7 +130,6 @@ edgesCardinalityExists: function(id){
       var cardinalitiesAvailable = [];
 
       this.edgesCardinality.forEach(function(e) {
-          console.log(e);
           if (!cardinalitiesAvailable.includes(e.from)) {
               cardinalitiesAvailable.push(e.fromCardinality);
           }
@@ -170,6 +197,11 @@ edgesCardinalityExists: function(id){
   getUsedCardinality: function()
   {
     return this._calculatingCardinalitiesAvailable();
+  },
+
+  getSortedUsedCardinality: function()
+  {
+    return this.getUsedCardinality().sort();
   },
 
 };
