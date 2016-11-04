@@ -68,11 +68,20 @@
                             type: Array,
                             notify: true,
                         },
+                        vocab:
+                        {
+                          type: Object,
+                          value: null,
+                        },
                     },
 
                     //Génère la nomenclature du graph rdf sous forme de classes et de propriétés
                     execute: function()
                     {
+                      // var vocab = new CONTROLLED_VOCABULARY();
+                      // vocab.setRDFStore(this.store);
+                      this.vocab.parseClassesAndProperties();
+                      console.log(this.vocab);
                         if (Object.keys(this.graph).length === 0 && this.graph.constructor === Object)
                             return;
 

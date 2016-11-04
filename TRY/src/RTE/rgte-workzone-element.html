@@ -12,10 +12,10 @@
         </style>
 
 
-        <rte-lister-element id="rteList" store="{{rdfstore}}" graph="{{graph}}" graphuri="{{graphuri}}" rdfcls="{{rdfcls}}" rdfprops="{{rdfprops}}"></rte-lister-element>
+        <rte-lister-element id="rteList" vocab="{{vocab}}" store="{{rdfstore}}" graph="{{graph}}" graphuri="{{graphuri}}" ></rte-lister-element>
         <rgte-element id="rgte" rgte="{{rgte}}" network="{{network}}"></rgte-element>
         <div  hidden$="{{isHidden}}">
-          <rgte-saver-xml-element id="xmlSaver" network="{{network}}"></rgte-saver-xml-element>
+          <rgte-saver-xml-element id="xmlSaver" network="{{network}}" rgte="{{rgte}}"></rgte-saver-xml-element>
         </div>
 
         <div hidden$="{{!isHidden}}">
@@ -99,7 +99,12 @@
             {
               type: Object,
               value: function(){ return new RGTE();},
-            }
+            },
+            vocab:
+            {
+              type: Object,
+              value: function(){ return new CONTROLLED_VOCABULARY();},
+            },
           },
 
           attached: function()

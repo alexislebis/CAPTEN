@@ -129,7 +129,7 @@
             </iron-list>
         </div>
 
-        <rdf-store-lister-element id="lister" rdfclasses="{{rdfcls}}" rdfprops="{{rdfprops}}"></rdf-store-lister-element>
+        <rdf-store-lister-element id="lister" vocab="{{vocab}}" rdfclasses="{{rdfcls}}" rdfprops="{{rdfprops}}"></rdf-store-lister-element>
 
     </template>
     <script>
@@ -219,7 +219,12 @@
                   type: Object,
                   notify: true,
                   value: null,
-                }
+                },
+                vocab:
+                {
+                  type: Object,
+                  value: function(){return new CONTROLLED_VOCABULARY();},
+                },
             },
 
             observers: [

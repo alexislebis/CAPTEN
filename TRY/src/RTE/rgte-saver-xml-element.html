@@ -70,6 +70,11 @@
                           notify: true,
                           value: false,
                         },
+                        rgte:
+                        {
+                          type: Object,
+                          value: function(){return new RGTE();},
+                        },
                     },
 
                     // observers:
@@ -96,12 +101,17 @@
 
                     save: function()
                     {
+                      this.rgteToRDF();
+                    },
+
+                    rgteToRDF: function()
+                    {
                         // this.network = net; //pointer, pas juste var
 
                         console.log(this.network);
 
-                        var ntwNodes = this._cleanNodes(this.network);
-                        var ntwEdges = this.network.body.edges;
+                        var ntwNodes = this.rgte.getNodes();
+                        var ntwEdges = this.rgte.getEdges();
 
                         var turtleResult = "##### Designed by "+this.uname+"\n\n";
 
@@ -111,12 +121,13 @@
 
 
                         turtleResult += "\n######################\n#\tCLASSES\n######################\n\n";
+
                         ntwNodes.forEach(function(n)
                         {
-                            if (n.id.substr(0, 4).indexOf("http") !== -1)
-                                turtleResult += "<" + n.id + "> ";
+                            if (n.label.substr(0, 4).indexOf("http") !== -1)
+                                turtleResult += "<" + n.label + "> ";
                             else
-                              turtleResult += ":"+n.id+" ";
+                              turtleResult += ":"+n.label+" ";
 
                             turtleResult += "<"+typeURI[0]+"> <"+classURI[0]+"> .\n\n";
                         });
@@ -131,27 +142,27 @@
 
 
                           //PROPERTY
-                          if (e.options.label.substr(0, 4).indexOf("http") !== -1)
-                              turtleResult += "<" + e.options.label + "> ";
+                          if (e.label.substr(0, 4).indexOf("http") !== -1)
+                              turtleResult += "<" + e.label + "> ";
                           else
-                            turtleResult += ":"+e.options.label+" ";
+                            turtleResult += ":"+e.label+" ";
 
                           turtleResult += "<"+typeURI[0]+"> <"+classURI[1]+"> ;\n";
 
                           //FROM
                           turtleResult += "<"+typeURI[1]+"> "
-                          if (e.fromId.substr(0, 4).indexOf("http") !== -1)
-                              turtleResult += "<" + e.fromId + "> ";
+                          if (this.rgte.getNodeById(e.from).label.substr(0, 4).indexOf("http") !== -1)
+                              turtleResult += "<" + this.rgte.getNodeById(e.from).label + "> ";
                           else
-                            turtleResult += ":"+e.fromId+" ";
+                            turtleResult += ":"+this.rgte.getNodeById(e.from).label+" ";
 
 
                             turtleResult+=";\n <"+typeURI[2]+'> ';
                               //TO
-                              if (e.toId.substr(0, 4).indexOf("http") !== -1)
-                                  turtleResult += "<" + e.toId + "> ";
+                              if (this.rgte.getNodeById(e.to).label.substr(0, 4).indexOf("http") !== -1)
+                                  turtleResult += "<" + this.rgte.getNodeById(e.to).label + "> ";
                               else
-                                turtleResult += ":"+e.toId+" ";
+                                turtleResult += ":"+this.rgte.getNodeById(e.to).label+" ";
 
                             turtleResult += '.\n\n';
                         };
@@ -171,6 +182,84 @@
                         document.body.removeChild(element);
 
                     },
+
+                    // save: function()
+                    // {
+                    //     // this.network = net; //pointer, pas juste var
+                    //
+                    //     console.log(this.network);
+                    //
+                    //     var ntwNodes = this._cleanNodes(this.network);
+                    //     var ntwEdges = this.network.body.edges;
+                    //
+                    //     var turtleResult = "##### Designed by "+this.uname+"\n\n";
+                    //
+                    //     turtleResult += "######################\n#\tPREFIXES\n######################\n\n"+customPrefix[0]+""+this.pname+"#> .\n\n\n"; //TODO the ontology prefix must be in function of the user or the name
+                    //
+                    //     var nodeParsed = [];
+                    //
+                    //
+                    //     turtleResult += "\n######################\n#\tCLASSES\n######################\n\n";
+                    //     ntwNodes.forEach(function(n)
+                    //     {
+                    //         if (n.id.substr(0, 4).indexOf("http") !== -1)
+                    //             turtleResult += "<" + n.id + "> ";
+                    //         else
+                    //           turtleResult += ":"+n.id+" ";
+                    //
+                    //         turtleResult += "<"+typeURI[0]+"> <"+classURI[0]+"> .\n\n";
+                    //     });
+                    //
+                    //
+                    //
+                    //     turtleResult += "\n\n######################\n#\tPROPERTIES\n######################\n\n";
+                    //
+                    //     for(var eID in ntwEdges)
+                    //     {
+                    //       var e = ntwEdges[eID];
+                    //
+                    //
+                    //       //PROPERTY
+                    //       if (e.options.label.substr(0, 4).indexOf("http") !== -1)
+                    //           turtleResult += "<" + e.options.label + "> ";
+                    //       else
+                    //         turtleResult += ":"+e.options.label+" ";
+                    //
+                    //       turtleResult += "<"+typeURI[0]+"> <"+classURI[1]+"> ;\n";
+                    //
+                    //       //FROM
+                    //       turtleResult += "<"+typeURI[1]+"> "
+                    //       if (e.fromId.substr(0, 4).indexOf("http") !== -1)
+                    //           turtleResult += "<" + e.fromId + "> ";
+                    //       else
+                    //         turtleResult += ":"+e.fromId+" ";
+                    //
+                    //
+                    //         turtleResult+=";\n <"+typeURI[2]+'> ';
+                    //           //TO
+                    //           if (e.toId.substr(0, 4).indexOf("http") !== -1)
+                    //               turtleResult += "<" + e.toId + "> ";
+                    //           else
+                    //             turtleResult += ":"+e.toId+" ";
+                    //
+                    //         turtleResult += '.\n\n';
+                    //     };
+                    //
+                    //     turtleResult += "###  Generated by the CAPTEN (version 0.0.1.20161020-1625) https://github.com/alexislebis/CAPTEN"
+                    //
+                    //
+                    //     var element = document.createElement('a');
+                    //     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(turtleResult));
+                    //     element.setAttribute('download', this.fname);
+                    //
+                    //     element.style.display = 'none';
+                    //     document.body.appendChild(element);
+                    //
+                    //     element.click();
+                    //
+                    //     document.body.removeChild(element);
+                    //
+                    // }
 
                     //prevent to use the "node edge" structure of vis.js
                     //in nodes[], vis save both edges and nodes, thus for having a well structured array, nodes must be cleaned up

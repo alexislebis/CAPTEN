@@ -66,12 +66,12 @@
                             <div class="border"></div>
                         </div>
                     </template>
-                </iron-list>
+    </iron-list>
 
-                <div>
-                    <h2>Availablle Properties</h2>
-                    <iron-list id="ilRDFP" items="[[rdfprops]]" as="item" class="flex" selection-enabled>
-                        <template>
+    <div>
+        <h2>Availablle Properties</h2>
+        <iron-list id="ilRDFP" items="[[rdfprops]]" as="item" class="flex" selection-enabled>
+            <template>
                             <div>
                                 <div class$="[[_computeClass(selected)]]" on-tap="_rdfpTapped">
                                     <div class="primary pad" tabindex$="[[tabIndex]]">[[item]]</div>
@@ -82,11 +82,11 @@
                                 <div class="border"></div>
 
                         </template>
-                        </div>
-                    </iron-list>
-                </div>
-            </div>
-        </div>
+    </div>
+    </iron-list>
+    </div>
+    </div>
+    </div>
     </template>
     <script>
         Polymer(
@@ -99,15 +99,27 @@
                 {
                     type: Array,
                     notify: true,
-                    value: function(){return[];},
-                    //observer: "_onRdfclassesChanged",
+                    value: function()
+                    {
+                        return [];
+                    },
+                    observer: "_test",
                 },
 
                 rdfprops:
                 {
                     type: Array,
                     notify: true,
-                    value: function(){return[];},
+                    value: function()
+                    {
+                        return [];
+                    },
+                },
+
+                vocab:
+                {
+                    type: Object,
+                    // value: function(){return new CONTROLLED_VOCABULARY();},
                 },
 
                 // selectedcls:
@@ -121,70 +133,56 @@
                 //   notify: true,
                 // },
             },
+            //
+            // observers: [
+            //     "_onRdfclassesChanged(rdfclasses.splices)",
+            //     "_onRdfpropertiesChanged(rdfprops.splices)",
+            // ],
 
-            observers: [
-                "_onRdfclassesChanged(rdfclasses.splices)",
-                "_onRdfpropertiesChanged(rdfprops.splices)",
-            ],
+            attached: function()
+            {
+                this.vocab.registerObserverCallbackOnChange(this, this._onVocabularyChange);
+            },
+
+            // === PRIVATE METHODS ===
+            _onVocabularyChange: function()
+            {
+                console.log(this.vocab.classes);
+                this._onRdfclassesChanged(null);
+                this._onRdfpropertiesChanged(null);
+            },
+
+            _iterateOnClasses: function(vocab)
+            {
+                console.log("yo");
+                return vocab.getClasses();
+            },
+
+            _test:function(p)
+            {
+              console.log("rdfclssChanged");
+            },
 
             _onRdfclassesChanged: function(change)
             {
+                console.log("rdfclssChanged");
 
-                if (Object.keys(this.rdfclasses).length === 0 && this.rdfclasses.constructor === Object)
-                    return;
+                //this.set('rdfclasses', this.vocab.getClasses());
+                this.rdfclasses = [];
+                this.rdfclasses = this.vocab.getClasses();
 
-                console.log("CALL: _onRdfclassesChanged");
-                //console.log(this.rdfclasses);
-                if (!change)
-                    return;
-
-                //  var items ='';
-                //var that = this;
-                //@IMPORTANT: Polymer splice function for array browsing
-                // change.indexSplices.forEach(function(s){
-                //   for (var i=0; i<s.addedCount; i++){
-                //     var index = s.index + i;
-                //     var item = '';
-                //
-                //     '<li>'+that.rdfclasses[index]+'</li>';
-                //
-                //     Polymer.dom(that.$.rdfClasses).innerHTML = item;
-                //     // console.log(s.object[s.index+i]+" vs. "+that.rdfclasses[s.index+i]);
-                //  }
-                //});
-
-                // for(var i = 0; i < this.rdfclasses.length; i++)
-                // {
-                //   items += '<li on-tap="_onRdfclassesClicked">'+this.rdfclasses[i]+'</li>';
-                // }
-                //
-                // Polymer.dom(this.$.rdfClasses).innerHTML = items;
-                // var that = this;
-                // console.log(Polymer.dom(that.root).querySelector(".rdfClasses"));
-                // console.log(n.path+" |||"+n.value);
-
-                // this.rdfclasses.forEach(function(e,i){
-                //   console.log(e);
-                // });
+                console.log(this.vocab.getClasses());
 
                 Polymer.dom(this.root).querySelector('#ilRDFC').notifyResize();
                 //document.querySelector('iron-list').notifyResize();
             },
 
-            iconForItem: function(isSelected)
+            _onRdfpropertiesChanged: function(change)
             {
-                return isSelected ? 'check-circle' : 'radio-button-unchecked';
-            },
+                this.rdfprops = [];
+                this.set('rdfprops', this.vocab.getProperties());
 
-
-            getClassListing: function()
-            {
-              return Polymer.dom(this.root).querySelector('#ilRDFC');
-            },
-
-            getPropsListing: function()
-            {
-              return Polymer.dom(this.root).querySelector('#ilRDFP');
+                Polymer.dom(this.root).querySelector('#ilRDFP').notifyResize();
             },
 
             _computeClass: function(isSelected)
@@ -196,49 +194,58 @@
             {
                 console.log(e.model.item);
 
-                if(!e.model.selected)//If the item is selected
-                  this.fire("ClassSelected", {element: e});
-                  else {
-                    this.fire("ClassDeselected", {});
-                  }
+                if (!e.model.selected) //If the item is selected
+                    this.fire("ClassSelected",
+                {
+                    element: e
+                });
+                else
+                {
+                    this.fire("ClassDeselected",
+                    {});
+                }
             },
             _rdfpTapped: function(e)
             {
                 console.log(e.model.item);
 
-                if(!e.model.selected)//If the item is selected
-                  this.fire("PropSelected", {element: e});
-                  else {
-                    this.fire("PropDeselected", {});
-                  }
+                if (!e.model.selected) //If the item is selected
+                    this.fire("PropSelected",
+                {
+                    element: e
+                });
+                else
+                {
+                    this.fire("PropDeselected",
+                    {});
+                }
             },
 
-            _onRdfpropertiesChanged: function(change)
+            // ===
+
+            iconForItem: function(isSelected)
             {
-                if (Object.keys(this.rdfprops).length === 0 && this.rdfprops.constructor === Object)
-                    return;
+                return isSelected ? 'check-circle' : 'radio-button-unchecked';
+            },
 
-                if (!change)
-                    return;
 
-                // var items ='';
-                //
-                // for(var i = 0; i < this.rdfprops.length; i++)
-                // {
-                //   items += '<li>'+this.rdfprops[i]+'</li>';
-                // }
-                //
-                // Polymer.dom(this.$.rdfProperties).innerHTML = items;
-                Polymer.dom(this.root).querySelector('#ilRDFP').notifyResize();
+            getClassListing: function()
+            {
+                return Polymer.dom(this.root).querySelector('#ilRDFC');
+            },
+
+            getPropsListing: function()
+            {
+                return Polymer.dom(this.root).querySelector('#ilRDFP');
             },
 
             clearClsSelection: function()
             {
-              this.$.ilRDFC.clearSelection();
+                this.$.ilRDFC.clearSelection();
             },
             clearPropSelection: function()
             {
-              this.$.ilRDFP.clearSelection();
+                this.$.ilRDFP.clearSelection();
             }
         });
     </script>
