@@ -13,9 +13,9 @@
 
 
         <rte-lister-element id="rteList" vocab="{{vocab}}" store="{{rdfstore}}" graph="{{graph}}" graphuri="{{graphuri}}" ></rte-lister-element>
-        <rgte-element id="rgte" rgte="{{rgte}}" network="{{network}}"></rgte-element>
+        <rgte-element id="rgte" rgte="{{rgte}}"></rgte-element>
         <div  hidden$="{{isHidden}}">
-          <rgte-saver-xml-element id="xmlSaver" network="{{network}}" rgte="{{rgte}}"></rgte-saver-xml-element>
+          <rgte-saver-xml-element id="xmlSaver" rgte="{{rgte}}"></rgte-saver-xml-element>
         </div>
 
         <div hidden$="{{!isHidden}}">

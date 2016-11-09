@@ -36,15 +36,15 @@
 
                     properties:
                     {
-                        network:
-                        {
-                            type: Object,
-                            value: function()
-                            {
-                                return {};
-                            },
-                            notify: true,
-                        },
+                        // network:
+                        // {
+                        //     type: Object,
+                        //     value: function()
+                        //     {
+                        //         return {};
+                        //     },
+                        //     notify: true,
+                        // },
                         fname:
                         {
                           type: String,
@@ -108,7 +108,7 @@
                     {
                         // this.network = net; //pointer, pas juste var
 
-                        console.log(this.network);
+                        // console.log(this.network);
 
                         var ntwNodes = this.rgte.getNodes();
                         var ntwEdges = this.rgte.getEdges();
@@ -263,21 +263,21 @@
 
                     //prevent to use the "node edge" structure of vis.js
                     //in nodes[], vis save both edges and nodes, thus for having a well structured array, nodes must be cleaned up
-                    _cleanNodes: function(network)
-                    {
-                        var newNodes = [];
-
-                        for (var nameNode in network.nodesHandler.body.nodes)
-                        {
-                            network.nodesHandler.body.nodeIndices.forEach(function(n)
-                            {
-                                if (nameNode == n)
-                                    newNodes.push(network.nodesHandler.body.nodes[nameNode]);
-                            });
-                        }
-
-                        return newNodes;
-                    },
+                    // _cleanNodes: function(network)
+                    // {
+                    //     var newNodes = [];
+                    //
+                    //     for (var nameNode in network.nodesHandler.body.nodes)
+                    //     {
+                    //         network.nodesHandler.body.nodeIndices.forEach(function(n)
+                    //         {
+                    //             if (nameNode == n)
+                    //                 newNodes.push(network.nodesHandler.body.nodes[nameNode]);
+                    //         });
+                    //     }
+                    //
+                    //     return newNodes;
+                    // },
 
                 });
             })();

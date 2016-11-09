@@ -90,69 +90,6 @@
                     type: Object,
                     value: null,
                 },
-                network:
-                {
-                    type: Object,
-                    notify: true,
-                },
-                nodes:
-                {
-                    type: Object,
-                    value: function()
-                    {
-                        return [];
-                    },
-                    notify: true,
-                },
-                edges:
-                {
-                    type: Object,
-                    value: function()
-                    {
-                        return [];
-                    },
-                    notify: true,
-                },
-                edgesCardinality:
-                {
-                    type: Object,
-                    notify: true,
-                    value: function()
-                    {
-                        return [];
-                    },
-                },
-                options:
-                {
-                    type: Object,
-                    value: function()
-                    {
-                        return [];
-                    },
-                    notify: true,
-                },
-                networkOptions:
-                {
-                    type: Object,
-                    value: function()
-                    {
-                        return {};
-                    },
-                    notify: true,
-                },
-                rgteNodeSelected:
-                {
-                    type: Object,
-                    value: null,
-                    notify: true,
-                },
-                rgteEdgeSelected:
-                {
-                    type: Object,
-                    value: null,
-                    notify: true,
-                },
-
                 rgte:
                 {
                   type: Object,
@@ -171,9 +108,9 @@
                 },
             },
 
-            observers: [
-                "_onNodesChange(nodes.splice)",
-            ],
+            // observers: [
+            //     "_onNodesChange(nodes.splice)",
+            // ],
 
             attached: function()
             {
@@ -213,15 +150,15 @@
                 this.$.propertyModal.open();
             },
 
-            _onNodesChange: function(change)
-            {
-                if (Object.keys(this.nodes).length === 0 && this.nodes.constructor === Object)
-                    return;
-
-                if (!change)
-                    return;
-
-            },
+            // _onNodesChange: function(change)
+            // {
+            //     if (Object.keys(this.nodes).length === 0 && this.nodes.constructor === Object)
+            //         return;
+            //
+            //     if (!change)
+            //         return;
+            //
+            // },
 
             // _oniWPBChanged: function(valueToCheck)
             // {
@@ -314,15 +251,15 @@
                 }
             },
 
-            getNetwork: function()
-            {
-                return this.network;
-            },
+            // getNetwork: function()
+            // {
+            //     return this.network;
+            // },
 
-            getEdgesCardinality: function()
-            {
-                return this.edgesCardinality;
-            },
+            // getEdgesCardinality: function()
+            // {
+            //     return this.edgesCardinality;
+            // },
 
         });
       })();

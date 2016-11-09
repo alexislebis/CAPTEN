@@ -180,7 +180,7 @@
             _onRdfpropertiesChanged: function(change)
             {
                 this.rdfprops = [];
-                this.set('rdfprops', this.vocab.getProperties());
+                this.set('rdfprops', this.vocab.getURIProperties());
 
                 Polymer.dom(this.root).querySelector('#ilRDFP').notifyResize();
             },

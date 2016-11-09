@@ -60,10 +60,11 @@
 
                         this.vocab.getGraph(function(g)
                         {
-
+                            var props = this.vocab.getURIProperties();
+                            var c = this.vocab.getClasses();
                             g.triples.forEach(function(elm)
                             {
-                                if (this.vocab.getProperties().includes(elm.subject.nominalValue))
+                                if (props.includes(elm.subject.nominalValue))
                                 {
 
                                     if (!this.propertieIsParsed(elm.subject.nominalValue, properties))
@@ -76,17 +77,17 @@
 
                                     if (this.isDomain(elm.predicate.nominalValue))
                                     {
-                                        if (this.vocab.getClasses().includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
+                                        if (c.includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
                                             properties[elm.subject.nominalValue][0].push(elm.object.nominalValue);
                                     }
                                     else if (this.isRange(elm.predicate.nominalValue))
                                     {
-                                        if (this.vocab.getClasses().includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
+                                        if (c.includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
                                             properties[elm.subject.nominalValue][1].push(elm.object.nominalValue);
                                     }
 
                                 }
-                                else if (this.vocab.getClasses().includes(elm.subject.nominalValue))
+                                else if (c.includes(elm.subject.nominalValue))
                                 {
                                     if (!this.belongsToForbiden(elm.predicate.nominalValue))
                                         visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, this._truncateURI(elm.predicate.nominalValue));
