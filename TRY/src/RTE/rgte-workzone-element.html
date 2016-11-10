@@ -12,7 +12,7 @@
         </style>
 
 
-        <rte-lister-element id="rteList" vocab="{{vocab}}" store="{{rdfstore}}" graph="{{graph}}" graphuri="{{graphuri}}" ></rte-lister-element>
+        <rte-lister-element id="rteList" vocab="{{vocab}}"></rte-lister-element>
         <rgte-element id="rgte" rgte="{{rgte}}"></rgte-element>
         <div  hidden$="{{isHidden}}">
           <rgte-saver-xml-element id="xmlSaver" rgte="{{rgte}}"></rgte-saver-xml-element>
@@ -40,55 +40,6 @@
 
           properties:
           {
-            rdfstore:
-            {
-                type: Object,
-                value: function()
-                {
-                    return {};
-                },
-                notify: true,
-                // observer: "_rdfStoreChanged",
-            },
-            graph:
-            {
-                type: Object,
-                value: function()
-                {
-                    return {};
-                },
-                // reflectToAttribute: true,
-                notify: true,
-            },
-            graphuri: //@REMOVE
-            {
-                type: Object,
-                value: function()
-                {
-                    return {};
-                },
-                notify: true,
-            },
-            network:
-            {
-              type: Object,
-              value: function()
-              {
-                return {};
-              },
-              notify: true,
-            },
-            rdfcls:
-            {
-                type: Array,
-                //value: function(){return {};},
-                notify: true,
-            },
-            rdfprops:
-            {
-                type: Array,
-                notify: true,
-            },
             isHidden:
             {
               type: Boolean,

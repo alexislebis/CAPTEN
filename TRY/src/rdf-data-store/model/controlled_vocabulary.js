@@ -186,15 +186,21 @@ CONTROLLED_VOCABULARY.prototype = {
 
     },
 
-    serializeToN3: function()
-    {
+    // ===
 
-    },
+    // === SERIALIZATION
+      serializeToN3: function()
+      {
 
+      },
+    // ===
+
+    // === ADDING METHODS
     addClass: function(cl)
     {
 
     },
+    // ===
 
     addProperty: function(pr)
     {

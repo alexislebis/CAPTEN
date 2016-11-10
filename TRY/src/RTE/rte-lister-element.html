@@ -129,7 +129,7 @@
             </iron-list>
         </div>
 
-        <rdf-store-lister-element id="lister" vocab="{{vocab}}" rdfclasses="{{rdfcls}}" rdfprops="{{rdfprops}}"></rdf-store-lister-element>
+        <rdf-store-lister-element id="lister" vocab="{{vocab}}"></rdf-store-lister-element>
 
     </template>
     <script>
@@ -139,36 +139,36 @@
 
             properties:
             {
-                store:
-                {
-                    type: Object,
-                    value: function()
-                    {
-                        return {};
-                    },
-                    notify: true,
-                    // observer: "_rdfStoreChanged",
-                },
-                graph:
-                {
-                    type: Object,
-                    value: function()
-                    {
-                        return {};
-                    },
-                    // reflectToAttribute: true,
-                    //observer: "_onGraphChanged",
-                    notify: true,
-                },
-                graphuri: //@REMOVE
-                {
-                    type: Object,
-                    value: function()
-                    {
-                        return {};
-                    },
-                    notify: true,
-                },
+                // store:
+                // {
+                //     type: Object,
+                //     value: function()
+                //     {
+                //         return {};
+                //     },
+                //     notify: true,
+                //     // observer: "_rdfStoreChanged",
+                // },
+                // graph:
+                // {
+                //     type: Object,
+                //     value: function()
+                //     {
+                //         return {};
+                //     },
+                //     // reflectToAttribute: true,
+                //     //observer: "_onGraphChanged",
+                //     notify: true,
+                // },
+                // graphuri: //@REMOVE
+                // {
+                //     type: Object,
+                //     value: function()
+                //     {
+                //         return {};
+                //     },
+                //     notify: true,
+                // },
                 customcls:
                 {
                     type: Array,
@@ -186,27 +186,6 @@
                     {
                         return [];
                     },
-                },
-                rdfcls:
-                {
-                    type: Array,
-                    //value: function(){return {};},
-                    notify: true,
-                },
-                rdfprops:
-                {
-                    type: Array,
-                    notify: true,
-                },
-                mergedCls:
-                {
-                    type: Array,
-                    notify: true,
-                },
-                mergedProps:
-                {
-                    type: Array,
-                    notify: true,
                 },
                 selectedcls://Class selected
                 {
@@ -231,15 +210,6 @@
                 "_onCustomClsChanged(customcls.splices)",
                 "_onCustomPropsChanged(customprops.splices)"
             ],
-
-            // ready: function()
-            // {
-            //   if(this.customcls == undefined)
-            //     this.customcls = [];
-            //   if(this.customprops == undefined)
-            //     this.customprops = [];
-            //
-            // },
 
             attached: function()
             {
@@ -281,12 +251,12 @@
             {
                 if (e.detail.type === "CLASS") //Si il s'agit d'une classe
                 {
-                    if (!this.customcls.includes(e.detail.value) && !this.rdfcls.includes(e.detail.value))
+                    if (!this.customcls.includes(e.detail.value) && !this.vocab.getClasses().includes(e.detail.value))
                         this.addCustomClass(e.detail.value);
                 }
                 else if (e.detail.type === "PROPERTY")
                 {
-                    if (!this.customprops.includes(e.detail.value) && !this.rdfprops.includes(e.detail.value))
+                    if (!this.customprops.includes(e.detail.value) && !this.vocab.getURIProperties().includes(e.detail.value))
                         this.addCustomProperty(e.detail.value);
                 }
 
@@ -347,7 +317,7 @@
                 if (!change)
                     return;
 
-                this._mergingCls();
+                // this._mergingCls();
 
                 Polymer.dom(this.root).querySelector('#ilCUSTCLS').notifyResize();
             },
@@ -359,7 +329,7 @@
                 if (!change)
                     return;
 
-                this._mergingProps();
+                // this._mergingProps();
 
                 Polymer.dom(this.root).querySelector('#ilCUSTPROPS').notifyResize();
             },
@@ -401,32 +371,32 @@
             },
 
             //RTE formulaire isn't specialized, thus rte fom expect only one array for classes to check the inclusion, IDEM for props.
-            _mergingCls: function()
-            {
-                this.mergedCls = [];
-
-                this.rdfcls.forEach(function(e){
-                  this.push('mergedCls', e);
-                }.bind(this));
-
-                this.customcls.forEach(function(e)
-                {
-                    this.push('mergedCls', e);
-                }.bind(this));
-            },
-            _mergingProps: function()
-            {
-                this.mergedProps = [];
-
-                this.rdfprops.forEach(function(e){
-                  this.push('mergedProps', e);
-                }.bind(this));
-
-                this.customprops.forEach(function(e)
-                {
-                    this.push('mergedProps', e);
-                }.bind(this));
-            },
+            // _mergingCls: function()
+            // {
+            //     this.mergedCls = [];
+            //
+            //     this.vocab.getClasses().forEach(function(e){
+            //       this.push('mergedCls', e);
+            //     }.bind(this));
+            //
+            //     this.customcls.forEach(function(e)
+            //     {
+            //         this.push('mergedCls', e);
+            //     }.bind(this));
+            // },
+            // _mergingProps: function()
+            // {
+            //     this.mergedProps = [];
+            //
+            //     this.rdfprops.forEach(function(e){
+            //       this.push('mergedProps', e);
+            //     }.bind(this));
+            //
+            //     this.customprops.forEach(function(e)
+            //     {
+            //         this.push('mergedProps', e);
+            //     }.bind(this));
+            // },
             _manageSelectedClass: function(e)
             {
               this.$.ilCUSTCLS.clearSelection();

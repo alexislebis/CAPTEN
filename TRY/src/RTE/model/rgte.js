@@ -39,6 +39,13 @@ RGTE.prototype = {
   },
 // ===
 
+// === SERIALIZATION
+  serializeToN3: function()
+  {
+
+  },
+// ===
+
 // === OBSERVATION
   registerObserverCallbackOnChange: function(objCallback, callback)
   {
