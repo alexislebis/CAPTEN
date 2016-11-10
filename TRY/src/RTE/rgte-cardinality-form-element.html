@@ -54,18 +54,6 @@
             is: "rgte-cardinality-form-element",
 
             properties: {
-                edge: {
-                    type: Object,
-                    notify: true,
-                    value: null,
-                },
-                edgesCardinality: {
-                    type: Object,
-                    notify: true,
-                    value: function() {
-                        return [];
-                    },
-                },
                 cardinalitiesAvailable: {
                     type: Array,
                     notify: true,
@@ -77,17 +65,63 @@
                     type: String,
                     value: 'a',
                     notify: true,
-                }
+                },
+                rgte: {
+                  type: Object,
+                  value: function()
+                  {
+                    return new RGTE();
+                  },
+                  notify: true,
+                },
+                edgeid: {
+                  type: Number,
+                  value: -1,
+                  notiy: true,
+                  observer: '_onEdgeIDChange'
+                },
+                domainSelected:
+                {
+                  type: String,
+                  value: 0,
+                  notify: true,
+                },
             },
 
-            observers: [
-                "_onEdgesCardinalityChanged(edgesCardinality.*)", //!!Attention, change propagation is not recursive
-            ],
 
 
+// === EVENT ===
 
-            _onEdgesCardinalityChanged: function(e) {
-                this._calculatingCardinalitiesAvailable();
+            _onEdgeIDChange: function(change)
+            {
+              if(this.edgeid === -1)
+                return;
+
+                this._loadCardinality();
+            },
+
+// === END EVENT ===
+
+            _loadCardinality: function()
+            {
+              // Load dropdown elements
+              this.cardinalitiesAvailable = this.rgte.getSortedUsedCardinality();
+
+
+              // Select appropriate element in the list
+              var edgeCrdConcerned = this.rgte.findCardinalityForEdge(this.edgeid);
+
+              if(edgeCrdConcerned.length >= 1)
+              {
+                console.log(this.cardinalitiesAvailable);
+                this.$.DomainDropdown.selected = this.cardinalitiesAvailable.indexOf(edgeCrdConcerned[0].fromCardinality);
+                console.log(this.$.DomainDropdown.selected);
+                this.$.RangeDropdown.selected = this.cardinalitiesAvailable.indexOf(edgeCrdConcerned[0].toCardinality);
+              }
+              else {
+                this.$.DomainDropdown.selected = '0';
+                this.$.RangeDropdown.selected = '0';
+              }
             },
 
             //@WARNING : after z, not correctly handled
@@ -97,24 +131,24 @@
                 this.push("cardinalitiesAvailable", this.rootVal);
             },
 
-            _calculatingCardinalitiesAvailable: function() {
-                // if (this.cardinalitiesAvailable == null)
-                //     return;
-
-                this.edgesCardinality.forEach(function(e) {
-                    console.log(e);
-                    if (!this.cardinalitiesAvailable.includes(e.from)) {
-                        this.push("cardinalitiesAvailable", e.from);
-                    }
-                    if (!this.cardinalitiesAvailable.includes(e.to)) {
-                        this.push("cardinalitiesAvailable", e.to);
-                    }
-                }.bind(this));
-
-            },
+            // _calculatingCardinalitiesAvailable: function() {
+            //     // if (this.cardinalitiesAvailable == null)
+            //     //     return;
+            //
+            //     this.edgesCardinality.forEach(function(e) {
+            //         console.log(e);
+            //         if (!this.cardinalitiesAvailable.includes(e.from)) {
+            //             this.push("cardinalitiesAvailable", e.from);
+            //         }
+            //         if (!this.cardinalitiesAvailable.includes(e.to)) {
+            //             this.push("cardinalitiesAvailable", e.to);
+            //         }
+            //     }.bind(this));
+            //
+            // },
 
             submit: function(event) {
-                if (this.edge === null) //prevent to submit new card
+                if (this.edgeid === -1) //prevent to submit new card
                     return;
 
                 Polymer.dom(event).localTarget.parentElement.submit();
@@ -123,32 +157,33 @@
 
             },
             submitForm: function(event) {
-                var notInclude = true;
-                var index = -1;
 
-                this.edgesCardinality.forEach(function(e, i) {
-                    if (e.id === this.edge.id) {
-                        notInclude = false;
-                        index = i;
-                    }
-                }.bind(this));
+              console.log((this.rgte.edgesCardinality));
 
-                if (notInclude)
-                    this.push('edgesCardinality', {
-                        id: this.edge.id,
-                        from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
-                        to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
-                    });
-                else { //Remove & re-add for notifying polymer listener...
-                    this.splice('edgesCardinality', index, 1);
-                    this.push('edgesCardinality', {
-                        id: this.edge.id,
-                        from: this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
-                        to: this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
-                    });
-                }
-                console.log(this.edgesCardinality);
-                //fire selectedProp has updated card
+              var edgeCrdConcerned = this.rgte.findCardinalityForEdge(this.edgeid);
+
+              console.log(edgeCrdConcerned);
+
+              if(edgeCrdConcerned.length === 0)
+              {
+                this.rgte.addEdgesCardinality(this.edgeid,
+                                              this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
+                                              this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
+                                            );
+              }
+              else if(edgeCrdConcerned.length === 1)
+              {
+                this.rgte.updateEdgeCardinality(edgeCrdConcerned[0].id,
+                                                this.$.DomainDropdown.items[this.$.DomainDropdown.selected].getAttribute("value"),
+                                                this.$.RangeDropdown.items[this.$.RangeDropdown.selected].getAttribute("value")
+                                              );
+              }
+              else {
+                console.log("Unexpected behavior");
+                //TODO
+              }
+
+              // console.log(this.rgte.getEdgesCardinality());
 
             },
         });

@@ -14,17 +14,20 @@ function Property(uri, From, to, additionalConstraints){
     this.to = to;
     this.constraints = additionalConstraints;
 
+    this.description = null;
+
     this.inheritanceArray = [];
 
-    this.subClasses = [
-              {subClasses:{}, uri: 'NAU', name: 'hasPreviousStep'},
-              {subClasses:{}, uri: 'NAU', name: 'hasPreviousVersion'},
-              {subClasses:{}, uri: 'NAU', name: 'require'},
-              {subClasses:{}, uri: 'NAU', name: 'useCase'},
-              {subClasses:{}, uri: 'NAU', name: 'hasScientificHaeccity'},
-              {subClasses:{}, uri: 'NAU', name: 'subpartOf'},
-              {subClasses:{}, uri: 'NAU', name: 'hasTerminology'},
-  ];
+    
+  //   this.subClasses = [
+  //             {subClasses:{}, uri: 'NAU', name: 'hasPreviousStep'},
+  //             {subClasses:{}, uri: 'NAU', name: 'hasPreviousVersion'},
+  //             {subClasses:{}, uri: 'NAU', name: 'require'},
+  //             {subClasses:{}, uri: 'NAU', name: 'useCase'},
+  //             {subClasses:{}, uri: 'NAU', name: 'hasScientificHaeccity'},
+  //             {subClasses:{}, uri: 'NAU', name: 'subpartOf'},
+  //             {subClasses:{}, uri: 'NAU', name: 'hasTerminology'},
+  // ];
 }
 
 Property.prototype = {

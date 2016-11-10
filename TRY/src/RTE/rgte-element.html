@@ -3,6 +3,7 @@
 <link rel="import" href="../wrapper/vis-element.html">
 <link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../RTE/rgte-displayer-element.html">
 <link rel="import" href="../RTE/rgte-cardinality-form-element.html">
 
 <dom-module id="rgte-element">
@@ -13,7 +14,16 @@
             }
         </style>
 
-        <vis-element id="rgte" network="{{network}}" , nodes="{{nodes}}" edges="{{edges}}"></vis-element>
+        <!-- <vis-element id="rgte" network="{{network}}" , nodes="{{nodes}}" edges="{{edges}}"></vis-element> -->
+        <div  hidden$="{{ !isWaitingPropertyBinding }}">
+        <paper-card>
+          <div class="card-content">A property is waiting to be bound</div>
+          <!-- <div class="card-actions"></div> -->
+        </paper-card>
+      </div>
+
+
+        <rgte-displayer-element id="rgteview" rgte="{{rgte}}"></rgte-displayer-element>
 
         <paper-dialog on-iron-overlay-closed="_isAddPropertyConfirmed" id="propertyModal" modal>
             <h2>Bind the property</h2>
@@ -42,10 +52,16 @@
 
 
 
-        <rgte-cardinality-form-element id="rgteCard" edge="{{rgteEdgeSelected}}" edges-cardinality="{{edgesCardinality}}"></rgte-cardinality-form-element>
+        <rgte-cardinality-form-element id="rgteCard" rgte="{{rgte}}" edgeid="{{edgeIDSelected}}"></rgte-cardinality-form-element>
 
     </template>
     <script>
+    (
+      function()
+      {
+        var NODE = 0;
+        var EDGE = 1;
+
         Polymer(
         {
             is: 'rgte-element',
@@ -57,7 +73,7 @@
                     type: Boolean,
                     value: false,
                     notify: true,
-                    observer: '_oniWPBChanged',
+                    // observer: '_oniWPBChanged',
                 },
                 nodeDomain:
                 {
@@ -74,93 +90,47 @@
                     type: Object,
                     value: null,
                 },
-                network:
+                rgte:
                 {
-                    type: Object,
-                    notify: true,
+                  type: Object,
+                  value: function(){
+                    return new RGTE();
+                  },
+                  notify: true,
+                  // observer: "_test"
                 },
-                nodes:
+
+                edgeIDSelected:
                 {
-                    type: Object,
-                    value: function()
-                    {
-                        return [];
-                    },
-                    notify: true,
-                },
-                edges:
-                {
-                    type: Object,
-                    value: function()
-                    {
-                        return [];
-                    },
-                    notify: true,
-                },
-                edgesCardinality:
-                {
-                    type: Object,
-                    notify: true,
-                    value: function()
-                    {
-                        return [];
-                    },
-                },
-                options:
-                {
-                    type: Object,
-                    value: function()
-                    {
-                        return [];
-                    },
-                    notify: true,
-                },
-                networkOptions:
-                {
-                    type: Object,
-                    value: function()
-                    {
-                        return {};
-                    },
-                    notify: true,
-                },
-                rgteNodeSelected:
-                {
-                    type: Object,
-                    value: null,
-                    notify: true,
-                },
-                rgteEdgeSelected:
-                {
-                    type: Object,
-                    value: null,
-                    notify: true,
+                  type: Number,
+                  value: -1,
+                  notify: true,
                 },
             },
 
-            observers: [
-                "_onNodesChange(nodes.splice)",
-                "_onEdgesCardinalityChanged(edgesCardinality.*)", //!!Attention, change propagation is not recursive
-            ],
+            // observers: [
+            //     "_onNodesChange(nodes.splice)",
+            // ],
 
             attached: function()
             {
-                this.network.addEventListener('click', function(p)
+                this.$.rgteview.addEventListener('NODE_CLICKED', function(p)
                 {
-                    this._behaviorSelector(p);
+                    this._behaviorSelector(p.detail, NODE);
                 }.bind(this));
+
+                this.$.rgteview.addEventListener('EDGE_CLICKED', function(p)
+              {
+                this._behaviorSelector(p.detail, EDGE);
+              }.bind(this));
             },
 
-            addClass: function(cls)
+
+            addClass: function(cls) //From rte-lister-element redirected by rgte-workzone-element
             {
-                if (this.nodes.includes(cls))
-                {
-                    //@TODO: RENAME THE NODE, not RETURN;
-                    return;
-                }
-                this.$.rgte.addNode(cls, cls);
-                this._redrawEdgesWithCardinilities();
+                this.rgte.addVisNode(cls);
             },
+
 
             addProp: function(prop)
             {
@@ -170,7 +140,7 @@
                     return;
                 }
 
-                if (this.nodes.length < 2)
+                if (this.rgte.getNodes().length < 2)
                 {
                     this.$.NotEnoughNodes.open();
                     return;
@@ -180,172 +150,22 @@
                 this.$.propertyModal.open();
             },
 
-            _onNodesChange: function(change)
-            {
-                if (Object.keys(this.nodes).length === 0 && this.nodes.constructor === Object)
-                    return;
+            // _onNodesChange: function(change)
+            // {
+            //     if (Object.keys(this.nodes).length === 0 && this.nodes.constructor === Object)
+            //         return;
+            //
+            //     if (!change)
+            //         return;
+            //
+            // },
 
-                if (!change)
-                    return;
-
-            },
-
-            _oniWPBChanged: function(change)
-            {
-                /*Notifing that the current state is to select nodes */
-            },
-
-            _onEdgesCardinalityChanged: function(change)
-            {
-                console.log("_onEdgesCardinalityChanged");
-                if (this.network === null || this.network === undefined)
-                    return;
-
-                // this._redrawEdgesWithCardinilities();
-                this._redrawEdgesWithCardinilities();
-            },
-
-            _redrawEdgesWithCardinilities: function()
-            {
-                //INSURING THAT RGTE-ELEMENT's model is sync with VIS-ELEMENT's model embedded
-                this._syncModel();
-
-                //UPDATING NETWORK WITH NEW NODES.
-                //Update the node will no change ID of already existing (and identical) elements
-                this.network.setData(
-                {
-                    nodes: this.nodes,
-                    edges: this.edges,
-                });
-
-                this.network.setOptions(this.options);
-
-                //DRAW CARDINALITY
-                //Associate, for each edges notified in edgesCardinality{id,from,to}, its cardinality
-                //Since the modification of arrows is directly applied in the network, the edges affected
-                //Will NOT be changed nor they ID. It is important because this.edges=this.network.edgesHandler.edges must
-                //be kept synch with this.edgesCardinality
-                this.edgesCardinality.forEach(function(e, i)
-                {
-                    var focusEdge = this.network.edgesHandler.body.edges[e.id];
-                    if (focusEdge != null) //If the network has a node focusEdge
-                    {
-                        focusEdge.options.arrows.from.enabled = true;
-                        focusEdge.options.arrows.to.enabled = true;
-
-                        var that = this;
-                        focusEdge.drawArrows = function drawArrows(ctx, arrowData)
-                        {
-                            if (this.options.arrows.from.enabled === true)
-                            {
-                                that._drawCardinalityFrom(ctx, this.selected, this.hover, arrowData.from, e.from);
-                            }
-                            if (this.options.arrows.to.enabled === true)
-                            {
-                                that._drawCardinalityTo(ctx, this.selected, this.hover, arrowData.to, e.to);
-                                this.edgeType.drawArrowHead(ctx, this.selected, this.hover, arrowData.to);
-                            }
-                        };
-                    }
-                }.bind(this));
-
-            },
-
-            _getEdgeFromID: function(id)
-            {
-                var res = null;
-                //getEDges in order to prevent desynchro with vis
-                this.$.rgte.getEdges().forEach(function(p, i)
-                {
-
-                    if (p.id === id)
-                    {
-                        res = this.$.rgte.getEdges()[i];
-                        return;
-                    }
-                }.bind(this));
-
-                return res;
-            },
-
-            _syncModel: function() //SYNC RGTE-ELEMENT's model with VIS-ELEMENT's model embedded
-                {
-                    this.network = this.$.rgte.getNetwork();
-                    this.edges = this.$.rgte.getEdges();
-                    this.nodes = this.$.rgte.getNodes();
-                    this.options = this.$.rgte.getOptions();
-                },
-
-            _drawCardiArrows: function(edge)
-            {
-                var that = this;
-
-                var currentEdge = this.$.rgte.getNetwork().edgesHandler.body.edges[edge.id];
-                currentEdge.arrows = {
-                    enabled: true,
-                    from: true,
-                    to: true
-                };
-
-                //Using this.$.rgte in order to prevent any desynchro woith the model of this.network
-                currentEdge.drawArrows = function drawArrows(ctx, arrowData)
-                {
-                    if (this.options.arrows.from.enabled === true)
-                    {
-                        that._drawCardinalityFrom(ctx, this.selected, this.hover, arrowData.from);
-                    }
-                    if (this.options.arrows.to.enabled === true)
-                    {
-                        that._drawCardinalityTo(ctx, this.selected, this.hover, arrowData.to);
-                    }
-                };
-            },
-
-            _drawCardinalityFrom: function(ctx, selected, hover, arrowData, fromCard)
-            {
-                if (selected)
-                {
-                    ctx.font = 'bold 16px sans-serif';
-                }
-                else
-                {
-                    ctx.font = 'bold 16px sans-serif';
-                }
-                ctx.fillStyle = '#2A8F09';
-                ctx.fillText(fromCard,
-                    arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
-                    arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
-            },
-
-            _drawCardinalityTo: function(ctx, selected, hover, arrowData, toCard)
-            {
-                var oldStyle = ctx.strokeStyle;
-                if (selected)
-                {
-                    ctx.font = 'bold 16px sans-serif';
-                }
-                else
-                {
-                    ctx.font = 'bold 16px sans-serif';
-                }
-                ctx.fillStyle = '#2A8F09';
-                ctx.fillText(toCard,
-                    arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
-                    arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
-
-                  ctx.strokeStyle = oldStyle;
-                  ctx.fillStyle = ctx.strokeStyle;
-                  // ctx.lineWidth = this.getLineWidth(selected, hover);
-
-                  // // draw arrow at the end of the line
-                  ctx.arrow(arrowData.point.x, arrowData.point.y, arrowData.angle, arrowData.length);
-                  //
-                  // // draw shadow if enabled
-                  // this.enableShadow(ctx);
-                  // ctx.fill();
-                  // // disable shadows for other elements.
-                  // this.disableShadow(ctx);
-            },
+            // _oniWPBChanged: function(valueToCheck)
+            // {
+            //   console.log(valueToCheck);
+            //   return !valueToCheck;
+            //     /*Notifing that the current state is to select nodes */
+            // },
 
             _isAddPropertyConfirmed: function(e) //Modifying RGTE behavior
                 {
@@ -363,40 +183,37 @@
                 },
 
             //Define the behavior of the RGTE on click
-            _behaviorSelector: function(params)
+            _behaviorSelector: function(params, type)
             {
+              console.log(params);
                 if (this.isWaitingPropertyBinding)
                 {
-                    this._linkingNodesBehavior(params);
+                    this._linkingNodesBehavior(params, type);
                 }
                 else
                 {
-                    this._defaultRGTEBehavior(params);
+                    this._defaultRGTEBehavior(params, type);
                 }
 
             },
 
             //Link the selected property (edge) with two classes (nodes)
-            _linkingNodesBehavior: function(params)
+            _linkingNodesBehavior: function(params, type)
             {
-                if (params.nodes.length != 0) //il y a au moins un noeud de sélectionné
+                if (type === NODE) //il y a au moins un noeud de sélectionné
                 {
                     if (this.nodeDomain === null) //Si l'user n'a pas encore sélectionner le nodeDomain
                     {
-                        this.nodeDomain = params.nodes[0];
+                        this.nodeDomain = params.id;
                         console.log("DOMAIN IS :" + this.nodeDomain);
                     }
                     else if (this.nodeRange === null) //Sinon, c'est le deuxième choix, on lie les deux noeuds
                     {
-                        this.nodeRange = params.nodes[0];
+                        this.nodeRange = params.id;
                         console.log("RANGE is :" + this.nodeRange);
-                        this.$.rgte.createEdgeBetween(this.nodeDomain, this.nodeRange, this.propertyToBind);
-
-                        // var idVal = this._findEdgeIDByLabel(this.propertyToBind)
-                        // this.push("edgesCardinality", {id: idVal, from: '1', to:'3'});//Set to default cardinality for the new edge
-                        // console.log(this.edgesCardinality);
-
-                        this._redrawEdgesWithCardinilities();
+                        //this.$.rgte.createEdgeBetween(this.nodeDomain, this.nodeRange, this.propertyToBind);
+                        var prop = this.rgte.createVisProperty(this.nodeDomain, this.nodeRange, this.propertyToBind);
+                        this.rgte.addVisProperty(prop.from, prop.to, prop.label, prop.arrows);
 
                         this.nodeDomain = null;
                         this.nodeRange = null;
@@ -415,50 +232,36 @@
                 }
             },
 
-            _findEdgeIDByLabel: function(label)
-            {
-
-                this.edges.forEach(function(e)
-                {
-                    if (e.label === label)
-                        return e.id;
-                });
-
-                return null;
-            },
-
             //Default RGTE behavior is reactivty on edge to allow setting cardinality, discarding. Reactivity on node to allow discarding
-            _defaultRGTEBehavior: function(params)
+            _defaultRGTEBehavior: function(params, type)
             {
+                console.log("dRB");
                 if (this.isWaitingPropertyBinding) //Don't change the behavior
                     return;
 
-                if (params.nodes.length != 0)
+                if (type === NODE)
                 {
-                    console.log("NODE CLICKED");
                     return;
                 }
-                else if (params.edges.length != 0)
+                else if (type === EDGE)
                 {
-
-                    this.rgteEdgeSelected = {
-                        id: params.edges[0],
-                        val: this.network.body.edges[params.edges[0]].options.label
-                    };
-
+                  console.log("EDGE "+params.id+" selected");
+                  this.edgeIDSelected = params.id;
+                  // this.rgteEdgeSelected = {"id": params.id, "val": params.edgeLabel};
                 }
             },
 
-            getNetwork: function()
-            {
-                return this.network;
-            },
+            // getNetwork: function()
+            // {
+            //     return this.network;
+            // },
 
-            getEdgesCardinality: function()
-            {
-                return this.edgesCardinality;
-            },
+            // getEdgesCardinality: function()
+            // {
+            //     return this.edgesCardinality;
+            // },
 
         });
+      })();
     </script>
 </dom-module>

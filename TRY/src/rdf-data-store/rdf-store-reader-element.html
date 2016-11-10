@@ -52,7 +52,12 @@
                   type: Object,
                   notify: true,
                   value : function(){return {};},
-                }
+                },
+                vocab:
+                {
+                  type: Object,
+                  value: function(){return new CONTROLLED_VOCABULARY();},
+                },
             },
             // Used for two-ways binding debug
               // observers: [
@@ -91,32 +96,17 @@
                     //this.store.registerParser("application/rdf+xml", TabulatorRDFXMLParser);
                     that.graphuri = "DEFAULT_GRAPH_URI";//@TODO: Dynamic Graph URI
 
-                    //@DEBUG
                     that.store.load('text/turtle', fileContent, function(s,d){
                       that.store.graph(function(err, graph)
                       {
-                        console.log(that.graph);
+                        that.vocab.setRDFStore(that.store);
+                        // that.vocab.parseClassesAndProperties();
+                        console.log(that.vocab);
                         that.graph = graph;
                       });
-                      // that.store.execute("SELECT * WHERE { <http://www.CAPTEN.org/SEED/ontologies/IAP/IAP#EvolConcept> ?p ?o }", function(success, results)
-                      //     {
-                      //         console.log(success, results);
-                      //     });
-                    });
-                    // // END DEBUG
 
-                    // that.store.load('text/turtle', fileContent, that.graphuri, function(s, d)
-                    // {
-                    //     // that.store.execute("SELECT * WHERE { ?s ?p ?o }", function(success, results)
-                    //     // {
-                    //     //     console.log(success, results);
-                    //     // });
-                    //     that.store.graph(that.graphuri, function(err, graph)
-                    //     {
-                    //       that.graph = graph;
-                    //       console.log(graph.triples[0].object);
-                    //     });
-                    // });
+                    });
+
                 });
             },
         });

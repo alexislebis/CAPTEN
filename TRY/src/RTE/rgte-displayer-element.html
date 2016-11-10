@@ -1,0 +1,168 @@
+<link rel="import" href="../wrapper/vis-element.html">
+<link rel="import" href="../wrapper/rgte-model-element.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="rgte-displayer-element">
+    <template>
+        <style>
+             :host {
+                display: block;
+            }
+        </style>
+
+        <vis-element id="rgteview"></vis-element>
+      </template>
+    <script>
+        Polymer(
+        {
+            is: 'rgte-displayer-element',
+
+            properties:
+            {
+                rgte:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return {};
+                    },
+                    notify: true,
+                },
+
+            },
+
+            // observers: [
+            //     "_onRgteChanged(rgte.*)",
+            // ],
+
+            attached: function()
+            {
+              this.$.rgteview.addEventListener('NETWORK_CLICKED', function(p)
+              {
+                  this._eventDispatcher(p.detail);
+              }.bind(this));
+
+              this.rgte.registerObserverCallbackOnChange(this, this._callbackOnRGTEChanged);
+            },
+
+            // _onRgteChanged: function(change)
+            // {
+            //     console.log(this.rgte);
+            //     this.draw();
+            // },
+
+// === OBSERVATION METHODS
+            _callbackOnRGTEChanged: function()
+            {
+              this.draw();
+            },
+// ===
+
+            draw: function()
+            {
+                var rgteView = this.$.rgteview;
+
+                if (rgteView.getNetwork() == null)
+                    return;
+
+                //UPDATING NETWORK WITH NEW NODES.
+                //Update the node will not change ID of already existing (and identical) elements
+                rgteView.addNodes(this.rgte.getNodes());
+                rgteView.addEdges(this.rgte.getEdges());
+
+                //DRAW CARDINALITY
+                //Associate, for each edges notified in edgesCardinality{id,from,to}, its cardinality
+                //Since the modification of arrows is directly applied in the network, the edges affected
+                //Will NOT be changed nor they ID. It is important because this.edges=this.network.edgesHandler.edges must
+                //be kept synch with this.edgesCardinality
+
+                this.rgte.getEdgesCardinality().forEach(function(e, i)
+                {
+                    var focusEdge = this.$.rgteview.getNetwork().edgesHandler.body.edges[e.edgeId];
+                    if (focusEdge != null) //If the network has a node focusEdge
+                    {
+                        focusEdge.options.arrows.from.enabled = true;
+                        focusEdge.options.arrows.to.enabled = true;
+
+                        var that = this;
+                        focusEdge.drawArrows = function drawArrows(ctx, arrowData)
+                        {
+                            if (this.options.arrows.from.enabled === true)
+                            {
+                                that._drawCardinalityFrom(ctx, this.selected, this.hover, arrowData.from, e.fromCardinality);
+                            }
+                            if (this.options.arrows.to.enabled === true)
+                            {
+                                that._drawCardinalityTo(ctx, this.selected, this.hover, arrowData.to, e.toCardinality);
+                                this.edgeType.drawArrowHead(ctx, this.selected, this.hover, arrowData.to);
+                            }
+                        };
+                    }
+                }.bind(this));
+
+                rgteView.redraw();
+            },
+
+            _drawCardinalityFrom: function(ctx, selected, hover, arrowData, fromCard)
+            {
+                if (selected)
+                {
+                    ctx.font = 'bold 16px sans-serif';
+                }
+                else
+                {
+                    ctx.font = 'bold 16px sans-serif';
+                }
+                ctx.fillStyle = '#2A8F09';
+                ctx.fillText(fromCard,
+                    arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
+                    arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
+            },
+
+            _drawCardinalityTo: function(ctx, selected, hover, arrowData, toCard)
+            {
+                var oldStyle = ctx.strokeStyle;
+                if (selected)
+                {
+                    ctx.font = 'bold 16px sans-serif';
+                }
+                else
+                {
+                    ctx.font = 'bold 16px sans-serif';
+                }
+                ctx.fillStyle = '#2A8F09';
+                ctx.fillText(toCard,
+                    arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
+                    arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
+
+                ctx.strokeStyle = oldStyle;
+                ctx.fillStyle = ctx.strokeStyle;
+                // ctx.lineWidth = this.getLineWidth(selected, hover);
+
+                // // draw arrow at the end of the line
+                ctx.arrow(arrowData.point.x, arrowData.point.y, arrowData.angle, arrowData.length);
+                //
+                // // draw shadow if enabled
+                // this.enableShadow(ctx);
+                // ctx.fill();
+                // // disable shadows for other elements.
+                // this.disableShadow(ctx);
+            },
+
+            _eventDispatcher: function(params)
+            {
+              if(params.nodes.length != 0)
+              {
+                this.fire('NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0]});
+              }
+              else if(params.edges.length != 0)
+              {
+                this.fire('EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label});
+              }
+            },
+
+
+        });
+    </script>
+</dom-module>

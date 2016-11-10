@@ -21,7 +21,8 @@
                 var domainURI = ["http://www.w3.org/2000/01/rdf-schema#domain"];
                 var rangeURI = ["http://www.w3.org/2000/01/rdf-schema#range"];
                 var unionURI = ["https://www.w3.org/2002/07/owl#unionOf",
-                                  "http://www.w3.org/2002/07/owl#unionOf"];
+                    "http://www.w3.org/2002/07/owl#unionOf"
+                ];
                 var classURI = ["http://www.w3.org/2002/07/owl#Class"];
                 var dumpedURI = ["http://www.w3.org/2002/07/owl#Class",
                     "http://www.w3.org/2002/07/owl#ObjectProperty",
@@ -30,77 +31,40 @@
                 ];
 
                 Polymer(
+                {
+                    is: 'rdf-store-displayer-element',
+
+                    properties:
                     {
-                        is: 'rdf-store-displayer-element',
-
-                        properties:
+                        vocab:
                         {
-                            rdfclasses:
+                            type: Object,
+                            value: function()
                             {
-                                type: Array,
-                                notify: true,
-                            },
-
-                            rdfprops:
-                            {
-                                type: Array,
-                                notify: true,
-                            },
-                            store:
-                            {
-                                type: Object,
-                                notify: true,
-                                value: function()
-                                {
-                                    return {};
-                                },
-                            },
-                            graphuri:
-                            {
-                                type: Object,
-                                notify: true,
-                                value: function()
-                                {
-                                    return {};
-                                },
-                            },
-                            graph:
-                            {
-                                type: Object,
-                                notify: true,
-                                value: function()
-                                {
-                                    return {};
-                                },
+                                return new CONTROLLED_VOCABULARY();
                             },
                         },
+                    },
 
-                        generateGraph: function()
+                    generateGraph: function()
+                    {
+                        var visDisplay = this.$.rdfDisplay;
+
+                        var properties = []; //[[][]]
+                        var blkNodes = []; // [][];
+                        var listObjBlkNodes = []; //[] representing the triple having a blanknodehas object
+
+                        var that = this;
+
+                        visDisplay.resetGraphStructure();
+
+                        this.vocab.getGraph(function(g)
                         {
-                            var headQuery = "SELECT ?s ?o { ?s '<";
-                            var tailQuery = ">' ?o }";
-                            // var q2  = "CONSTRUCT { <"+this.classes[0]+"> ?p ?o } \
-                            //            WHERE { <"+this.classes[0]+"> ?p ?o  }";
-
-                            var defaultGraph = [];
-                            var namedGraphs = [
+                            var props = this.vocab.getURIProperties();
+                            var c = this.vocab.getClasses();
+                            g.triples.forEach(function(elm)
                             {
-                                'token': 'uri',
-                                'value': this.graphuri
-                            }];
-                            var visDisplay = this.$.rdfDisplay;
-
-                            var properties = []; //[[][]]
-                            var blkNodes = []; // [][];
-                            var listObjBlkNodes = []; //[] representing the triple having a blanknodehas object
-
-                            var that = this;
-
-                            visDisplay.resetGraphStructure();
-
-                            this.graph.triples.forEach(function(elm)
-                            {
-                                if (this.rdfprops.includes(elm.subject.nominalValue))
+                                if (props.includes(elm.subject.nominalValue))
                                 {
 
                                     if (!this.propertieIsParsed(elm.subject.nominalValue, properties))
@@ -113,144 +77,211 @@
 
                                     if (this.isDomain(elm.predicate.nominalValue))
                                     {
-                                        if (this.rdfclasses.includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
+                                        if (c.includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
                                             properties[elm.subject.nominalValue][0].push(elm.object.nominalValue);
                                     }
                                     else if (this.isRange(elm.predicate.nominalValue))
                                     {
-                                        if (this.rdfclasses.includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
+                                        if (c.includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
                                             properties[elm.subject.nominalValue][1].push(elm.object.nominalValue);
                                     }
-                                    //   if(!this.belongsToForbiden(elm.predicate.nominalValue) && !this.belongsToForbiden(elm.object.nominalValue))
-                                    //   {
-                                    //     console.log();
-                                    //     visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, elm.predicate.nominalValue);
-                                    //   }
+
                                 }
-                                else if (this.rdfclasses.includes(elm.subject.nominalValue)) {
-                                  if(!this.belongsToForbiden(elm.predicate.nominalValue))
-                                    visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, this._truncateURI(elm.predicate.nominalValue));
+                                else if (c.includes(elm.subject.nominalValue))
+                                {
+                                    if (!this.belongsToForbiden(elm.predicate.nominalValue))
+                                        visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, this._truncateURI(elm.predicate.nominalValue));
                                 }
-                                //
-                                // else if (elm.subject.nominalValue.match(/[_].*/)) {
-                                //
-                                //   var isMatched = elm.object.nominalValue.match(/[_].*/);
-                                //
-                                //   if(!isMatched /*&&
-                                //       !this.belongsToForbiden(elm.object.nominalValue)*/) //If the object is not a blanknode
-                                //   {
-                                //     blkNodes[elm.subject.nominalValue] = [];
-                                //     blkNodes[elm.subject.nominalValue].push(elm.object.nominalValue);
-                                //   }
-                                //
-                                //   else if (isMatched) { //two blanknode -> need to resolve interlink
-                                //     if(blkNodes[elm.subject.nominalValue] != undefined && blkNodes[elm.object.nominalValue] != undefined)
-                                //     {
-                                //       blkNodes[elm.object.nominalValue].forEach(function(obj){
-                                //         blkNodes[elm.subject.nominalValue].push(obj);
-                                //       });
-                                //     }
-                                //   }
-                                // }
 
                             }.bind(this));
 
-                            //console.log(properties);
 
                             this._addNodes(this.rdfclasses);
-                            this._addEdges(properties);
-                            // console.log(blkNodes);
+                            this._addEdges(g, properties);
 
                             visDisplay.redrawNetwork();
 
+                        }.bind(this));
 
-                        },
+                    },
 
-                        _addNodes: function(classes)
+
+                    // generateGraph: function()
+                    // {
+                    //     var headQuery = "SELECT ?s ?o { ?s '<";
+                    //     var tailQuery = ">' ?o }";
+                    //     // var q2  = "CONSTRUCT { <"+this.classes[0]+"> ?p ?o } \
+                    //     //            WHERE { <"+this.classes[0]+"> ?p ?o  }";
+                    //
+                    //     var defaultGraph = [];
+                    //     var namedGraphs = [
+                    //     {
+                    //         'token': 'uri',
+                    //         'value': this.graphuri
+                    //     }];
+                    //     var visDisplay = this.$.rdfDisplay;
+                    //
+                    //     var properties = []; //[[][]]
+                    //     var blkNodes = []; // [][];
+                    //     var listObjBlkNodes = []; //[] representing the triple having a blanknodehas object
+                    //
+                    //     var that = this;
+                    //
+                    //     visDisplay.resetGraphStructure();
+                    //
+                    //     this.graph.triples.forEach(function(elm)
+                    //     {
+                    //         if (this.rdfprops.includes(elm.subject.nominalValue))
+                    //         {
+                    //
+                    //             if (!this.propertieIsParsed(elm.subject.nominalValue, properties))
+                    //             {
+                    //                 properties[elm.subject.nominalValue] = [
+                    //                     [],
+                    //                     []
+                    //                 ];
+                    //             }
+                    //
+                    //             if (this.isDomain(elm.predicate.nominalValue))
+                    //             {
+                    //                 if (this.rdfclasses.includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
+                    //                     properties[elm.subject.nominalValue][0].push(elm.object.nominalValue);
+                    //             }
+                    //             else if (this.isRange(elm.predicate.nominalValue))
+                    //             {
+                    //                 if (this.rdfclasses.includes(elm.object.nominalValue) || elm.object.nominalValue.match(/[_].*/))
+                    //                     properties[elm.subject.nominalValue][1].push(elm.object.nominalValue);
+                    //             }
+                    //             //   if(!this.belongsToForbiden(elm.predicate.nominalValue) && !this.belongsToForbiden(elm.object.nominalValue))
+                    //             //   {
+                    //             //     console.log();
+                    //             //     visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, elm.predicate.nominalValue);
+                    //             //   }
+                    //         }
+                    //         else if (this.rdfclasses.includes(elm.subject.nominalValue)) {
+                    //           if(!this.belongsToForbiden(elm.predicate.nominalValue))
+                    //             visDisplay.createEdgeBetween(elm.subject.nominalValue, elm.object.nominalValue, this._truncateURI(elm.predicate.nominalValue));
+                    //         }
+                    //         //
+                    //         // else if (elm.subject.nominalValue.match(/[_].*/)) {
+                    //         //
+                    //         //   var isMatched = elm.object.nominalValue.match(/[_].*/);
+                    //         //
+                    //         //   if(!isMatched /*&&
+                    //         //       !this.belongsToForbiden(elm.object.nominalValue)*/) //If the object is not a blanknode
+                    //         //   {
+                    //         //     blkNodes[elm.subject.nominalValue] = [];
+                    //         //     blkNodes[elm.subject.nominalValue].push(elm.object.nominalValue);
+                    //         //   }
+                    //         //
+                    //         //   else if (isMatched) { //two blanknode -> need to resolve interlink
+                    //         //     if(blkNodes[elm.subject.nominalValue] != undefined && blkNodes[elm.object.nominalValue] != undefined)
+                    //         //     {
+                    //         //       blkNodes[elm.object.nominalValue].forEach(function(obj){
+                    //         //         blkNodes[elm.subject.nominalValue].push(obj);
+                    //         //       });
+                    //         //     }
+                    //         //   }
+                    //         // }
+                    //
+                    //     }.bind(this));
+                    //
+                    //     //console.log(properties);
+                    //
+                    //     this._addNodes(this.rdfclasses);
+                    //     this._addEdges(properties);
+                    //     // console.log(blkNodes);
+                    //
+                    //     visDisplay.redrawNetwork();
+                    //
+                    //
+                    // },
+
+                    _addNodes: function(classes)
+                    {
+                        var visDisplay = this.$.rdfDisplay;
+                        this.vocab.getClasses().forEach(function(elm)
                         {
-                            var visDisplay = this.$.rdfDisplay;
-                            classes.forEach(function(elm)
-                            {
-                                visDisplay.addNode(elm, this._truncateURI(elm));
-                            }.bind(this));
-                        },
-                        _addEdges: function(properties)
-                        {
-                            var visDisplay = this.$.rdfDisplay;
+                            visDisplay.addNode(elm, this._truncateURI(elm));
+                        }.bind(this));
+                    },
+                    _addEdges: function(graph, properties)
+                    {
+                        var visDisplay = this.$.rdfDisplay;
 
-                            for (var label in properties)
+                        for (var label in properties)
+                        {
+                            if (properties[label][0] != undefined && properties[label][1] != undefined)
                             {
-                                if (properties[label][0] != undefined && properties[label][1] != undefined)
+                                if (properties[label][0][0] != undefined && properties[label][0][0].match(/[_].*/))
                                 {
-                                    if (properties[label][0][0] != undefined && properties[label][0][0].match(/[_].*/))
+                                    var nodeID = this._resolve(graph, properties[label][0][0]);
+                                    for (var x in nodeID)
                                     {
-                                        var nodeID = this._resolve(properties[label][0][0]);
-                                        for(var x in nodeID)
-                                        {
-                                          visDisplay.createEdgeBetween(x, properties[label][1][0], this._truncateURI(label));
-                                        }
+                                        visDisplay.createEdgeBetween(x, properties[label][1][0], this._truncateURI(label));
                                     }
-                                    else if (properties[label][1][0] != undefined && properties[label][1][0].match(/[_].*/))
+                                }
+                                else if (properties[label][1][0] != undefined && properties[label][1][0].match(/[_].*/))
+                                {
+                                    var nodeID = this._resolve(graph, properties[label][1][0]);
+                                    for (var x in nodeID)
                                     {
-                                        var nodeID = this._resolve(properties[label][1][0]);
-                                        for(var x in nodeID)
-                                        {
-                                          visDisplay.createEdgeBetween(properties[label][0][0], x, this._truncateURI(label));
-                                        }
+                                        visDisplay.createEdgeBetween(properties[label][0][0], x, this._truncateURI(label));
                                     }
+                                }
 
-                                    else
+                                else
+                                {
+                                    properties[label][0].forEach(function(p0)
                                     {
-                                        properties[label][0].forEach(function(p0)
+                                        properties[label][1].forEach(function(p1)
                                         {
-                                            properties[label][1].forEach(function(p1)
-                                            {
-                                                visDisplay.createEdgeBetween(p0, p1, this._truncateURI(label));
-                                            }.bind(this));
+                                            visDisplay.createEdgeBetween(p0, p1, this._truncateURI(label));
                                         }.bind(this));
-                                    }
+                                    }.bind(this));
                                 }
                             }
-                        },
-                        _resolve: function(label)
+                        }
+                    },
+                    _resolve: function(graph, label)
+                    {
+                        var isClass = false; //If isClass is true, then the blank node will be considered as a node
+                        var isUnion = false; //If Union is set to true && isClass is set to true, then its a union class, otherwise (isUnion = false && isClass = true) its an intersection
+                        var labelIndex = this._findIndexOf(graph, label);
+                        var nodeID = [];
+                        var visDisplay = this.$.rdfDisplay;
+
+                        //console.log(label);
+
+                        labelIndex.forEach(function(elm, i)
                         {
-                            var isClass = false; //If isClass is true, then the blank node will be considered as a node
-                            var isUnion = false; //If Union is set to true && isClass is set to true, then its a union class, otherwise (isUnion = false && isClass = true) its an intersection
-                            var labelIndex = this._findIndexOf(label);
-                            var nodeID = [];
-                            var visDisplay = this.$.rdfDisplay;
+                            var triple = graph.triples[elm];
 
-                            //console.log(label);
+                            //console.log(triple.subject.nominalValue + " - " +triple.predicate.nominalValue + " - " +triple.object.nominalValue);
 
-                            labelIndex.forEach(function(elm, i)
+                            if (classURI.includes(triple.object.nominalValue)) //if it's a class
+                                isClass = true;
+                            else if (triple.object.nominalValue.match(/[_].*/)) //recursively retrieve other nodes pointed out by the current blank node
+                            {
+                                var tmpNodeID = this._resolve(graph, triple.object.nominalValue);
+
+                                for (var elmt in tmpNodeID)
                                 {
-                                    var triple = this.graph.triples[elm];
-
-                                      //console.log(triple.subject.nominalValue + " - " +triple.predicate.nominalValue + " - " +triple.object.nominalValue);
-
-                                    if (classURI.includes(triple.object.nominalValue)) //if it's a class
-                                        isClass = true;
-                                    else if (triple.object.nominalValue.match(/[_].*/)) //recursively retrieve other nodes pointed out by the current blank node
-                                    {
-                                        var tmpNodeID = this._resolve(triple.object.nominalValue);
-
-                                        for (var elmt in tmpNodeID)
-                                        {
-                                            nodeID[elmt] = true;
-                                        }
-
-                                }
-                                else if (this.rdfclasses.includes(triple.object.nominalValue))
-                                {
-                                    nodeID[triple.object.nominalValue] = true;
+                                    nodeID[elmt] = true;
                                 }
 
-                                if (unionURI.includes(triple.predicate.nominalValue))
-                                {
-                                    isUnion = true;
-                                }
+                            }
+                            else if (this.vocab.getClasses().includes(triple.object.nominalValue))
+                            {
+                                nodeID[triple.object.nominalValue] = true;
+                            }
 
-                            }.bind(this));
+                            if (unionURI.includes(triple.predicate.nominalValue))
+                            {
+                                isUnion = true;
+                            }
+
+                        }.bind(this));
 
                         if (isClass && isUnion)
                         {
@@ -265,25 +296,26 @@
                             nodeID = [];
                             nodeID[label] = true;
                         }
-                        else if (isClass && !isUnion) {
-                          visDisplay.addNode(label, "∩");
+                        else if (isClass && !isUnion)
+                        {
+                            visDisplay.addNode(label, "∩");
 
-                          for (var x in nodeID)
-                          {
-                              visDisplay.createEdgeBetween(label, x, "IntersectionOf");
-                          }
+                            for (var x in nodeID)
+                            {
+                                visDisplay.createEdgeBetween(label, x, "IntersectionOf");
+                            }
 
-                          nodeID = [];
-                          nodeID[label] = true;
+                            nodeID = [];
+                            nodeID[label] = true;
                         }
 
                         return nodeID;
                     },
-                    _findIndexOf: function(label)
+                    _findIndexOf: function(graph, label)
                     {
                         var idx = [];
 
-                        this.graph.triples.forEach(function(elm, i)
+                        graph.triples.forEach(function(elm, i)
                         {
                             if (elm.subject.nominalValue == label)
                                 idx.push(i);
@@ -293,9 +325,9 @@
                     },
                     _truncateURI: function(uri)
                     {
-                      var result = uri.split('#');
+                        var result = uri.split('#');
 
-                      return result[result.length-1];
+                        return result[result.length - 1];
                     },
                     belongsToForbiden: function(elmt)
                     {
@@ -319,6 +351,6 @@
                         return false
                     },
                 });
-        })();
+            })();
     </script>
 </dom-module>

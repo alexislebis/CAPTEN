@@ -16,13 +16,13 @@
         </style>
         <!-- <rgte-element id="rgte"></rgte-element> -->
         <!--<h1>RTE<span style="color:blue">#[[name]]</span></h1>-->
-        <rdf-store-reader-element id="FRE" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}"></rdf-store-reader-element>
-        <rdf-store-nomenclature-element id="rdn" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}" classes="{{rdfcls}}" props="{{rdfprops}}"></rdf-store-nomenclature-element>
+        <rdf-store-reader-element id="FRE" vocab="{{vocab}}"></rdf-store-reader-element>
+        <!-- <rdf-store-nomenclature-element id="rdn" vocab="{{vocab}}" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}" classes="{{rdfcls}}" props="{{rdfprops}}"></rdf-store-nomenclature-element> -->
 
-        <rgte-workzone-element id="rgteWorkzone" rdfstore="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}" rdfcls="{{rdfcls}}" rdfprops="{{rdfprops}}"></rgte-workzone-element>
+        <rgte-workzone-element id="rgteWorkzone" vocab="{{vocab}}"></rgte-workzone-element>
 
         <!-- <rte-lister-element id="rteList" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}" rdfcls="{{rdfcls}}" rdfprops="{{rdfprops}}"></rte-lister-element> -->
-        <rdf-store-displayer-element id="displayer" rdfclasses="{{rdfcls}}" rdfprops="{{rdfprops}}" store="{{rdfStore}}" graph="{{graph}}"></rdf-store-displayer-element>
+        <rdf-store-displayer-element id="displayer" vocab="{{vocab}}"></rdf-store-displayer-element>
 
 
         <paper-button raised on-tap="generateRDFGraphDisplay">Generate RDF Graph Display</paper-button>
@@ -70,7 +70,7 @@
                         return {};
                     },
                     // reflectToAttribute: true,
-                    observer: "_onGraphChanged",
+                    // observer: "_onGraphChanged",
                     notify: true,
                 },
                 graphuri: //@REMOVE
@@ -92,32 +92,19 @@
                 {
                     type: Array,
                     notify: true,
-                }
+                },
+                vocab:
+                {
+                  type: Object,
+                  value: function(){return new CONTROLLED_VOCABULARY();},
+                },
             },
 
-            ready: function()
-            {
-              // console.log("plopdelol");
-              // var test = new Objective();
-              // console.log(test.inheritanceArray);
-              // test.is("reliesOn");console.log(test);
-              // test.is("testTaMere");console.log(test);
-                // this.$.FRE.returnFunction = function(){
-                //   console.log("Wesh");
-                // }
-                //this.$.truc.addNode("lol","LOOOOOOOOOL");
-            },
-            attached: function()
-            {
-                // this.$.rgteWorkzone.addEventListener('-RGTEAddedToTheBag', function(e)
-                // {
-                //   this.fire('-RGTEAddedToTheBag', {network: e.detail.network, cardinality: e.detail.cardinality});
-                // }.bind(this));
-            },
             tapFunc: function()
             {
                 console.log(this.graph);
             },
+
             _rdfStoreChanged: function(e)
             {
                 if (Object.keys(this.rdfStore).length === 0 && this.rdfStore.constructor === Object)
@@ -130,13 +117,13 @@
                 this.$.truc.setNodes(this.valNbNodes);
             },
 
-            _onGraphChanged: function(n, o)
-            {
-                if (Object.keys(this.graph).length === 0 && this.graph.constructor === Object)
-                    return;
-
-                this.$.rdn.execute();
-            },
+            // _onGraphChanged: function(n, o)
+            // {
+            //     if (Object.keys(this.graph).length === 0 && this.graph.constructor === Object)
+            //         return;
+            //
+            //     this.$.rdn.execute();
+            // },
 
             generateRDFGraphDisplay: function() {
               this.$.displayer.generateGraph();

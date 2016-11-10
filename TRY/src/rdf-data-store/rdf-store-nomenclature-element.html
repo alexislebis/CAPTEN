@@ -68,11 +68,20 @@
                             type: Array,
                             notify: true,
                         },
+                        vocab:
+                        {
+                          type: Object,
+                          value: null,
+                        },
                     },
 
                     //Génère la nomenclature du graph rdf sous forme de classes et de propriétés
                     execute: function()
                     {
+                      // var vocab = new CONTROLLED_VOCABULARY();
+                      // vocab.setRDFStore(this.store);
+                      this.vocab.parseClassesAndProperties();
+                      console.log(this.vocab);
                         if (Object.keys(this.graph).length === 0 && this.graph.constructor === Object)
                             return;
 
@@ -137,11 +146,11 @@
                         }.bind(this));
 
 
-                        this.graph.forEach(function(e, i)
-                        {
-                            if (e.subject.nominalValue.indexOf('Scient') != -1 || e.predicate.nominalValue.indexOf('Scient') != -1 || e.object.nominalValue.indexOf('Scient') != -1)
-                                console.log(e);
-                        });
+                        // this.graph.forEach(function(e, i)
+                        // {
+                        //     if (e.subject.nominalValue.indexOf('Scient') != -1 || e.predicate.nominalValue.indexOf('Scient') != -1 || e.object.nominalValue.indexOf('Scient') != -1)
+                        //         console.log(e);
+                        // });
                         //
                         //     //otherwise check if it's a owl property
                         //     // if (!dumpedURI.includes(e.subject.nominalValue))
