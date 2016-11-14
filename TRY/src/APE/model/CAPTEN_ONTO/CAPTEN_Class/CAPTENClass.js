@@ -7,13 +7,18 @@
 function CAPTENClass(uri, properties) {
     this.uri = uri;
     this.properties = this.properties; //[Property]
+    this.isBlank = false;
 
     //Dynamic inheritance system. CF Property for more details
     this.iName = "Class";
     this.name = this.iName;
     this.inheritanceArray = [];
-    this.subClasses = [];
+    this.subClasses = [];//Here are the classes which inherit this
+    this.subClassOf = [];//Here, the classes inherited from this
 
+
+    if(this.uri != null && this.uri.match(/[_].*/))
+      this.isBlank = true;
 }
 
 CAPTENClass.prototype = {
@@ -51,6 +56,49 @@ CAPTENClass.prototype = {
             throw new NotSubClassException(newName, this);
 
         return;
+    },
+
+    equals: function(CAPTENc)
+    {
+      if(CAPTENc instanceof CAPTENClass)
+      {
+        if(this.uri === CAPTENc.uri)
+          return true;
+      }
+
+      return false;
+    },
+
+    includedIn: function(arrayCls)
+    {
+      var nbIte = 0;
+
+      for(var i in arrayCls)
+       {
+         nbIte++;
+         if(this.equals(arrayCls[i]))
+          return i;
+       }
+
+       if(nbIte === 0)//If the array is not a map, thus it has to be iterated in a normal way
+        {
+          for(var i = 0; i < arrayCls.length; i++)
+          {
+            if(this.equals(arrayCls[i]))
+              return i;
+          }
+        }
+
+       return -1;
+    },
+
+    becomesSubClassOf: function(cls)
+    {
+      if(cls.includedIn(this.subClassOf) !== -1)
+        return;
+
+      this.subClassOf.push(cls);
+      cls.subClasses.push(this);
     },
 
 };
