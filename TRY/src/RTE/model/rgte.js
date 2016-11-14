@@ -7,7 +7,7 @@
 function RGTE(){
 
   this.observers = [];
-  this.nodes = [];
+  this.nodes = [];//Need to be CAPTENCLass
   this.edges = [];
   this.edgesCardinality = []; //Array of edge (currently based on vis edge).
 
