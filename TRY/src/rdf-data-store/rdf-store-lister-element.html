@@ -58,7 +58,7 @@
                     <template>
                         <div>
                             <div class$="[[_computeClass(selected)]]" on-tap="_rdfcTapped">
-                                <div class="primary pad" tabindex$="[[tabIndex]]">[[item]]</div>
+                                <div class="primary pad" tabindex$="[[tabIndex]]">[[item.uri]]</div>
                                 <div class="selectedItem">
                                     <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
                                 </div>
@@ -103,7 +103,6 @@
                     {
                         return [];
                     },
-                    observer: "_test",
                 },
 
                 rdfprops:
@@ -156,11 +155,6 @@
             {
                 console.log("yo");
                 return vocab.getClasses();
-            },
-
-            _test:function(p)
-            {
-              console.log("rdfclssChanged");
             },
 
             _onRdfclassesChanged: function(change)
