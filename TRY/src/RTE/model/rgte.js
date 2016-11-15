@@ -21,14 +21,55 @@ RGTE.cardiID = 0;
 RGTE.prototype = {
 
 // === ADDING METHODS ===
-  addVisNode: function(nodeLabel){
-    this.nodes.push({"id": RGTE.nodeID++, "label": nodeLabel, "shape": "dot", "size":30});
+  addVisNode: function(nodeLabel, label){
+    // var cls = new CAPTENClass(nodeLabel);
+    // cls.id = RGTE.nodeID++;
+
+    var cls = nodeLabel.copy();
+
+    cls.idVoc = cls.id;
+    cls.id = RGTE.nodeID++;
+
+    for(var i in this.nodes)
+      if(this.nodes[i].id === cls.id)
+        throw new ClassAlreadyUsedInRGTE(cls, this);
+
+    if(label != null)
+      cls.label = label;
+    else
+      cls.label = nodeLabel.uri;
+
+    cls.shape = "dot";
+    cls.size = 30;
+    // this.nodes.push({"id": RGTE.nodeID++, "label": nodeLabel, "shape": "dot", "size":30});
+    this.nodes.push(cls);
     this.notifyChange();
   },
 
-  addVisProperty: function(fromID, toID, edgeLabel)
+  // addVisProperty: function(fromID, toID, edgeLabel, arrows)
+  // {
+  //   var prop = new Property(edgeLabel);
+  //   // prop.id = RGTE.edgeID++;
+  //   prop.from = fromID.id;
+  //   prop.to = toID.id;
+  //   prop.arrows = arrows;
+  //   prop.label = edgeLabel;
+  //   // this.edges.push({"id": RGTE.edgeID++, "from":fromID, "to":toID, "label":edgeLabel, "arrows": "to"});
+  //   this.edges.push(prop);
+  //   this.notifyChange();
+  // },
+
+  addVisProperty: function(proper, arrows)
   {
-    this.edges.push({"id": RGTE.edgeID++, "from":fromID, "to":toID, "label":edgeLabel, "arrows": "to"});
+    var prop = proper.copy();
+    // prop.id = RGTE.edgeID++;
+    prop.idVoc = proper.id;
+    prop.id = RGTE.id++;
+    prop.arrows = arrows;
+    // prop.arrows = arrows;
+    // prop.label = edgeLabel;
+    // this.edges.push({"id": RGTE.edgeID++, "from":fromID, "to":toID, "label":edgeLabel, "arrows": "to"});
+    this.edges.push(prop);
     this.notifyChange();
   },
 
@@ -88,20 +129,20 @@ RGTE.prototype = {
 
   createVisProperty: function(fromID, toID, edgeLabel)
   {
-    var fromOK = false;
-    var toOK = false;
+    var fromOK = null;
+    var toOK = null;
 
     for(var i = 0; (i < this.nodes.length && (!fromOK || !toOK)); i++)
     {
       if(this.nodes[i].id === fromID)
-        fromOK = true;
+        fromOK = this.nodes[i];
 
       if(this.nodes[i].id === toID)
-        toOK = true;
+        toOK = this.nodes[i];
     }
 
-    if(fromOK && toOK)
-      return {"from":fromID, "to":toID, "label":edgeLabel, "arrows": "to"};
+    if(fromOK != null && toOK != null)
+      return {"from":fromOK, "to":toOK, "label":edgeLabel, "arrows": "to"};
 
     return null;
   },
@@ -152,6 +193,19 @@ edgeCardinalityExists: function(id){
   getNodes: function()
   {
     return this.nodes;
+  },
+
+  getNodesSerializedJSON: function()
+  {
+    var array = [];
+
+    this.nodes.forEach(function(e){
+      array.push(JSON.stringify(e))
+    }.bind(this));
+
+    console.log(array);
+
+    return array;
   },
 
   getEdges: function()

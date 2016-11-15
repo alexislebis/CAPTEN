@@ -2,6 +2,7 @@
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="./rte-formulaire-element.html">
+<link rel="import" href="./rgte-custom-class-relation-element.html">
 
 
 <dom-module id="rte-lister-element">
@@ -48,6 +49,10 @@
                 height: 24px;
             }
 
+            .makeRelation {
+              color: var(--paper-green-500);
+            }
+
             .removeElmt {
                 color: var(--paper-red-600);
                 width: 26px;
@@ -84,11 +89,13 @@
 
         <rte-formulaire-element id="rteform" classes="{{mergedCls}}" props="{{mergedProps}}"></rte-formulaire-element>
 
+        <rgte-custom-class-relation-element id="customRel" vocab="{{vocab.nonBlankNodes}}"></rgte-custom-class-relation-element>
+
         <div class$="[[_isCLSSelected(selectedcls)]]">
-          <p>Selected class (node): [[selectedcls]]<iron-icon icon="add-circle" on-tap="_addClassToRGTE" class="addToRTE">add-circle</iron-icon></p>
+          <p>Selected class (node): [[selectedcls.uri]]<iron-icon icon="add-circle" on-tap="_addClassToRGTE" class="addToRTE">add-circle</iron-icon></p>
         </div>
         <div class$="[[_isPROPSelected(selectedprop)]]">
-          <p>Selected property (edge): [[selectedprop]]<iron-icon icon="add-circle" on-tap="_addPropToRGTE" id="propRGTE" class="addToRTE">add-circle</iron-icon></p>
+          <p>Selected property (edge): [[selectedprop.uri]]<iron-icon icon="add-circle" on-tap="_addPropToRGTE" id="propRGTE" class="addToRTE">add-circle</iron-icon></p>
         </div>
 
         <div>
@@ -98,11 +105,12 @@
                 <template>
                     <div>
                         <div class$="[[_computeClass(selected)]]" on-tap="_custcTapped">
-                            <div class="primary pad" tabindex$="[[tabIndex]]">[[item]]</div>
+                            <div class="primary pad" tabindex$="[[tabIndex]]">[[item.uri]]</div>
                             <div class="selectedItem">
                                 <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
                             </div>
                         </div>
+                        <iron-icon class="makeRelation" icon="settings-input-component" on-tap="_makeRel"></iron-icon>
                         <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomCLS"></iron-icon>
                         <div class="border"></div>
                     </div>
@@ -116,7 +124,7 @@
                 <template>
                     <div>
                         <div class$="[[_computeClass(selected)]]" on-tap="_custpTapped">
-                            <div class="primary pad" tabindex$="[[tabIndex]]">[[item]]</div>
+                            <div class="primary pad" tabindex$="[[tabIndex]]">[[item.uri]]</div>
                             <div class="selectedItem">
                                 <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
                             </div>
@@ -204,6 +212,12 @@
                   type: Object,
                   value: function(){return new CONTROLLED_VOCABULARY();},
                 },
+
+                rgte:
+                {
+                  type: Object,
+                  value: function(){ return new RGTE();},
+                }
             },
 
             observers: [
@@ -266,14 +280,14 @@
                 if (cClass == undefined && Object.keys(cClass).length === 0 && cClass.constructor === Object)
                     return;
 
-                this.push('customcls', cClass);
+                this.push('customcls', new CAPTENClass(cClass));
             },
             addCustomProperty: function(cProp)
             {
                 if (cProp == undefined && Object.keys(cProp).length === 0 && cProp.constructor === Object)
                     return;
 
-                this.push('customprops', cProp);
+                this.push('customprops', new Property(cProp));
             },
 
             iconForItem: function(isSelected)
@@ -411,6 +425,11 @@
 
               if(!e.detail.element.model.selected)
               this.selectedprop = e.detail.element.model.item;
+            },
+
+            _makeRel: function(e)
+            {
+              this.$.customRel.focusedClass();
             },
         });
     </script>

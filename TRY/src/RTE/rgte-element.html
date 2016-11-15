@@ -212,8 +212,11 @@
                         this.nodeRange = params.id;
                         console.log("RANGE is :" + this.nodeRange);
                         //this.$.rgte.createEdgeBetween(this.nodeDomain, this.nodeRange, this.propertyToBind);
-                        var prop = this.rgte.createVisProperty(this.nodeDomain, this.nodeRange, this.propertyToBind);
-                        this.rgte.addVisProperty(prop.from, prop.to, prop.label, prop.arrows);
+                        // var prop = this.rgte.createVisProperty(this.nodeDomain, this.nodeRange, this.propertyToBind);
+                        this.propertyToBind.from = this.nodeDomain;
+                        this.propertyToBind.to = this.nodeRange;
+                        // console.log(prop);
+                        this.rgte.addVisProperty(this.propertyToBind, "to");
 
                         this.nodeDomain = null;
                         this.nodeRange = null;
