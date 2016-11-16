@@ -89,7 +89,7 @@
 
         <rte-formulaire-element id="rteform" classes="{{mergedCls}}" props="{{mergedProps}}"></rte-formulaire-element>
 
-        <rgte-custom-class-relation-element id="customRel" vocab="{{vocab.nonBlankNodes}}"></rgte-custom-class-relation-element>
+        <rgte-custom-class-relation-element id="customRel" vocab="{{vocab}}" rgte="{{rgte}}"></rgte-custom-class-relation-element>
 
         <div class$="[[_isCLSSelected(selectedcls)]]">
           <p>Selected class (node): [[selectedcls.uri]]<iron-icon icon="add-circle" on-tap="_addClassToRGTE" class="addToRTE">add-circle</iron-icon></p>
@@ -280,7 +280,7 @@
                 if (cClass == undefined && Object.keys(cClass).length === 0 && cClass.constructor === Object)
                     return;
 
-                this.push('customcls', new CAPTENClass(cClass));
+                this.push('customcls', new CAPTENClass(cClass, cClass));
             },
             addCustomProperty: function(cProp)
             {

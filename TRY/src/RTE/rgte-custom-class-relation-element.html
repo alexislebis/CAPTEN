@@ -17,8 +17,8 @@
 
           <paper-dropdown-menu label="Domain" name="type" required>
               <paper-menu class="dropdown-content" id="menu{{item}}">
-                  <template is="dom-repeat" items="[[_getClasses()]]" as="cls">
-                      <paper-item value$="[[cls]]">[[cls]]</paper-item>
+                  <template is="dom-repeat" items="[[classes]]" as="cls">
+                      <paper-item value$="[[cls.id]]">[[cls.label]]</paper-item>
                   </template>
                 </paper-menu>
               </paper-dropdown-menu>
@@ -46,6 +46,17 @@
                 value: [1],
               },
 
+              vocab:
+              {
+                type: Object,
+                //value: function(){return new CONTROLLED_VOCABULARY();},
+              },
+
+              rgte:
+              {
+                type: Object,
+              },
+
               classes:
               {
                 type: Object,
@@ -59,19 +70,42 @@
             },
 
 
+
+            attached: function()
+            {
+              this.vocab.registerObserverCallbackOnChange(this, this._onVocabularyChange);
+              this.rgte.registerObserverCallbackOnChange(this, this._onRGTEChange);
+            },
+
+// === OBSERVER
+            _onVocabularyChange: function()
+            {
+              this._updateClassesToDisplay();
+            },
+
+            _onRGTEChange: function()
+            {
+
+            },
+// ===
+
             focusedClass: function(cl)
             {
 
             },
-            
+
             _addNewMenu: function()
             {
               this.push('nbOfForms',this.nbOfForms[this.nbOfForms.length-1]++);
             },
 
-            _getClasses: function()
+            _updateClassesToDisplay: function()
             {
               console.log('couco');
+
+              this.classes = [];
+              this.classes = this.vocab.getClasses();
+
               return this.classes;
             },
         });

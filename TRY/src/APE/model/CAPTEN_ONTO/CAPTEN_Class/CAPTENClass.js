@@ -4,7 +4,7 @@
  * CAPTENClass represents the classes used in the CAPTEN-ONTO for the APE description. Each CAPTENClass must have a name (materialized by its className), an URI and a set of properties
  */
 
-function CAPTENClass(uri, properties) {
+function CAPTENClass(uri, label, properties) {
     this.id = CAPTENClass.id++;
 
     this.uri = uri;
@@ -13,7 +13,12 @@ function CAPTENClass(uri, properties) {
 
     //Dynamic inheritance system. CF Property for more details
     this.iName = "Class";
-    this.label = this.iName;
+
+    if(label == null)
+      this.label = this.iName;
+    else
+      this.label = label;
+      
     this.inheritanceArray = [];
     this.subClasses = [];//Here are the classes which inherit this
     this.subClassOf = [];//Here, the classes inherited from this
