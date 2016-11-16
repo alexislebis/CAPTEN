@@ -5,21 +5,25 @@
  */
 
 function CAPTENClass(uri, properties) {
+    this.id = CAPTENClass.id++;
+
     this.uri = uri;
     this.properties = this.properties; //[Property]
     this.isBlank = false;
 
     //Dynamic inheritance system. CF Property for more details
     this.iName = "Class";
-    this.name = this.iName;
+    this.label = this.iName;
     this.inheritanceArray = [];
     this.subClasses = [];//Here are the classes which inherit this
     this.subClassOf = [];//Here, the classes inherited from this
 
-
+    console.log(this.uri);
     if(this.uri != null && this.uri.match(/[_].*/))
       this.isBlank = true;
 }
+
+CAPTENClass.id = 0;
 
 CAPTENClass.prototype = {
 
@@ -99,6 +103,22 @@ CAPTENClass.prototype = {
 
       this.subClassOf.push(cls);
       cls.subClasses.push(this);
+    },
+
+    copy: function()
+    {
+      var cls = new CAPTENClass(this.uri);
+
+      cls.id = this.id;
+      cls.properties = this.properties;
+      cls.isBlank = this.isBlank;
+      cls.iName = this.iName;
+      cls.label = this.label;
+      cls.inheritanceArray = this.inheritanceArray;
+      cls.subClassOf = this.subClassOf;
+      cls.subClasses = this.subClasses;
+
+      return cls;
     },
 
 };

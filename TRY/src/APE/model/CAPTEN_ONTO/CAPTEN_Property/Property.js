@@ -4,21 +4,29 @@
  *
  * The additionalConstraint parameter allows to express more complex logic in future realese, such as, Student _commingFrom_ MOOC iff max 1 MOOC.
  */
-function Property(uri, From, to, additionalConstraints){
+function Property(uri, label, From, to, additionalConstraints){
+    this.id = Property.id++;
 
     this.iName = "Property";//Memorize the root level for inheritance
-    this.name = this.iName;
+
+    if(label == null)
+      this.label = this.iName;
+    else
+      this.label = label;
+      
     this.uri = uri;
 
     this.from = From;
+
     this.to = to;
+
     this.constraints = additionalConstraints;
 
     this.description = null;
 
     this.inheritanceArray = [];
 
-    
+
   //   this.subClasses = [
   //             {subClasses:{}, uri: 'NAU', name: 'hasPreviousStep'},
   //             {subClasses:{}, uri: 'NAU', name: 'hasPreviousVersion'},
@@ -29,6 +37,8 @@ function Property(uri, From, to, additionalConstraints){
   //             {subClasses:{}, uri: 'NAU', name: 'hasTerminology'},
   // ];
 }
+
+Property.id = 0;
 
 Property.prototype = {
 
@@ -66,6 +76,28 @@ Property.prototype = {
       throw new NotSubClassException(newName, this);
 
     return;
+  },
+
+  copy: function()
+  {
+    var cls = new Property();
+    cls.id = this.id;
+
+    cls.iName = this.iName;
+    cls.label = this.label;
+    cls.uri = this.uri;
+
+    cls.from = this.from;
+
+    cls.to = this.to;
+
+    cls.constraints = this.constraints;
+
+    cls.description = this.description;
+
+    cls.description = this.inheritanceArray;
+
+    return cls;
   },
 
 };
