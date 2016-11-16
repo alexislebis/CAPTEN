@@ -287,7 +287,7 @@
                 if (cProp == undefined && Object.keys(cProp).length === 0 && cProp.constructor === Object)
                     return;
 
-                this.push('customprops', new Property(cProp));
+                this.push('customprops', new Property(cProp, cProp));
             },
 
             iconForItem: function(isSelected)
