@@ -145,6 +145,7 @@
 
             update: function(cl)
             {
+              //TODO Actually issue. When to is a on a cls, go to another and back to the initial one, excpetion throw @ the 2nd. Mostly due to a desyncrho with the resetting. To test, just reset the forms > Sum(nbSubClassOf + nbSubClasses). 
               if(this.selectedcls == null) return null;
 
               this.resetDisplay();
