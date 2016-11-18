@@ -14,7 +14,7 @@
       <form is="iron-form" method="get" action="/" id="Form" on-iron-form-submit="submitForm">
         <template is="dom-repeat" items="{{nbOfForms}}" as="item">
           <div id="drops{{item}}">
-            {{selectedcls.uri}} 
+            {{selectedcls.uri}}
             <paper-dropdown-menu label="Inheritance Relation with" name="inherit" required on-iron-select="_addSuperClass">
               <paper-menu class="dropdown-content" id="inheritDrop{{item}}">
                 <template is="dom-repeat" items="[[inheritanceTypeArray]]" as="type">
@@ -134,10 +134,49 @@
             },
 // ===
 
+            resetDisplay: function()
+            {
+                this.nbOfForms = [];
+                this.push('nbOfForms', 1);
+
+                this.$$('#inheritDrop'+this.nbOfForms[0])._setSelectedItem(null);
+                this.$$('#menu'+this.nbOfForms[0])._setSelectedItem(null);
+            },
+
             update: function(cl)
             {
               if(this.selectedcls == null) return null;
 
+              this.resetDisplay();
+
+              var index = -1;
+              var offset = 0;//Si an element has to be removed, an offset must be considered in the forms number. Otherwise, their will be blank form or even errors
+
+              //subClassOf
+              for(var i = 0; i < this.selectedcls.subClassOf.length; i++)
+              {
+                if(i - offset > 0)//Si on a plus d'un élément à afficher, il faut update le nombre de form
+                  this._addNewMenu();
+
+                //On s'assure que this.selectedcls.subClassOf[i] existe toujours, sinon on delete
+                index = this.selectedcls.includedIn(this.selectedcls.subClassOf[i].subClasses);
+
+                if(index != -1)
+                  {
+                    console.log(i - offset);
+                    console.log('#inheritDrop'+((i+1) - offset));
+                    console.log(this.$$('#inheritDrop'+((i+1) - offset)));
+                    console.log(this.$$('#menu'+((i+1) - offset)));
+                    this.$$('#inheritDrop'+((i+1) - offset))._setSelectedItem(this.inheritanceTypeArray[0]);
+                    this.$$('#menu'+((i+1) - offset))._setSelectedItem(this.selectedcls.subClassOf[i].label);
+                  }
+                  else {
+                    this.removeASubClassOf(this.selectedcls.subClassOf[i]);//Removing gosht subclass
+                    offset ++;
+                  }
+
+                  //TODO update SubClass side too
+              }
             },
 
             _addNewMenu: function()
