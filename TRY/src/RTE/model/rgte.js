@@ -201,7 +201,8 @@ edgeCardinalityExists: function(id){
     var array = [];
 
     this.nodes.forEach(function(e){
-      array.push(JSON.stringify(e))
+      console.log(e);
+      array.push(e);//JSON.stringify(e))
     }.bind(this));
 
     console.log(array);

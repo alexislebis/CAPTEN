@@ -415,16 +415,16 @@
             {
               this.$.ilCUSTCLS.clearSelection();
 
-              if(!e.detail.element.model.selected)
-                this.selectedcls = e.detail.element.model.item.uri;
+              // if(!e.detail.element.model.selected)
+                this.selectedcls = e.detail;
 
             },
             _manageSelectedProp: function(e)
             {
               this.$.ilCUSTPROPS.clearSelection();
 
-              if(!e.detail.element.model.selected)
-              this.selectedprop = e.detail.element.model.item;
+              // if(!e.detail.element.model.selected)
+              this.selectedprop = e.detail;
             },
 
             _makeRel: function(e)

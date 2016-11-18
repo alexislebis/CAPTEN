@@ -18,7 +18,7 @@ function CAPTENClass(uri, label, properties) {
       this.label = this.iName;
     else
       this.label = label;
-      
+
     this.inheritanceArray = [];
     this.subClasses = [];//Here are the classes which inherit this
     this.subClassOf = [];//Here, the classes inherited from this
