@@ -11,17 +11,26 @@
       }
     </style>
 
-
       <form is="iron-form" method="get" action="/" id="Form" on-iron-form-submit="submitForm">
-        <template is="dom-repeat" items="{{nbOfForms}}">
+        <template is="dom-repeat" items="{{nbOfForms}}" as="item">
+          <div id="drops{{item}}">
+            {{selectedcls.uri}} 
+            <paper-dropdown-menu label="Inheritance Relation with" name="inherit" required on-iron-select="_addSuperClass">
+              <paper-menu class="dropdown-content" id="inheritDrop{{item}}">
+                <template is="dom-repeat" items="[[inheritanceTypeArray]]" as="type">
+                  <paper-item value$="[[type]]">[[type]]</paper-item>
+                </template>
+              </paper-menu>
 
-          <paper-dropdown-menu label="Domain" name="type" required>
-              <paper-menu class="dropdown-content" id="menu{{item}}">
-                  <template is="dom-repeat" items="[[classes]]" as="cls">
-                      <paper-item value$="[[cls.id]]">[[cls.label]]</paper-item>
-                  </template>
-                </paper-menu>
-              </paper-dropdown-menu>
+            </paper-dropdown-menu>
+            <paper-dropdown-menu label="a Concept" name="type" required on-iron-select="_addSuperClass">
+                <paper-menu class="dropdown-content" id="menu{{item}}">
+                    <template is="dom-repeat" items="[[classes]]" as="cls">
+                        <paper-item value$="[[cls.id]]">[[cls.label]]</paper-item>
+                    </template>
+                  </paper-menu>
+            </paper-dropdown-menu>
+          </div>
 
           </template>
 
@@ -46,6 +55,13 @@
                 value: [1],
               },
 
+              inheritanceTypeArray:
+              {
+                type: Array,
+                notify: true,
+                value: function(){ return ["Is a", "Can be"];},
+              },
+
               vocab:
               {
                 type: Object,
@@ -63,13 +79,28 @@
                 notify: true,
               },
 
-              rgteNode:
+              customcls:
+              {
+                type: Array,
+                notify: true,
+              },
+
+              customprops:
+              {
+                type: Array,
+                notify: true,
+              },
+
+              selectedcls:
               {
                 type: Object,
               },
             },
 
-
+            observers: [
+                "_onCustomClsChanged(customcls.splices)",
+                "_onCustomPropsChanged(customprops.splices)"
+            ],
 
             attached: function()
             {
@@ -77,7 +108,7 @@
               this.rgte.registerObserverCallbackOnChange(this, this._onRGTEChange);
             },
 
-// === OBSERVER
+// === OBSERVERs
             _onVocabularyChange: function()
             {
               this._updateClassesToDisplay();
@@ -87,26 +118,113 @@
             {
 
             },
+
+            _onCustomClsChanged: function(c)
+            {
+              if(this.customcls == null)
+                return; //NTD on boostrap
+
+                console.log('onchange');
+              this._updateClassesToDisplay();
+            },
+
+            _onCustomPropsChanged: function(c)
+            {
+
+            },
 // ===
 
-            focusedClass: function(cl)
+            update: function(cl)
             {
+              if(this.selectedcls == null) return null;
 
             },
 
             _addNewMenu: function()
             {
-              this.push('nbOfForms',this.nbOfForms[this.nbOfForms.length-1]++);
+              this.push('nbOfForms',this.nbOfForms[this.nbOfForms.length-1]+1);
             },
 
             _updateClassesToDisplay: function()
             {
-              console.log('couco');
-
               this.classes = [];
-              this.classes = this.vocab.getClasses();
+
+              if(this.vocab != null)
+              {
+                this.classes = this.vocab.getClasses();
+              }
+              for(var p = 0; p < this.customcls.length; p++)
+                if(this.selectedcls != null && this.selectedcls.includedIn(this.classes))
+                {
+                  //NTD
+                  //Prevent this.selectedcls to be its own subclass
+                }
+                else {
+                    this.push('classes', this.customcls[p]);
+                }
+
+              this._autoSelectRelation();
 
               return this.classes;
+            },
+
+            /**
+             * This private function autoselect the relations of the current class. For example, pre fill the selector. Especially usefull when changing focused node
+             */
+            _autoSelectRelation: function()
+            {
+
+            },
+
+            _addSuperClass: function(e)
+            {
+              var idx = e.target.id.replace( /^\D+/g, '')
+
+
+              if(this.selectedcls == null || this.$$('#inheritDrop'+idx).selectedItem == null || this.$$('#inheritDrop'+idx).selectedItem.innerText == null|| this.$$('#menu'+idx).selectedItem == null || this.$$('#menu'+idx).selectedItem.innerText == null) //go out if all the two forms are not specialized
+                return;
+
+              var tmpCapten = new CAPTENClass(e.target.selectedItem.innerText);
+              var inhType = this._findIndexOfInheritanceType(this.$$('#inheritDrop'+idx).selectedItem.innerText);   if(inhType == -1){return;}
+              var index = tmpCapten.includedIn(this.vocab.getClasses());
+
+
+              //TODO Test if not the same element in the concept
+
+              if(index == -1)
+                index = tmpCapten.includedIn(this.customcls);
+              else {
+                if(inhType == 0)//if the relation is : "IS A"
+                  this.selectedcls.becomesSubClassOf(this.vocab.getClasses()[index]);
+                else if(inhType == 1)//If the relation is : "CAN BE"
+                  this.vocab.getClasses()[index].becomesSubClassOf(this.selectedcls);
+
+                  console.log(this.selectedcls);
+                return;
+              }
+
+
+              if(index == -1)
+                throw new NoCAPTENClassMatchesException(tmpCapten, this.vocab.getClasses()+" "+this.customcls);
+              else{
+                if(inhType == 0)
+                  this.selectedcls.becomesSubClassOf(this.customcls[index]);
+                else if(inhType == 1)
+                  this.customcls[index].becomesSubClassOf(this.selectedcls);
+              }
+
+              console.log(this.selectedcls);
+            },
+
+            _findIndexOfInheritanceType: function(text)
+            {
+              for(var i = 0; i < this.inheritanceTypeArray.length; i++)
+              {
+                if(text === this.inheritanceTypeArray[i])
+                  return i;
+              }
+
+              return -1;
             },
         });
     </script>

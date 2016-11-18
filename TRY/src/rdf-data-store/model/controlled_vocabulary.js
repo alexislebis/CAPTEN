@@ -47,7 +47,10 @@ CONTROLLED_VOCABULARY.prototype = {
             this._recomputeNodes();
         }
 
-        return this.nonBlankNodes;
+
+        console.log(this.classes);
+        console.log(this.nonBlankNodes);
+        return this.nonBlankNodes.slice();//cp of the array
     },
 
     /**
@@ -55,7 +58,7 @@ CONTROLLED_VOCABULARY.prototype = {
      */
     getAllClasses: function()
     {
-        return this.classes;
+        return this.classes.slice();
     },
 
     getBlankNodes: function()
@@ -65,12 +68,12 @@ CONTROLLED_VOCABULARY.prototype = {
             this._recomputeNodes();
         }
 
-        return this.blankNodes;
+        return this.blankNodes.slice();
     },
 
     getProperties: function()
     {
-        return this.properties;
+        return this._cloneProperties();
     },
 
     /**
@@ -389,12 +392,15 @@ CONTROLLED_VOCABULARY.prototype = {
         this.nonBlankNodes = [];
         this.blankNodes = [];
 
+        var v = 0;
+
         for (var i in this.classes)
         {
             if (this.classes[i].isBlank)
                 this.blankNodes.push(this.classes[i]);
-            else
+            else{
                 this.nonBlankNodes.push(this.classes[i]);
+              }
         }
 
         this.isRecomputeNonBlankNodesNeeded = false;
@@ -548,6 +554,16 @@ CONTROLLED_VOCABULARY.prototype = {
         {
             return "<" + RANGE_URI + "> [ " + +"<" + TYPE_URI + "> <" + CLASS_URI + "> ; \n" + +"<" + UNION_URI + "> (" + buff + ')' + "] ;";
         }
+    },
+
+    _cloneProperties: function()
+    {
+      var clonedProps = [];
+
+      for(var i in this.properties)
+        clonedProps[i] = this.properties[i];
+
+      return clonedProps;
     },
     // ==
 };

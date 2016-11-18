@@ -89,7 +89,9 @@
 
         <rte-formulaire-element id="rteform" classes="{{mergedCls}}" props="{{mergedProps}}"></rte-formulaire-element>
 
-        <rgte-custom-class-relation-element id="customRel" vocab="{{vocab}}" rgte="{{rgte}}"></rgte-custom-class-relation-element>
+        <div hidden="{{hideClassRelationForm}}">
+          <rgte-custom-class-relation-element id="customRel" vocab="{{vocab}}" customcls="{{customcls}}" customproprs="{{customprops}}" rgte="{{rgte}}" selectedcls="{{selectedcls}}"></rgte-custom-class-relation-element>
+        </div>
 
         <div class$="[[_isCLSSelected(selectedcls)]]">
           <p>Selected class (node): [[selectedcls.uri]]<iron-icon icon="add-circle" on-tap="_addClassToRGTE" class="addToRTE">add-circle</iron-icon></p>
@@ -110,7 +112,7 @@
                                 <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
                             </div>
                         </div>
-                        <iron-icon class="makeRelation" icon="settings-input-component" on-tap="_makeRel"></iron-icon>
+                        <iron-icon class="makeRelation" icon="swap-vert" on-tap="_makeRel"></iron-icon>
                         <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomCLS"></iron-icon>
                         <div class="border"></div>
                     </div>
@@ -217,7 +219,13 @@
                 {
                   type: Object,
                   value: function(){ return new RGTE();},
-                }
+                },
+
+                hideClassRelationForm:
+                {
+                  type: Boolean,
+                  value: true,
+                },
             },
 
             observers: [
@@ -308,6 +316,8 @@
                   this.selectedcls = e.model.item;
                 else
                   this.selectedcls = null;
+
+                this.hideClassRelationForm = true;
             },
             _custpTapped: function(e)
             {
@@ -384,33 +394,7 @@
               return (prop === undefined || prop === null) ? "hidden":"noHidden";
             },
 
-            //RTE formulaire isn't specialized, thus rte fom expect only one array for classes to check the inclusion, IDEM for props.
-            // _mergingCls: function()
-            // {
-            //     this.mergedCls = [];
-            //
-            //     this.vocab.getClasses().forEach(function(e){
-            //       this.push('mergedCls', e);
-            //     }.bind(this));
-            //
-            //     this.customcls.forEach(function(e)
-            //     {
-            //         this.push('mergedCls', e);
-            //     }.bind(this));
-            // },
-            // _mergingProps: function()
-            // {
-            //     this.mergedProps = [];
-            //
-            //     this.rdfprops.forEach(function(e){
-            //       this.push('mergedProps', e);
-            //     }.bind(this));
-            //
-            //     this.customprops.forEach(function(e)
-            //     {
-            //         this.push('mergedProps', e);
-            //     }.bind(this));
-            // },
+
             _manageSelectedClass: function(e)
             {
               this.$.ilCUSTCLS.clearSelection();
@@ -429,7 +413,11 @@
 
             _makeRel: function(e)
             {
-              this.$.customRel.focusedClass();
+              if(this.selectedcls == null)
+                return ;
+
+              this.$.customRel.update();
+              this.hideClassRelationForm = false;
             },
         });
     </script>
