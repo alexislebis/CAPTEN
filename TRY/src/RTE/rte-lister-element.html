@@ -257,6 +257,10 @@
                   //this.$.ilCUSTPROPS.clearSelection();
                   this.selectedprop = null;
                 }.bind(this));
+
+                this.$.lister.addEventListener('-MakeRelTapped', function(e){
+                  this._makeRel();
+                }.bind(this));
             },
 
             _addClassToRGTE: function(e)

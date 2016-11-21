@@ -223,18 +223,22 @@
                 if (this.vocab != null)
                 {
                     this.classes = this.vocab.getClasses();
+
+                                    console.log(this.vocab.getClasses());
+                                    console.log(this.customcls);
                 }
+
                 for (var p = 0; p < this.customcls.length; p++)
                 {
-                    if (this.selectedcls != null && this.selectedcls.includedIn(this.classes) != -1)
-                    {
-                        //NTD
-                        //Prevent this.selectedcls to be its own subclass
-                    }
-                    else
-                    {
+                    // if (this.selectedcls != null && this.selectedcls.includedIn(this.classes) != -1)
+                    // {
+                    //     //NTD
+                    //     //Prevent this.selectedcls to be its own subclass
+                    // }
+                    // else
+                    // {
                         this.push('classes', this.customcls[p]);
-                    }
+                    // }
 
 
                     this._autoSelectRelation();

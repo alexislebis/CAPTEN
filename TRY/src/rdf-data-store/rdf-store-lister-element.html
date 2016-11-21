@@ -62,7 +62,9 @@
                                 <div class="selectedItem">
                                     <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
                                 </div>
+
                             </div>
+                            <iron-icon class="makeRelation" icon="swap-vert" on-tap="_makeRelTapped"></iron-icon>
                             <div class="border"></div>
                         </div>
                     </template>
@@ -212,6 +214,11 @@
                 }
             },
 
+            _makeRelTapped: function(e)
+            {
+              this.fire("-MakeRelTapped");
+            },
+
             _toArray: function(obj)
             {
                 return Object.keys(obj).map(function(key)
@@ -248,7 +255,7 @@
             clearPropSelection: function()
             {
                 this.$.ilRDFP.clearSelection();
-            }
+            },
         });
     </script>
 </dom-module>

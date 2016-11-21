@@ -175,11 +175,6 @@ CAPTENClass.prototype = {
         var buff1 = this.subClassOf.slice(0, indexOfClsInThis);
         var buff2 = this.subClassOf.slice(indexOfClsInThis + 1, this.subClassOf.length);
 
-        console.log("==="+this.uri+"===");
-        console.log(this.subClassOf);
-        console.log(buff1);
-        console.log(buff2);
-
         this.subClassOf = [];
         for (var i = 0; i < buff1.length; i++)
             this.subClassOf.push(buff1[i]);
@@ -199,12 +194,6 @@ CAPTENClass.prototype = {
 
       var buff1 = this.subClasses.slice(0, indexOfClsInThis);
       var buff2 = this.subClasses.slice(indexOfClsInThis + 1, this.subClasses.length);
-
-
-              console.log("==="+this.uri+"===");
-              console.log(this.subClassOf);
-              console.log(buff1);
-              console.log(buff2);
 
       this.subClasses = [];
       for (var i = 0; i < buff1.length; i++)
