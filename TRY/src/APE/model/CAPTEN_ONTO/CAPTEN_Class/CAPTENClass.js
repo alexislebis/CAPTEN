@@ -119,13 +119,16 @@ CAPTENClass.prototype = {
      * Reset all the relations of subclass concerning this. For example, if "A" is a "B" and can be a "C", both "B" and "C" will lose their relations with "A" (A's arrays are reseted).
      */
     resetSubClassRelations: function() {
-      for(var i = 0; i < this.subClassOf.length; i++)
+
+      while(this.subClassOf.length > 0)
       {
-        this.removeSubClassRelationWith(this.subClassOf[i]);
+        this.removeSubClassRelationWith(this.subClassOf[0]);
       }
 
-      for(var i = 0; i < this.subClasses.length; i++)
-        this.removeSubClassRelationWith(this.subClasses[i]);
+      while(this.subClasses.length > 0)
+      {
+        this.removeSubClassRelationWith(this.subClasses[0]);
+      }
     },
 
     /**
@@ -138,6 +141,8 @@ CAPTENClass.prototype = {
 
         indexOfClsInThis = cls.includedIn(this.subClassOf);
 
+        console.log(indexOfClsInThis);
+
         if (indexOfClsInThis != -1) //cls is a subClassOf this
         {
             this.removeASubClassOf(cls, indexOfClsInThis);
@@ -147,6 +152,8 @@ CAPTENClass.prototype = {
         }
 
         indexOfClsInThis = cls.includedIn(this.subClasses);
+
+        console.log(indexOfClsInThis);
 
         if(indexOfClsInThis != -1)
         {
@@ -168,11 +175,18 @@ CAPTENClass.prototype = {
         var buff1 = this.subClassOf.slice(0, indexOfClsInThis);
         var buff2 = this.subClassOf.slice(indexOfClsInThis + 1, this.subClassOf.length);
 
+        console.log("==="+this.uri+"===");
+        console.log(this.subClassOf);
+        console.log(buff1);
+        console.log(buff2);
+
         this.subClassOf = [];
         for (var i = 0; i < buff1.length; i++)
             this.subClassOf.push(buff1[i]);
         for (var i = 0; i < buff2.length; i++)
             this.subClassOf.push(buff2[i]);
+
+        console.log(this.subClassOf);
     },
 
     removeASuperClass: function(cls, indexOfClsInThis)
@@ -186,11 +200,19 @@ CAPTENClass.prototype = {
       var buff1 = this.subClasses.slice(0, indexOfClsInThis);
       var buff2 = this.subClasses.slice(indexOfClsInThis + 1, this.subClasses.length);
 
+
+              console.log("==="+this.uri+"===");
+              console.log(this.subClassOf);
+              console.log(buff1);
+              console.log(buff2);
+
       this.subClasses = [];
       for (var i = 0; i < buff1.length; i++)
           this.subClasses.push(buff1[i]);
       for (var i = 0; i < buff2.length; i++)
           this.subClasses.push(buff2[i]);
+
+      console.log(this.subClasses);
     },
 
     copy: function()
