@@ -11,7 +11,7 @@
       }
     </style>
 
-      <form is="iron-form" method="get" action="/" id="Form" on-iron-form-submit="_submitForm">
+      <form is="iron-form" method="get" action="/" id="Form" on-iron-form-submit="_submitForm" on-iron-form-element-register="_elementRegister">
         <template is="dom-repeat" items="{{nbOfForms}}" as="item">
           <div id="drops{{item}}">
             {{selectedcls.uri}}
@@ -23,7 +23,7 @@
     </paper-menu>
 
     </paper-dropdown-menu>
-    <paper-dropdown-menu label="a Concept" name="type" >
+    <paper-dropdown-menu label="a Concept" name="type">
         <paper-menu class="dropdown-content" id="menu{{item}}">
             <template is="dom-repeat" items="[[classes]]" as="cls">
                         <paper-item value$="[[cls.id]]">[[cls.label]]</paper-item>
@@ -53,7 +53,7 @@
                 {
                     type: Array,
                     notify: true,
-                    value: [1],
+                    value: [],
                 },
 
                 inheritanceTypeArray:
@@ -103,7 +103,8 @@
 
             observers: [
                 "_onCustomClsChanged(customcls.splices)",
-                "_onCustomPropsChanged(customprops.splices)"
+                "_onCustomPropsChanged(customprops.splices)",
+                "_onNbOfFormsChanged(nbOfForms.splices)"
             ],
 
             attached: function()
@@ -134,86 +135,128 @@
             _onCustomPropsChanged: function(c) {
 
             },
+
+            _onNbOfFormsChanged: function(c)
+            {
+                console.log(c);
+            },
+
+            _elementRegister: function(c)
+            {
+                if (this.$$('#inheritDrop' + this.nbOfForms.length) == null)
+                {
+                    //NTD
+                }
+                else
+                {
+                    this._fillForms();
+                }
+            },
+
+            processNewNodes: function(info) {
+
+            },
+
+            processRemovedNodes: function(info)
+            {
+                console.log("removed nodes");
+            },
             // ===
 
             resetDisplay: function()
             {
-                // this.nbOfForms = [];
-                // this.push('nbOfForms', 1);
+                this.splice('nbOfForms', 0, this.nbOfForms.length);
 
-                for (var i = 0; i < this.nbOfForms.length; i++)
-                {
-                    console.log('#inheritDrop' + this.nbOfForms[i]);
-                    console.log(this.$$('#inheritDrop' + this.nbOfForms[i]));
-                    this.$$('#inheritDrop' + this.nbOfForms[i]).selected = null;
-                    this.$$('#menu' + this.nbOfForms[i]).selected = null;
-                }
             },
 
-            update: function(cl)
+            _fillForms: function()
             {
-                console.log(this.selectedcls);
-                //TODO Actually issue. When to is a on a cls, go to another and back to the initial one, excpetion throw @ the 2nd. Mostly due to a desyncrho with the resetting. To test, just reset the forms > Sum(nbSubClassOf + nbSubClasses).
                 if (this.selectedcls == null) return null;
 
-                this.resetDisplay();
+                //this.resetDisplay();
 
                 var index = -1;
                 var offset = 0; //Si an element has to be removed, an offset must be considered in the forms number. Otherwise, their will be blank form or even errors
                 var i = 0; //for remembering position of the already filled form
 
+                if (this.selectedcls.subClasses.length + this.selectedcls.subClassOf.length == 0)
+                {
+                    this.$$('#inheritDrop' + 1).selected = null;
+                    this.$$('#menu' + 1).selected = null;
+                    return;
+                }
+
                 //subClassOf
                 for (i = 0; i < this.selectedcls.subClassOf.length; i++)
                 {
-                    // if (i - offset > 0) //Si on a plus d'un élément à afficher, il faut update le nombre de form
-                    //     this._addNewMenu();
+                        //On s'assure que this.selectedcls.subClassOf[i] existe toujours, sinon on delete
+                        index = this.selectedcls.includedIn(this.selectedcls.subClassOf[i].subClasses);
 
-
-                      console.log(this.$$('#inheritDrop' +2));
-                    //On s'assure que this.selectedcls.subClassOf[i] existe toujours, sinon on delete
-                    index = this.selectedcls.includedIn(this.selectedcls.subClassOf[i].subClasses);
-
-                    if (index != -1)
-                    {
-                        console.log(i - offset);
-                        console.log(this.$$('#inheritDrop' + ((i + 1) - offset)));
-                        this.$$('#inheritDrop' + ((i + 1) - offset)).selected = 0;
-                        this.$$('#menu' + ((i + 1) - offset)).selected = this._indexOfClass(this.selectedcls.subClassOf[i]); //(this.selectedcls.subClassOf[i].label);
-                    }
-                    else
-                    {
-                        this.removeASubClassOf(this.selectedcls.subClassOf[i]); //Removing gosht subclass
-                        offset++;
-                    }
+                        if (index != -1)
+                        {
+                            // console.log(i - offset);
+                            // console.log(this.$$('#inheritDrop' + (idx)));
+                            if(this.$$('#inheritDrop' + (i + 1)) != null){
+                            this.$$('#inheritDrop' + (i + 1)).selected = 0;
+                            this.$$('#menu' + (i + 1)).selected = this._indexOfClass(this.selectedcls.subClassOf[i]); //(this.selectedcls.subClassOf[i].label);
+                            }
+                        }
+                        else // TODO manage offsetting and deleting gosht relation
+                        {
+                            // this.removeASubClassOf(this.selectedcls.subClassOf[i]); //Removing gosht subclass
+                            // offset++;
+                        }
+                    // }
                 }
 
                 for (var j = 0; j < this.selectedcls.subClasses.length; j++)
                 {
-                    // if (j + i - offset > 0) //Si on a plus d'un élément à afficher, il faut update le nombre de form
-                    //     this._addNewMenu();
 
-                    //On s'assure que this.selectedcls.subClassOf[i] existe toujours, sinon on delete
-                    index = this.selectedcls.includedIn(this.selectedcls.subClasses[j].subClassOf);
+                        index = this.selectedcls.includedIn(this.selectedcls.subClasses[j].subClassOf);
 
-                    if (index != -1)
-                    {
-                        console.log(j + i - offset);
-                        console.log(this._indexOfClass(this.selectedcls.subClasses[j]));
-                        this.$$('#inheritDrop' + ((j + i + 1) - offset)).selected = 1;
-                        this.$$('#menu' + ((j + i + 1) - offset)).selected = this._indexOfClass(this.selectedcls.subClasses[j]); //(this.selectedcls.subClassOf[i].label);
-                    }
-                    else
-                    {
-                        this.removeASubClassOf(this.selectedcls.subClasses[j]); //Removing gosht subclass
-                        offset++;
-                    }
+                        if (index != -1)
+                        {
+                            // console.log(j + i - offset);
+                            // console.log(this._indexOfClass(this.selectedcls.subClasses[(idx - this.selectedcls.subClassOf.length)-1]));
+                            if(this.$$('#inheritDrop' + (i + j + 1)) != null){
+                            this.$$('#inheritDrop' + (i + j + 1)).selected = 1;
+                            this.$$('#menu' + (i + j + 1)).selected = this._indexOfClass(this.selectedcls.subClasses[j]); //(this.selectedcls.subClassOf[i].label);
+                          }
+                        }
+                        else // TODO manage offsetting and deleting gosht relation
+                        {
+                            // this.removeASubClassOf(this.selectedcls.subClasses[j]); //Removing gosht subclass
+                            // offset++;
+                        }
+                    // }
                 }
+
+            },
+
+            update: function(cl)
+            {
+                if (this.selectedcls == null) return null;
+
+                this._addNewMenus(this.selectedcls.subClasses.length + this.selectedcls.subClassOf.length);
 
             },
 
             _addNewMenu: function()
             {
-                this.push('nbOfForms', this.nbOfForms[this.nbOfForms.length - 1] + 1);
+                this.push('nbOfForms', this.nbOfForms.length + 1);
+            },
+
+            _addNewMenus: function(nbMenus)
+            {
+                this.resetDisplay();
+
+                for (var i = 0; i < nbMenus; i++)
+                    this.push('nbOfForms', this.nbOfForms.length + 1);
+
+                // while(this.$$('#inheritDrop'+this.nbOfForms.length) == null)
+                // {
+                //   console.log('while');
+                // }
             },
 
             _updateClassesToDisplay: function()
@@ -224,20 +267,14 @@
                 {
                     this.classes = this.vocab.getClasses();
 
-                                    console.log(this.vocab.getClasses());
-                                    console.log(this.customcls);
+                    console.log(this.vocab.getClasses());
+                    console.log(this.customcls);
                 }
 
                 for (var p = 0; p < this.customcls.length; p++)
                 {
-                    // if (this.selectedcls != null && this.selectedcls.includedIn(this.classes) != -1)
-                    // {
-                    //     //NTD
-                    //     //Prevent this.selectedcls to be its own subclass
-                    // }
-                    // else
-                    // {
-                        this.push('classes', this.customcls[p]);
+
+                    this.push('classes', this.customcls[p]);
                     // }
 
 
@@ -255,6 +292,7 @@
                 if (this.selectedcls == null)
                     return;
 
+                console.log(cls);
                 var classes = this.vocab.getClasses();
                 var index = cls.includedIn(classes);
 
@@ -268,6 +306,7 @@
 
                     return index;
                 }
+                return index;
             },
 
             /**
@@ -279,9 +318,10 @@
 
             _addSuperClass: function(e)
             {
-                var idx = e;//.target.id.replace(/^\D+/g, '')
+                var idx = e; //.target.id.replace(/^\D+/g, '')
 
-                if (this.selectedcls == null || this.$$('#inheritDrop' + idx).selectedItem == null || this.$$('#inheritDrop' + idx).selectedItem.innerText == null || this.$$('#menu' + idx).selectedItem == null || this.$$('#menu' + idx).selectedItem.innerText == null) //go out if all the two forms are not specialized
+                if (this.selectedcls == null || this.$$('#inheritDrop' + idx).selectedItem == null || this.$$('#inheritDrop' + idx).selectedItem.innerText == null || this.$$('#menu' + idx).selectedItem == null || this.$$('#menu' + idx).selectedItem
+                    .innerText == null) //go out if all the two forms are not specialized
                     return;
 
                 var tmpCapten = new CAPTENClass(this.$$('#menu' + idx).selectedItem.innerText);
@@ -338,12 +378,12 @@
 
             _submitForm: function()
             {
-              this.selectedcls.resetSubClassRelations();
+                this.selectedcls.resetSubClassRelations();
 
-              for(var i = 0; i < this.nbOfForms.length; i++)
-              {
-                this._addSuperClass(this.nbOfForms[i]);
-              }
+                for (var i = 0; i < this.nbOfForms.length; i++)
+                {
+                    this._addSuperClass(this.nbOfForms[i]);
+                }
             }
         });
     </script>

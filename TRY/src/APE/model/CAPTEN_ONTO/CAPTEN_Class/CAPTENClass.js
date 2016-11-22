@@ -24,7 +24,7 @@ function CAPTENClass(uri, label, properties)
     this.subClasses = []; //Here are the classes which inherit this
     this.subClassOf = []; //Here, the classes inherited from this
 
-    console.log(this.uri);
+    //console.log(this.uri);
     if (this.uri != null && this.uri.match(/[_].*/))
         this.isBlank = true;
 }
@@ -57,7 +57,7 @@ CAPTENClass.prototype = {
         {
             if (e.name === newName)
             {
-                console.log(e.subClasses);
+                //console.log(e.subClasses);
                 that.inheritanceArray.push(that.name); //memorizing the previous super class;
                 that.name = e.name;
                 that.subClasses = e.subClasses;
@@ -141,7 +141,7 @@ CAPTENClass.prototype = {
 
         indexOfClsInThis = cls.includedIn(this.subClassOf);
 
-        console.log(indexOfClsInThis);
+        //console.log(indexOfClsInThis);
 
         if (indexOfClsInThis != -1) //cls is a subClassOf this
         {
@@ -153,7 +153,7 @@ CAPTENClass.prototype = {
 
         indexOfClsInThis = cls.includedIn(this.subClasses);
 
-        console.log(indexOfClsInThis);
+        // //console.log(indexOfClsInThis);
 
         if(indexOfClsInThis != -1)
         {
@@ -181,7 +181,7 @@ CAPTENClass.prototype = {
         for (var i = 0; i < buff2.length; i++)
             this.subClassOf.push(buff2[i]);
 
-        console.log(this.subClassOf);
+        //console.log(this.subClassOf);
     },
 
     removeASuperClass: function(cls, indexOfClsInThis)
@@ -201,7 +201,7 @@ CAPTENClass.prototype = {
       for (var i = 0; i < buff2.length; i++)
           this.subClasses.push(buff2[i]);
 
-      console.log(this.subClasses);
+      //console.log(this.subClasses);
     },
 
     copy: function()
