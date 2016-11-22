@@ -86,6 +86,22 @@ RGTE.prototype = {
   {
 
   },
+
+  serializeAndIntegrateVocabulary: function(vocab)
+  {
+    var voc = vocab.clone();
+
+    console.log(voc.getClasses());
+
+    for(var i in this.nodes)
+      voc.addClass(this.nodes[i]);
+
+    for(var i in this.edges)
+      voc.addProperty(this._convertEdge(this.edges[i]));
+
+    console.log(voc);// TODO Traduire les node id du rgte dans from et to en [] [] de prop.
+    console.log(voc.serializeToN3());
+  },
 // ===
 
 // === OBSERVATION
@@ -173,6 +189,31 @@ edgeCardinalityExists: function(id){
 },
 
 // === PRIVATE METHODS ===
+
+/**
+ * Transform planar from & to edge attribute to arrayed ones for properties.
+ */
+ // NB : Edges used planar from & to because of multi use of the same properties
+_convertEdge: function(edge)
+{
+  var nfrom = this.getNodeById(edge.from);
+
+  if(nfrom == null)
+    return;
+
+  var nto = this.getNodeById(edge.to);
+  if(nto == null)
+    return;
+
+  var e = edge.copy();
+  e.from = [];
+  e.to = [];
+
+  e.from.push(nfrom);
+  e.to.push(nto);
+
+  return e;
+},
 
   _calculatingCardinalitiesAvailable: function() {
 

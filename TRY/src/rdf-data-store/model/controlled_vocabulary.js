@@ -73,7 +73,7 @@ CONTROLLED_VOCABULARY.prototype = {
 
     getProperties: function()
     {
-        return this._cloneProperties();
+        return this._cloneArrayMap(this.properties);
     },
 
     /**
@@ -95,6 +95,16 @@ CONTROLLED_VOCABULARY.prototype = {
     {
         //TODO parser les propriétés et lister toutes celle en relations avec le noeud en question.
         //Prendre en compte les unions
+    },
+
+    getUnionOf: function()
+    {
+      this._cloneArrayMap(this.unionOf);
+    },
+
+    getIntersectionOf: function()
+    {
+      this._cloneArrayMap(this.intersections);
     },
     // ===
 
@@ -333,7 +343,7 @@ CONTROLLED_VOCABULARY.prototype = {
     // ===
 
     // === ADDING METHODS
-    addClass: function(cl, editionProfil)
+    addClass: function(cl, editionProfil)//Edition profil : who add the classes
     {
         this.isRecomputeNonBlankNodesNeeded = true;
         this.isRecomputeBlankNodesNeeded = true;
@@ -358,6 +368,9 @@ CONTROLLED_VOCABULARY.prototype = {
         this.isRecomputeNonBlankNodesNeeded = true;
         this.isRecomputeBlankNodesNeeded = true;
 
+        console.log(pr);
+        console.log(this.properties);
+
         if (pr.uri == null || pr.to == null || pr.from == null)
             return;
 
@@ -365,7 +378,7 @@ CONTROLLED_VOCABULARY.prototype = {
             this.versions.push(editionProfil);
 
         //If the property does not exist, need to add it and enriched the class section
-        if (!this.properties[pr.uri] == null)
+        if (this.properties[pr.uri] == null)
         {
             var res = false;
 
@@ -379,8 +392,8 @@ CONTROLLED_VOCABULARY.prototype = {
         else
         { //otherwise, the property exist and the need is to stack up the class in rray.
             //While the serialization, stacked classes must be transformed in unionOf
-            this.properties[pr.uri].from = pr.from;
-            this.properties[pr.uri].to = pr.to;
+            this.properties[pr.uri].from.concat(pr.from);
+            this.properties[pr.uri].to.concat(pr.to);
         }
 
     },
@@ -554,6 +567,32 @@ CONTROLLED_VOCABULARY.prototype = {
         {
             return "<" + RANGE_URI + "> [ " + +"<" + TYPE_URI + "> <" + CLASS_URI + "> ; \n" + +"<" + UNION_URI + "> (" + buff + ')' + "] ;";
         }
+    },
+
+    // ===
+
+    // === CLONING METHODS
+    clone: function()
+    {
+        var vc = new CONTROLLED_VOCABULARY();
+
+        vc.classes = this._cloneArrayMap(this.classes);
+        vc.properties = this.getProperties();
+        vc.unionOf = this._cloneArrayMap(this.unionOf);
+        vc.intersections = this._cloneArrayMap(this.intersections);
+
+        return vc;
+    },
+
+    _cloneArrayMap: function(arrayMap)
+    {
+      var clonedArray = [];
+
+      for(var i in arrayMap){
+        clonedArray[i] = arrayMap[i];
+      }
+
+      return clonedArray;
     },
 
     _cloneProperties: function()
