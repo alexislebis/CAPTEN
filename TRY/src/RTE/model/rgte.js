@@ -64,7 +64,8 @@ RGTE.prototype = {
     var prop = proper.copy();
     // prop.id = RGTE.edgeID++;
     prop.idVoc = proper.id;
-    prop.id = RGTE.id++;
+    prop.id = RGTE.edgeID++;
+    console.log(prop.id);
     prop.arrows = arrows;
     // prop.arrows = arrows;
     // prop.label = edgeLabel;
@@ -200,7 +201,8 @@ edgeCardinalityExists: function(id){
     var array = [];
 
     this.nodes.forEach(function(e){
-      array.push(JSON.stringify(e))
+      console.log(e);
+      array.push(e);//JSON.stringify(e))
     }.bind(this));
 
     console.log(array);

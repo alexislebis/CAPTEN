@@ -47,7 +47,10 @@ CONTROLLED_VOCABULARY.prototype = {
             this._recomputeNodes();
         }
 
-        return this.nonBlankNodes;
+
+        console.log(this.classes);
+        console.log(this.nonBlankNodes);
+        return this.nonBlankNodes.slice();//cp of the array
     },
 
     /**
@@ -55,7 +58,7 @@ CONTROLLED_VOCABULARY.prototype = {
      */
     getAllClasses: function()
     {
-        return this.classes;
+        return this.classes.slice();
     },
 
     getBlankNodes: function()
@@ -65,12 +68,12 @@ CONTROLLED_VOCABULARY.prototype = {
             this._recomputeNodes();
         }
 
-        return this.blankNodes;
+        return this.blankNodes.slice();
     },
 
     getProperties: function()
     {
-        return this.properties;
+        return this._cloneProperties();
     },
 
     /**
@@ -138,6 +141,7 @@ CONTROLLED_VOCABULARY.prototype = {
      */
     classesContain: function(uriClass)
     {
+      console.log("WARNING CALL!! COPY OF THE DETECTED CLASS");
         return (new CAPTENClass(uriClass)).includedIn(this.classes);
     },
 
@@ -159,7 +163,7 @@ CONTROLLED_VOCABULARY.prototype = {
                 {
                     if (!this.classes.includes(r.class.value))
                         if (!r.class.value.match(/[_].*/))
-                            this.classes[r.class.value] = new CAPTENClass(r.class.value);
+                            this.classes[r.class.value] = new CAPTENClass(r.class.value, r.class.value);
                 }.bind(this));
             }
             else
@@ -176,16 +180,16 @@ CONTROLLED_VOCABULARY.prototype = {
                     results.forEach(function(r)
                     {
                         if (this.classes[r.o.value] == null)
-                            this.classes[r.o.value] = new CAPTENClass(r.o.value);
+                            this.classes[r.o.value] = new CAPTENClass(r.o.value, r.o.value);
 
                         // if (!this.properties.includes(r.prop.value))
                         //     this.properties.push(r.prop.value);
                         if (this.properties[r.prop.value] == null)
-                            this.properties[r.prop.value] = new Property(r.prop.value); //{"uri":r.prop.value};
+                            this.properties[r.prop.value] = new Property(r.prop.value, r.prop.value); //{"uri":r.prop.value};
                         if (this.classes[r.o.value] != null)
                             if (this.properties[r.prop.value].from == null)
                                 this.properties[r.prop.value].from = [];
-                        this.properties[r.prop.value].from.push(new CAPTENClass(r.o.value));
+                        this.properties[r.prop.value].from.push(new CAPTENClass(r.o.value, r.o.value));
                     }.bind(this));
                 }
                 else
@@ -203,15 +207,15 @@ CONTROLLED_VOCABULARY.prototype = {
                         results.forEach(function(r)
                         {
                             if (this.classes[r.o.value] == null)
-                                this.classes[r.o.value] = new CAPTENClass(r.o.value);
+                                this.classes[r.o.value] = new CAPTENClass(r.o.value, r.o.value);
                             // if(!this.properties.includes(r.s.value))
                             //   this.properties.push( r.s.value);
                             if (this.properties[r.s.value] == null)
-                                this.properties[r.s.value] = new Property(r.s.value); //{"uri":r.s.value};
+                                this.properties[r.s.value] = new Property(r.s.value, r.s.value); //{"uri":r.s.value};
                             if (this.classes[r.o.value] != null)
                                 if (this.properties[r.s.value].to == null)
                                     this.properties[r.s.value].to = [];
-                            this.properties[r.s.value].to.push(new CAPTENClass(r.o.value));
+                            this.properties[r.s.value].to.push(new CAPTENClass(r.o.value, r.o.value));
                         }.bind(this));
                     }
                     else
@@ -388,12 +392,15 @@ CONTROLLED_VOCABULARY.prototype = {
         this.nonBlankNodes = [];
         this.blankNodes = [];
 
+        var v = 0;
+
         for (var i in this.classes)
         {
             if (this.classes[i].isBlank)
                 this.blankNodes.push(this.classes[i]);
-            else
+            else{
                 this.nonBlankNodes.push(this.classes[i]);
+              }
         }
 
         this.isRecomputeNonBlankNodesNeeded = false;
@@ -413,7 +420,7 @@ CONTROLLED_VOCABULARY.prototype = {
                 {
                     if (this.unionOf[s[i][j].x.value] == null)
                         this.unionOf[s[i][j].x.value] = [];
-                    this.unionOf[s[i][j].x.value].push(new CAPTENClass(s[i][j].d.value));
+                    this.unionOf[s[i][j].x.value].push(new CAPTENClass(s[i][j].d.value, s[i][j].d.value));
                 }
             }
 
@@ -547,6 +554,16 @@ CONTROLLED_VOCABULARY.prototype = {
         {
             return "<" + RANGE_URI + "> [ " + +"<" + TYPE_URI + "> <" + CLASS_URI + "> ; \n" + +"<" + UNION_URI + "> (" + buff + ')' + "] ;";
         }
+    },
+
+    _cloneProperties: function()
+    {
+      var clonedProps = [];
+
+      for(var i in this.properties)
+        clonedProps[i] = this.properties[i];
+
+      return clonedProps;
     },
     // ==
 };

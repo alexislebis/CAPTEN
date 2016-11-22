@@ -11,27 +11,37 @@
       }
     </style>
 
+      <form is="iron-form" method="get" action="/" id="Form" on-iron-form-submit="_submitForm" on-iron-form-element-register="_elementRegister">
+        <template is="dom-repeat" items="{{nbOfForms}}" as="item">
+          <div id="drops{{item}}">
+            {{selectedcls.uri}}
+            <paper-dropdown-menu label="Inheritance Relation with" name="inherit" >
+              <paper-menu class="dropdown-content" id="inheritDrop{{item}}">
+                <template is="dom-repeat" items="[[inheritanceTypeArray]]" as="type">
+                  <paper-item value$="[[type]]">[[type]]</paper-item>
+                </template>
+    </paper-menu>
 
-      <form is="iron-form" method="get" action="/" id="Form" on-iron-form-submit="submitForm">
-        <template is="dom-repeat" items="{{nbOfForms}}">
+    </paper-dropdown-menu>
+    <paper-dropdown-menu label="a Concept" name="type">
+        <paper-menu class="dropdown-content" id="menu{{item}}">
+            <template is="dom-repeat" items="[[classes]]" as="cls">
+                        <paper-item value$="[[cls.id]]">[[cls.label]]</paper-item>
+                    </template>
+        </paper-menu>
+    </paper-dropdown-menu>
+    </div>
 
-          <paper-dropdown-menu label="Domain" name="type" required>
-              <paper-menu class="dropdown-content" id="menu{{item}}">
-                  <template is="dom-repeat" items="[[_getClasses()]]" as="cls">
-                      <paper-item value$="[[cls]]">[[cls]]</paper-item>
-                  </template>
-                </paper-menu>
-              </paper-dropdown-menu>
+    </template>
 
-          </template>
-
-          <iron-icon icon="add-circle" on-tap="_addNewMenu" class="addToRTE"></iron-icon>
-      </form>
-
-
+    <iron-icon icon="add-circle" on-tap="_addNewMenu" class="addToRTE"></iron-icon>
+    <paper-button raised on-click="_submit">Save relations!</paper-button>
+    </form>
 
 
-  </template>
+
+
+    </template>
     <script>
         Polymer(
         {
@@ -39,41 +49,342 @@
 
             properties:
             {
-              nbOfForms:
-              {
-                type: Array,
-                notify: true,
-                value: [1],
-              },
+                nbOfForms:
+                {
+                    type: Array,
+                    notify: true,
+                    value: [],
+                },
 
-              classes:
-              {
-                type: Object,
-                notify: true,
-              },
+                inheritanceTypeArray:
+                {
+                    type: Array,
+                    notify: true,
+                    value: function()
+                    {
+                        return ["Is a", "Can be"];
+                    },
+                },
 
-              rgteNode:
-              {
-                type: Object,
-              },
+                vocab:
+                {
+                    type: Object,
+                    //value: function(){return new CONTROLLED_VOCABULARY();},
+                },
+
+                rgte:
+                {
+                    type: Object,
+                },
+
+                classes:
+                {
+                    type: Object,
+                    notify: true,
+                },
+
+                customcls:
+                {
+                    type: Array,
+                    notify: true,
+                },
+
+                customprops:
+                {
+                    type: Array,
+                    notify: true,
+                },
+
+                selectedcls:
+                {
+                    type: Object,
+                },
             },
 
+            observers: [
+                "_onCustomClsChanged(customcls.splices)",
+                "_onCustomPropsChanged(customprops.splices)",
+                "_onNbOfFormsChanged(nbOfForms.splices)"
+            ],
 
-            focusedClass: function(cl)
+            attached: function()
             {
+                this.vocab.registerObserverCallbackOnChange(this, this._onVocabularyChange);
+                this.rgte.registerObserverCallbackOnChange(this, this._onRGTEChange);
+            },
+
+            // === OBSERVERs
+            _onVocabularyChange: function()
+            {
+                this._updateClassesToDisplay();
+            },
+
+            _onRGTEChange: function() {
 
             },
-            
+
+            _onCustomClsChanged: function(c)
+            {
+                if (this.customcls == null)
+                    return; //NTD on boostrap
+
+                console.log('onchange');
+                this._updateClassesToDisplay();
+            },
+
+            _onCustomPropsChanged: function(c) {
+
+            },
+
+            _onNbOfFormsChanged: function(c)
+            {
+                console.log(c);
+            },
+
+            _elementRegister: function(c)
+            {
+                if (this.$$('#inheritDrop' + this.nbOfForms.length) == null)
+                {
+                    //NTD
+                }
+                else
+                {
+                    this._fillForms();
+                }
+            },
+
+            processNewNodes: function(info) {
+
+            },
+
+            processRemovedNodes: function(info)
+            {
+                console.log("removed nodes");
+            },
+            // ===
+
+            resetDisplay: function()
+            {
+                this.splice('nbOfForms', 0, this.nbOfForms.length);
+
+            },
+
+            _fillForms: function()
+            {
+                if (this.selectedcls == null) return null;
+
+                //this.resetDisplay();
+
+                var index = -1;
+                var offset = 0; //Si an element has to be removed, an offset must be considered in the forms number. Otherwise, their will be blank form or even errors
+                var i = 0; //for remembering position of the already filled form
+
+                if (this.selectedcls.subClasses.length + this.selectedcls.subClassOf.length == 0)
+                {
+                    this.$$('#inheritDrop' + 1).selected = null;
+                    this.$$('#menu' + 1).selected = null;
+                    return;
+                }
+
+                //subClassOf
+                for (i = 0; i < this.selectedcls.subClassOf.length; i++)
+                {
+                        //On s'assure que this.selectedcls.subClassOf[i] existe toujours, sinon on delete
+                        index = this.selectedcls.includedIn(this.selectedcls.subClassOf[i].subClasses);
+
+                        if (index != -1)
+                        {
+                            // console.log(i - offset);
+                            // console.log(this.$$('#inheritDrop' + (idx)));
+                            if(this.$$('#inheritDrop' + (i + 1)) != null){
+                            this.$$('#inheritDrop' + (i + 1)).selected = 0;
+                            this.$$('#menu' + (i + 1)).selected = this._indexOfClass(this.selectedcls.subClassOf[i]); //(this.selectedcls.subClassOf[i].label);
+                            }
+                        }
+                        else // TODO manage offsetting and deleting gosht relation
+                        {
+                            // this.removeASubClassOf(this.selectedcls.subClassOf[i]); //Removing gosht subclass
+                            // offset++;
+                        }
+                    // }
+                }
+
+                for (var j = 0; j < this.selectedcls.subClasses.length; j++)
+                {
+
+                        index = this.selectedcls.includedIn(this.selectedcls.subClasses[j].subClassOf);
+
+                        if (index != -1)
+                        {
+                            // console.log(j + i - offset);
+                            // console.log(this._indexOfClass(this.selectedcls.subClasses[(idx - this.selectedcls.subClassOf.length)-1]));
+                            if(this.$$('#inheritDrop' + (i + j + 1)) != null){
+                            this.$$('#inheritDrop' + (i + j + 1)).selected = 1;
+                            this.$$('#menu' + (i + j + 1)).selected = this._indexOfClass(this.selectedcls.subClasses[j]); //(this.selectedcls.subClassOf[i].label);
+                          }
+                        }
+                        else // TODO manage offsetting and deleting gosht relation
+                        {
+                            // this.removeASubClassOf(this.selectedcls.subClasses[j]); //Removing gosht subclass
+                            // offset++;
+                        }
+                    // }
+                }
+
+            },
+
+            update: function(cl)
+            {
+                if (this.selectedcls == null) return null;
+
+                this._addNewMenus(this.selectedcls.subClasses.length + this.selectedcls.subClassOf.length);
+
+            },
+
             _addNewMenu: function()
             {
-              this.push('nbOfForms',this.nbOfForms[this.nbOfForms.length-1]++);
+                this.push('nbOfForms', this.nbOfForms.length + 1);
             },
 
-            _getClasses: function()
+            _addNewMenus: function(nbMenus)
             {
-              console.log('couco');
-              return this.classes;
+                this.resetDisplay();
+
+                for (var i = 0; i < nbMenus; i++)
+                    this.push('nbOfForms', this.nbOfForms.length + 1);
+
+                // while(this.$$('#inheritDrop'+this.nbOfForms.length) == null)
+                // {
+                //   console.log('while');
+                // }
             },
+
+            _updateClassesToDisplay: function()
+            {
+                this.classes = [];
+
+                if (this.vocab != null)
+                {
+                    this.classes = this.vocab.getClasses();
+
+                    console.log(this.vocab.getClasses());
+                    console.log(this.customcls);
+                }
+
+                for (var p = 0; p < this.customcls.length; p++)
+                {
+
+                    this.push('classes', this.customcls[p]);
+                    // }
+
+
+                    this._autoSelectRelation();
+                }
+                return this.classes;
+            },
+
+            /**
+             * This function return the index of the selected class in the set of the vocab + custom classes.
+             * WARNING : Strong dependencies with this._updateClassesToDisplay since it is based on the idea that vocabulary classes are first, then custm cls
+             */
+            _indexOfClass: function(cls)
+            {
+                if (this.selectedcls == null)
+                    return;
+
+                console.log(cls);
+                var classes = this.vocab.getClasses();
+                var index = cls.includedIn(classes);
+
+                if (index == -1)
+                {
+                    index = cls.includedIn(this.customcls);
+                    if (index != -1) //Need to move the index after the first classes belonging to the vocab
+                    {
+                        index = index * 1 + classes.length * 1; //F U JS, f u...
+                    }
+
+                    return index;
+                }
+                return index;
+            },
+
+            /**
+             * This private function autoselect the relations of the current class. For example, pre fill the selector. Especially usefull when changing focused node
+             */
+            _autoSelectRelation: function() {
+
+            },
+
+            _addSuperClass: function(e)
+            {
+                var idx = e; //.target.id.replace(/^\D+/g, '')
+
+                if (this.selectedcls == null || this.$$('#inheritDrop' + idx).selectedItem == null || this.$$('#inheritDrop' + idx).selectedItem.innerText == null || this.$$('#menu' + idx).selectedItem == null || this.$$('#menu' + idx).selectedItem
+                    .innerText == null) //go out if all the two forms are not specialized
+                    return;
+
+                var tmpCapten = new CAPTENClass(this.$$('#menu' + idx).selectedItem.innerText);
+                var inhType = this._findIndexOfInheritanceType(this.$$('#inheritDrop' + idx).selectedItem.innerText);
+                if (inhType == -1)
+                {
+                    return;
+                }
+                var index = tmpCapten.includedIn(this.vocab.getClasses());
+
+
+                //TODO Test if not the same element in the concept
+
+                if (index == -1)
+                    index = tmpCapten.includedIn(this.customcls);
+                else
+                {
+                    if (inhType == 0) //if the relation is : "IS A"
+                        this.selectedcls.becomesSubClassOf(this.vocab.getClasses()[index]);
+                    else if (inhType == 1) //If the relation is : "CAN BE"
+                        this.vocab.getClasses()[index].becomesSubClassOf(this.selectedcls);
+
+                    return;
+                }
+
+
+                if (index == -1)
+                    throw new NoCAPTENClassMatchesException(tmpCapten, this.vocab.getClasses() + " " + this.customcls);
+                else
+                {
+                    if (inhType == 0)
+                        this.selectedcls.becomesSubClassOf(this.customcls[index]);
+                    else if (inhType == 1)
+                        this.customcls[index].becomesSubClassOf(this.selectedcls);
+                }
+            },
+
+            _findIndexOfInheritanceType: function(text)
+            {
+                for (var i = 0; i < this.inheritanceTypeArray.length; i++)
+                {
+                    if (text === this.inheritanceTypeArray[i])
+                        return i;
+                }
+
+                return -1;
+            },
+
+            // === SUBMIT METHODS
+            _submit: function(event)
+            {
+                Polymer.dom(event).localTarget.parentElement.submit();
+            },
+
+            _submitForm: function()
+            {
+                this.selectedcls.resetSubClassRelations();
+
+                for (var i = 0; i < this.nbOfForms.length; i++)
+                {
+                    this._addSuperClass(this.nbOfForms[i]);
+                }
+            }
         });
     </script>
 </dom-module>
