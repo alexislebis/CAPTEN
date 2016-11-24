@@ -220,4 +220,44 @@ CAPTENClass.prototype = {
         return cls;
     },
 
+    // The JSON stringify does not work since it depends on recusive call
+    serializeToJSON: function()
+    {
+      var ser = {}
+
+        for(var i in this)
+        {
+          if(i !== "subClassOf" && i != "subClasses" && i != "properties")
+            ser[i] = this[i];
+        }
+
+        console.log(this);
+
+        ser['subClassOf'] = {};
+        ser['subClasses'] = {};
+        ser['properties'] = {};
+
+        for(var i in this.subClassOf)
+        {
+          ser['subClassOf'][i] = {};
+          ser['subClassOf'][i].idRGTE = this.subClassOf[i].id;
+          ser['subClassOf'][i].uri = this.subClassOf[i].uri;
+        }
+
+        for(var i in this.subClasses)
+        {
+          ser['subClassOf'][i] = {};
+          ser['subClasses'][i].idRGTE = this.subClassOf[i].id;
+          ser['subClasses'][i].uri = this.subClassOf[i].uri;
+        }
+
+        for(var i in this.properties)
+        {
+          ser['subClassOf'][i] = {};
+          set['properties'][i].idRGTE = this.properties[i].id;
+          set['properties'][i].uri = this.properties[i].uri;
+        }
+      return ser;
+    },
+
 };

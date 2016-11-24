@@ -59,7 +59,7 @@
         this.$.rteElem.addEventListener("-RGTEAddedToTheBag", function(e)
         {
           console.log("WARNING: Currently, only one RGTE can be used simultaneously.");//TODO
-          this.rgtes = [];
+          // this.rgtes = [];
           this.push('rgtes', e.detail);
         }.bind(this));
       },

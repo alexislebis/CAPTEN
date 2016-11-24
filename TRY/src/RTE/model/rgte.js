@@ -84,10 +84,12 @@ RGTE.prototype = {
 // === SERIALIZATION
   serializeToN3: function()
   {
-
+    console.log(this.nodes[0].serializeToJSON());
   },
 
-  serializeAndIntegrateVocabulary: function(vocab)
+
+  //TODO update versions of this.vocab with usernames & others
+  serializeAndIntegrateVocabulary: function(vocab, usernames, prefixes)
   {
     var voc = vocab.clone();
 
@@ -99,8 +101,7 @@ RGTE.prototype = {
     for(var i in this.edges)
       voc.addProperty(this._convertEdge(this.edges[i]));
 
-    console.log(voc);// TODO Traduire les node id du rgte dans from et to en [] [] de prop.
-    console.log(voc.serializeToN3());
+    return voc.serializeToN3();
   },
 // ===
 

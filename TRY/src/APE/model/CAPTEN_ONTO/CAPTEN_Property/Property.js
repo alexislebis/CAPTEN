@@ -13,7 +13,7 @@ function Property(uri, label, From, to, additionalConstraints){
       this.label = this.iName;
     else
       this.label = label;
-      
+
     this.uri = uri;
 
     this.from = From;
@@ -99,5 +99,18 @@ Property.prototype = {
 
     return cls;
   },
+
+  serializeToJSON: function()
+  {
+    var ser = {}
+
+    for(var i in this)
+    {
+      if(i !== 'from' && i !== 'to' && i !== 'constraints' && i !== 'inheritanceArray')
+        ser[i] = this[i];
+    }
+
+    //TODO faire le reste des tableaux
+  }
 
 };
