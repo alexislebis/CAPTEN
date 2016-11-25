@@ -240,21 +240,21 @@ CAPTENClass.prototype = {
         for(var i in this.subClassOf)
         {
           ser['subClassOf'][i] = {};
-          ser['subClassOf'][i].idRGTE = this.subClassOf[i].id;
+          ser['subClassOf'][i].id = this.subClassOf[i].id;
           ser['subClassOf'][i].uri = this.subClassOf[i].uri;
         }
 
         for(var i in this.subClasses)
         {
           ser['subClassOf'][i] = {};
-          ser['subClasses'][i].idRGTE = this.subClassOf[i].id;
+          ser['subClasses'][i].id = this.subClassOf[i].id;
           ser['subClasses'][i].uri = this.subClassOf[i].uri;
         }
 
         for(var i in this.properties)
         {
           ser['subClassOf'][i] = {};
-          set['properties'][i].idRGTE = this.properties[i].id;
+          set['properties'][i].id = this.properties[i].id;
           set['properties'][i].uri = this.properties[i].uri;
         }
       return ser;

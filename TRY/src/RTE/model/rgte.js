@@ -6,17 +6,22 @@
 
 function RGTE(){
 
+  this.id = RGTE.rgteID++;
+
   this.observers = [];
   this.nodes = [];//Need to be CAPTENCLass
   this.edges = [];
   this.edgesCardinality = []; //Array of edge (currently based on vis edge).
 
   this.context = null;
+
+  this.versions = null; //Array of different version with {Author, date, etc}
 }
 
 RGTE.nodeID = 0;
 RGTE.edgeID = 0;
 RGTE.cardiID = 0;
+RGTE.rgteID = 0;
 
 RGTE.prototype = {
 
@@ -82,9 +87,36 @@ RGTE.prototype = {
 // ===
 
 // === SERIALIZATION
-  serializeToN3: function()
+  serializeToJSON: function()
   {
-    console.log(this.nodes[0].serializeToJSON());
+    var seri = {};
+
+    seri['id'] = this.id;
+    seri['type'] = 'RGTE';
+
+    seri['nodes'] = {};
+    seri['edges'] = {};
+    seri['edgesCardinality'] = {};
+
+    for(var i in this.nodes)
+    {
+      seri['nodes'][i] = {};
+      seri['nodes'][i] = this.nodes[i].serializeToJSON();
+    }
+
+    for(var i in this.edges)
+    {
+      seri['edges'][i] = {};
+      seri['edges'][i] = this.edges[i].serializeToJSON();
+    }
+
+    for(var i in this.edgesCardinality)
+    {
+      seri['edgesCardinality'][i] = {};
+      seri['edgesCardinality'][i] = this.edgesCardinality[i];
+    }
+
+    return seri;
   },
 
 

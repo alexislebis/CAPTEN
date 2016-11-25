@@ -33,8 +33,6 @@
             </div>
         </paper-dialog>
 
-        <paper-button on-click="_test">CLICK</paper-button>
-
 
       </template>
       <script>
@@ -60,12 +58,6 @@
               value: function(){ return new CONTROLLED_VOCABULARY();},
             },
           },
-
-
-                      _test: function()
-                      {
-                        this.rgte.serializeAndIntegrateVocabulary(this.vocab);
-                      },
 
           attached: function()
           {

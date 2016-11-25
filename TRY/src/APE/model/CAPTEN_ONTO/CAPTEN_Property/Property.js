@@ -110,7 +110,38 @@ Property.prototype = {
         ser[i] = this[i];
     }
 
+    ser['from'] = {};
+    ser['to'] = {};
+
+
     //TODO faire le reste des tableaux
+    if(this.from.constructor === Array) //If it's an array, then elements are CaptenClass
+    {
+      for(var i in this.from)
+      {
+        ser['from'][i] = {};
+        ser['from'][i].id = this.from[i].id;
+        ser['from'][i].uri = this.from[i].uri;
+      }
+    }
+    else { //else it's just a simple number
+      ser['from'] = this.from;
+    }
+
+    if(this.to.constructor === Array)
+    {
+      for(var i in this.to)
+      {
+        ser['to'][i] = {};
+        ser['to'][i].id = this.to[i].id;
+        ser['to'][i].uri = this.to[i].uri;
+      }
+    }
+    else { //else it's just a simple number
+      ser['to'] = this.to;
+    }
+
+    return ser;
   }
 
 };

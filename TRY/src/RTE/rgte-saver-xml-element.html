@@ -115,7 +115,16 @@
                         document.body.removeChild(element);
 
 
-                        this.rgte.serializeToN3();
+                        var rgteToSave = JSON.stringify(this.rgte.serializeToJSON());
+                        element.setAttribute('href', 'data:text/JSON;charset=utf-8,' + encodeURIComponent(rgteToSave));
+                        element.setAttribute('download', this.fname+".captenRGTE");
+
+                        element.style.display = 'none';
+                        document.body.appendChild(element);
+
+                        element.click();
+
+                        document.body.removeChild(element);
                     },
 
                 });
