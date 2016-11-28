@@ -100,6 +100,44 @@ Property.prototype = {
     return cls;
   },
 
+  includedIn: function(arrayProp)
+  {
+
+      if(arrayProp == null)
+        return -1;
+
+      var nbIte = 0;
+
+      for (var i in arrayProp)
+      {
+          nbIte++;
+          if (this.equals(arrayProp[i]))
+              return i;
+      }
+
+      if (nbIte === 0) //If the array is not a map, thus it has to be iterated in a normal way
+      {
+          for (var i = 0; i < arrayProp.length; i++)
+          {
+              if (this.equals(arrayProp[i]))
+                  return i;
+          }
+      }
+
+      return -1;
+  },
+
+  equals: function(prop)
+  {
+    if (prop instanceof Property)
+    {
+        if (this.uri === prop.uri)
+            return true;
+    }
+
+    return false;
+  },
+
   serializeToJSON: function()
   {
     var ser = {}

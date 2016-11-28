@@ -37,6 +37,29 @@
                 value: null,
                 notify: true,
               },
+              vocab:
+              {
+                type: Object,
+                value: function(){return new CONTROLLED_VOCABULARY();},
+              },
+              customcls://used for file-reader
+              {
+                  type: Array,
+                  notify: true,
+                  value: function()
+                  {
+                      return [];
+                  },
+              },
+              customprops:
+              {
+                  type: Array,
+                  notify: true,
+                  value: function()
+                  {
+                      return [];
+                  },
+              },
             },
             // Used for two-ways binding debug
               // observers: [
@@ -73,7 +96,22 @@
               console.log(jO);
               // console.log(jO.nodes[0].subClassOf[0].uri);
 
-              this.rgte.parseJSON(jO);
+              this.rgte.parseJSON(jO, this.vocab);
+              var dispArray = this.rgte.vocabularyDispersion(this.vocab);
+
+              var cust = this.customcls;
+              for(var i in dispArray['classes'])
+                cust.push(dispArray['classes'][i]);
+
+              var pro = this.customprops;
+              for(var i in dispArray['properties'])
+                pro.push(dispArray['properties'][i]);
+
+              this.customcls = [];
+              this.customprops = [];
+
+              this.customcls = cust;
+              this.customprops = pro;
             },
         });
     </script>

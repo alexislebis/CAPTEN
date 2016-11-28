@@ -90,6 +90,28 @@ RGTE.prototype = {
   },
 // ===
 
+  /**
+   * Compute the dispersion of the RGTE regarding the vocabulary.
+   * Dispersion = RGTE \ VOCAB.
+   * @return 2D array with classes and properties keys, containing all the non matched elements of this (RGTE) in the vocabulary vocab
+   */
+  vocabularyDispersion: function(vocab)
+  {
+    var dispArray = [];
+    dispArray['classes'] = [];
+    dispArray['properties'] = [];
+
+    for(var i  in this.nodes)
+      if(this.nodes[i].includedIn(vocab.getClasses()) == -1)
+        dispArray['classes'].push(this.nodes[i]);
+
+    for(var i in this.edges)
+      if(this.edges[i].includedIn(vocab.getProperties()) == -1)
+        dispArray['properties'].push(this.edges[i]);
+
+      return dispArray;
+  },
+
 // === SERIALIZATION
   serializeToJSON: function()
   {
@@ -162,11 +184,10 @@ RGTE.prototype = {
 // ===
 
 // === PARSING
-  parseJSON: function(json, voc)
+  parseJSON: function(json, vocab)
   {
     console.log(json.nodes[0].subClassOf[0].uri);
     console.log(json['nodes'][0]['subClassOf'][0].uri);
-    var vocab = voc;
 
     if(json['type'] == null || json['type'] != 'RGTE')
       return; //not a rgte json
@@ -186,7 +207,7 @@ RGTE.prototype = {
 
       node.parseJSONObject(json[RGTE.NODES][i], vocab);
 
-      vocab.addClass(node);
+      // vocab.addClass(node);
 
       this[RGTE.NODES].push(node);
     }
@@ -201,7 +222,7 @@ RGTE.prototype = {
       var edge = new Property();
       edge.parseJSONObject(json[RGTE.EDGES][i]);
 
-      vocab.addProperty(edge);
+      // vocab.addProperty(edge);
       this[RGTE.EDGES].push(edge);
     }
 
@@ -214,6 +235,10 @@ RGTE.prototype = {
       // var jsonO = JSON.parse('{"id":0,"uri":"aze","isBlank":false,"iName":"Class","label":"aze","inheritanceArray":[],"idVoc":15,"shape":"dot","size":30,"subClassOf":{},"subClasses":{},"properties":{}}');
 
       this.notifyChange();
+      vocab.notifyChange();
+
+      console.log(this.vocabularyDispersion(vocab));
+      console.log(vocab);
       // clsTEST.parseJSONObject(jsonO);
   },
 // ===

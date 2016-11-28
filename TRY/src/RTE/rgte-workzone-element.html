@@ -13,9 +13,9 @@
         </style>
 
 
-        <rgte-file-reader-element id="rgteReader" rgte="{{rgte}}"></rgte-file-reader-element>
+        <rgte-file-reader-element id="rgteReader" rgte="{{rgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-file-reader-element>
 
-        <rte-lister-element id="rteList" vocab="{{vocab}}" rgte="{{rgte}}"></rte-lister-element>
+        <rte-lister-element id="rteList" vocab="{{vocab}}" rgte="{{rgte}}" customcls="{{customcls}}" customprops="{{customprops}}"></rte-lister-element>
         <rgte-element id="rgte" rgte="{{rgte}}"></rgte-element>
         <div  hidden$="{{isHidden}}">
           <rgte-saver-xml-element id="xmlSaver" rgte="{{rgte}}" vocab="{{vocab}}"></rgte-saver-xml-element>
@@ -59,6 +59,24 @@
             {
               type: Object,
               value: function(){ return new CONTROLLED_VOCABULARY();},
+            },
+            customcls://used for file-reader
+            {
+                type: Array,
+                notify: true,
+                value: function()
+                {
+                    return [];
+                },
+            },
+            customprops:
+            {
+                type: Array,
+                notify: true,
+                value: function()
+                {
+                    return [];
+                },
             },
           },
 

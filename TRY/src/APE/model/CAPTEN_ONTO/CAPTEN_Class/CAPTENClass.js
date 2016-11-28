@@ -16,7 +16,7 @@ function CAPTENClass(uri, label, properties)
     this.iName = "Class";
 
     if (label == null)
-        this.label = this.iName;
+        this.label = this.uri;
     else
         this.label = label;
 
@@ -273,50 +273,8 @@ CAPTENClass.prototype = {
         for(var i in json)
         {
           this[i] = json[i];
-
-          // if(i === 'subClassOf' || i === 'subClasses')
-          // {
-          //   for(var k in this[i])
-          //   {
-          //     var uriN = this[i][k].uri;
-          //     var idN = this[i][k].id;
-          //
-          //     this[i][k] = {};
-          //     this[i][k].uri = uriN;
-          //     this[i][k].id = idN;
-          //   }
-          //
-          //   for(var j in json[i])
-          //   {
-          //     this[i][j] = [];
-          //     this[i][j].id = json[i][j].id;
-          //     this[i][j].uri = json[i][j].uri;
-          //
-          //   }
           }
 
-          // if(i === 'subClassOf')
-          // {
-          //   for(var j in json.subClassOf)
-          //   {
-          //     this.subClassOf[j] = [];
-          //     this.subClassOf[j].id = json.subClassOf[j].id;
-          //     this.subClassOf[j].uri = json.subClassOf[j].uri;
-          //
-          //     console.log(json.subClassOf[0].uri);
-          //   }
-          // }
-          // else if(i === 'subClasses')
-          // {
-          //   for(var j in json.subClasses)
-          //   {
-          //     this.subClasses[j] = [];
-          //     this.subClasses[j].id = json.subClasses[j].id;
-          //     this.subClasses[j].uri = json.subClasses[j].uri;
-          //   }
-          //
-          // }
-        // }
     },
 
     updateInheritences: function(vocab)
