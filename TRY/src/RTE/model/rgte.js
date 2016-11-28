@@ -23,6 +23,10 @@ RGTE.edgeID = 0;
 RGTE.cardiID = 0;
 RGTE.rgteID = 0;
 
+RGTE.NODES = "nodes";
+RGTE.EDGES = "edges";
+RGTE.CARDI = "edgesCardinality";
+
 RGTE.prototype = {
 
 // === ADDING METHODS ===
@@ -94,26 +98,26 @@ RGTE.prototype = {
     seri['id'] = this.id;
     seri['type'] = 'RGTE';
 
-    seri['nodes'] = {};
-    seri['edges'] = {};
-    seri['edgesCardinality'] = {};
+    seri[RGTE.NODES] = {};
+    seri[RGTE.EDGES] = {};
+    seri[RGTE.CARDI] = {};
 
     for(var i in this.nodes)
     {
-      seri['nodes'][i] = {};
-      seri['nodes'][i] = this.nodes[i].serializeToJSON();
+      seri[RGTE.NODES][i] = {};
+      seri[RGTE.NODES][i] = this.nodes[i].serializeToJSON();
     }
 
     for(var i in this.edges)
     {
-      seri['edges'][i] = {};
-      seri['edges'][i] = this.edges[i].serializeToJSON();
+      seri[RGTE.EDGES][i] = {};
+      seri[RGTE.EDGES][i] = this.edges[i].serializeToJSON();
     }
 
     for(var i in this.edgesCardinality)
     {
-      seri['edgesCardinality'][i] = {};
-      seri['edgesCardinality'][i] = this.edgesCardinality[i];
+      seri[RGTE.CARDI][i] = {};
+      seri[RGTE.CARDI][i] = this.edgesCardinality[i];
     }
 
     return seri;
@@ -155,6 +159,63 @@ RGTE.prototype = {
       });
     },
 
+// ===
+
+// === PARSING
+  parseJSON: function(json, voc)
+  {
+    console.log(json.nodes[0].subClassOf[0].uri);
+    console.log(json['nodes'][0]['subClassOf'][0].uri);
+    var vocab = voc;
+
+    if(json['type'] == null || json['type'] != 'RGTE')
+      return; //not a rgte json
+
+      if(vocab == null)
+        vocab = new CONTROLLED_VOCABULARY(); //The vocab cannot be null since uri depends of it, even custom one
+
+
+    this[RGTE.NODES] = [];
+    this[RGTE.EDGES] = [];
+    this[RGTE.CARDI] = [];
+
+    // === NODES
+    for(var i in json[RGTE.NODES])
+    {
+      var node = new CAPTENClass();
+
+      node.parseJSONObject(json[RGTE.NODES][i], vocab);
+
+      vocab.addClass(node);
+
+      this[RGTE.NODES].push(node);
+    }
+    for(var i in this.nodes) //while all nodes are loaded and the vocab was update, inheritence needs to be recmputed correctly (currently only id & uri are stored)
+      this.nodes[i].updateInheritences(vocab);
+
+
+    console.log(this);
+    // === EDGES
+    for(var i in json[RGTE.EDGES])
+    {
+      var edge = new Property();
+      edge.parseJSONObject(json[RGTE.EDGES][i]);
+
+      vocab.addProperty(edge);
+      this[RGTE.EDGES].push(edge);
+    }
+
+    // === EDGES CARDINALITIES
+    for(var i in json[RGTE.CARDI])
+    {
+      this.edgesCardinality.push({"id": json[RGTE.CARDI][i].id, "edgeId": json[RGTE.CARDI][i].edgeId, "fromCardinality":json[RGTE.CARDI][i].fromCardinality, "toCardinality": json[RGTE.CARDI][i].toCardinality});
+    }
+      // var clsTEST = new CAPTENClass();
+      // var jsonO = JSON.parse('{"id":0,"uri":"aze","isBlank":false,"iName":"Class","label":"aze","inheritanceArray":[],"idVoc":15,"shape":"dot","size":30,"subClassOf":{},"subClasses":{},"properties":{}}');
+
+      this.notifyChange();
+      // clsTEST.parseJSONObject(jsonO);
+  },
 // ===
 
 

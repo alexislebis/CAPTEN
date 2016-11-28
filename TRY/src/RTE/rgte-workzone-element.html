@@ -2,6 +2,7 @@
 <link rel="import" href="../RTE/rte-lister-element.html">
 <link rel="import" href="../RTE/rgte-element.html">
 <link rel="import" href="../RTE/rgte-saver-xml-element.html">
+<link rel="import" href="../RTE/rgte-file-reader-element.html">
 
 <dom-module id="rgte-workzone-element">
     <template>
@@ -11,6 +12,8 @@
             }
         </style>
 
+
+        <rgte-file-reader-element id="rgteReader" rgte="{{rgte}}"></rgte-file-reader-element>
 
         <rte-lister-element id="rteList" vocab="{{vocab}}" rgte="{{rgte}}"></rte-lister-element>
         <rgte-element id="rgte" rgte="{{rgte}}"></rgte-element>
@@ -75,6 +78,8 @@
           {
             this.$.OnlyOneRGTEATM.open();
 
+            // console.log("DELETE BELOW");
+            // this.rgte.parseJSON('lol','1');
           },
 
           _saveRGTEToXML: function()

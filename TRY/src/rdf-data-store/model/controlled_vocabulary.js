@@ -40,6 +40,20 @@ CONTROLLED_VOCABULARY.prototype = {
         });
     },
 
+    getClassFromURI: function(uriClass)
+    {
+      var indice = (new CAPTENClass(uriClass)).includedIn(this.classes);
+
+      console.log(uriClass);
+      console.log(indice);
+
+      if(indice == -1)
+        return;
+
+      return this.classes[indice];
+    },
+
+
     getClasses: function()
     {
         if (this.isRecomputeNonBlankNodesNeeded)
@@ -345,6 +359,9 @@ CONTROLLED_VOCABULARY.prototype = {
     // === ADDING METHODS
     addClass: function(cl, editionProfil)//Edition profil : who add the classes
     {
+        if(this.classes == null)
+          this.classes = [];
+
         this.isRecomputeNonBlankNodesNeeded = true;
         this.isRecomputeBlankNodesNeeded = true;
 
@@ -352,7 +369,7 @@ CONTROLLED_VOCABULARY.prototype = {
             this.versions.push(editionProfil);
 
 
-        if (!this.classes.includes(cl))
+        if (cl.includedIn(this.classes) == -1)
         {
             this.classes.push(cl);
 
@@ -365,6 +382,9 @@ CONTROLLED_VOCABULARY.prototype = {
 
     addProperty: function(pr, editionProfil)
     {
+        if(this.properties == null)
+          this.properties = [];
+
         this.isRecomputeNonBlankNodesNeeded = true;
         this.isRecomputeBlankNodesNeeded = true;
 

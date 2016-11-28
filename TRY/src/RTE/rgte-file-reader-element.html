@@ -1,0 +1,80 @@
+<link rel="import" href="../../bower_components/file-reader/file-reader.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="rgte-file-reader-element">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+            h2 {
+                text-align: center;
+            }
+        </style>
+
+        <div>
+          <h3>Load initial relational graph of traced elements (<em>RGTE</em>)</h3>
+          <file-reader id="fileReaderElement">RGTE File</file-reader>
+        </div>
+
+    </template>
+    <script>
+        Polymer(
+        {
+            is: 'rgte-file-reader-element',
+            properties:
+            {
+              rgtejson:
+              {
+                type: String,
+                value: null,
+                notify: true,
+              },
+
+              rgte:
+              {
+                type: Object,
+                value: null,
+                notify: true,
+              },
+            },
+            // Used for two-ways binding debug
+              // observers: [
+              //   '_onGraphChanged(graphuri)'
+              // ],
+            ready: function()
+            {
+                var that = this;
+                this.$.fileReaderElement.returnFunction = function()
+                {
+                    var body;
+                    var callback = {
+                        onload: function(e)
+                        {
+                            that.loadRGTEJSON(e.target.result);
+                        },
+                        onprogress: function() {},
+                        onerror: function() {}
+                    }
+                    this.getSlice(0, 1, callback);
+                };
+            },
+            // _onGraphChanged: function(n,o)
+            // {
+            //   // if(Object.keys(this.rdfStore).length === 0 && this.rdfStore.constructor === Object)
+            //   //   return;
+            //
+            //   console.log("CALL:_onGraphChanged("+n+","+o+")");
+            // },
+            loadRGTEJSON: function(fileContent)
+            {
+              console.log(JSON.parse(fileContent));
+              var jO = JSON.parse(fileContent);
+              console.log(jO);
+              // console.log(jO.nodes[0].subClassOf[0].uri);
+
+              this.rgte.parseJSON(jO);
+            },
+        });
+    </script>
+</dom-module>

@@ -85,6 +85,10 @@ CAPTENClass.prototype = {
 
     includedIn: function(arrayCls)
     {
+
+        if(arrayCls == null)
+          return -1;
+
         var nbIte = 0;
 
         for (var i in arrayCls)
@@ -108,27 +112,27 @@ CAPTENClass.prototype = {
 
     becomesSubClassOf: function(cls)
     {
-        if (cls.includedIn(this.subClassOf) !== -1)
-            return;
-
-        this.subClassOf.push(cls);
-        cls.subClasses.push(this);
+        if (cls.includedIn(this.subClassOf) == -1)
+          this.subClassOf.push(cls);
+        if(this.includedIn(this.subClasses) == -1)
+          cls.subClasses.push(this);
     },
 
     /**
      * Reset all the relations of subclass concerning this. For example, if "A" is a "B" and can be a "C", both "B" and "C" will lose their relations with "A" (A's arrays are reseted).
      */
-    resetSubClassRelations: function() {
+    resetSubClassRelations: function()
+    {
 
-      while(this.subClassOf.length > 0)
-      {
-        this.removeSubClassRelationWith(this.subClassOf[0]);
-      }
+        while (this.subClassOf.length > 0)
+        {
+            this.removeSubClassRelationWith(this.subClassOf[0]);
+        }
 
-      while(this.subClasses.length > 0)
-      {
-        this.removeSubClassRelationWith(this.subClasses[0]);
-      }
+        while (this.subClasses.length > 0)
+        {
+            this.removeSubClassRelationWith(this.subClasses[0]);
+        }
     },
 
     /**
@@ -155,22 +159,22 @@ CAPTENClass.prototype = {
 
         // //console.log(indexOfClsInThis);
 
-        if(indexOfClsInThis != -1)
+        if (indexOfClsInThis != -1)
         {
-          this.removeASuperClass(cls, indexOfClsInThis);
-          cls.removeASubClassOf(this);
+            this.removeASuperClass(cls, indexOfClsInThis);
+            cls.removeASubClassOf(this);
 
-          return;
+            return;
         }
     },
 
     removeASubClassOf: function(cls, indexOfClsInThis)
     {
-        if(indexOfClsInThis == null || indexOfClsInThis < 0 || indexOfClsInThis >= this.subClassOf.length)
-          indexOfClsInThis = cls.includedIn(this.subClassOf);
+        if (indexOfClsInThis == null || indexOfClsInThis < 0 || indexOfClsInThis >= this.subClassOf.length)
+            indexOfClsInThis = cls.includedIn(this.subClassOf);
 
-        if(indexOfClsInThis == -1)
-          return;
+        if (indexOfClsInThis == -1)
+            return;
 
         var buff1 = this.subClassOf.slice(0, indexOfClsInThis);
         var buff2 = this.subClassOf.slice(indexOfClsInThis + 1, this.subClassOf.length);
@@ -186,22 +190,22 @@ CAPTENClass.prototype = {
 
     removeASuperClass: function(cls, indexOfClsInThis)
     {
-      if(indexOfClsInThis == null || indexOfClsInThis < 0 || indexOfClsInThis >= this.subClasses.length)
-        indexOfClsInThis = cls.includedIn(this.subClasses);
+        if (indexOfClsInThis == null || indexOfClsInThis < 0 || indexOfClsInThis >= this.subClasses.length)
+            indexOfClsInThis = cls.includedIn(this.subClasses);
 
-        if(indexOfClsInThis == -1)
-          return;
+        if (indexOfClsInThis == -1)
+            return;
 
-      var buff1 = this.subClasses.slice(0, indexOfClsInThis);
-      var buff2 = this.subClasses.slice(indexOfClsInThis + 1, this.subClasses.length);
+        var buff1 = this.subClasses.slice(0, indexOfClsInThis);
+        var buff2 = this.subClasses.slice(indexOfClsInThis + 1, this.subClasses.length);
 
-      this.subClasses = [];
-      for (var i = 0; i < buff1.length; i++)
-          this.subClasses.push(buff1[i]);
-      for (var i = 0; i < buff2.length; i++)
-          this.subClasses.push(buff2[i]);
+        this.subClasses = [];
+        for (var i = 0; i < buff1.length; i++)
+            this.subClasses.push(buff1[i]);
+        for (var i = 0; i < buff2.length; i++)
+            this.subClasses.push(buff2[i]);
 
-      //console.log(this.subClasses);
+        //console.log(this.subClasses);
     },
 
     copy: function()
@@ -223,12 +227,12 @@ CAPTENClass.prototype = {
     // The JSON stringify does not work since it depends on recusive call
     serializeToJSON: function()
     {
-      var ser = {}
+        var ser = {}
 
-        for(var i in this)
+        for (var i in this)
         {
-          if(i !== "subClassOf" && i != "subClasses" && i != "properties")
-            ser[i] = this[i];
+            if (i !== "subClassOf" && i != "subClasses" && i != "properties")
+                ser[i] = this[i];
         }
 
         console.log(this);
@@ -237,27 +241,115 @@ CAPTENClass.prototype = {
         ser['subClasses'] = {};
         ser['properties'] = {};
 
-        for(var i in this.subClassOf)
+        for (var i in this.subClassOf)
         {
-          ser['subClassOf'][i] = {};
-          ser['subClassOf'][i].id = this.subClassOf[i].id;
-          ser['subClassOf'][i].uri = this.subClassOf[i].uri;
+            ser['subClassOf'][i] = {};
+            ser['subClassOf'][i].id = this.subClassOf[i].id;
+            ser['subClassOf'][i].uri = this.subClassOf[i].uri;
         }
 
-        for(var i in this.subClasses)
+        for (var i in this.subClasses)
         {
-          ser['subClassOf'][i] = {};
-          ser['subClasses'][i].id = this.subClassOf[i].id;
-          ser['subClasses'][i].uri = this.subClassOf[i].uri;
+            ser['subClassOf'][i] = {};
+            ser['subClasses'][i].id = this.subClassOf[i].id;
+            ser['subClasses'][i].uri = this.subClassOf[i].uri;
         }
 
-        for(var i in this.properties)
+        for (var i in this.properties)
         {
-          ser['subClassOf'][i] = {};
-          set['properties'][i].id = this.properties[i].id;
-          set['properties'][i].uri = this.properties[i].uri;
+            ser['subClassOf'][i] = {};
+            set['properties'][i].id = this.properties[i].id;
+            set['properties'][i].uri = this.properties[i].uri;
         }
-      return ser;
+        return ser;
+    },
+
+    // === PARSING
+    parseJSONObject: function(json, vocab)
+    {
+        if (json == null)
+            return;
+
+        for(var i in json)
+        {
+          this[i] = json[i];
+
+          // if(i === 'subClassOf' || i === 'subClasses')
+          // {
+          //   for(var k in this[i])
+          //   {
+          //     var uriN = this[i][k].uri;
+          //     var idN = this[i][k].id;
+          //
+          //     this[i][k] = {};
+          //     this[i][k].uri = uriN;
+          //     this[i][k].id = idN;
+          //   }
+          //
+          //   for(var j in json[i])
+          //   {
+          //     this[i][j] = [];
+          //     this[i][j].id = json[i][j].id;
+          //     this[i][j].uri = json[i][j].uri;
+          //
+          //   }
+          }
+
+          // if(i === 'subClassOf')
+          // {
+          //   for(var j in json.subClassOf)
+          //   {
+          //     this.subClassOf[j] = [];
+          //     this.subClassOf[j].id = json.subClassOf[j].id;
+          //     this.subClassOf[j].uri = json.subClassOf[j].uri;
+          //
+          //     console.log(json.subClassOf[0].uri);
+          //   }
+          // }
+          // else if(i === 'subClasses')
+          // {
+          //   for(var j in json.subClasses)
+          //   {
+          //     this.subClasses[j] = [];
+          //     this.subClasses[j].id = json.subClasses[j].id;
+          //     this.subClasses[j].uri = json.subClasses[j].uri;
+          //   }
+          //
+          // }
+        // }
+    },
+
+    updateInheritences: function(vocab)
+    {
+      var newSCO = [];
+      var newSC = [];
+
+      console.log(this);
+
+      for(var i in this.subClassOf)
+      {
+        vocab.addClass(new CAPTENClass(this.subClassOf[i].uri));
+        newSCO.push(vocab.getClassFromURI(this.subClassOf[i].uri));
+      }
+
+      for(var i in this.subClasses)
+      {
+        vocab.addClass(new CAPTENClass(this.subClasses[i].uri));
+        newSC.push(vocab.getClassFromURI(this.subClasses[i].uri));
+      }
+
+      this.subClassOf = newSCO;
+      this.subClasses = newSC;
+
+      console.log(newSCO);
+      console.log(newSC);
+      console.log(this);
+
+      for(var i in this.subClassOf)
+        this.becomesSubClassOf(this.subClassOf[i]);
+
+      for(var i in this.subClasses)
+        this.subClasses[i].becomesSubClassOf(this);
     },
 
 };

@@ -142,6 +142,38 @@ Property.prototype = {
     }
 
     return ser;
-  }
+  },
+
+  addFromTo: function(fromCL, toCL)
+  {
+    if(fromCL == null || toCL == null)
+      return;
+
+    if(this.from == null)
+      this.from = [];
+    if(this.to == null)
+      this.to = [];
+
+    this.from.push(fromCL);
+    this.to.push(toCL);
+
+    if(fromCL.properties == null)
+      fromCL.properties = [];
+    if(toCL.properties == null)
+      toCL.properties = [];
+
+    fromCL.properties.push(this);
+    toCL.properties.push(this);
+  },
+
+  // === PARSING
+  parseJSONObject: function(json)
+  {
+    if(json == null)
+      return;
+
+    for(var i in json)
+      this[i] = json[i];
+  },
 
 };
