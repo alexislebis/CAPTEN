@@ -13,7 +13,7 @@
 
     <ape-model-element></ape-model-element>
 
-    <operators-workzone-element id="opWorkzone"></operators-workzone-element>
+    <operators-workzone-element id="opWorkzone" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operators-workzone-element>
 
     <h1>
       APE n°<span style="color:green">[[name]]</span>
@@ -43,6 +43,22 @@
           type: Array,
           notify: true,
           value: function(){return [];},
+        },
+
+
+        vocab:
+        {
+          type: Object,
+        },
+        customcls://used for file-reader
+        {
+            type: Array,
+            notify: true,
+        },
+        customprops:
+        {
+            type: Array,
+            notify: true,
         },
         //
         // operators:{

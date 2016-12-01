@@ -28,11 +28,11 @@
     </paper-tabs>
 
     <iron-pages selected='{{data.tabName}}' attr-for-selected="name">
-      <div name="rte"><main-rte id="rteElem"></main-rte></div>
+      <div name="rte" ><main-rte id="rteElem" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></main-rte></div>
       <div name="voog"><main-voog></main-voog></div>
-      <div name="ape"><ape-element id="apeElem" rgtes="{{rgtes}}"></ape-element></div>
+      <div name="ape"><ape-element id="apeElem" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></ape-element></div>
     </iron-pages>
-
+    
     <h1>{{data.page}}</h1>
 
   </template>
@@ -52,6 +52,30 @@
           value: function(){return [];},
         },
 
+        vocab:
+        {
+          type: Object,
+          value: function(){ return new CONTROLLED_VOCABULARY();},
+        },
+        customcls://used for file-reader
+        {
+            type: Array,
+            notify: true,
+            value: function()
+            {
+                return [];
+            },
+        },
+        customprops:
+        {
+            type: Array,
+            notify: true,
+            value: function()
+            {
+                return [];
+            },
+        },
+
       },
 
       attached: function()
@@ -63,6 +87,8 @@
           this.push('rgtes', e.detail);
         }.bind(this));
       },
+
+
     });
   </script>
 </dom-module>

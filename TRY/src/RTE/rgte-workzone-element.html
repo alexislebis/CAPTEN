@@ -12,8 +12,9 @@
             }
         </style>
 
-
-        <rgte-file-reader-element id="rgteReader" rgte="{{rgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-file-reader-element>
+        <div hidden="{{disableLoadMenu}}">
+          <rgte-file-reader-element id="rgteReader" rgte="{{rgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-file-reader-element>
+        </div>
 
         <rte-lister-element id="rteList" vocab="{{vocab}}" rgte="{{rgte}}" customcls="{{customcls}}" customprops="{{customprops}}"></rte-lister-element>
         <rgte-element id="rgte" rgte="{{rgte}}"></rgte-element>
@@ -21,107 +22,130 @@
           <rgte-saver-xml-element id="xmlSaver" rgte="{{rgte}}" vocab="{{vocab}}"></rgte-saver-xml-element>
         </div>
 
-        <div hidden$="{{!isHidden}}">
-        <paper-button raised on-tap="_saveRGTEToXML" >Save Menu</paper-button>
+        <div hidden$="{{disableSaveMenu}}">
+          <div hidden$="{{!isHidden}}">
+          <paper-button raised on-tap="_saveRGTEToXML" >Save Menu</paper-button>
+          </div>
         </div>
-        <paper-button raised on-click="_generateAddRGTE">Add current RGTE to the "bag"</paper-button>
 
-        <paper-dialog on-iron-overlay-closed="_isAccepted" id="OnlyOneRGTEATM" modal>
-            <h2>Only one RGTE in the bag</h2>
-            <p>Currently, you cannot use more than one RGTE simultaneously in the description of an AP. Try to complete your RGTE instead.
-            <br/>Nothing happens.</p>
-            <div class="buttons">
-                <paper-button dialog-dismiss autofocus>Abort</paper-button>
-                <paper-button dialog-confirm autofocus>Replace :'(</paper-button>
-            </div>
-        </paper-dialog>
+        <div hidden$="{{disableBagMenu}}">
+          <paper-button raised on-click="_generateAddRGTE">Add current RGTE to the "bag"</paper-button>
 
+          <paper-dialog on-iron-overlay-closed="_isAccepted" id="OnlyOneRGTEATM" modal>
+              <h2>Only one RGTE in the bag</h2>
+              <p>Currently, you cannot use more than one RGTE simultaneously in the description of an AP. Try to complete your RGTE instead.
+              <br/>Nothing happens.</p>
+              <div class="buttons">
+                  <paper-button dialog-dismiss autofocus>Abort</paper-button>
+                  <paper-button dialog-confirm autofocus>Replace :'(</paper-button>
+              </div>
+          </paper-dialog>
+        </div>
 
       </template>
-      <script>
-        Polymer({
-          is: 'rgte-workzone-element',
+    <script>
+        Polymer(
+        {
+            is: 'rgte-workzone-element',
 
-          properties:
-          {
-            isHidden:
+            properties:
             {
-              type: Boolean,
-              value: true,
-              notify: true,
-            },
-            rgte:
-            {
-              type: Object,
-              value: function(){ return new RGTE();},
-            },
-            vocab:
-            {
-              type: Object,
-              value: function(){ return new CONTROLLED_VOCABULARY();},
-            },
-            customcls://used for file-reader
-            {
-                type: Array,
-                notify: true,
-                value: function()
+                isHidden:
                 {
-                    return [];
+                    type: Boolean,
+                    value: true,
+                    notify: true,
                 },
-            },
-            customprops:
-            {
-                type: Array,
-                notify: true,
-                value: function()
+                rgte:
                 {
-                    return [];
+                    type: Object,
+                    value: function()
+                    {
+                        return new RGTE();
+                    },
                 },
+
+                vocab:
+                {
+                    type: Object,
+                },
+                customcls: //used for file-reader
+                {
+                    type: Array,
+                    notify: true,
+                },
+                customprops:
+                {
+                    type: Array,
+                    notify: true,
+                },
+
+                // === FEATURES BEHAVIORS
+                disableSaveMenu:
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
+                disableBagMenu:
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
+                disableLoadMenu:
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
+
             },
-          },
 
-          attached: function()
-          {
-            this.$.rteList.addEventListener('-ClassAddedToRGTE', function(e){
-                this.$.rgte.addClass(e.detail.val);
-            }.bind(this));
+            attached: function()
+            {
+                this.$.rteList.addEventListener('-ClassAddedToRGTE', function(e)
+                {
+                    this.$.rgte.addClass(e.detail.val);
+                }.bind(this));
 
-            this.$.rteList.addEventListener('-PropAddedToRGTE', function(e){
-                this.$.rgte.addProp(e.detail.val);
-            }.bind(this));
+                this.$.rteList.addEventListener('-PropAddedToRGTE', function(e)
+                {
+                    this.$.rgte.addProp(e.detail.val);
+                }.bind(this));
 
-          },
+            },
 
-          _generateAddRGTE: function()
-          {
-            this.$.OnlyOneRGTEATM.open();
+            _generateAddRGTE: function()
+            {
+                this.$.OnlyOneRGTEATM.open();
 
-            // console.log("DELETE BELOW");
-            // this.rgte.parseJSON('lol','1');
-          },
+                // console.log("DELETE BELOW");
+                // this.rgte.parseJSON('lol','1');
+            },
 
-          _saveRGTEToXML: function()
-          {
-            this.isHidden = false;
-            // this.$.xmlSaver.save(this.network);
-          },
+            _saveRGTEToXML: function()
+            {
+                this.isHidden = false;
+                // this.$.xmlSaver.save(this.network);
+            },
 
-          _isAccepted: function(e)
-          {
-            if(!e.detail.confirmed)
-              return;
+            _isAccepted: function(e)
+            {
+                if (!e.detail.confirmed)
+                    return;
 
-            //var RGTE = {network: this.$.rgte.getNetwork(), cardinality: this.$.rgte.getEdgesCardinality()};
-            this.fire("-RGTEAddedToTheBag", this.rgte);
-          },
+                //var RGTE = {network: this.$.rgte.getNetwork(), cardinality: this.$.rgte.getEdgesCardinality()};
+                this.fire("-RGTEAddedToTheBag", this.rgte);
+            },
 
-          _computeHidden: function(isHidden)
-          {
-            console.log("cH:"+isHidden);
-            return isHidden;
-          },
+            _computeHidden: function(isHidden)
+            {
+                console.log("cH:" + isHidden);
+                return isHidden;
+            },
 
         });
-      </script>
+    </script>
 
-    </dom-module>
+</dom-module>

@@ -1,0 +1,53 @@
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="multi-paper-inputs-element">
+  <template>
+    <style>
+      :host {
+        font-family: sans-serif;
+      }
+    </style>
+
+
+
+  </template>
+  <script>
+  Polymer(
+  {
+    is: "multi-paper-inputs-element",
+
+    properties:
+    {
+        allRequired:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+
+        firstRequired:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+
+        maxChar:
+        {
+          type: Number,
+          value: -1,
+          notify: true,
+        },
+
+        values:
+        {
+          type: Array,
+          value: function(){return [];},
+          notify: true,
+        },
+    },
+
+
+  });
+  </script>
+</dom-module>

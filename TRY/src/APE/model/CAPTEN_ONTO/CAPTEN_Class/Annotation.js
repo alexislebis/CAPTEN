@@ -27,3 +27,12 @@ function ExampleOfUse(){
 }
 
 ExampleOfUse.prototype = Object.create(Annotation.prototype);
+
+function Tag(){
+    Annotation.call(this);
+    this.uri = "NAU";
+
+    this.value = null;
+}
+
+Tag.prototype = Object.create(Annotation.prototype);

@@ -1,4 +1,5 @@
-function NarratedOperator(usualName) {
+function NarratedOperator(usualName)
+{
 
     CAPTENClass.call(this);
 
@@ -9,6 +10,9 @@ function NarratedOperator(usualName) {
     this.steps = null; //Associative array : [RelationOrder]:[ListOfSteps]
 
     this.annotation = null; //Annotation regarding the IndpOp
+
+
+    this.objective = null;
 
     //Behavoural Patterns
     // this.inputPatterns = null; //Inputs RGTE pattern needed
@@ -30,6 +34,19 @@ function NarratedOperator(usualName) {
  * its expected patterns ( [] ).
  */
 NarratedOperator.prototype = Object.create(CAPTENClass.prototype);
-NarratedOperator.prototype.solve = function(inputs) {
-                console.log("solving");
-        };
+
+NarratedOperator.prototype = {
+
+    solve: function(inputs)
+    {
+        console.log("solving");
+    },
+
+    /**
+     * Test if a NOP is equal to an another NOP. The equality should be mostly defined by the patterns
+     */
+    isEqual: function(nop)
+    {
+
+    },
+};

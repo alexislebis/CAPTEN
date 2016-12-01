@@ -19,7 +19,7 @@
         <rdf-store-reader-element id="FRE" vocab="{{vocab}}"></rdf-store-reader-element>
         <!-- <rdf-store-nomenclature-element id="rdn" vocab="{{vocab}}" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}" classes="{{rdfcls}}" props="{{rdfprops}}"></rdf-store-nomenclature-element> -->
 
-        <rgte-workzone-element id="rgteWorkzone" vocab="{{vocab}}"></rgte-workzone-element>
+        <rgte-workzone-element id="rgteWorkzone" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
 
         <!-- <rte-lister-element id="rteList" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}" rdfcls="{{rdfcls}}" rdfprops="{{rdfprops}}"></rte-lister-element> -->
         <rdf-store-displayer-element id="displayer" vocab="{{vocab}}"></rdf-store-displayer-element>
@@ -97,6 +97,16 @@
                 {
                   type: Object,
                   value: function(){return new CONTROLLED_VOCABULARY();},
+                },
+                customcls://used for file-reader
+                {
+                    type: Array,
+                    notify: true,
+                },
+                customprops:
+                {
+                    type: Array,
+                    notify: true,
                 },
             },
 
