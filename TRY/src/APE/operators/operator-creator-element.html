@@ -2,6 +2,8 @@
 <link rel="import" href="../../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 
 <link rel="import" href="../../RTE/rgte-workzone-element.html">
 
@@ -14,35 +16,69 @@
     </style>
 
   <span on-tap="_close">Close <iron-icon icon="clear" prefix></iron-icon></span>
-  <paper-input id="creatorName" label="Creator's name" value="{{creatorName}}" required></paper-input>
 
-  <paper-input id="nameNOP" label="NOP's name" value="{{nopname}}" required maxlength="100"></paper-input>
-  <paper-textarea label="Description of the narrated operator"></paper-textarea>
+  <form is="iron-form" method="get" action="/" id="newNopForm" on-iron-form-submit="_submitForm">
+    <paper-input id="creatorName" name="n" label="Creator's name" value="{{creatorName}}" required></paper-input>
 
-  <paper-input id="objectif1NOP" label="NOP's objective (#1)" value="{{nopobjectif1}}" maxlength="100"></paper-input>
+    <paper-input id="nameNOP" label="NOP's name" value="{{nopname}}" char-counter required maxlength="100"></paper-input>
+    <paper-textarea label="Description of the narrated operator"></paper-textarea>
+    <paper-textarea label="Example"></paper-textarea>
 
-  <div>
-    <paper-input id="tag1" label="Tag" value="{{noptag1}}" maxlength="15"></paper-input>
-    <!-- TODO : Faire les multi-paper-inputs -->
-  </div>
+    <paper-input id="objectif1NOP" label="NOP's objective (#1)" value="{{nopobjectif1}}" char-counter maxlength="100"></paper-input>
 
-  <div>
-  <!-- <paper-textarea label="Example of utilization "></paper-textarea> -->
-  <!-- TODO multi text area  -->
-  </div>
+    <div id="conceptsConveyed">
+      <paper-input id="conceptConvoyed1" label="Concept conveyed by the NOP (#1)"></paper-input>
 
-  <div>
-    TODO
-    <!-- TODO : Relations sur les particularités, contraintes, etc... Utiliser Haeeceity sans doute vers elmts -->
-  </div>
+    </div>
 
-  <div hidden$="{{isInputPatternDisplayed}}" on-tap="_toggleInputPatternDisplayed">
-    Open input pattern <iron-icon icon="add-box"></iron-icon>
-  </div>
-  <div hidden$="{{!isInputPatternDisplayed}}">
-    <span on-tap="_toggleInputPatternDisplayed"> Close input pattern  <iron-icon icon="clear"></iron-icon></span>
-    <rgte-workzone-element id="inputPattern" disable-Save-Menu disable-Bag-Menu disable-Load-Menu vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
-  </div>
+    <div>
+      <paper-input id="tag1" label="Tag" value="{{noptag1}}" char-counter maxlength="15"></paper-input>
+      <!-- TODO : Faire les multi-paper-inputs -->
+    </div>
+
+    <div>
+    <!-- <paper-textarea label="Example of utilization "></paper-textarea> -->
+    <!-- TODO multi text area  -->
+    </div>
+
+    <div id="relationNOP">
+      <!-- Dérivé de, etc. -->
+      <!-- TODO : Relations sur les particularités, contraintes, etc... Utiliser Haeeceity sans doute vers elmts -->
+    </div>
+
+    <div id="patterns">
+      <div id="inputP">
+        <div hidden$="{{isInputPatternDisplayed}}" on-tap="_toggleInputPatternDisplayed">
+          Open input pattern <iron-icon icon="add-box"></iron-icon>
+        </div>
+        <div hidden$="{{!isInputPatternDisplayed}}">
+          <span on-tap="_toggleInputPatternDisplayed"> Close input pattern  <iron-icon icon="clear"></iron-icon></span>
+          <rgte-workzone-element id="inputPattern" disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopinputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+        </div>
+      </div>
+      <div id="outputP">
+        <div hidden$="{{isOutputPatternDisplayed}}" on-tap="_toggleOutputPatternDisplayed">
+          Open output pattern <iron-icon icon="add-box"></iron-icon>
+        </div>
+        <div hidden$="{{!isOutputPatternDisplayed}}">
+          <span on-tap="_toggleOutputPatternDisplayed"> Close output pattern  <iron-icon icon="clear"></iron-icon></span>
+          <rgte-workzone-element id="outputPattern" disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopoutputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+        </div>
+      </div>
+      <div id="settingP">
+
+      </div>
+    </div>
+
+
+    <div id="toolsImplementation">
+      <paper-input id="creatorName" label="Tool handling the NOP (version). Example : KTBS (v0.2.5)"></paper-input>
+      <!-- TODO : gestion plus pousser des outils. Par exemple lors d'un choix d'outils, sous menu pour indiquer op et configuration , version, etc..-->
+    </div>
+
+
+    <paper-button raised on-click="_submitted">Create !</paper-button>
+  </form>
 
   </template>
     <script>
@@ -135,6 +171,13 @@
                   notify: true,
                 },
 
+                isOutputPatternDisplayed:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+
                 vocab:
                 {
                   type: Object,
@@ -164,8 +207,49 @@
 
             _toggleInputPatternDisplayed: function()
             {
-              this.vocab.notifyChange();
               this.isInputPatternDisplayed = !this.isInputPatternDisplayed;
+
+              if(this.isInputPatternDisplayed)
+              {
+                this.vocab.notifyChange();
+                this._updateCustoms();
+              }
+            },
+
+            _toggleOutputPatternDisplayed: function()
+            {
+              this.isOutputPatternDisplayed = !this.isOutputPatternDisplayed;
+
+              if(this.isOutputPatternDisplayed)
+              {
+                this.vocab.notifyChange();
+                this._updateCustoms();
+              }
+            },
+
+            _updateCustoms: function()
+            {
+              var cls = this.customcls;
+              var props = this.customprops;
+
+              this.customcls = [];
+              this.customprops = [];
+
+              this.customcls = cls;
+              this.customprops = props;
+            },
+
+
+// === SUBMISSION FORM
+            _submitted: function(event)
+            {
+                console.log(Polymer.dom(event).localTarget.parentElement.submit);
+                Polymer.dom(event).localTarget.parentElement.submit();
+            },
+
+            _submitForm: function(event)
+            {
+              var form = Polymer.dom(event).localTarget;
 
             },
 
