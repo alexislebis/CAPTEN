@@ -111,6 +111,22 @@
                 {
                   this.isNewNopHidden = true;
                 }.bind(this));
+
+              this.$.nopCreator.addEventListener('-NewNOP', function(e)
+              {
+                this.addNewOperator(e.detail);
+              }.bind(this));
+            },
+
+            addNewOperator: function(nop)
+            {
+              console.log(nop);
+              // var ops = this.operators;
+              // ops.push(nop);
+              //
+              // this.operators = [];
+
+              this.push('operators', nop);
             },
 
             _onOperatorsChanged: function(change)
