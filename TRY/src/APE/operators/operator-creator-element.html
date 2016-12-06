@@ -338,6 +338,11 @@
             _submitForm: function(event)
             {
               // var form = Polymer.dom(event).localTarget;
+
+              //Insuring that the submission does not comming from another form
+              if(event.path[0].id.indexOf('newNopForm') == -1)
+                return;
+
               var nop = this._buildNOP();
 
               this.fire('-NewNOP', nop);

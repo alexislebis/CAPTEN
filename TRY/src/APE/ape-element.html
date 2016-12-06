@@ -128,7 +128,8 @@
       _rgteClicked: function(e)
       {
         var rgteIndex = parseInt(Polymer.dom(e).localTarget.id.split('rgte')[1]);
-        console.log(rgteIndex);
+        console.log("VALIDATION FOR SWAPPING RGTE REQUIRED!");
+        this.$.stepEditor.changeRGTE(this.rgtes[rgteIndex]);
       },
 
       _currentOperatorOnChanged: function()

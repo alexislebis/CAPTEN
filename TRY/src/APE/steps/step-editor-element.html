@@ -8,9 +8,11 @@
     </style>
 
     <h4>RGTE</h4>
+    <div id="rgteDisplayer">
     <template is="dom-if" if="{{displayRGTE}}">
       <rgte-displayer-element rgte="{{step.inputs}}"></rgte-displayer-element>
     </template>
+  </div>
     <h4>Operator</h4>
     <div id="opInputDisplayer">
     <template is="dom-if" if="{{displayOperatorInputs}}">
@@ -53,9 +55,17 @@
 // === NATIVE
         attached: function()
         {
+
+          //For redrawing the displayer when operator input is displayed for the first time
           this._observer=Polymer.dom(this.$.opInputDisplayer).observeNodes(function(info)
           {
             if(this.displayOperatorInputs)
+              info.addedNodes[1].draw();
+          }.bind(this));
+
+          this._observer=Polymer.dom(this.$.rgteDisplayer).observeNodes(function(info)
+          {
+            if(this.displayRGTE)
               info.addedNodes[1].draw();
           }.bind(this));
         },
