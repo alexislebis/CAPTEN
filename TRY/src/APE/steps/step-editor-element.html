@@ -1,0 +1,113 @@
+<link rel="import" href="../../RTE/rgte-displayer-element.html">
+
+
+<dom-module id="step-editor-element">
+  <template>
+    <style>
+
+    </style>
+
+    <h4>RGTE</h4>
+    <template is="dom-if" if="{{displayRGTE}}">
+      <rgte-displayer-element rgte="{{step.inputs}}"></rgte-displayer-element>
+    </template>
+    <h4>Operator</h4>
+    <div id="opInputDisplayer">
+    <template is="dom-if" if="{{displayOperatorInputs}}">
+      <rgte-displayer-element rgte="{{step.operator.behaviors.input}}"></rgte-displayer-element>
+    </template>
+  </div>
+    <h4>Output</h4>
+
+  </template>
+  <script>
+    Polymer(
+      {
+        is: 'step-editor-element',
+
+        properties:
+        {
+          step:
+          {
+            type: Object,
+            value: function(){return new Step();},
+            notify: true,
+          },
+          displayOperatorInputs:
+          {
+            type: Boolean,
+            value: false,
+            notify: true,
+            observer: "_onDisplayersChanged",
+          },
+          displayRGTE:
+          {
+            type: Boolean,
+            value: false,
+            notify: true,
+            observer: "_onDisplayersChanged",
+          },
+
+        },
+
+// === NATIVE
+        attached: function()
+        {
+          this._observer=Polymer.dom(this.$.opInputDisplayer).observeNodes(function(info)
+          {
+            if(this.displayOperatorInputs)
+              info.addedNodes[1].draw();
+          }.bind(this));
+        },
+// ===
+
+        changeOperator: function(op)
+        {
+          if(op == null)
+            return;
+
+          this.step.operator = op;
+          this._computeDisplayingOperatorInputs();
+        },
+
+        changeRGTE: function(rgte)
+        {
+          if(rgte == null)
+            return;
+
+          this.step.inputs = rgte;
+          this._computeDisplayingRGTE();
+        },
+
+    // === DISPLAY
+        _computeDisplayingOperatorInputs: function()
+        {
+          if(this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
+            this.displayOperatorInputs = false;
+          else
+            this.displayOperatorInputs = true;
+        } ,
+
+        _computeDisplayingRGTE: function()
+        {
+          if(this.step.inputs == null)
+            this.displayRGTE = false;
+          else
+            this.displayRGTE = true;
+        },
+
+    // === EVENTS
+      _onDisplayersChanged: function()
+      {
+        if(this.displayOperatorInputs && this.displayRGTE)
+          this._automaticallyCompute();
+      },
+
+    // === PROCESSING
+      _automaticallyCompute: function()
+      {
+        console.log("TODO");
+      },
+    });
+  </script>
+</dom-module>

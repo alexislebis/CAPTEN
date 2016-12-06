@@ -1,4 +1,5 @@
 <link rel="import" href="../wrapper/ape-model-element.html">
+<link rel="import" href="./steps/step-editor-element.html">
 
 <link rel="import" href="./operators/operators-workzone-element.html">
 
@@ -22,7 +23,9 @@
 
     <ape-model-element></ape-model-element>
 
-    <operators-workzone-element id="opWorkzone" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operators-workzone-element>
+    <step-editor-element id="stepEditor"></step-editor-element>
+
+    <operators-workzone-element id="opWorkzone" currentoperator="{{currentoperator}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operators-workzone-element>
 
     <h1>
       APE n°<span style="color:green">[[name]]</span>
@@ -68,6 +71,12 @@
         {
             type: Array,
             notify: true,
+        },
+        currentoperator:
+        {
+          type: Object,
+          notify: true,
+          observer: '_currentOperatorOnChanged',
         },
         //
         // operators:{
@@ -120,6 +129,14 @@
       {
         var rgteIndex = parseInt(Polymer.dom(e).localTarget.id.split('rgte')[1]);
         console.log(rgteIndex);
+      },
+
+      _currentOperatorOnChanged: function()
+      {
+        if(this.currentoperator == null)
+          return;
+
+        this.$.stepEditor.changeOperator(this.currentoperator);
       },
 // ===
 
