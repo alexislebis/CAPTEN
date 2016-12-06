@@ -11,6 +11,15 @@
       }
     </style>
 
+    <div id="rgteMenuBar">
+      <h3>RGTE Menu bar</h3>
+      <template id="rgtesMenuBar" is="dom-repeat" items="[[rgtes]]" index-as="index">
+        <div>
+          <rgte-displayer-element id$="{{_generateRGTEID(index)}}" rgte="{{item}}" on-tap="_rgteClicked"></rgte-displayer-element>
+        </div>
+      </template>
+    </div>
+
     <ape-model-element></ape-model-element>
 
     <operators-workzone-element id="opWorkzone" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operators-workzone-element>
@@ -79,13 +88,61 @@
 
       },
 
+      attached: function()
+      {
+        this._observer=Polymer.dom(this.$.rgteMenuBar).observeNodes(function(info)
+        {
+          var div = this._findNewRGTEDiv(info.addedNodes);
+          if(div != null)
+          {
+            this.$$("#"+div).draw();
+          }
+        }.bind(this));
+      },
+
+// === EVENTS
       _onRGTESChanged: function(change)
       {
         if(change == null)
           return;
 
 
-        console.log(this.rgtes);
+          console.log(this.$$('#rgte'+i));
+        var i = 0;
+        while(this.$$('#rgte'+i) != null)
+        {
+          this.$$('#rgte'+i).draw();
+          i++;
+        }
+      },
+
+      _rgteClicked: function(e)
+      {
+        var rgteIndex = parseInt(Polymer.dom(e).localTarget.id.split('rgte')[1]);
+        console.log(rgteIndex);
+      },
+// ===
+
+      _generateRGTEID: function(index)
+      {
+        console.log(index)
+        return "rgte"+index;
+      },
+
+      _findNewRGTEDiv: function(info)
+      {
+        for(var j = 0; j < info.length; j++)
+        {
+          for(var i in info[j].childNodes)
+          {
+            if(info[j].childNodes[i].id != null && info[j].childNodes[i].id.includes('rgte'))
+            {
+              return info[j].childNodes[i].id;
+            }
+          }
+        }
+
+        return null;
       },
 
     });

@@ -305,7 +305,7 @@
             {
               var nop = new NarratedOperator();
 
-              nop.usualName = new Author(this.nopname);
+              nop.usualName = this.nopname;
               nop.uri = this.nopname;
               nop.uriConceptConvoyed = this.nopconceptconvoyed1; //TODO array of uri concepts
               // nop.annotation = [];
@@ -320,7 +320,9 @@
               nop.behaviors['parameters'] = this.nopparameter1;
               nop.implementedByOperation = [];
               nop.implementedByOperation.push(this.noptool1); //TODO array & operations
-              nop.author = this.creatorName;
+              nop.author = new Author();
+              nop.author.authorName = this.nopname;
+              console.log(nop.author);
               nop.creationDate = new Date();
 
               return nop;
