@@ -34,25 +34,24 @@ Please make sure that **[python](https://www.python.org/)**, **[git](https://git
 
 
 1. Download the CAPTEN project:
-```bash
-git clone https://github.com/alexislebis/CAPTEN.git
-```  
+  ```bash
+  git clone https://github.com/alexislebis/CAPTEN.git
+  ```
 2. Then, run the bower_dependencies script in order to build all the dependencies in the different sub repositories:
-```bash
-./bower_dependencies.sh
-```  
-3. [OPTIONAL]
-If bower stalls while retrieving some dependencies and throws the following error:
+  ```bash
+  ./bower_dependencies.sh
+  ```  
+3. [OPTIONAL] If bower stalls while retrieving some dependencies and throws the following error:
 `git ls-remote -tags --heads git://github.com/...`, please make sure that your git command is correctly configured to access github with the https protocol. You can do so with the following command line:
-```bash
-git config --global url."https://".insteadOf git://
-```  
+  ```bash
+  git config --global url."https://".insteadOf git://
+  ```
 4. CAPTEN-SEED rely on **[Polymer](https://www.polymer-project.org/1.0/)**. Thus, in order to render and use correctly the web project, you have to create an HTML server listening a specific port (here, the 3000).
-```bash
-cd ./SEED/
-python -m SimpleHTTPServer 3000
-```  
-5. Finally, open your web-browser at `http://localhost:3000/` (assuming that 3000 was the port used during the python command line).
+  ```bash
+  cd ./SEED/
+  python -m SimpleHTTPServer 3000
+  ```  
+5. Finally, open your web-browser at `http://localhost:3000/` (assuming that 3000 was the port used during the python command line). 
 
 ## Thanks
 [//]: # (I would like to thanks any contributors of the project. I would like to thanks especially **[Vanda Luengo](http://www.lip6.fr/actualite/personnes-fiche.php?ident=P1041)** and **[Nathalie Guin](http://liris.cnrs.fr/nathalie.guin/)** for their precious advices and helps.)
