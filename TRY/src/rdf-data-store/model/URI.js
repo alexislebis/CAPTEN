@@ -7,3 +7,5 @@ var UNION_URI     = "http://www.w3.org/2002/07/owl#unionOf";
 var SUBCLASS_URI  = "http://www.w3.org/2000/01/rdf-schema#subClassOf";
 
 var CUSTOM_PREFIX_URI = "http://www.CAPTEN.org/SEED/ontologies/custom/";
+
+var USED_AS = "http://www.CAPTEN.org/SEED/ontologies/usedAs";//TODO add it to the ontology OR locate it
