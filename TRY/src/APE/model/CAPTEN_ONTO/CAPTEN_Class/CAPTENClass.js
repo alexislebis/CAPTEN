@@ -72,6 +72,18 @@ CAPTENClass.prototype = {
         return;
     },
 
+  // === OVERRIDED METHODS
+    retrieveUniqueIdentifier: function()
+    {
+      var id = this.id;
+
+      // if(this.idVoc != null) //If the captenClass is used inside a RGTE, in order to avoid id colision since the id is transfered into idVoc and current id is the id inside RGTE, we take the oposite
+      //  id *= -1;
+
+      return id;
+    },
+// ===
+
     equals: function(CAPTENc)
     {
         if (CAPTENc instanceof CAPTENClass)

@@ -45,6 +45,12 @@
             value: function(){return new Step();},
             notify: true,
           },
+          propAsyncBuild:
+          {
+            type: Object,
+            value: function(){return new PropertyAsyncrhonousBuilder();},
+            notify: true,
+          },
           usedConceptsInput://Associative array. Key is rgte input uri of the operator, value a property between different concept
           {
             type: Array,
@@ -89,6 +95,8 @@
 // === NATIVE
         attached: function()
         {
+          this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackUsedConceptsInputComplete);
+
           //For redrawing the displayer when operator input is displayed for the first time
           this._observer=Polymer.dom(this.$.opInputDisplayer).observeNodes(function(info)
           {
@@ -122,7 +130,9 @@
           this.step.operator = op;
           this._computeDisplayingOperatorInputs();
 
-          this._updateUsedConcepts();
+          if(this.step.operator.behaviors != null){
+          this.propAsyncBuild.setSecondObject(this.step.operator.behaviors['input']);
+          this._updateUsedConcepts();}
         },
 
         changeRGTE: function(rgte)
@@ -132,6 +142,8 @@
 
           this.step.inputs = rgte;
           this._computeDisplayingRGTE();
+
+          this.propAsyncBuild.setFirstObject(this.step.inputs);
         },
 
     // === DISPLAY
@@ -167,6 +179,11 @@
         this.isBindingRGTEParams = !this.isBindingRGTEParams;
       },
 
+      _callbackUsedConceptsInputComplete: function()
+      {
+        console.log("COMPLETE");
+      },
+
     // === PRIVATE METHODS
       // === BEHAVIORS METHODS
         _behaviorSelectorWhenGraphsClicked: function(params)
@@ -189,6 +206,14 @@
             console.log("=============");
             return ;
           }
+          //TEST, DELME after
+            var test = this.step.inputs.getNodeById(params.id);
+            if(test == null)
+              test = this.step.operator.behaviors['input'].getNodeById(params.id);
+
+            this.propAsyncBuild.bind(test);
+          //=========================
+
           var node = null;
 
           node = this.step.inputs.getNodeById(params.id);
@@ -277,6 +302,8 @@
 
           if(this.step.operator.behaviors['params'] != null)
             this._updateUsedConceptsKeyed('params');
+
+          this.propAsyncBuild.setArray(this.usedConceptsInput);
         },
           _updateUsedConceptsKeyed: function(key)
           {

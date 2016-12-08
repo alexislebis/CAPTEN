@@ -427,4 +427,46 @@ _convertEdge: function(edge)
     return this.getUsedCardinality().sort();
   },
 
+  // === OVERRIDED METHODS
+    contains: function(obj)
+    {
+      //CHECK if obj is a NODE or a prop or this
+      if(obj instanceof RGTE)
+      {
+        throw new Error('Unimplemented function');
+        return;
+      }
+
+      if(obj instanceof CAPTENClass)
+      {
+        var idPath = '';
+
+        if(obj.idVoc == null)//Verifying if the obj is just a vocabulary OR used inside another RGTE
+          idPath = 'idVoc'; //Configuring the path to the id of the vocabulary directly since the obj is only a vocab class, never used inside a rgte
+        else
+          idPath = 'id';
+
+        for(var i in this.nodes)
+        {
+          if(this.nodes[i][idPath] == obj.id)
+            return this.nodes[i];
+        }
+
+        return;
+      }
+
+      if(obj instanceof Property)
+      {
+        throw new Error('Unimplemented function');
+        return;
+      }
+
+      return;
+    },
+
+    retrieveUniqueIdentifier: function()
+    {
+      return this.id;
+    },
+
 };
