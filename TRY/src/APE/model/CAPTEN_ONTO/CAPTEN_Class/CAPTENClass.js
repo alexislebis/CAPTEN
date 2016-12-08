@@ -73,6 +73,16 @@ CAPTENClass.prototype = {
     },
 
   // === OVERRIDED METHODS
+    contains: function(obj)
+    {
+      if(obj instanceof CAPTENClass)
+      {
+
+      }
+
+      throw new Error('Unimplemented function');
+    },
+
     retrieveUniqueIdentifier: function()
     {
       var id = this.id;

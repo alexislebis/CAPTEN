@@ -44,20 +44,39 @@ PropertyAsyncrhonousBuilder.prototype = {
       },
   // ===
 
+  verifyCompatibility: function(smth)
+  {
+    this.verifyContainsExistence(smth);
+    this.verifyRetrieveUniqueIdentifierExistence(smth);
+  },
+
+  verifyContainsExistence: function(smth)
+  {
+    if(typeof smth.contains !== "function")
+      throw new Error(smth+' does not implement: contains');
+  },
+
+  verifyRetrieveUniqueIdentifierExistence: function(smth)
+  {
+    if(typeof smth.retrieveUniqueIdentifier !== 'function')
+      throw new Error(smth+' does not implement: retrieveUniqueIdentifier');
+  },
+
   bind: function(evalObj, uriProp, labelProp)
   {
     console.log("===WARNING===");
     console.log("Currently, if A and B are identical, then always the 'from' clause will be filled");
     console.log("=============");
 
-    console.log("===WARNING===");
-    console.log("Need to check if A & B are Contains.");
-    console.log("=============");
+    this.verifyCompatibility(this.A);
+    this.verifyCompatibility(this.B);
+    this.verifyRetrieveUniqueIdentifierExistence(evalObj);
 
-    console.log("===WARNING===");
-    console.log("Need to check if A & B are RetrieveUniqueIdentifier.");
-    console.log("=============");
-
+    if(this.A == this.B)
+    {
+      this._bindWithinA(evalObj, uriProp, labelProp);
+      return;
+    }
     var obj = this.A.contains(evalObj);
 
     console.log(evalObj);
@@ -91,6 +110,24 @@ PropertyAsyncrhonousBuilder.prototype = {
     }
 
     throw new Error('Undefined Provenance of '+evalObj+'.');
+
+  },
+
+  _bindWithinA: function(evalObj, uriProp, labelProp)
+  {
+    var obj = this.A.contains(evalObj);
+    if(obj == null)
+      return;
+
+    var prop = null;
+    //Retrieve the state of the facorty
+    if(this.fromObject == null)
+      prop = this._updateCurrentProperty(obj, null, uriProp, labelProp);
+    else if(this.toObject == null)
+      prop = this._updateCurrentProperty(null, obj, uriProp, labelProp);
+
+    if(prop != null)
+      this._addPropertyToArray(prop);
 
   },
 
@@ -143,7 +180,7 @@ PropertyAsyncrhonousBuilder.prototype = {
 
   verifyArrayFilling: function()
   {
-    if(this.arrayToFill == null)
+    if(this.arrayToFill == null || this.arrayToFill.length == 0)
       return false;
 
     for(var i in this.arrayToFill)

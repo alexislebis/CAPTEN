@@ -206,49 +206,12 @@
             console.log("=============");
             return ;
           }
-          //TEST, DELME after
-            var test = this.step.inputs.getNodeById(params.id);
-            if(test == null)
-              test = this.step.operator.behaviors['input'].getNodeById(params.id);
 
-            this.propAsyncBuild.bind(test);
-          //=========================
+          var obj = this.step.inputs.getNodeById(params.id);
+          if(obj == null)
+            obj = this.step.operator.behaviors['input'].getNodeById(params.id);
 
-          var node = null;
-
-          node = this.step.inputs.getNodeById(params.id);
-          if(node != null)
-          {
-            var prop = this._updateCurrentProperty(node, null);
-
-            if(prop != null)
-            {
-              this.usedConceptsInput[prop.to.id] = prop;
-            }
-
-            console.log(this.usedConceptsInput);
-            return;
-          }
-
-          node = this.step.operator.behaviors['input'].getNodeById(params.id);
-          if(node != null)
-          {
-            if(this.usedConceptsInput[node.id] == null)//If the concept is not already filled
-            {
-              this.usedConceptsInput[node.id] = this._updateCurrentProperty(null, node);
-
-              console.log(this.usedConceptsInput);
-            }
-            else //Otherwise, the user must be warned that a previous input concept is already associated with a property
-            {
-
-            }
-
-            return;
-          }
-          else {
-            console.log('UNDEFINED PROVENANCE');
-          }
+          this.propAsyncBuild.bind(obj);
 
           return;
         },
