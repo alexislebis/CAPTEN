@@ -1,6 +1,7 @@
 <link rel="import" href="../wrapper/rdfstore-element.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 
 <dom-module id="rdf-store-lister-element">
     <template>
@@ -52,8 +53,10 @@
         </style>
         <div id="rdflister">
             <div>
-                <h2>Available Classes</h2>
+                <h2 on-tap="_toggleRDFClasses">Available Classes</h2>
                 <!-- <ul id="rdfClasses"></ul> -->
+                <iron-collapse id="classRDFCollapse">
+
                 <iron-list id="ilRDFC" items="[[rdfclasses]]" as="item" class="flex" selection-enabled>
                     <template>
                         <div>
@@ -68,10 +71,17 @@
                             <div class="border"></div>
                         </div>
                     </template>
-    </iron-list>
+                </iron-list>
+
+                </iron-collapse>
+              </div>
 
     <div>
-        <h2>Availablle Properties</h2>
+        <h2 on-tap="_toggleRDFProps">Availablle Properties</h2>
+
+        <iron-collapse id="propRDFCollapse">
+
+
         <iron-list id="ilRDFP" items="{{_toArray(rdfprops)}}" as="item" class="flex" selection-enabled>
             <template>
                             <div>
@@ -84,9 +94,9 @@
                                 <div class="border"></div>
 
                         </template>
-    </div>
-    </iron-list>
-    </div>
+              </div>
+              </iron-list>
+          </iron-collapse>
     </div>
     </div>
     </template>
@@ -151,6 +161,16 @@
                 console.log(this.vocab.classes);
                 this._onRdfclassesChanged(null);
                 this._onRdfpropertiesChanged(null);
+            },
+
+            _toggleRDFClasses: function()
+            {
+              this.$.classRDFCollapse.toggle();
+            },
+
+            _toggleRDFProps: function()
+            {
+              this.$.propRDFCollapse.toggle();
             },
 
             _iterateOnClasses: function(vocab)
