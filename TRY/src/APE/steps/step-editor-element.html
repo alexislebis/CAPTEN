@@ -261,12 +261,19 @@
             return;
 
           if(this.step.operator.behaviors['input'] != null)
+          {
             this._updateUsedConceptsKeyed('input');
+            console.log(this.step.operator.behaviors['input'].getNodes().length);
+            this.propAsyncBuild.setArray(this.step.operator.behaviors['input'].getNodes().length);
+          }
 
           if(this.step.operator.behaviors['params'] != null)
-            this._updateUsedConceptsKeyed('params');
+          {  this._updateUsedConceptsKeyed('params');
+            console.log("TODO propAsyncBuild!!!!");
+          }
 
-          this.propAsyncBuild.setArray(this.usedConceptsInput);
+          // this.propAsyncBuild.setArray(this.usedConceptsInput);
+
         },
           _updateUsedConceptsKeyed: function(key)
           {

@@ -3,7 +3,7 @@
  * Use a PAB when user has to create several bind between differents objects. Note that the ID key of the array MUST BE a unique reference of the TO object in the properety relation <From-To> (likely its ID)
  */
 
-function PropertyAsyncrhonousBuilder(A, B, arrayToFill)
+function PropertyAsyncrhonousBuilder(A, B, length)
 {
   this.id = PropertyAsyncrhonousBuilder.id;
   PropertyAsyncrhonousBuilder.id++;
@@ -13,9 +13,9 @@ function PropertyAsyncrhonousBuilder(A, B, arrayToFill)
 
   this.observers = [];
 
-  this.arrayToFill = arrayToFill;
-  if(this.arrayToFill == null)
-    this.arrayToFill = [];
+  this.lengthArray = length;
+
+  this.reset();
 
   this.fromObject = null; //relocate in FacrotyPoolProperty
   this.toObject = null; //relocate in FacrotyPoolProperty
@@ -133,7 +133,8 @@ PropertyAsyncrhonousBuilder.prototype = {
 
   setArray: function(array)
   {
-    this.arrayToFill = array;
+    this.lengthArray = array;
+    this.reset();
 
     this.verifyArrayFilling();
   },
@@ -161,17 +162,15 @@ PropertyAsyncrhonousBuilder.prototype = {
 
   reset: function()
   {
-    for(var i in this.arrayToFill)
-    {
-      this.arrayToFill[i] = null;
-    }
+    this.arrayToFill = null;
+    this.arrayToFill = [];
   },
 
   _addPropertyToArray: function(property)
   {
     console.log(property);
-    if(this.arrayToFill[property.to.retrieveUniqueIdentifier()] === undefined)
-      throw new Error('The array of '+this+" does not include such a key "+property.to.retrieveUniqueIdentifier());
+    // if(this.arrayToFill[property.to.retrieveUniqueIdentifier()] === undefined)
+    //   throw new Error('The array of '+this+" does not include such a key "+property.to.retrieveUniqueIdentifier());
 
     this.arrayToFill[property.to.retrieveUniqueIdentifier()] = property;
 
@@ -183,13 +182,19 @@ PropertyAsyncrhonousBuilder.prototype = {
     if(this.arrayToFill == null || this.arrayToFill.length == 0)
       return false;
 
-    for(var i in this.arrayToFill)
-    {
-      if(this.arrayToFill[i] == null)
-        return false;
-    }
+    // for(var i in this.arrayToFill)
+    // {
+    //   if(this.arrayToFill[i] == null)
+    //     return false;
+    // }
 
-    this.notifyCompletion();
+    var counter = 0;
+    for(var i in this.arrayToFill)
+      counter++;
+
+    if(counter == this.lengthArray)
+      this.notifyCompletion();
+
     return true;
   },
 
