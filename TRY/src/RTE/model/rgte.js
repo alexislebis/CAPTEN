@@ -6,7 +6,7 @@
 
 function RGTE(){
 
-  this.id = RGTE.rgteID++;
+  this.id = CAPTEN.ID++;
 
   this.observers = [];
   this.nodes = [];//Need to be CAPTENCLass
@@ -37,7 +37,7 @@ RGTE.prototype = {
     var cls = nodeLabel.copy();
 
     cls.idVoc = cls.id;
-    cls.id = RGTE.nodeID++;
+    cls.id = CAPTEN.ID++;
 
     for(var i in this.nodes)
       if(this.nodes[i].id === cls.id)
@@ -73,7 +73,7 @@ RGTE.prototype = {
     var prop = proper.copy();
     // prop.id = RGTE.edgeID++;
     prop.idVoc = proper.id;
-    prop.id = RGTE.edgeID++;
+    prop.id = CAPTEN.ID++;
     console.log(prop);
     prop.arrows = arrows;
     // prop.arrows = arrows;
@@ -85,7 +85,7 @@ RGTE.prototype = {
 
   addEdgesCardinality: function(eid, fromCardinality, toCardinality)
   {
-    this.edgesCardinality.push({"id": RGTE.cardiID++, "edgeId": eid, "fromCardinality":fromCardinality, "toCardinality": toCardinality});
+    this.edgesCardinality.push({"id": CAPTEN.ID++, "edgeId": eid, "fromCardinality":fromCardinality, "toCardinality": toCardinality});
     this.notifyChange();
   },
 // ===

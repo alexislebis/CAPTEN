@@ -5,7 +5,7 @@
  * The additionalConstraint parameter allows to express more complex logic in future realese, such as, Student _commingFrom_ MOOC iff max 1 MOOC.
  */
 function Property(uri, label, From, to, additionalConstraints){
-    this.id = Property.id++;
+    this.id = CAPTEN.ID++;
 
     this.iName = "Property";//Memorize the root level for inheritance
 

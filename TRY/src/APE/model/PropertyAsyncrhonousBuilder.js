@@ -7,7 +7,7 @@
 
 function PropertyAsyncrhonousBuilder(A, B, length)
 {
-  this.id = PropertyAsyncrhonousBuilder.id;
+  this.id = CAPTEN.ID++;
   PropertyAsyncrhonousBuilder.id++;
 
   this.A = A; //The first object, mostly the FROM. Please note that if A == B, then A will also be considered as TO
@@ -218,6 +218,9 @@ PropertyAsyncrhonousBuilder.prototype = {
       this.notifyUncompletion();
       return false;
     }
+
+    console.log(this.A);
+    console.log(this.B);
 
     var counter = 0;
     for(var i in this.arrayToFill)
