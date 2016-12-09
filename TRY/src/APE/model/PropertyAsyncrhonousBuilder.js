@@ -14,6 +14,7 @@ function PropertyAsyncrhonousBuilder(A, B, length)
   this.B = B; //The second object
 
   this.observers = [];
+  this.observersUnc = [];
 
   this.lengthArray = length;
 
@@ -44,6 +45,23 @@ PropertyAsyncrhonousBuilder.prototype = {
             }
         });
       },
+
+      registerObserverCallbackOnUncompletion: function(objCallback, callback)
+      {
+        this.observersUnc.push([objCallback,callback]);
+      },
+
+        // === NOTIFICATION
+        notifyUncompletion: function()
+        {
+          this.observersUnc.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0]);//e[0] define the `this` context for e[1]
+              }
+          });
+        },
   // ===
 
   verifyCompatibility: function(smth)
@@ -66,10 +84,6 @@ PropertyAsyncrhonousBuilder.prototype = {
 
   bind: function(evalObj, uriProp, labelProp)
   {
-    console.log("===WARNING===");
-    console.log("Currently, if A and B are identical, then always the 'from' clause will be filled");
-    console.log("=============");
-
     this.verifyCompatibility(this.A);
     this.verifyCompatibility(this.B);
     this.verifyRetrieveUniqueIdentifierExistence(evalObj);
@@ -141,6 +155,12 @@ PropertyAsyncrhonousBuilder.prototype = {
     this.verifyArrayFilling();
   },
 
+  addArrayRow: function()
+  {
+    this.lengthArray++;
+    this.verifyArrayFilling();
+  },
+
   setFirstObject: function(A)
   {
     this._setObjects(A,null);
@@ -194,22 +214,23 @@ PropertyAsyncrhonousBuilder.prototype = {
   verifyArrayFilling: function()
   {
     if(this.arrayToFill == null || this.arrayToFill.length == 0)
+    {
+      this.notifyUncompletion();
       return false;
-
-    // for(var i in this.arrayToFill)
-    // {
-    //   if(this.arrayToFill[i] == null)
-    //     return false;
-    // }
+    }
 
     var counter = 0;
     for(var i in this.arrayToFill)
       counter++;
 
     if(counter == this.lengthArray)
+    {
       this.notifyCompletion();
+      return true;
+    }
 
-    return true;
+    this.notifyUncompletion();
+    return false;
   },
 
   _updateCurrentProperty: function(from, to, uri, label)

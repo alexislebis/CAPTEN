@@ -165,7 +165,6 @@
 
                 _callbackPropertyBindingComplete: function()
                 {
-                  console.log("PROPERTY OKKKKKKKKKKKK");
                   var prop;
                   var arr = this.propAsyncBuild.getArrayFilled();
 
@@ -177,7 +176,7 @@
                   this.rgte.addVisProperty(prop, "to");
 
                   this.propAsyncBuild.reset();
-                  console.log(this.rgte);
+
                   this.isWaitingPropertyBinding = false;
                 },
 

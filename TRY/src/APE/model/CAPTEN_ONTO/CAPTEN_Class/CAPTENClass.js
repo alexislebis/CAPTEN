@@ -10,6 +10,9 @@ function CAPTENClass(uri, label, properties)
 
     this.uri = uri;
     this.properties = this.properties; //[Property]
+    if(this.properties == null)
+      this.properties = [];
+      
     this.isBlank = false;
 
     //Dynamic inheritance system. CF Property for more details

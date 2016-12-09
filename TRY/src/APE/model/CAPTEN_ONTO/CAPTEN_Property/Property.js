@@ -101,6 +101,16 @@ Property.prototype = {
     return cls;
   },
 
+  /**
+   * Inverse the property from and to. The targeted object becomes the root.
+   */
+  inverse: function()
+  {
+    var tmp = this.from;
+    this.from = this.to;
+    this.to = tmp;
+  },
+
   includedIn: function(arrayProp)
   {
 
