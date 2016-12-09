@@ -74,7 +74,7 @@ RGTE.prototype = {
     // prop.id = RGTE.edgeID++;
     prop.idVoc = proper.id;
     prop.id = RGTE.edgeID++;
-    console.log(prop.id);
+    console.log(prop);
     prop.arrows = arrows;
     // prop.arrows = arrows;
     // prop.label = edgeLabel;

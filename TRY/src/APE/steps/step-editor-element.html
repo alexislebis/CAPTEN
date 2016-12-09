@@ -211,7 +211,7 @@
           if(obj == null)
             obj = this.step.operator.behaviors['input'].getNodeById(params.id);
 
-          this.propAsyncBuild.bind(obj);
+          this.propAsyncBuild.bind(obj, USED_AS, 'usedAs');
 
           return;
         },

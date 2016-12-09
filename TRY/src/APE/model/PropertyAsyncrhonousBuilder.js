@@ -3,6 +3,8 @@
  * Use a PAB when user has to create several bind between differents objects. Note that the ID key of the array MUST BE a unique reference of the TO object in the properety relation <From-To> (likely its ID)
  */
 
+//TODO add constraints. The array is validated iff all the contraints (i.e. all the to.uniqueIdentifier supplied) are satisfied
+
 function PropertyAsyncrhonousBuilder(A, B, length)
 {
   this.id = PropertyAsyncrhonousBuilder.id;
@@ -147,6 +149,11 @@ PropertyAsyncrhonousBuilder.prototype = {
   setSecondObject: function(B)
   {
     this._setObjects(null, B);
+  },
+
+  getArrayFilled: function()
+  {
+    return this.arrayToFill;
   },
 
   _setObjects: function(A, B)
