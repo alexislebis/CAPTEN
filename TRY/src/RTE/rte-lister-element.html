@@ -299,7 +299,7 @@
                 if (cProp == undefined && Object.keys(cProp).length === 0 && cProp.constructor === Object)
                     return;
 
-                this.push('customprops', new Property(cProp, cProp));
+                this.push('customprops', PROPERTIES_POOL.create(cProp, cProp));
             },
 
             iconForItem: function(isSelected)

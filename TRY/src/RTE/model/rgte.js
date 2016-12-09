@@ -219,7 +219,7 @@ RGTE.prototype = {
     // === EDGES
     for(var i in json[RGTE.EDGES])
     {
-      var edge = new Property();
+      var edge = PROPERTIES_POOL.create();
       edge.parseJSONObject(json[RGTE.EDGES][i]);
 
       // vocab.addProperty(edge);

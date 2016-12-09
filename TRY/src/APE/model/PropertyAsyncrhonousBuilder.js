@@ -169,6 +169,13 @@ PropertyAsyncrhonousBuilder.prototype = {
 
   reset: function()
   {
+    for(var i in this.arrayToFill)
+    {
+      if(this.arrayToFill[i] instanceof Property)
+      {
+        PROPERTIES_POOL.remove(this.arrayToFill[i]);
+      }
+    }
     this.arrayToFill = null;
     this.arrayToFill = [];
   },
@@ -215,7 +222,8 @@ PropertyAsyncrhonousBuilder.prototype = {
 
     if(this.fromObject != null && this.toObject != null)
     {
-      var tmp = new Property(uri, label, this.fromObject, this.toObject);
+      // var tmp = new Property(uri, label, this.fromObject, this.toObject);
+      var tmp = PROPERTIES_POOL.create(uri, label, this.fromObject, this.toObject)
       this._resetCurrentProperty();
       return tmp;
     }

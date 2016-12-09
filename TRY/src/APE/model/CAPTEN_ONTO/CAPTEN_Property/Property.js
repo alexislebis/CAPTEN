@@ -80,7 +80,8 @@ Property.prototype = {
 
   copy: function()
   {
-    var cls = new Property();
+    // var cls = new Property();
+    var cls = PROPERTIES_POOL.create(this.uri);
     cls.id = this.id;
 
     cls.iName = this.iName;
@@ -213,5 +214,13 @@ Property.prototype = {
     for(var i in json)
       this[i] = json[i];
   },
+  // ===
+
+  // === OVERRIDED METHODS
+    retrieveUniqueIdentifier: function()
+    {
+      return this.id;
+    },
+  // ===
 
 };

@@ -239,7 +239,7 @@
 
           if(this.fromRGTE != null && this.toNOP != null)
           {
-            var tmp = new Property(USED_AS, 'used as', this.fromRGTE, this.toNOP);
+            var tmp = PROPERTIES_POOL.create(USED_AS, 'used as', this.fromRGTE, this.toNOP);
             this._resetCurrentProperty();
             return tmp;
           }
