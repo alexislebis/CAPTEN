@@ -256,7 +256,9 @@ CAPTENClass.prototype = {
 
         for (var i in this)
         {
-            if (i !== "subClassOf" && i != "subClasses" && i != "properties")
+            if(i === 'idVoc')
+              ser[i] = this.idVoc.serializeToJSON();
+            else if (i !== "subClassOf" && i != "subClasses" && i != "properties")
                 ser[i] = this[i];
         }
 

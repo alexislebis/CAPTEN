@@ -36,7 +36,7 @@ RGTE.prototype = {
 
     var cls = nodeLabel.copy();
 
-    cls.idVoc = cls.id;
+    cls.idVoc = nodeLabel;
     cls.id = CAPTEN.ID++;
 
     for(var i in this.nodes)
@@ -142,6 +142,7 @@ RGTE.prototype = {
       seri[RGTE.CARDI][i] = this.edgesCardinality[i];
     }
 
+    console.log(seri);
     return seri;
   },
 
@@ -186,6 +187,7 @@ RGTE.prototype = {
 // === PARSING
   parseJSON: function(json, vocab)
   {
+    // throw new Error("Identification to the rdf voc is not correctly done. Must use the structure of the json and match uri")
     console.log(json.nodes[0].subClassOf[0].uri);
     console.log(json['nodes'][0]['subClassOf'][0].uri);
 
@@ -206,7 +208,7 @@ RGTE.prototype = {
       var node = new CAPTENClass();
 
       node.parseJSONObject(json[RGTE.NODES][i], vocab);
-
+      this._updateNodeVoc(node, vocab);
       // vocab.addClass(node);
 
       this[RGTE.NODES].push(node);
@@ -239,7 +241,26 @@ RGTE.prototype = {
 
       console.log(this.vocabularyDispersion(vocab));
       console.log(vocab);
+      console.log(this);
       // clsTEST.parseJSONObject(jsonO);
+  },
+
+  _updateNodeVoc: function(captenClass, vocab)
+  {
+    if(captenClass.idVoc.uri == null)
+      return;
+
+    var voc = vocab.getClassFromURI(captenClass.idVoc.uri);
+
+    if(voc == null)
+    {
+      var newCaptenCls = new CAPTENClass(captenClass.idVoc.uri);
+      vocab.addClass(newCaptenCls);
+
+      voc = newCaptenCls;
+    }
+
+    captenClass.idVoc = voc;
   },
 // ===
 
@@ -442,14 +463,20 @@ _convertEdge: function(edge)
         var idPath = '';
 
         if(obj.idVoc == null)//Verifying if the obj is just a vocabulary OR used inside another RGTE
-          idPath = 'idVoc'; //Configuring the path to the id of the vocabulary directly since the obj is only a vocab class, never used inside a rgte
-        else
-          idPath = 'id';
-
-        for(var i in this.nodes)
         {
-          if(this.nodes[i][idPath] == obj.id)
-            return this.nodes[i];
+          for(var i in this.nodes)
+          {
+              if(this.nodes[i].idVoc.retrieveUniqueIdentifier() == obj.id)
+                return this.nodes[i];
+          }
+        }
+        else
+        {
+          for(var i in this.nodes)
+          {
+              if(this.nodes[i].retrieveUniqueIdentifier() == obj.id)
+                return this.nodes[i];
+          }
         }
 
         return;
