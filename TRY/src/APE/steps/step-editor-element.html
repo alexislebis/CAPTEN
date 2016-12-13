@@ -24,11 +24,11 @@
     </template>
   </div>
     <h4>Operator</h4>
-    <div id="opInputDisplayer">
-    <template is="dom-if" if="{{displayOperatorInputs}}">
+      <div id="opInputDisplayer">
+      <template is="dom-if" if="{{displayOperatorInputs}}">
       <rgte-displayer-element id="opInput" rgte="{{step.operator.behaviors.input}}"></rgte-displayer-element>
-    </template>
-  </div>
+      </template>
+    </div>
     <h4>Output</h4>
 
   </template>
@@ -181,7 +181,7 @@
 
       _callbackUsedConceptsInputComplete: function()
       {
-        console.log("COMPLETE");
+        this._computeOutput();
       },
 
     // === PRIVATE METHODS
@@ -224,6 +224,15 @@
         _defaultBehavior: function(params)
         {
 
+        },
+
+        _computeOutput: function()
+        {
+          // console.log("COMPLETE");
+          this.step.outputs = this.step.inputs.copy();
+          console.log(this.step.inputs);
+          console.log(this.step.outputs);
+          console.log(this.step.outputs.copy());
         },
         //===
 

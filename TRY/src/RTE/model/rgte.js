@@ -91,6 +91,59 @@ RGTE.prototype = {
 // ===
 
   /**
+   * Copy return this copied, with ancestor updated and a new attribute idEquivalence storing the oldId ref of any element of this to the newID of any alement of the new rgte
+   */
+  copy: function()
+  {
+    var newRGTE = new RGTE();
+    // var tmpCls;
+    // var classID = [];
+
+    if(newRGTE.ancestor == null)
+      newRGTE.ancestor = [];
+    newRGTE.ancestor.push(this);
+
+    newRGTE.idEquivalence = [];// key:[oldID;newID]
+
+    newRGTE.observers = this.observers;
+
+    console.log(this.nodes);
+    for(var i in this.nodes)
+    {
+      var tmpCls = this.nodes[i].copy();
+      var classID = [];
+
+      classID.push(this.nodes[i].id);
+      classID.push(tmpCls.id);
+
+      newRGTE.idEquivalence.push(classID);
+
+      newRGTE.nodes.push(tmpCls);
+    }
+
+    for(var i in this.edges)
+    {
+      var tmpProp = this.edges[i].copy();
+      var propID = [];
+
+      propID.push(this.edges[i].id),
+      propID.push(tmpProp.id);
+
+      newRGTE.idEquivalence.push(propID);
+
+      tmpProp.from = newRGTE._getIdEquivalenceById("OLD_ID", this.edges[i].from)[1];
+      tmpProp.to = newRGTE._getIdEquivalenceById("OLD_ID", this.edges[i].to)[1];
+
+      newRGTE.edges.push(tmpProp);
+    }
+
+    for(var i in this.edgesCardinality)
+      newRGTE.addEdgesCardinality(this.edgesCardinality[i].id, newRGTE._getIdEquivalenceById("OLD_ID", this.edgesCardinality[i].fromCardinality)[1], newRGTE._getIdEquivalenceById("OLD_ID", this.edgesCardinality[i].toCardinality)[1]);
+
+    return newRGTE;
+  },
+
+  /**
    * Compute the dispersion of the RGTE regarding the vocabulary.
    * Dispersion = RGTE \ VOCAB.
    * @return 2D array with classes and properties keys, containing all the non matched elements of this (RGTE) in the vocabulary vocab
@@ -188,8 +241,8 @@ RGTE.prototype = {
   parseJSON: function(json, vocab)
   {
     // throw new Error("Identification to the rdf voc is not correctly done. Must use the structure of the json and match uri")
-    console.log(json.nodes[0].subClassOf[0].uri);
-    console.log(json['nodes'][0]['subClassOf'][0].uri);
+    // console.log(json.nodes[0].subClassOf[0].uri);
+    // console.log(json['nodes'][0]['subClassOf'][0].uri);
 
     if(json['type'] == null || json['type'] != 'RGTE')
       return; //not a rgte json
@@ -355,6 +408,31 @@ _convertEdge: function(edge)
   return e;
 },
 
+_getIdEquivalenceById: function(location, ID)
+{
+  if(this.idEquivalence == null)
+    return;
+
+  var index = 1;
+
+  if(location = "OLD_ID");
+    index = 0;
+
+  for(var i in this.idEquivalence)
+    if(this.idEquivalence[i][index] == ID)
+      return this.idEquivalence[i];
+
+  return null;
+},
+_isIdEquivalenceExists: function(location,ID)
+{
+  if(this._getIdEquivalenceById(location, ID) == null)
+    return false;
+
+  return true;
+
+},
+
   _calculatingCardinalitiesAvailable: function() {
 
       var cardinalitiesAvailable = [];
@@ -403,7 +481,7 @@ _convertEdge: function(edge)
 
   getNodeById: function(id)
   {
-    for(var i = 0; i < this.nodes.length; i++)
+    for(var i in this.nodes)
     {
       if(id === this.nodes[i].id)
         return this.nodes[i];
@@ -414,7 +492,7 @@ _convertEdge: function(edge)
 
   getEdgeById: function(id)
   {
-    for(var i = 0; i < this.edges.length; i++)
+    for(var i in this.edges)
     {
       if(id === this.edges[i].id)
         return this.edges[i];
@@ -425,7 +503,7 @@ _convertEdge: function(edge)
 
   getCardinalityById: function(id)
   {
-    for(var i = 0; i < this.edgesCardinality.length; i++)
+    for(var i in this.edgesCardinality)
     {
       if(id === this.edgesCardinality[i].id)
         return this.edgesCardinality[i];

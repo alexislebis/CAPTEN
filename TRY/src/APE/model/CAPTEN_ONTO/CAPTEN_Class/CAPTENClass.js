@@ -237,14 +237,17 @@ CAPTENClass.prototype = {
     {
         var cls = new CAPTENClass(this.uri);
 
+        for(var i in this)
+          if(i != 'id')
+            cls[i] = this[i];
         //cls.id = this.id;
-        cls.properties = this.properties;
-        cls.isBlank = this.isBlank;
-        cls.iName = this.iName;
-        cls.label = this.label;
-        cls.inheritanceArray = this.inheritanceArray;
-        cls.subClassOf = this.subClassOf;
-        cls.subClasses = this.subClasses;
+        // cls.properties = this.properties;
+        // cls.isBlank = this.isBlank;
+        // cls.iName = this.iName;
+        // cls.label = this.label;
+        // cls.inheritanceArray = this.inheritanceArray;
+        // cls.subClassOf = this.subClassOf;
+        // cls.subClasses = this.subClasses;
 
         return cls;
     },
