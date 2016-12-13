@@ -237,7 +237,7 @@ CAPTENClass.prototype = {
     {
         var cls = new CAPTENClass(this.uri);
 
-        cls.id = this.id;
+        //cls.id = this.id;
         cls.properties = this.properties;
         cls.isBlank = this.isBlank;
         cls.iName = this.iName;
