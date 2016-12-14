@@ -25,7 +25,7 @@
                     type: Object,
                     value: function()
                     {
-                        return {};
+                        return new RGTE();
                     },
                     notify: true,
                 },
@@ -103,6 +103,19 @@
                 }.bind(this));
 
                 rgteView.redraw();
+            },
+
+            replaceRGTE: function(rgte)
+            {
+              if(rgte == null)
+                return;
+
+              var oldRGTE = this.rgte;
+
+              this.rgte = rgte;
+              this.rgte.registerObserverCallbackOnChange(this, this._callbackOnRGTEChanged);
+
+              return oldRGTE;
             },
 
             _drawCardinalityFrom: function(ctx, selected, hover, arrowData, fromCard)

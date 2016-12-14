@@ -82,7 +82,7 @@ Property.prototype = {
   {
     // var cls = new Property();
     var cls = PROPERTIES_POOL.create(this.uri);
-    cls.id = this.id;
+    // cls.id = this.id;
 
     cls.iName = this.iName;
     cls.label = this.label;

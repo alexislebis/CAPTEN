@@ -2,7 +2,7 @@
 
 
 <dom-module id="step-editor-element">
-  <template>
+    <template>
     <style>
 
     </style>
@@ -10,317 +10,383 @@
       <iron-icon icon="lightbulb-outline"></iron-icon> Clicking on a node in the RGTE and the operator input will bind them.
     </template>
     <div>
-      <div id="bindRgteToNop">
-        <iron-icon icon="trending-flat" on-tap="_toggleRGTENOPBinding"></iron-icon> Link concepts with the operation
-      </div>
-      <div id="bindRgteToParam">
-        <iron-icon icon="trending-flat" on-tap="_toggleRGTEParamsBinding"></iron-icon> Link concepts with parameters
-      </div>
+        <div id="bindRgteToNop">
+            <iron-icon icon="trending-flat" on-tap="_toggleRGTENOPBinding"></iron-icon> Link concepts with the operation
+        </div>
+        <div id="bindRgteToParam">
+            <iron-icon icon="trending-flat" on-tap="_toggleRGTEParamsBinding"></iron-icon> Link concepts with parameters
+        </div>
     </div>
     <h4>RGTE</h4>
     <div id="rgteDisplayer">
-    <template is="dom-if" if="{{displayRGTE}}">
+        <template is="dom-if" if="{{displayRGTE}}">
       <rgte-displayer-element id="rgte" rgte="{{step.inputs}}"></rgte-displayer-element>
     </template>
-  </div>
+    </div>
     <h4>Operator</h4>
-      <div id="opInputDisplayer">
-      <template is="dom-if" if="{{displayOperatorInputs}}">
+    <div id="opInputDisplayer">
+        <template is="dom-if" if="{{displayOperatorInputs}}">
       <rgte-displayer-element id="opInput" rgte="{{step.operator.behaviors.input}}"></rgte-displayer-element>
       </template>
     </div>
     <h4>Output</h4>
-
-  </template>
-  <script>
-    Polymer(
-      {
-        is: 'step-editor-element',
-
-        properties:
+    <div id="opOutputDisplayer">
+        <!-- <template is="dom-if" if="{{displayOperatorOutputs}}"> -->
+      <rgte-displayer-element id="opOutput" rgte="{{step.outputs}}"></rgte-displayer-element>
+      <!-- </template> -->
+    </div>
+    </template>
+    <script>
+        Polymer(
         {
-          step:
-          {
-            type: Object,
-            value: function(){return new Step();},
-            notify: true,
-          },
-          propAsyncBuild:
-          {
-            type: Object,
-            value: function(){return new PropertyAsyncrhonousBuilder();},
-            notify: true,
-          },
-          usedConceptsInput://Associative array. Key is rgte input uri of the operator, value a property between different concept
-          {
-            type: Array,
-            value: function(){return [];},
-            notify: true,
-          },
-          usedConceptsParams:
-          {
-            type: Array,
-            value: function(){return [];},
-            notify: true,
-          },
-          displayOperatorInputs:
-          {
-            type: Boolean,
-            value: false,
-            notify: true,
-            observer: "_onDisplayersChanged",
-          },
-          displayRGTE:
-          {
-            type: Boolean,
-            value: false,
-            notify: true,
-            observer: "_onDisplayersChanged",
-          },
-          isBindingRGTENOP:
-          {
-            type: Boolean,
-            value: false,
-            notify: true,
-          },
-          isBindingRGTEParams:
-          {
-            type: Boolean,
-            value: false,
-            notify: true,
-          },
+            is: 'step-editor-element',
 
-        },
-
-// === NATIVE
-        attached: function()
-        {
-          this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackUsedConceptsInputComplete);
-
-          //For redrawing the displayer when operator input is displayed for the first time
-          this._observer=Polymer.dom(this.$.opInputDisplayer).observeNodes(function(info)
-          {
-            if(this.displayOperatorInputs){
-              info.addedNodes[1].draw();
-              info.addedNodes[1].addEventListener('NODE_CLICKED', function(p)
-              {
-                this._behaviorSelectorWhenGraphsClicked(p.detail);
-              }.bind(this));
-            }
-          }.bind(this));
-
-          this._observer=Polymer.dom(this.$.rgteDisplayer).observeNodes(function(info)
-          {
-            if(this.displayRGTE)
-            {  info.addedNodes[1].draw();
-              info.addedNodes[1].addEventListener('NODE_CLICKED', function(p)
-              {
-                this._behaviorSelectorWhenGraphsClicked(p.detail);
-              }.bind(this));
-            }
-          }.bind(this));
-        },
-// ===
-
-        changeOperator: function(op)
-        {
-          if(op == null)
-            return;
-
-          this.step.operator = op;
-          this._computeDisplayingOperatorInputs();
-
-          if(this.step.operator.behaviors != null){
-          this.propAsyncBuild.setSecondObject(this.step.operator.behaviors['input']);
-          this._updateUsedConcepts();}
-        },
-
-        changeRGTE: function(rgte)
-        {
-          if(rgte == null)
-            return;
-
-          this.step.inputs = rgte;
-          this._computeDisplayingRGTE();
-
-          this.propAsyncBuild.setFirstObject(this.step.inputs);
-        },
-
-    // === DISPLAY
-        _computeDisplayingOperatorInputs: function()
-        {
-          if(this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
-            this.displayOperatorInputs = false;
-          else
-            this.displayOperatorInputs = true;
-        } ,
-
-        _computeDisplayingRGTE: function()
-        {
-          if(this.step.inputs == null)
-            this.displayRGTE = false;
-          else
-            this.displayRGTE = true;
-        },
-
-    // === EVENTS
-      _onDisplayersChanged: function()
-      {
-        if(this.displayOperatorInputs && this.displayRGTE)
-          this._automaticallyCompute();
-      },
-
-      _toggleRGTENOPBinding: function()
-      {
-        this.isBindingRGTENOP = !this.isBindingRGTENOP;
-      },
-      _toggleRGTEParamsBinding: function()
-      {
-        this.isBindingRGTEParams = !this.isBindingRGTEParams;
-      },
-
-      _callbackUsedConceptsInputComplete: function()
-      {
-        this._computeOutput();
-      },
-
-    // === PRIVATE METHODS
-      // === BEHAVIORS METHODS
-        _behaviorSelectorWhenGraphsClicked: function(params)
-        {
-          if(this.isBindingRGTENOP && this.isBindingRGTEParams)
-            { console.log('Curently, binding simultaneously rgte with param & nop is not supported. Disable one of them to procced.');}
-          if(this.isBindingRGTENOP)
-            this._bindingRGTENOP(params);
-          else if(this.isBindingRGTEParams)
-            this._bindingRGTEParams(params);
-          else
-            this._defaultBehavior(params);
-        },
-        _bindingRGTENOP: function(params)
-        {
-          if(this.isArrayFullyCompleted(this.usedConceptsInput))
-          {
-            console.log("===WARNING===");
-            console.log("Currently, recomputing is not allowed. Thus, you could not change any bound between concepts once the configuration is over. Create a new step instead.");
-            console.log("=============");
-            return ;
-          }
-
-          var obj = this.step.inputs.getNodeById(params.id);
-          if(obj == null)
-            obj = this.step.operator.behaviors['input'].getNodeById(params.id);
-
-          this.propAsyncBuild.bind(obj, USED_AS, 'usedAs');
-
-          return;
-        },
-
-        _bindingRGTEParams: function(params)
-        {
-
-        },
-
-        _defaultBehavior: function(params)
-        {
-
-        },
-
-        _computeOutput: function()
-        {
-          // console.log("COMPLETE");
-          this.step.outputs = this.step.inputs.copy();
-          console.log(this.step.inputs);
-          console.log(this.step.outputs);
-          console.log(this.step.outputs.copy());
-        },
-        //===
-
-        // First element From (always the RGTE Input)
-        // Second element To (always the Opertor Input pattern)
-        _updateCurrentProperty: function(fromRGTE, toNOP)
-        {
-          if(fromRGTE != null)
-            this.fromRGTE = fromRGTE;
-
-          if(toNOP != null)
-            this.toNOP = toNOP;
-
-          if(this.fromRGTE != null && this.toNOP != null)
-          {
-            var tmp = PROPERTIES_POOL.create(USED_AS, 'used as', this.fromRGTE, this.toNOP);
-            this._resetCurrentProperty();
-            return tmp;
-          }
-
-          return null;
-        },
-
-        _resetCurrentProperty: function()
-        {
-          this.fromRGTE = null; this.toNOP = null;
-        },
-
-        /* _updateUsedConcepts reset the usedConceptsInput and usedConceptsParams
-            arrays with the number of excepted concept
-            (number of rgte classes) of the operator input and parameters*/
-        _updateUsedConcepts: function()
-        {
-          if(this.step.operator == null || this.step.operator.behaviors == null)
-            return;
-
-          if(this.step.operator.behaviors['input'] != null)
-          {
-            this._updateUsedConceptsKeyed('input');
-            console.log(this.step.operator.behaviors['input'].getNodes().length);
-            this.propAsyncBuild.setArray(this.step.operator.behaviors['input'].getNodes().length);
-          }
-
-          if(this.step.operator.behaviors['params'] != null)
-          {  this._updateUsedConceptsKeyed('params');
-            console.log("TODO propAsyncBuild!!!!");
-          }
-
-          // this.propAsyncBuild.setArray(this.usedConceptsInput);
-
-        },
-          _updateUsedConceptsKeyed: function(key)
-          {
-            var array = [];
-            var nodes =  this.step.operator.behaviors[key].getNodes();
-
-            for(var i in nodes)
+            properties:
             {
-              if(nodes[i].uri != null) //If uri exist, we use it. Otherwise, we use the value of node directly
-                array[nodes[i].id] = null;
-              else
-                array[nodes[i]] = null;
-            }
+                relorder://relationalOrder
+                {
+                  type: Number,
+                  value: -1,
+                  notify: true,
+                },
 
-            this.usedConceptsInput = [];
-            this.usedConceptsInput = array;
-          },
+                step:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return new Step();
+                    },
+                    notify: true,
+                },
+                propAsyncBuild:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return new PropertyAsyncrhonousBuilder();
+                    },
+                    notify: true,
+                },
+                usedConceptsInput: //Associative array. Key is rgte input uri of the operator, value a property between different concept
+                {
+                    type: Array,
+                    value: function()
+                    {
+                        return [];
+                    },
+                    notify: true,
+                },
+                usedConceptsParams:
+                {
+                    type: Array,
+                    value: function()
+                    {
+                        return [];
+                    },
+                    notify: true,
+                },
+                displayOperatorInputs:
+                {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    observer: "_onDisplayersChanged",
+                },
+                displayOperatorOutputs:
+                {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                },
+                displayRGTE:
+                {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                    observer: "_onDisplayersChanged",
+                },
+                isBindingRGTENOP:
+                {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                },
+                isBindingRGTEParams:
+                {
+                    type: Boolean,
+                    value: false,
+                    notify: true,
+                },
 
-    // === PROCESSING
-      _automaticallyCompute: function()
-      {
-        console.log("TODO");
-      },
+            },
 
-    // PUBLIC METHODS
-      isArrayFullyCompleted: function(array)//Check only the 1st level
-      {
-        if(array == null)
-          return false;
+            // === NATIVE
+            attached: function()
+            {
+                this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackUsedConceptsInputComplete);
+                this.propAsyncBuild.registerObserverCallbackOnUncompletion(this, this._callbackUCIUncompletion);
 
-        for(var i in array)
-        {
-          if(array[i] == null)
-            return false;
-        }
+                //For redrawing the displayer when operator input is displayed for the first time
+                this._observer = Polymer.dom(this.$.opInputDisplayer).observeNodes(function(info)
+                {
+                    if (this.displayOperatorInputs)
+                    {
+                        info.addedNodes[1].draw();
+                        info.addedNodes[1].addEventListener('NODE_CLICKED', function(p)
+                        {
+                            this._behaviorSelectorWhenGraphsClicked(p.detail);
+                        }.bind(this));
+                    }
+                }.bind(this));
 
-        return true;
-      },
-    });
-  </script>
+                this._observer = Polymer.dom(this.$.rgteDisplayer).observeNodes(function(info)
+                {
+                    if (this.displayRGTE)
+                    {
+                        info.addedNodes[1].draw();
+                        info.addedNodes[1].addEventListener('NODE_CLICKED', function(p)
+                        {
+                            this._behaviorSelectorWhenGraphsClicked(p.detail);
+                        }.bind(this));
+                    }
+                }.bind(this));
+            },
+            // ===
+
+            changeOperator: function(op)
+            {
+                if (op == null)
+                    return;
+
+                this.step.operator = op;
+                this._computeDisplayingOperatorInputs();
+
+                if (this.step.operator.behaviors != null)
+                {
+                    this.propAsyncBuild.setSecondObject(this.step.operator.behaviors['input']);
+                    this._updateUsedConcepts();
+                }
+            },
+
+            changeRGTE: function(rgte)
+            {
+                if (rgte == null)
+                    return;
+
+                this.step.inputs = rgte;
+                this._computeDisplayingRGTE();
+
+                this.propAsyncBuild.setFirstObject(this.step.inputs);
+            },
+
+            fireOutput: function()
+            {
+              this.fire("-OutputRecomputed", {step: this.step});
+            },
+
+            // === DISPLAY
+            _computeDisplayingOperatorInputs: function()
+            {
+                if (this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
+                    this.displayOperatorInputs = false;
+                else
+                    this.displayOperatorInputs = true;
+            },
+
+            _computeDisplayingRGTE: function()
+            {
+                if (this.step.inputs == null)
+                    this.displayRGTE = false;
+                else
+                    this.displayRGTE = true;
+            },
+
+            // === EVENTS
+            _onDisplayersChanged: function()
+            {
+                if (this.displayOperatorInputs && this.displayRGTE)
+                    this._automaticallyCompute();
+            },
+
+            _toggleRGTENOPBinding: function()
+            {
+                this.isBindingRGTENOP = !this.isBindingRGTENOP;
+            },
+            _toggleRGTEParamsBinding: function()
+            {
+                this.isBindingRGTEParams = !this.isBindingRGTEParams;
+            },
+
+            _callbackUsedConceptsInputComplete: function()
+            {
+                this._computeOutput();
+                this.displayOperatorOutputs = true;
+            },
+
+            _callbackUCIUncompletion: function()
+            {
+              this.displayOperatorOutputs = false;
+            },
+
+            // === PRIVATE METHODS
+            // === BEHAVIORS METHODS
+            _behaviorSelectorWhenGraphsClicked: function(params)
+            {
+                if (this.isBindingRGTENOP && this.isBindingRGTEParams)
+                {
+                    console.log('Curently, binding simultaneously rgte with param & nop is not supported. Disable one of them to procced.');
+                }
+                if (this.isBindingRGTENOP)
+                    this._bindingRGTENOP(params);
+                else if (this.isBindingRGTEParams)
+                    this._bindingRGTEParams(params);
+                else
+                    this._defaultBehavior(params);
+            },
+            _bindingRGTENOP: function(params)
+            {
+                if (this.isArrayFullyCompleted(this.usedConceptsInput))
+                {
+                    console.log("===WARNING===");
+                    console.log("Currently, recomputing is not allowed. Thus, you could not change any bound between concepts once the configuration is over. Create a new step instead.");
+                    console.log("=============");
+                    return;
+                }
+
+                var obj = this.step.inputs.getNodeById(params.id);
+                if (obj == null)
+                    obj = this.step.operator.behaviors['input'].getNodeById(params.id);
+
+                this.propAsyncBuild.bind(obj, USED_AS, 'usedAs');
+
+                return;
+            },
+
+            _bindingRGTEParams: function(params) {
+
+            },
+
+            _defaultBehavior: function(params) {
+
+            },
+
+            _computeOutput: function()
+            {
+                // console.log("COMPLETE");
+                var outObs = this.step.outputs.observers;
+                //TODO locate correct pattern regarding context of step
+                console.log("MATCH REGARDING CONTEXT");
+
+
+                this.step.outputs = this.step.inputs.merge(this.step.operator.behaviors.output);
+                this.step.outputs.resetObservers();
+
+                for(var i in this.propAsyncBuild.arrayToFill)
+                {
+                  var fromID = this.step.outputs._getIdEquivalenceById("OLD_ID", this.propAsyncBuild.arrayToFill[i].from.id)[1];
+
+                  for(var j in this.step.operator.behaviors.output.nodes)
+                  {
+                    var toID = this.step.outputs._getIdEquivalenceById("OLD_ID",this.step.operator.behaviors.output.nodes[j].id)[1];
+                    this.step.outputs.addVisProperty(new Property(GENERATES_URI, 'generates', fromID, toID), 'to');
+                  }
+                }
+
+                this.$.opOutput.replaceRGTE(this.step.outputs);
+                this.$.opOutput.draw();
+
+                this.fireOutput();
+            },
+            //===
+
+            // First element From (always the RGTE Input)
+            // Second element To (always the Opertor Input pattern)
+            _updateCurrentProperty: function(fromRGTE, toNOP)
+            {
+                if (fromRGTE != null)
+                    this.fromRGTE = fromRGTE;
+
+                if (toNOP != null)
+                    this.toNOP = toNOP;
+
+                if (this.fromRGTE != null && this.toNOP != null)
+                {
+                    var tmp = PROPERTIES_POOL.create(USED_AS, 'used as', this.fromRGTE, this.toNOP);
+                    this._resetCurrentProperty();
+                    return tmp;
+                }
+
+                return null;
+            },
+
+            _resetCurrentProperty: function()
+            {
+                this.fromRGTE = null;
+                this.toNOP = null;
+            },
+
+            /* _updateUsedConcepts reset the usedConceptsInput and usedConceptsParams
+                arrays with the number of excepted concept
+                (number of rgte classes) of the operator input and parameters*/
+            _updateUsedConcepts: function()
+            {
+                if (this.step.operator == null || this.step.operator.behaviors == null)
+                    return;
+
+                if (this.step.operator.behaviors['input'] != null)
+                {
+                    this._updateUsedConceptsKeyed('input');
+                    console.log(this.step.operator.behaviors['input'].getNodes().length);
+                    this.propAsyncBuild.setArray(this.step.operator.behaviors['input'].getNodes().length);
+                }
+
+                if (this.step.operator.behaviors['params'] != null)
+                {
+                    this._updateUsedConceptsKeyed('params');
+                    console.log("TODO propAsyncBuild!!!!");
+                }
+
+                // this.propAsyncBuild.setArray(this.usedConceptsInput);
+
+            },
+            _updateUsedConceptsKeyed: function(key)
+            {
+                var array = [];
+                var nodes = this.step.operator.behaviors[key].getNodes();
+
+                for (var i in nodes)
+                {
+                    if (nodes[i].uri != null) //If uri exist, we use it. Otherwise, we use the value of node directly
+                        array[nodes[i].id] = null;
+                    else
+                        array[nodes[i]] = null;
+                }
+
+                this.usedConceptsInput = [];
+                this.usedConceptsInput = array;
+            },
+
+            // === PROCESSING
+            _automaticallyCompute: function()
+            {
+                console.log("TODO");
+            },
+
+            // PUBLIC METHODS
+            isArrayFullyCompleted: function(array) //Check only the 1st level
+                {
+                    if (array == null)
+                        return false;
+
+                    for (var i in array)
+                    {
+                        if (array[i] == null)
+                            return false;
+                    }
+
+                    return true;
+                },
+        });
+    </script>
 </dom-module>

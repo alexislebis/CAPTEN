@@ -53,6 +53,8 @@ RGTE.prototype = {
     // this.nodes.push({"id": RGTE.nodeID++, "label": nodeLabel, "shape": "dot", "size":30});
     this.nodes.push(cls);
     this.notifyChange();
+
+    return cls.id;
   },
 
   // addVisProperty: function(fromID, toID, edgeLabel, arrows)
@@ -81,6 +83,8 @@ RGTE.prototype = {
     // this.edges.push({"id": RGTE.edgeID++, "from":fromID, "to":toID, "label":edgeLabel, "arrows": "to"});
     this.edges.push(prop);
     this.notifyChange();
+
+    return prop.id;
   },
 
   addEdgesCardinality: function(eid, fromCardinality, toCardinality)
@@ -134,6 +138,9 @@ RGTE.prototype = {
       tmpProp.from = newRGTE._getIdEquivalenceById("OLD_ID", this.edges[i].from)[1];
       tmpProp.to = newRGTE._getIdEquivalenceById("OLD_ID", this.edges[i].to)[1];
 
+      if(this.edges[i].arrows != null)
+        tmpProp.arrows = this.edges[i].arrows;
+
       newRGTE.edges.push(tmpProp);
     }
 
@@ -141,6 +148,36 @@ RGTE.prototype = {
       newRGTE.addEdgesCardinality(this.edgesCardinality[i].id, newRGTE._getIdEquivalenceById("OLD_ID", this.edgesCardinality[i].fromCardinality)[1], newRGTE._getIdEquivalenceById("OLD_ID", this.edgesCardinality[i].toCardinality)[1]);
 
     return newRGTE;
+  },
+
+  merge: function(rgte)
+  {
+    if( rgte == null)
+      return null;
+
+    var nr1 = this.copy();
+    var nr2 = rgte.copy();
+
+    console.log(nr1);
+    console.log(nr2);
+
+    for(var i in nr2.nodes)
+    {
+      console.log(nr2.nodes[i]);
+      nr1.nodes.push(nr2.nodes[i]);
+      console.log(nr1.nodes)
+    }
+
+    for(var i in nr2.edges)
+      nr1.edges.push(nr2.edges[i]);
+
+    for(var i in nr2.edgesCardinality)
+      nr1.edgesCardinality.push(nr2.edgesCardinality[i]);
+
+    for(var i in nr2.idEquivalence)
+      nr1.idEquivalence.push(nr2.idEquivalence[i]);
+
+    return nr1;
   },
 
   /**
@@ -234,6 +271,11 @@ RGTE.prototype = {
           }
       });
     },
+
+  resetObservers: function()
+  {
+    this.observers = [];
+  },
 
 // ===
 

@@ -92,6 +92,7 @@
         "_onRGTESChanged(rgtes.splices)",
       ],
 
+    // === NATIVE
       ready: function()
       {
 
@@ -106,6 +107,11 @@
           {
             this.$$("#"+div).draw();
           }
+        }.bind(this));
+
+        this.$.stepEditor.addEventListener("-OutputRecomputed", function(e)
+        {
+          this.push('rgtes', e.detail.step.outputs);
         }.bind(this));
       },
 
