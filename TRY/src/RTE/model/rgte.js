@@ -6,7 +6,7 @@
 
 function RGTE(){
 
-  this.id = RGTE.rgteID++;
+  this.id = CAPTEN.ID++;
 
   this.observers = [];
   this.nodes = [];//Need to be CAPTENCLass
@@ -36,8 +36,8 @@ RGTE.prototype = {
 
     var cls = nodeLabel.copy();
 
-    cls.idVoc = cls.id;
-    cls.id = RGTE.nodeID++;
+    cls.idVoc = nodeLabel;
+    cls.id = CAPTEN.ID++;
 
     for(var i in this.nodes)
       if(this.nodes[i].id === cls.id)
@@ -53,6 +53,8 @@ RGTE.prototype = {
     // this.nodes.push({"id": RGTE.nodeID++, "label": nodeLabel, "shape": "dot", "size":30});
     this.nodes.push(cls);
     this.notifyChange();
+
+    return cls.id;
   },
 
   // addVisProperty: function(fromID, toID, edgeLabel, arrows)
@@ -73,22 +75,110 @@ RGTE.prototype = {
     var prop = proper.copy();
     // prop.id = RGTE.edgeID++;
     prop.idVoc = proper.id;
-    prop.id = RGTE.edgeID++;
-    console.log(prop.id);
+    prop.id = CAPTEN.ID++;
+    console.log(prop);
     prop.arrows = arrows;
     // prop.arrows = arrows;
     // prop.label = edgeLabel;
     // this.edges.push({"id": RGTE.edgeID++, "from":fromID, "to":toID, "label":edgeLabel, "arrows": "to"});
     this.edges.push(prop);
     this.notifyChange();
+
+    return prop.id;
   },
 
   addEdgesCardinality: function(eid, fromCardinality, toCardinality)
   {
-    this.edgesCardinality.push({"id": RGTE.cardiID++, "edgeId": eid, "fromCardinality":fromCardinality, "toCardinality": toCardinality});
+    this.edgesCardinality.push({"id": CAPTEN.ID++, "edgeId": eid, "fromCardinality":fromCardinality, "toCardinality": toCardinality});
     this.notifyChange();
   },
 // ===
+
+  /**
+   * Copy return this copied, with ancestor updated and a new attribute idEquivalence storing the oldId ref of any element of this to the newID of any alement of the new rgte
+   */
+  copy: function()
+  {
+    var newRGTE = new RGTE();
+    // var tmpCls;
+    // var classID = [];
+
+    if(newRGTE.ancestor == null)
+      newRGTE.ancestor = [];
+    newRGTE.ancestor.push(this);
+
+    newRGTE.idEquivalence = [];// key:[oldID;newID]
+
+    newRGTE.observers = this.observers;
+
+    console.log(this.nodes);
+    for(var i in this.nodes)
+    {
+      var tmpCls = this.nodes[i].copy();
+      var classID = [];
+
+      classID.push(this.nodes[i].id);
+      classID.push(tmpCls.id);
+
+      newRGTE.idEquivalence.push(classID);
+
+      newRGTE.nodes.push(tmpCls);
+    }
+
+    for(var i in this.edges)
+    {
+      var tmpProp = this.edges[i].copy();
+      var propID = [];
+
+      propID.push(this.edges[i].id),
+      propID.push(tmpProp.id);
+
+      newRGTE.idEquivalence.push(propID);
+
+      tmpProp.from = newRGTE._getIdEquivalenceById("OLD_ID", this.edges[i].from)[1];
+      tmpProp.to = newRGTE._getIdEquivalenceById("OLD_ID", this.edges[i].to)[1];
+
+      if(this.edges[i].arrows != null)
+        tmpProp.arrows = this.edges[i].arrows;
+
+      newRGTE.edges.push(tmpProp);
+    }
+
+    for(var i in this.edgesCardinality)
+      newRGTE.addEdgesCardinality(this.edgesCardinality[i].id, newRGTE._getIdEquivalenceById("OLD_ID", this.edgesCardinality[i].fromCardinality)[1], newRGTE._getIdEquivalenceById("OLD_ID", this.edgesCardinality[i].toCardinality)[1]);
+
+    return newRGTE;
+  },
+
+  merge: function(rgte)
+  {
+    if( rgte == null)
+      return null;
+
+    var nr1 = this.copy();
+    var nr2 = rgte.copy();
+
+    console.log(nr1);
+    console.log(nr2);
+
+    for(var i in nr2.nodes)
+    {
+      console.log(nr2.nodes[i]);
+      nr1.nodes.push(nr2.nodes[i]);
+      console.log(nr1.nodes)
+    }
+
+    for(var i in nr2.edges)
+      nr1.edges.push(nr2.edges[i]);
+
+    for(var i in nr2.edgesCardinality)
+      nr1.edgesCardinality.push(nr2.edgesCardinality[i]);
+
+    for(var i in nr2.idEquivalence)
+      nr1.idEquivalence.push(nr2.idEquivalence[i]);
+
+    return nr1;
+  },
 
   /**
    * Compute the dispersion of the RGTE regarding the vocabulary.
@@ -142,6 +232,7 @@ RGTE.prototype = {
       seri[RGTE.CARDI][i] = this.edgesCardinality[i];
     }
 
+    console.log(seri);
     return seri;
   },
 
@@ -181,13 +272,19 @@ RGTE.prototype = {
       });
     },
 
+  resetObservers: function()
+  {
+    this.observers = [];
+  },
+
 // ===
 
 // === PARSING
   parseJSON: function(json, vocab)
   {
-    console.log(json.nodes[0].subClassOf[0].uri);
-    console.log(json['nodes'][0]['subClassOf'][0].uri);
+    // throw new Error("Identification to the rdf voc is not correctly done. Must use the structure of the json and match uri")
+    // console.log(json.nodes[0].subClassOf[0].uri);
+    // console.log(json['nodes'][0]['subClassOf'][0].uri);
 
     if(json['type'] == null || json['type'] != 'RGTE')
       return; //not a rgte json
@@ -206,7 +303,7 @@ RGTE.prototype = {
       var node = new CAPTENClass();
 
       node.parseJSONObject(json[RGTE.NODES][i], vocab);
-
+      this._updateNodeVoc(node, vocab);
       // vocab.addClass(node);
 
       this[RGTE.NODES].push(node);
@@ -219,7 +316,7 @@ RGTE.prototype = {
     // === EDGES
     for(var i in json[RGTE.EDGES])
     {
-      var edge = new Property();
+      var edge = PROPERTIES_POOL.create();
       edge.parseJSONObject(json[RGTE.EDGES][i]);
 
       // vocab.addProperty(edge);
@@ -239,7 +336,26 @@ RGTE.prototype = {
 
       console.log(this.vocabularyDispersion(vocab));
       console.log(vocab);
+      console.log(this);
       // clsTEST.parseJSONObject(jsonO);
+  },
+
+  _updateNodeVoc: function(captenClass, vocab)
+  {
+    if(captenClass.idVoc.uri == null)
+      return;
+
+    var voc = vocab.getClassFromURI(captenClass.idVoc.uri);
+
+    if(voc == null)
+    {
+      var newCaptenCls = new CAPTENClass(captenClass.idVoc.uri);
+      vocab.addClass(newCaptenCls);
+
+      voc = newCaptenCls;
+    }
+
+    captenClass.idVoc = voc;
   },
 // ===
 
@@ -334,6 +450,31 @@ _convertEdge: function(edge)
   return e;
 },
 
+_getIdEquivalenceById: function(location, ID)
+{
+  if(this.idEquivalence == null)
+    return;
+
+  var index = 1;
+
+  if(location = "OLD_ID");
+    index = 0;
+
+  for(var i in this.idEquivalence)
+    if(this.idEquivalence[i][index] == ID)
+      return this.idEquivalence[i];
+
+  return null;
+},
+_isIdEquivalenceExists: function(location,ID)
+{
+  if(this._getIdEquivalenceById(location, ID) == null)
+    return false;
+
+  return true;
+
+},
+
   _calculatingCardinalitiesAvailable: function() {
 
       var cardinalitiesAvailable = [];
@@ -382,7 +523,7 @@ _convertEdge: function(edge)
 
   getNodeById: function(id)
   {
-    for(var i = 0; i < this.nodes.length; i++)
+    for(var i in this.nodes)
     {
       if(id === this.nodes[i].id)
         return this.nodes[i];
@@ -393,7 +534,7 @@ _convertEdge: function(edge)
 
   getEdgeById: function(id)
   {
-    for(var i = 0; i < this.edges.length; i++)
+    for(var i in this.edges)
     {
       if(id === this.edges[i].id)
         return this.edges[i];
@@ -404,7 +545,7 @@ _convertEdge: function(edge)
 
   getCardinalityById: function(id)
   {
-    for(var i = 0; i < this.edgesCardinality.length; i++)
+    for(var i in this.edgesCardinality)
     {
       if(id === this.edgesCardinality[i].id)
         return this.edgesCardinality[i];
@@ -442,14 +583,20 @@ _convertEdge: function(edge)
         var idPath = '';
 
         if(obj.idVoc == null)//Verifying if the obj is just a vocabulary OR used inside another RGTE
-          idPath = 'idVoc'; //Configuring the path to the id of the vocabulary directly since the obj is only a vocab class, never used inside a rgte
-        else
-          idPath = 'id';
-
-        for(var i in this.nodes)
         {
-          if(this.nodes[i][idPath] == obj.id)
-            return this.nodes[i];
+          for(var i in this.nodes)
+          {
+              if(this.nodes[i].idVoc.retrieveUniqueIdentifier() == obj.id)
+                return this.nodes[i];
+          }
+        }
+        else
+        {
+          for(var i in this.nodes)
+          {
+              if(this.nodes[i].retrieveUniqueIdentifier() == obj.id)
+                return this.nodes[i];
+          }
         }
 
         return;

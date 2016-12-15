@@ -75,16 +75,6 @@
                     notify: true,
                     // observer: '_oniWPBChanged',
                 },
-                nodeDomain:
-                {
-                    type: Object,
-                    value: null,
-                },
-                nodeRange:
-                {
-                    type: Object,
-                    value: null,
-                },
                 propertyToBind:
                 {
                     type: Object,
@@ -106,11 +96,14 @@
                   value: -1,
                   notify: true,
                 },
-            },
 
-            // observers: [
-            //     "_onNodesChange(nodes.splice)",
-            // ],
+                propAsyncBuild:
+                {
+                  type: Object,
+                  value: function(){return new PropertyAsyncrhonousBuilder();},
+                  notify: true,
+                }
+            },
 
             attached: function()
             {
@@ -123,6 +116,11 @@
               {
                 this._behaviorSelector(p.detail, EDGE);
               }.bind(this));
+
+              this.propAsyncBuild.setFirstObject(this.rgte);
+              this.propAsyncBuild.setSecondObject(this.rgte);
+              this.propAsyncBuild.setArray(1);
+              this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackPropertyBindingComplete)
             },
 
 
@@ -150,23 +148,6 @@
                 this.$.propertyModal.open();
             },
 
-            // _onNodesChange: function(change)
-            // {
-            //     if (Object.keys(this.nodes).length === 0 && this.nodes.constructor === Object)
-            //         return;
-            //
-            //     if (!change)
-            //         return;
-            //
-            // },
-
-            // _oniWPBChanged: function(valueToCheck)
-            // {
-            //   console.log(valueToCheck);
-            //   return !valueToCheck;
-            //     /*Notifing that the current state is to select nodes */
-            // },
-
             _isAddPropertyConfirmed: function(e) //Modifying RGTE behavior
                 {
                     if (e.detail.confirmed)
@@ -177,9 +158,26 @@
                     { //Otherwise the user don't want to bind prop, thus it has to be reset
                         this.propertyToBind = null;
                         this.isWaitingPropertyBinding = null;
-                        this.nodeDomain = null;
-                        this.nodeRange = null;
+                        // this.nodeDomain = null;
+                        // this.nodeRange = null;
                     }
+                },
+
+                _callbackPropertyBindingComplete: function()
+                {
+                  var prop;
+                  var arr = this.propAsyncBuild.getArrayFilled();
+
+                  for(var i in arr)
+                    prop = arr[i];
+
+                  prop.from = prop.from.retrieveUniqueIdentifier();//Assured that from has retrieveUniqueIdentifier since it comes from the asyncBuilder
+                  prop.to = prop.to.retrieveUniqueIdentifier();
+                  this.rgte.addVisProperty(prop, "to");
+
+                  this.propAsyncBuild.reset();
+
+                  this.isWaitingPropertyBinding = false;
                 },
 
             //Define the behavior of the RGTE on click
@@ -202,36 +200,7 @@
             {
                 if (type === NODE) //il y a au moins un noeud de sélectionné
                 {
-                    if (this.nodeDomain === null) //Si l'user n'a pas encore sélectionner le nodeDomain
-                    {
-                        this.nodeDomain = params.id;
-                        console.log("DOMAIN IS :" + this.nodeDomain);
-                    }
-                    else if (this.nodeRange === null) //Sinon, c'est le deuxième choix, on lie les deux noeuds
-                    {
-                        this.nodeRange = params.id;
-                        console.log("RANGE is :" + this.nodeRange);
-                        //this.$.rgte.createEdgeBetween(this.nodeDomain, this.nodeRange, this.propertyToBind);
-                        // var prop = this.rgte.createVisProperty(this.nodeDomain, this.nodeRange, this.propertyToBind);
-                        this.propertyToBind.from = this.nodeDomain;
-                        this.propertyToBind.to = this.nodeRange;
-                        // console.log(prop);
-                        this.rgte.addVisProperty(this.propertyToBind, "to");
-
-                        this.nodeDomain = null;
-                        this.nodeRange = null;
-                        this.isWaitingPropertyBinding = false;
-                        this.propertyToBind = null;
-                        // this.network.on("click", function (params){}.bind(this));
-                    }
-                    else
-                    { //On s'assure de retirer l'état si jamais on n'est pas dans une bonne situation
-                        this.nodeDomain = null;
-                        this.nodeRange = null;
-                        this.isWaitingPropertyBinding = false;
-                        this.propertyToBind = null;
-                        // this.network.on("click", function (params){}.bind(this));
-                    }
+                    this.propAsyncBuild.bind(this.rgte.getNodeById(params.id), this.propertyToBind.uri, this.propertyToBind.label);
                 }
             },
 

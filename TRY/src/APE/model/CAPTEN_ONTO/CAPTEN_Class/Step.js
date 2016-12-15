@@ -7,8 +7,8 @@ function Step() {
     this.settings = null; //At the difference to Indp.Op.specificSettings, it concerns all the settings needed for the step. not for the IndOp running.
     //The union of Indep.Op.specificSettings with this.settings constitute the whole --isConfiguredBy-->Setting of the ontology
     this.operator = null;
-    this.inputs = null; //[RGTE]. It is actually see as a Union of the different inputs
-    this.outputs = null;
+    this.inputs = new RGTE(); //[RGTE]. It is actually see as a Union of the different inputs
+    this.outputs = new RGTE();
     this.relationOrder = null; //Integer. Representing the place of this in the IAP.
 
     this.context = null; //TODO define CONTEXT notion

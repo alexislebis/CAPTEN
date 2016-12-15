@@ -209,7 +209,7 @@ CONTROLLED_VOCABULARY.prototype = {
                         // if (!this.properties.includes(r.prop.value))
                         //     this.properties.push(r.prop.value);
                         if (this.properties[r.prop.value] == null)
-                            this.properties[r.prop.value] = new Property(r.prop.value, r.prop.value); //{"uri":r.prop.value};
+                            this.properties[r.prop.value] = PROPERTIES_POOL.create(r.prop.value, r.prop.value); //{"uri":r.prop.value};
                         if (this.classes[r.o.value] != null)
                             if (this.properties[r.prop.value].from == null)
                                 this.properties[r.prop.value].from = [];
@@ -235,7 +235,7 @@ CONTROLLED_VOCABULARY.prototype = {
                             // if(!this.properties.includes(r.s.value))
                             //   this.properties.push( r.s.value);
                             if (this.properties[r.s.value] == null)
-                                this.properties[r.s.value] = new Property(r.s.value, r.s.value); //{"uri":r.s.value};
+                                this.properties[r.s.value] = PROPERTIES_POOL.create(r.s.value, r.s.value); //{"uri":r.s.value};
                             if (this.classes[r.o.value] != null)
                                 if (this.properties[r.s.value].to == null)
                                     this.properties[r.s.value].to = [];

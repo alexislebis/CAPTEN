@@ -6,10 +6,13 @@
 
 function CAPTENClass(uri, label, properties)
 {
-    this.id = CAPTENClass.id++;
+    this.id = CAPTEN.ID++;
 
     this.uri = uri;
     this.properties = this.properties; //[Property]
+    if(this.properties == null)
+      this.properties = [];
+
     this.isBlank = false;
 
     //Dynamic inheritance system. CF Property for more details
@@ -234,14 +237,17 @@ CAPTENClass.prototype = {
     {
         var cls = new CAPTENClass(this.uri);
 
-        cls.id = this.id;
-        cls.properties = this.properties;
-        cls.isBlank = this.isBlank;
-        cls.iName = this.iName;
-        cls.label = this.label;
-        cls.inheritanceArray = this.inheritanceArray;
-        cls.subClassOf = this.subClassOf;
-        cls.subClasses = this.subClasses;
+        for(var i in this)
+          if(i != 'id')
+            cls[i] = this[i];
+        //cls.id = this.id;
+        // cls.properties = this.properties;
+        // cls.isBlank = this.isBlank;
+        // cls.iName = this.iName;
+        // cls.label = this.label;
+        // cls.inheritanceArray = this.inheritanceArray;
+        // cls.subClassOf = this.subClassOf;
+        // cls.subClasses = this.subClasses;
 
         return cls;
     },
@@ -253,7 +259,9 @@ CAPTENClass.prototype = {
 
         for (var i in this)
         {
-            if (i !== "subClassOf" && i != "subClasses" && i != "properties")
+            if(i === 'idVoc')
+              ser[i] = this.idVoc.serializeToJSON();
+            else if (i !== "subClassOf" && i != "subClasses" && i != "properties")
                 ser[i] = this[i];
         }
 

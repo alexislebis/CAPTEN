@@ -5,7 +5,7 @@
  * The additionalConstraint parameter allows to express more complex logic in future realese, such as, Student _commingFrom_ MOOC iff max 1 MOOC.
  */
 function Property(uri, label, From, to, additionalConstraints){
-    this.id = Property.id++;
+    this.id = CAPTEN.ID++;
 
     this.iName = "Property";//Memorize the root level for inheritance
 
@@ -80,8 +80,9 @@ Property.prototype = {
 
   copy: function()
   {
-    var cls = new Property();
-    cls.id = this.id;
+    // var cls = new Property();
+    var cls = PROPERTIES_POOL.create(this.uri);
+    // cls.id = this.id;
 
     cls.iName = this.iName;
     cls.label = this.label;
@@ -98,6 +99,16 @@ Property.prototype = {
     cls.description = this.inheritanceArray;
 
     return cls;
+  },
+
+  /**
+   * Inverse the property from and to. The targeted object becomes the root.
+   */
+  inverse: function()
+  {
+    var tmp = this.from;
+    this.from = this.to;
+    this.to = tmp;
   },
 
   includedIn: function(arrayProp)
@@ -213,5 +224,13 @@ Property.prototype = {
     for(var i in json)
       this[i] = json[i];
   },
+  // ===
+
+  // === OVERRIDED METHODS
+    retrieveUniqueIdentifier: function()
+    {
+      return this.id;
+    },
+  // ===
 
 };

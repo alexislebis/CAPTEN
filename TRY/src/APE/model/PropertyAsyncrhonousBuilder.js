@@ -3,15 +3,18 @@
  * Use a PAB when user has to create several bind between differents objects. Note that the ID key of the array MUST BE a unique reference of the TO object in the properety relation <From-To> (likely its ID)
  */
 
+//TODO add constraints. The array is validated iff all the contraints (i.e. all the to.uniqueIdentifier supplied) are satisfied
+
 function PropertyAsyncrhonousBuilder(A, B, length)
 {
-  this.id = PropertyAsyncrhonousBuilder.id;
+  this.id = CAPTEN.ID++;
   PropertyAsyncrhonousBuilder.id++;
 
   this.A = A; //The first object, mostly the FROM. Please note that if A == B, then A will also be considered as TO
   this.B = B; //The second object
 
   this.observers = [];
+  this.observersUnc = [];
 
   this.lengthArray = length;
 
@@ -42,6 +45,23 @@ PropertyAsyncrhonousBuilder.prototype = {
             }
         });
       },
+
+      registerObserverCallbackOnUncompletion: function(objCallback, callback)
+      {
+        this.observersUnc.push([objCallback,callback]);
+      },
+
+        // === NOTIFICATION
+        notifyUncompletion: function()
+        {
+          this.observersUnc.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0]);//e[0] define the `this` context for e[1]
+              }
+          });
+        },
   // ===
 
   verifyCompatibility: function(smth)
@@ -64,10 +84,6 @@ PropertyAsyncrhonousBuilder.prototype = {
 
   bind: function(evalObj, uriProp, labelProp)
   {
-    console.log("===WARNING===");
-    console.log("Currently, if A and B are identical, then always the 'from' clause will be filled");
-    console.log("=============");
-
     this.verifyCompatibility(this.A);
     this.verifyCompatibility(this.B);
     this.verifyRetrieveUniqueIdentifierExistence(evalObj);
@@ -139,6 +155,12 @@ PropertyAsyncrhonousBuilder.prototype = {
     this.verifyArrayFilling();
   },
 
+  addArrayRow: function()
+  {
+    this.lengthArray++;
+    this.verifyArrayFilling();
+  },
+
   setFirstObject: function(A)
   {
     this._setObjects(A,null);
@@ -147,6 +169,11 @@ PropertyAsyncrhonousBuilder.prototype = {
   setSecondObject: function(B)
   {
     this._setObjects(null, B);
+  },
+
+  getArrayFilled: function()
+  {
+    return this.arrayToFill;
   },
 
   _setObjects: function(A, B)
@@ -162,6 +189,13 @@ PropertyAsyncrhonousBuilder.prototype = {
 
   reset: function()
   {
+    for(var i in this.arrayToFill)
+    {
+      if(this.arrayToFill[i] instanceof Property)
+      {
+        PROPERTIES_POOL.remove(this.arrayToFill[i]);
+      }
+    }
     this.arrayToFill = null;
     this.arrayToFill = [];
   },
@@ -180,22 +214,26 @@ PropertyAsyncrhonousBuilder.prototype = {
   verifyArrayFilling: function()
   {
     if(this.arrayToFill == null || this.arrayToFill.length == 0)
+    {
+      this.notifyUncompletion();
       return false;
+    }
 
-    // for(var i in this.arrayToFill)
-    // {
-    //   if(this.arrayToFill[i] == null)
-    //     return false;
-    // }
+    console.log(this.A);
+    console.log(this.B);
 
     var counter = 0;
     for(var i in this.arrayToFill)
       counter++;
 
     if(counter == this.lengthArray)
+    {
       this.notifyCompletion();
+      return true;
+    }
 
-    return true;
+    this.notifyUncompletion();
+    return false;
   },
 
   _updateCurrentProperty: function(from, to, uri, label)
@@ -208,7 +246,8 @@ PropertyAsyncrhonousBuilder.prototype = {
 
     if(this.fromObject != null && this.toObject != null)
     {
-      var tmp = new Property(uri, label, this.fromObject, this.toObject);
+      // var tmp = new Property(uri, label, this.fromObject, this.toObject);
+      var tmp = PROPERTIES_POOL.create(uri, label, this.fromObject, this.toObject)
       this._resetCurrentProperty();
       return tmp;
     }

@@ -102,7 +102,7 @@
 
                     rgteToRDF: function()
                     {
-
+                        console.log("WARNING: UTF_8 SUPPORTED WHILE SAVING BU NOT SUPPORTED WHILE PARSING");
                         var element = document.createElement('a');
                         element.setAttribute('href', 'data:text/turtle;charset=utf-8,' + encodeURIComponent(this.rgte.serializeAndIntegrateVocabulary(this.vocab, this.uname, this.pname)));
                         element.setAttribute('download', this.fname+".ttl");

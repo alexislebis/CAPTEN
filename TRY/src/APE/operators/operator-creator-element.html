@@ -13,6 +13,10 @@
       :host {
         font-family: sans-serif;
       }
+
+      .propSelected{
+        background-color: red;
+      }
     </style>
 
   <span on-tap="_close">Close <iron-icon icon="clear" prefix></iron-icon></span>
@@ -47,6 +51,17 @@
     </div>
 
     <div id="patterns">
+      <div>
+        <template is="dom-if" if="{{isBindingIO}}">
+          <iron-icon icon="lightbulb-outline"></iron-icon> Clicking on a node in the operator input and output will bind them.
+        </template>
+        <div id="bindIToO">
+          <iron-icon icon="trending-flat" on-tap="_toggleIOBinding"></iron-icon> Link concepts with the operation
+        </div>
+        <div id="bindPToO">
+          <iron-icon icon="trending-flat" on-tap="_toggleRGTEParamsBinding"></iron-icon> Link concepts with parameters
+        </div>
+      </div>
       <div id="inputP">
         <div hidden$="{{isInputPatternDisplayed}}" on-tap="_toggleInputPatternDisplayed">
           Open input pattern <iron-icon icon="add-box"></iron-icon>
@@ -86,6 +101,26 @@
       <!-- TODO : gestion plus pousser des outils. Par exemple lors d'un choix d'outils, sous menu pour indiquer op et configuration , version, etc..-->
     </div>
 
+    <paper-dialog on-iron-overlay-closed="_replaceOrAddIO" id="propertyIOModal" modal>
+        <h2>Replace or add ?</h2>
+        <p>Will this new property replace an existing one or be simply added ?</p>
+        <div class="buttons">
+            <paper-button dialog-dismiss>Replace</paper-button>
+            <paper-button dialog-confirm autofocus>Add</paper-button>
+        </div>
+    </paper-dialog>
+
+    <paper-dialog on-iron-overlay-closed="_selectPropIO" id="propertySelectIOModal" modal>
+        <h2>Select a property to replace</h2>
+        <template id="propsSelector" is="dom-repeat" items="[[props]]" index-as="index">
+          <div on-tap="_propSelect" id="prop[[idProp]]" class$="[[_computePropertySelection(index, indexSelectedProp)]]">
+            {{item.uri}} : From {{item.from.uri}} to {{item.to.uri}}
+          </div>
+        </template>
+        <div class="buttons">
+            <paper-button dialog-confirm autofocus>Ok</paper-button>
+        </div>
+    </paper-dialog>
 
     <paper-button raised on-click="_submitted">Create !</paper-button>
   </form>
@@ -166,6 +201,18 @@
                   notify: true,
                 },
 
+                currentProp://Memorize the last prop generated, for remplace or adding
+                {
+                  type: Object,
+                  value: null,
+                },
+                props://All the props to insert into the new operator
+                {
+                  type: Array,
+                  value: function(){return [];},
+                  notify: true,
+                },
+
 
                 creatorName:
                 {
@@ -200,6 +247,38 @@
                         return new RGTE();
                     },
                     notify: true,
+                },
+
+                indexSelectedProp://For coloriate the selected prop
+                {
+                  type: Number,
+                  value: -1,
+                  notify: true,
+                },
+                //Async properties managment
+                isIOCompleted://Used for determine if a new row has to be added to the propAsyncBuildIO
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                propAsyncBuildIO://PropertyAsyncrhonousBuilder for Input to Output
+                {
+                  type: Object,
+                  value: function(){return new PropertyAsyncrhonousBuilder();},
+                  notify: true,
+                },
+                isBindingIO:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                isBindingParams:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
                 },
                 superrgte: // SuperRGTE = nopinputrgte U nopoutputrgte U nopsettingsrgte U additional_properties
                 {
@@ -248,10 +327,109 @@
                 },
             },
 
+          // === NATIVE METHODS
+            attached: function()
+            {
+              this.propAsyncBuildIO.setFirstObject(this.nopinputrgte);
+              this.propAsyncBuildIO.setSecondObject(this.nopoutputrgte);
+              this.propAsyncBuildIO.setArray(1);//Work only with 1 property a time. Added to this.props
+              this.propAsyncBuildIO.registerObserverCallbackOnCompletion(this, this._onIOCompletion);
+              this.propAsyncBuildIO.registerObserverCallbackOnUncompletion(this, this._onIOUncompletion);
+
+              this.$.inputPattern.addEventListener('NODE_CLICKED', function(p)
+              {
+                this._behaviorSelectorIOClicked(p.detail);
+              }.bind(this));
+              this.$.outputPattern.addEventListener('NODE_CLICKED', function(p)
+              {
+                this._behaviorSelectorIOClicked(p.detail);
+              }.bind(this));
+            },
+          // ===
             // === PRIVATE METHODS
             _onNopNameChange: function(change)
             {
 
+            },
+
+            _behaviorSelectorIOClicked: function(params)
+            {
+              if(this.isBindingIO && this.isBindingParams)
+              {
+                console.log('Curently, binding simultaneously input with param & output is not supported. Disable one of them to procced.');
+              }
+              else if(this.isBindingIO)
+                this._bindingIO(params);
+              else if(this.isBindingParams)
+                this._bindingIP(params);
+              else
+                this._defaultBehavior(params);
+            },
+
+            _defaultBehavior: function(params)
+            {
+
+            },
+
+            _bindingIO: function(params)
+            {
+              var obj = this.nopinputrgte.getNodeById(params.id);
+              if(obj == null)
+                obj = this.nopoutputrgte.getNodeById(params.id);
+
+              this.propAsyncBuildIO.bind(obj,INFLUENCES_URI,'influences');
+            },
+
+            _bindingIP: function(params)
+            {
+
+            },
+
+            _toggleIOBinding: function()
+            {
+              this.isBindingIO = !this.isBindingIO;
+            },
+
+            _onIOCompletion: function()
+            {
+              this.currentProp;
+              var arr = this.propAsyncBuildIO.getArrayFilled();
+
+              for(var i in arr)
+                this.currentProp = arr[i];
+
+              this.$.propertyIOModal.open();
+              this.propAsyncBuildIO.reset();
+            },
+
+            _propSelect: function(e)
+            {
+              this.indexSelectedProp = e.model.index;
+            },
+
+            _computePropertySelection: function(idxelem, currentIdx)
+            {
+              if(idxelem == currentIdx)
+                return 'propSelected';
+
+              return '';
+            },
+
+            _selectPropIO: function(e)//Triggered when the selection modal of prop is closed
+            {
+              if(this.indexSelectedProp == -1 || this.indexSelectedProp == null)
+                return;
+
+              this.splice('props', this.indexSelectedProp, 1);
+              this.push('props', this.currentProp);
+
+              this.indexSelectedProp = -1;
+              this.currentProp = null;
+            },
+
+            _onIOUncompletion: function()
+            {
+              this.isIOCompleted = false;
             },
 
             _close: function(change)
@@ -298,6 +476,18 @@
               this.customprops = props;
             },
 
+            _replaceOrAddIO: function(e)
+            {
+              if (e.detail.confirmed)//Add new prop
+              {
+                  this.push('props',this.currentProp);
+              }
+              else
+              { //Otherwise the user don't want to bind prop, thus it has to be reset
+                this.$.propertySelectIOModal.open();
+              }
+            },
+
             /**
              * Build the NOP from the data contained within the form
              */
@@ -324,6 +514,10 @@
               nop.author.authorName = this.nopname;
               console.log(nop.author);
               nop.creationDate = new Date();
+
+              nop.properties = this.props;
+
+              console.log("RESET THE CARD !");
 
               return nop;
             },
