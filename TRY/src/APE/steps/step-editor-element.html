@@ -6,6 +6,19 @@
     <style>
 
     </style>
+
+    <div id="returnToWorkzone">
+      <p on-tap="_returnToWorkzone">
+          Return to workzone <iron-icon icon="exit-to-app"></iron-icon>
+      </p>
+    </div>
+
+    <div id="newStep">
+      <p on-tap="_createNewStep">
+          Create new a step <iron-icon icon="add-box"></iron-icon>
+      </p>
+    </div>
+
     <template is="dom-if" if="{{isBindingRGTENOP}}">
       <iron-icon icon="lightbulb-outline"></iron-icon> Clicking on a node in the RGTE and the operator input will bind them.
     </template>
@@ -21,6 +34,7 @@
     <div id="rgteDisplayer">
         <template is="dom-if" if="{{displayRGTE}}">
       <rgte-displayer-element id="rgte" rgte="{{step.inputs}}"></rgte-displayer-element>
+      <!-- <rgte-displayer-element id="rgte" rgte="{{si}}"></rgte-displayer-element> -->
     </template>
     </div>
     <h4>Operator</h4>
@@ -58,7 +72,17 @@
                         return new Step();
                     },
                     notify: true,
+                    observer: "_updateElement",
                 },
+                  si: //step.inputs
+                  {
+                    type: Object,
+                    value: function()
+                    {
+                      return null;
+                    },
+                    notify: true,
+                  },
                 propAsyncBuild:
                 {
                     type: Object,
@@ -121,6 +145,13 @@
 
             },
 
+            _updateElement: function()
+            {
+              console.log("SI UPDATED");
+              this._si = this.step.inputs;
+              this.displayRGTE = true;
+            },
+
             // === NATIVE
             attached: function()
             {
@@ -142,18 +173,20 @@
 
                 this._observer = Polymer.dom(this.$.rgteDisplayer).observeNodes(function(info)
                 {
-                    if (this.displayRGTE)
+                  for(var i in info.addedNodes)
+                  {
+                    if (info.addedNodes[i] != null && info.addedNodes[i].localName === 'rgte-displayer-element' && this.displayRGTE)
                     {
-                        info.addedNodes[1].draw();
-                        info.addedNodes[1].addEventListener('NODE_CLICKED', function(p)
+                        info.addedNodes[i].draw();
+                        info.addedNodes[i].addEventListener('NODE_CLICKED', function(p)
                         {
                             this._behaviorSelectorWhenGraphsClicked(p.detail);
                         }.bind(this));
                     }
+                  }
                 }.bind(this));
             },
             // ===
-
             changeOperator: function(op)
             {
                 if (op == null)
@@ -203,6 +236,16 @@
             },
 
             // === EVENTS
+            _returnToWorkzone: function()
+            {
+              this.fire("-ReturnToWorkzone");
+            },
+
+            _createNewStep: function()
+            {
+              this.fire("-CreateNewStep");
+            },
+
             _onDisplayersChanged: function()
             {
                 if (this.displayOperatorInputs && this.displayRGTE)

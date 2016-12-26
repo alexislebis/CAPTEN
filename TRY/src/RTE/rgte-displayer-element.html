@@ -43,7 +43,8 @@
                   this._eventDispatcher(p.detail);
               }.bind(this));
 
-              this.rgte.registerObserverCallbackOnChange(this, this._callbackOnRGTEChanged);
+              if(this.rgte != null)
+                this.rgte.registerObserverCallbackOnChange(this, this._callbackOnRGTEChanged);
             },
 
             // _onRgteChanged: function(change)
