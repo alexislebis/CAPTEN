@@ -105,6 +105,7 @@ Step.prototype = {
         }
       }
 
+      this.isStateComputed = true;
       this.notifyOutputsComputation();
   },
 
@@ -145,10 +146,10 @@ Step.prototype = {
 
   bindRGTENOP: function(params)
   {
-      if (this.isArrayFullyCompleted(this.usedComputationInput))
+      if (this.isStateComputed)
       {
           console.log("===WARNING===");
-          console.log("Currently, recomputing is not allowed. Thus, you could not change any bound between concepts once the configuration is over. Create a new step instead.");
+          console.log("The step is currently flag as computed, meaning that its outputs has been produced. Currently, recomputing is not allowed. Thus, you could not change any bound between concepts once the configuration is over. Create a new step instead.");
           console.log("=============");
           return;
       }
@@ -164,6 +165,27 @@ Step.prototype = {
 
   bindRGTEParams: function(params) {
 
+  },
+
+  findDependencies: function(steps, arrows)
+  {
+    if(this.inputs == null)
+      return null;
+
+      var props = [];
+      var prop = null;
+
+    for(var i in steps)
+    {
+      if(steps[i].outputs)
+        if(steps[i].outputs.id == this.inputs.id)
+          { prop = new Property(FOLLOWED_BY_URI, "followed by", steps[i].id, this.id);
+            prop.arrows = arrows;
+            props.push(prop);
+          }
+    }
+
+    return props;
   },
 
   /* _updateUsedConcepts reset the usedComputationInput and usedConceptsParams

@@ -137,6 +137,7 @@
           }
 
           this.stepEditorReference.changeRGTE(rgte);
+          this._updateDisplayer();
         },
 
         useOperator: function(op) //Receive rgte and forward to the step editor iff it is active
@@ -154,6 +155,24 @@
         },
 
         // === PRIVATE
+
+          // _updateStepsDependencies: function()//Compute the dependecies of the step between them
+          // {
+          //   for(var i in this.steps)
+          //   {
+          //     this._stepDependencies(this.steps[i]);
+          //   }
+          // },
+          //
+          // _stepDependencies: function(step)
+          // {
+          //   for(var i in this.steps)
+          //   {
+          //     if(this.steps[i].outputs.id == step.inputs.id)
+          //       return new Property(FOLLOWED_BY_URI, "followed by", this.steps[i].id, this.step[i]);
+          //   }
+          // },
+
         _updateCurrentStep: function(p)
         {
           for(var i in this.steps)
@@ -180,7 +199,12 @@
           this.isStepEditionEnabled = false;
           // this.isStepEditionEnabled = true;
 
-          this.$.stepsDisplayer.draw();
+          this._updateDisplayer();
+        },
+
+        _updateDisplayer: function()
+        {
+          this.$.stepsDisplayer.draw(this.steps);
         },
 
         _hiddeStepEditor: function()

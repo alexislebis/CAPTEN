@@ -43,7 +43,7 @@
         },
 
         // === PUBLIC
-        draw: function()
+        draw: function(s)
         {
           var stepView = this.$.stepsview;
 
@@ -51,7 +51,11 @@
             return;
 
           stepView.addNodes(this._stepsToNodes());
-          // stepView.addEdges(this._belongsToEdges());
+
+          if(s != null)
+          {
+            stepView.addEdges(this._edgesDependencies());
+          }
 
           stepView.redraw();
         },
@@ -72,11 +76,21 @@
         {
           return {'id': step.id, 'label': numero+'#Step'}
         },
-        _belongsToEdges: function()
+        _edgesDependencies: function()
         {
-          throw new Error('Unimplemented function');
+          var props = [];
+          var prop = null;
+
+          for(var i in this.steps)
+          {
+            prop = this.steps[i].findDependencies(this.steps, 'to');
+            for(var j in prop)
+              props.push(prop[j]);
+          }
+
+          return props;
         },
-        _belongToEdge: function(belRelation)//Dry
+        _edgeDependencies: function(belRelation)//Dry
         {
           throw new Error('Unimplemented function');
         },
