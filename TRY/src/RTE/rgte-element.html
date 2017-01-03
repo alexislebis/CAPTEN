@@ -51,8 +51,9 @@
         </paper-dialog>
 
 
-
-        <rgte-cardinality-form-element id="rgteCard" rgte="{{rgte}}" edgeid="{{edgeIDSelected}}"></rgte-cardinality-form-element>
+        <div hidden$="{{ disableCardinality }}">
+          <rgte-cardinality-form-element id="rgteCard" rgte="{{rgte}}" edgeid="{{edgeIDSelected}}"></rgte-cardinality-form-element>
+        </div>
 
     </template>
     <script>
@@ -102,7 +103,13 @@
                   type: Object,
                   value: function(){return new PropertyAsyncrhonousBuilder();},
                   notify: true,
-                }
+                },
+                disableCardinality:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
             },
 
             attached: function()

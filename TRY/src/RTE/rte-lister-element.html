@@ -94,10 +94,18 @@
         </div>
 
         <div class$="[[_isCLSSelected(selectedcls)]]">
-          <p>Selected class (node): [[selectedcls.uri]]<iron-icon icon="add-circle" on-tap="_addClassToRGTE" class="addToRTE">add-circle</iron-icon></p>
+          <p>Selected class (node): [[selectedcls.uri]]
+            <span hidden$="{{disableAdding}}">
+              <iron-icon icon="add-circle" on-tap="_addClassToRGTE" class="addToRTE">add-circle</iron-icon>
+            </span>
+          </p>
         </div>
         <div class$="[[_isPROPSelected(selectedprop)]]">
-          <p>Selected property (edge): [[selectedprop.uri]]<iron-icon icon="add-circle" on-tap="_addPropToRGTE" id="propRGTE" class="addToRTE">add-circle</iron-icon></p>
+          <p>Selected property (edge): [[selectedprop.uri]]
+            <span hidden$="{{disableAdding}}">
+              <iron-icon icon="add-circle" on-tap="_addPropToRGTE" id="propRGTE" class="addToRTE">add-circle</iron-icon>
+            </span>
+          </p>
         </div>
 
         <div>
@@ -225,6 +233,12 @@
                 {
                   type: Boolean,
                   value: true,
+                },
+                disableAdding:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
                 },
             },
 

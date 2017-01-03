@@ -12,6 +12,31 @@
         </style>
 
         <vis-element id="rgteview"></vis-element>
+
+        <template id="modif" is="dom-if" if="{{enableModification}}">
+          <iron-icon icon="settings" on-tap="_toggleOpenModif"></iron-icon>
+        </template>
+
+        <template id="openModif" is="dom-if" if="{{isModificationEnabled}}">
+          <template id="noSelect" is="dom-if" if="{{_isNothingSelected(nodeSelected, edgeSelected)}}">
+            <p>You can edit or replace on-the-fly existing node or edge by clicking on it</p>
+          </template>
+          <template id="nodeSelect" is="dom-if" if="{{_isNodeSelected(nodeSelected)}}">
+            <form is="iron-form" method="get" action="/" id="nodeRenameForm" on-iron-form-submit="submitForm">
+                <paper-input id="updateNodeName" name="name" label="Name" required></paper-input>
+                <paper-button raised on-click="replace">Replace</paper-button>
+            </form>
+          </template>
+          <template id="edgeSelect" is="dom-if" if="{{_isEdgeSelected(edgeSelected)}}">
+            <form is="iron-form" method="get" action="/" id="EdgeRenameForm" on-iron-form-submit="submitForm">
+                <paper-input id="updateEdgeName" name="name" label="Name" required></paper-input>
+                <paper-button raised on-click="replace">Replace</paper-button>
+            </form>
+
+            <paper-button raised>Relink</paper-button>
+          </template>
+        </template>
+
       </template>
     <script>
         Polymer(
@@ -30,8 +55,33 @@
                     notify: true,
                 },
 
-            },
+                enableModification:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
 
+                isModificationEnabled://When user want to modify smth
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                nodeSelected:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                edgeSelected:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+
+            },
             // observers: [
             //     "_onRgteChanged(rgte.*)",
             // ],
@@ -43,8 +93,16 @@
                   this._eventDispatcher(p.detail);
               }.bind(this));
 
-              if(this.rgte != null)
+              this.$.rgteview.addEventListener("NETWORK_GENERATED", function(p)//Used for refresh the graph when network became available. Otherwise, some desyncrho may appear regarding the display of the graph
+              {
+                this.draw();
+              }.bind(this));
+
+              if(this.rgte != null){
                 this.rgte.registerObserverCallbackOnChange(this, this._callbackOnRGTEChanged);
+
+                }
+
             },
 
             // _onRgteChanged: function(change)
@@ -167,16 +225,53 @@
 
             _eventDispatcher: function(params)
             {
-              if(params.nodes.length != 0)
+              if(!this.isModificationEnabled)
               {
-                this.fire('NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0]});
+                if(params.nodes.length != 0)
+                {
+                  this.fire('NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0]});
+                }
+                else if(params.edges.length != 0)
+                {
+                  this.fire('EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label});
+                }
               }
-              else if(params.edges.length != 0)
-              {
-                this.fire('EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label});
+              //if user want to modify the rgte
+              else {
+                if(params.nodes.length != 0)//Node clicked
+                {
+                  this.nodeSelected = true;
+                  this.edgeSelected = false;
+                }
+                else if(params.edges.length != 0)
+                {
+                  this.nodeSelected = false;
+                  this.edgeSelected = true;
+                }
               }
             },
 
+            _toggleOpenModif: function()
+            {
+              this.isModificationEnabled = !this.isModificationEnabled;
+              console.log(this.isModificationEnabled);
+            },
+
+            _isNothingSelected: function(nodeSelected, edgeSelected)
+            {
+              console.log((!nodeSelected && !edgeSelected));
+              return (!nodeSelected && !edgeSelected);
+            },
+
+            _isNodeSelected: function(nodeSelected)
+            {
+              return nodeSelected;
+            },
+
+            _isEdgeSelected: function(edgeSelected)
+            {
+              return edgeSelected;
+            },
 
         });
     </script>

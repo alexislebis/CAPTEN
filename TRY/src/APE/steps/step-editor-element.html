@@ -33,7 +33,8 @@
     <h4>RGTE</h4>
     <div id="rgteDisplayer">
         <template is="dom-if" if="{{displayRGTE}}" restamp>
-      <rgte-displayer-element id="rgte" rgte="{{step.inputs}}"></rgte-displayer-element>
+      <rgte-workzone-element id="rgte" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.inputs}}" disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-workzone-element>
+      <!-- <rgte-displayer-element id="rgte" rgte="{{step.inputs}}" enable-Modification></rgte-displayer-element> -->
       <!-- <rgte-displayer-element id="rgte" rgte="{{si}}"></rgte-displayer-element> -->
     </template>
     </div>
@@ -46,7 +47,7 @@
     <h4>Output</h4>
     <div id="stepOutputs">
         <template is="dom-if" if="{{displayStepOutputs}}" restamp>
-      <rgte-displayer-element id="opOutput" rgte="{{step.outputs}}"></rgte-displayer-element>
+      <rgte-displayer-element id="opOutput" rgte="{{step.outputs}}" enable-Modification></rgte-displayer-element>
       </template>
     </div>
     </template>
@@ -57,6 +58,22 @@
 
             properties:
             {
+              vocab:
+              {
+                type: Object,
+              },
+              customcls://used for file-reader
+              {
+                  type: Array,
+                  notify: true,
+              },
+              customprops:
+              {
+                  type: Array,
+                  notify: true,
+              },
+
+
                 relorder://relationalOrder
                 {
                   type: Number,

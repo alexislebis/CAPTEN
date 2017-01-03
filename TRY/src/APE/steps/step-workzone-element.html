@@ -22,7 +22,7 @@
     <!-- <div hidden="{{!isStepEditionEnabled}}"> -->
     <div id="stepEditionDiv">
       <template id="refreshEditor" is="dom-if" if="{{isStepEditionEnabled}}" restamp>
-        <step-editor-element id="stepEditor" step="{{cstep}}"></step-editor-element>
+        <step-editor-element id="stepEditor" step="{{cstep}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-editor-element>
       </template>
     </div>
 
@@ -39,6 +39,22 @@
 
         properties:
         {
+          vocab:
+          {
+            type: Object,
+          },
+          customcls://used for file-reader
+          {
+              type: Array,
+              notify: true,
+          },
+          customprops:
+          {
+              type: Array,
+              notify: true,
+          },
+
+
           rgtes://PROVENANCE ape-elements
           {
             type: Array,
