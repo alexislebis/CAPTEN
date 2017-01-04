@@ -31,6 +31,13 @@ PropertiesPool.prototype = {
     return null;
   },
 
+  getByID: function(id)
+  {
+    for(var i in this.pool)
+      if(this.pool[i].id === id)
+        return this.pool[i];
+  },
+
   remove: function(prop)
   {
     var index = -1;
@@ -44,6 +51,21 @@ PropertiesPool.prototype = {
 
     this.pool.splice(index,1);
     return true;
+  },
+
+  relatedProperties: function(extremityID)
+  {
+    var related = [];
+
+    for(var i in this.pool)
+    {
+      if(this.pool[i].from === extremityID)
+        related.push(this.pool[i]);
+      else if(this.pool[i].to === extremityID)
+        related.push(this.pool[i]);
+    }
+
+    return related;
   },
 
 };

@@ -52,7 +52,7 @@
             }
         </style>
         <div id="rdflister">
-            <div>
+            <div hidden$="{{disableClassesLister}}">
                 <h2 on-tap="_toggleRDFClasses">Available Classes</h2>
                 <!-- <ul id="rdfClasses"></ul> -->
                 <iron-collapse id="classRDFCollapse">
@@ -76,7 +76,7 @@
                 </iron-collapse>
               </div>
 
-    <div>
+    <div hidden$="{{disablePropertiesLister}}">
         <h2 on-tap="_toggleRDFProps">Availablle Properties</h2>
 
         <iron-collapse id="propRDFCollapse">
@@ -133,15 +133,18 @@
                     // value: function(){return new CONTROLLED_VOCABULARY();},
                 },
 
-                // selectedcls:
-                // {
-                //   type: Object,
-                //   notify: true,
-                // },
-                // selectedprop:
-                // {
-                //   type: Object,
-                //   notify: true,
+                disableClassesLister:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                disablePropertiesLister:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
                 // },
             },
             //

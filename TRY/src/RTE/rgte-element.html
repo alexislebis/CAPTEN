@@ -25,6 +25,60 @@
 
         <rgte-displayer-element id="rgteview" rgte="{{rgte}}"></rgte-displayer-element>
 
+        <template id="modif" is="dom-if" if="{{enableModification}}">
+          <iron-icon icon="settings" on-tap="_toggleOpenModif"></iron-icon>
+        </template>
+
+        <template id="openModif" is="dom-if" if="{{isModificationEnabled}}">
+          <template id="noSelect" is="dom-if" if="{{_isNothingSelectedModif(nodeModification, edgeModification)}}">
+            <p>You can edit or replace on-the-fly existing node or edge by clicking on it</p>
+          </template>
+          <template id="nodeSelect" is="dom-if" if="{{_isNodeSelectedModif(nodeModification)}}">
+            <h4>Node Selected for modification</h4>
+            <paper-button raised on-click="_create">Create</paper-button>
+            <paper-button raised on-click="_replace">Replace</paper-button>
+            <paper-button raised on-click="_delete">Delete</paper-button>
+            <p>Current state : {{_displayCurrentEditingState(editingState)}}</p>
+
+          </template>
+          <template id="edgeSelect" is="dom-if" if="{{_isEdgeSelectedModif(edgeModification)}}">
+            <h4>Edge selected for modification</h4>
+            <paper-button raised on-click="_create">Create</paper-button>
+            <paper-button raised on-click="_replace">Replace</paper-button>
+            <paper-button raised on-click="_relink">Relink</paper-button>
+            <paper-button raised on-click="_delete">Delete</paper-button>
+            <p>Current state : {{_displayCurrentEditingState(editingState)}}</p>
+          </template>
+        </template>
+
+        <!-- <paper-dialog id="propertyModification" modal>
+            <h2>Action chooser</h2>
+            <p>You have chose one property. Now you must choose if this property will be used to rename the selected property in the graph, or relink </p>
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>Close</paper-button>
+                <paper-button dialog-confirm>Rename</paper-button>
+                <paper-button dialog-confirm>Relink</paper-button>
+            </div>
+        </paper-dialog> -->
+
+        <paper-dialog on-iron-overlay-closed="_isRemovingNodeAccepted" id="removeNodeModal" modal>
+          <h2>Confirm node deletion</h2>
+          <p>Do you wish to definitely remove the selected node in the graph?</p>
+          <div class="buttons">
+            <paper-button raised dialog-dismiss autofocus>No, do not remove it</paper-button>
+            <paper-button raised dialog-confirm>Yes, remove it</paper-button>
+          </div>
+        </paper-dialog>
+
+        <paper-dialog on-iron-overlay-closed="_isRemovingEdgeAccepted" id="removeEdgeModal" modal>
+          <h2>Confirm edge deletion</h2>
+          <p>Do you wish to definitely remove the selected edge in the graph?</p>
+          <div class="buttons">
+            <paper-button raised dialog-dismiss autofocus>No, do not remove it</paper-button>
+            <paper-button raised dialog-confirm>Yes, remove it</paper-button>
+          </div>
+        </paper-dialog>
+
         <paper-dialog on-iron-overlay-closed="_isAddPropertyConfirmed" id="propertyModal" modal>
             <h2>Bind the property</h2>
             <p>Please choose the two nodes that will be linked with the selected property. First is the domain, the second the range.</p>
@@ -63,12 +117,43 @@
         var NODE = 0;
         var EDGE = 1;
 
+        var CREATE = 10;
+        var REPLACE = 11;
+        var RELINK = 12;
+        var DELETE = 13;
+
         Polymer(
         {
             is: 'rgte-element',
 
             properties:
             {
+
+                enableModification:
+                {
+                    type: Boolean,
+                    notify: true,
+                    value: false,
+                },
+                isModificationEnabled://When user want to modify smth
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                nodeModification:
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
+                edgeModification:
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
+
                 isWaitingPropertyBinding:
                 {
                     type: Boolean,
@@ -76,6 +161,14 @@
                     notify: true,
                     // observer: '_oniWPBChanged',
                 },
+
+                editingState://State of the graph edition
+                {
+                  type: Number,
+                  value: CREATE,
+                  notify: true,
+                },
+
                 propertyToBind:
                 {
                     type: Object,
@@ -92,6 +185,13 @@
                 },
 
                 edgeIDSelected:
+                {
+                  type: Number,
+                  value: -1,
+                  notify: true,
+                },
+
+                nodeIDSelected:
                 {
                   type: Number,
                   value: -1,
@@ -130,10 +230,139 @@
               this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackPropertyBindingComplete)
             },
 
+// DISAPTCHER SUR ADD
+            classDispatcherBehavior: function(cls)
+            {
+              switch(this.editingState)
+              {
+                case CREATE:
+                  this.addClass(cls);
+                  break;
+                case REPLACE:
+                  this._updateCurrentNode(cls);
+                  break;
+                default:
+                  this.addClass(cls);
+                  break;
+              }
+            },
+
+            propertyDispatcherBehavior: function(prop)
+            {
+              switch(this.editingState)
+              {
+                case CREATE:
+                  this.addProp(prop);
+                  break;
+                case REPLACE:
+                  this._updateCurrentProperty(prop);
+                  break;
+                case RELINK:
+                  this._relinkCurentProperty(prop);
+                  break;
+                default:
+                  this.addProp(prop);
+                  break;
+              }
+            },
 
             addClass: function(cls) //From rte-lister-element redirected by rgte-workzone-element
             {
-                this.rgte.addVisNode(cls);
+              return this.rgte.addVisNode(cls);
+            },
+
+            _updateCurrentNode: function(cls)//@CHECK PROPERTIES_POOL Related
+            {
+              if(!this.isModificationEnabled)
+                return;
+
+              if(this.nodeIDSelected == -1)
+                return;
+
+              var res = this._deleteCurrentNode();
+
+              for(var i in res)
+              {
+                if(res[i].from === this.nodeIDSelected)
+                {
+                  // this.rgte.updateEdgeFromTo(res[i], addClass(this.nodeIDSelected), res[i].to);
+                  this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), this.addClass(cls), res[i].to);
+                }
+                else if(res[i].to === this.nodeIDSelected)
+                {
+                  this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), res[i].from, this.addClass(cls));
+                }
+                else {
+                  throw new Error("Unexpected property to update");
+                }
+              }
+
+              this.nodeIDSelected = -1;
+            },
+
+            _deleteCurrentNode: function()//@WARNING if all nodes are deleted, it may become impossible to add new ones (since they may be hidden)
+            {
+              if(!this.isModificationEnabled)
+                return;
+
+              if(this.nodeIDSelected == -1)
+                return;
+
+              var res = this.rgte.removeNode(this.nodeIDSelected);
+
+              return res;
+            },
+
+            _updateCurrentProperty: function(prop)
+            {
+              if(!this.isModificationEnabled)
+                return;
+
+              if(this.edgeIDSelected == -1)
+                return;
+
+              var res = this._deleteCurrentEdge();
+
+              if(res == null || res.length < 2)
+              {
+                throw new Error("Unexpected nodes for redraw property");
+                this.edgeIDSelected = -1;
+
+                return;
+              }
+
+              this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(prop, 'to'), res[0], res[1]);
+
+              this.edgeIDSelected = -1;
+            },
+
+            _deleteCurrentEdge: function()
+            {
+              if(!this.isModificationEnabled)
+                return;
+
+              if(this.edgeIDSelected == -1)
+                return;
+
+              var res = this.rgte.removeEdge(this.edgeIDSelected);
+
+              return res;
+            },
+
+            _relinkCurentProperty: function(prop)
+            {
+              if(!this.isModificationEnabled)
+                return;
+
+              throw new Error("Unimplemented");
+            },
+
+            _changeEditingState: function(state)
+            {
+              this.editingState = state;
+
+              this.propertyToBind = null;
+              this.isWaitingPropertyBinding = null;
             },
 
 
@@ -170,6 +399,27 @@
                     }
                 },
 
+            _isRemovingNodeAccepted: function(e)
+            {
+              if(e.detail.confirmed)
+              {
+                this._deleteCurrentNode();
+              }
+              else
+                this.nodeIDSelected = -1;
+            },
+
+            _isRemovingEdgeAccepted: function(e)
+            {
+              if(e.detail.confirmed)
+              {
+                this._deleteCurrentEdge();
+              }
+              else {
+                this.edgeIDSelected = -1;
+              }
+            },
+
                 _callbackPropertyBindingComplete: function()
                 {
                   var prop;
@@ -195,11 +445,32 @@
                 {
                     this._linkingNodesBehavior(params, type);
                 }
+                else if (this.isModificationEnabled)
+                {
+                  this._modificationBehavior(params, type);
+                }
                 else
                 {
                     this._defaultRGTEBehavior(params, type);
                 }
 
+            },
+
+            _displayCurrentEditingState: function(state)
+            {
+              switch(state)
+              {
+                case CREATE:
+                  return "CREATE. Click on the (+) will add the element to the graph like the standard behaviour.";
+                case REPLACE:
+                  return "REPLACE. After clicking on the element in the graph and then after select an element in the list, clicking on the (+) will replace the graph element";
+                case RELINK:
+                  return "RELINK. After clicking on the property in the graph, you have to choose two nodes";
+                case DELETE:
+                  return "DELETE. Delete the next selected element in the graph (if it has some properties, all the properties associated with too).";
+                default:
+                  return "No behaviour currently selected";
+              }
             },
 
             //Link the selected property (edge) with two classes (nodes)
@@ -230,6 +501,86 @@
                 }
             },
 
+            _modificationBehavior: function(params, type)
+            {
+              if(type === NODE)
+              {
+                this.nodeModification = true;
+                this.edgeModification = false;
+                this.nodeIDSelected = params.id;
+
+                if(this.editingState === DELETE)
+                  this.$.removeNodeModal.open();
+
+              }
+              else if(type === EDGE)
+              {
+                this.nodeModification = false;
+                this.edgeModification = true;
+                this.edgeIDSelected = params.id;
+
+                if(this.editingState === DELETE)
+                  this.$.removeEdgeModal.open();
+              }
+            },
+
+            _toggleOpenModif: function()
+            {
+              this.isModificationEnabled = !this.isModificationEnabled;
+
+              if(!this.isModificationEnabled)//close lister if user quit the modif zone
+              {
+                this._triggerListBehavior(true, true, true, true);
+                this.nodeModification = false;
+                this.edgeModification = false;
+              }
+            },
+
+            _isNothingSelectedModif: function(nodeSelected, edgeSelected)
+            {
+              if(!nodeSelected && !edgeSelected)
+                this._triggerListBehavior(true, true, true, true);
+              return (!nodeSelected && !edgeSelected);
+            },
+
+            _isNodeSelectedModif: function(nodeSelected)
+            {
+              if(nodeSelected)
+                this._triggerListBehavior(false, false, false, true);
+              return nodeSelected;
+            },
+
+            _isEdgeSelectedModif: function(edgeSelected)
+            {
+              if(edgeSelected)
+                this._triggerListBehavior(false, false, true, false);
+              return edgeSelected;
+            },
+
+            //Allow to notify Workzone to redsaplay the interefce of listing
+            _triggerListBehavior: function(lister, adding, classes, properties)
+            {
+              this.fire('MANAGE_LISTER_VISIBILITY', {isListerDisable:lister, isListerAddingDisable: adding, isClassesListerDisable: classes, isPropertiesListerDisable: properties});
+            },
+
+            //=== BUTTONS
+              _create: function()
+              {
+                this._changeEditingState(CREATE);
+              },
+              _replace: function()
+              {
+                this._changeEditingState(REPLACE);
+              },
+              _relink: function()
+              {
+                this._changeEditingState(RELINK);
+              },
+              _delete: function()
+              {
+                this._changeEditingState(DELETE);
+              },
+            // ===
             // getNetwork: function()
             // {
             //     return this.network;

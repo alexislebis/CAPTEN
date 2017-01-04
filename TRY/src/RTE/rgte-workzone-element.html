@@ -19,10 +19,10 @@
         </div>
 
         <div hidden$="{{disableLister}}">
-          <rte-lister-element id="rteList" vocab="{{vocab}}" rgte="{{rgte}}" customcls="{{customcls}}" customprops="{{customprops}}" disable-Adding="{{disableAdding}}"></rte-lister-element>
+          <rte-lister-element id="rteList" vocab="{{vocab}}" rgte="{{rgte}}" customcls="{{customcls}}" customprops="{{customprops}}" disable-Adding="{{disableAdding}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rte-lister-element>
         </div>
 
-        <rgte-element id="rgte" rgte="{{rgte}}" disable-Cardinality="{{disableCardinality}}"></rgte-element>
+        <rgte-element id="rgte" rgte="{{rgte}}" disable-Cardinality="{{disableCardinality}}" enable-Modification="{{enableModification}}"></rgte-element>
 
 
         <div  hidden$="{{isHidden}}">
@@ -124,6 +124,24 @@
                   value: false,
                   notify: true,
                 },
+                enableModification:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                disableClassesLister:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                disablePropertiesLister:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
 
             },
 
@@ -135,12 +153,19 @@
             {
                 this.$.rteList.addEventListener('-ClassAddedToRGTE', function(e)
                 {
-                    this.$.rgte.addClass(e.detail.val);
+                    this.$.rgte.classDispatcherBehavior(e.detail.val);
                 }.bind(this));
 
                 this.$.rteList.addEventListener('-PropAddedToRGTE', function(e)
                 {
-                    this.$.rgte.addProp(e.detail.val);
+                    this.$.rgte.propertyDispatcherBehavior(e.detail.val);
+                }.bind(this));
+
+                this.$.rgte.addEventListener('MANAGE_LISTER_VISIBILITY', function(p){
+                  this.disableLister = p.detail.isListerDisable;
+                  this.disableAdding = p.detail.isListerAddingDisable;
+                  this.disableClassesLister  = p.detail.isClassesListerDisable;
+                  this.disablePropertiesLister = p.detail.isPropertiesListerDisable;
                 }.bind(this));
 
             },
