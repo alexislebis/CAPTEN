@@ -297,6 +297,8 @@
                 else {
                   throw new Error("Unexpected property to update");
                 }
+
+                this.rgte.removeEdge(res[i].id);
               }
 
               this.nodeIDSelected = -1;

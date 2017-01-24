@@ -68,6 +68,19 @@ PropertiesPool.prototype = {
     return related;
   },
 
+  getPropertiesByExtremities: function(from, to)
+  {
+    var related = [];
+
+    for(var i in this.pool)
+    {
+      if(this.pool[i].from === from && this.pool[i].to === to)
+        related.push(this.pool[i]);
+    }
+
+    return related;
+  },
+
 };
 
 var PROPERTIES_POOL = new PropertiesPool();
