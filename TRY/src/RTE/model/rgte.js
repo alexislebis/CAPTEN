@@ -500,11 +500,16 @@ _isIdEquivalenceExists: function(location,ID)
   getNodesSerializedJSON: function()
   {
     var array = [];
+    //
+    // this.nodes.forEach(function(e){
+    //   console.log(e);
+    //   array.push(e);//JSON.stringify(e))
+    // }.bind(this));
 
-    this.nodes.forEach(function(e){
-      console.log(e);
-      array.push(e);//JSON.stringify(e))
-    }.bind(this));
+    for(var i in this.nodes)
+    {
+      array.push(this.nodes[i]);
+    }
 
     console.log(array);
 
@@ -513,7 +518,11 @@ _isIdEquivalenceExists: function(location,ID)
 
   getEdges: function()
   {
-    return this.edges;
+    var array = [];
+    for(var i in this.edges){ //@WARNING OPTI
+      array.push(this.edges[i]);
+    }
+    return array;
   },
 
   getEdgesCardinality: function()
@@ -552,6 +561,72 @@ _isIdEquivalenceExists: function(location,ID)
     }
 
     return null;
+  },
+
+  removeNode: function(nodeID)
+  {
+    var res = this._removeNode(nodeID);
+    this.notifyChange();
+    return res;
+  },
+  _removeNode: function(nodeID)//Without modification of change
+  {
+    var affectedProps = [];
+
+    for(var i in this.nodes)
+    {
+      if(this.nodes[i].id === nodeID)
+      {
+        affectedProps = PROPERTIES_POOL.relatedProperties(nodeID);
+
+        for(var j in affectedProps)
+          this._removeEdge(affectedProps[j]);
+
+        delete this.nodes[i];
+        return affectedProps;
+      }
+    }
+  },
+
+  removeEdge: function(propertyID)//With notification of change
+  {
+    var res = this._removeEdge(propertyID);
+    this.notifyChange();
+    return res;
+  },
+  _removeEdge: function(propertyID)//Without notification of change
+  {
+    var affectedNodes = [];
+
+    for(var i in this.edges)
+    {
+      if(this.edges[i].id === propertyID)
+      {
+        affectedNodes.push(this.edges[i].from);
+        affectedNodes.push(this.edges[i].to);
+
+        delete this.edges[i];
+        return affectedNodes;
+      }
+    }
+  },
+
+  updateEdgeFromTo: function(id, from, to)
+  {
+    for(var i in this.edges)
+    {
+      if(this.edges[i].id === id)
+      {
+        this.edges[i].from = from;
+        this.edges[i].to = to;
+
+        console.log(PROPERTIES_POOL.getByID(id));
+
+        this.notifyChange();
+
+        return;
+      }
+    }
   },
 
   /**

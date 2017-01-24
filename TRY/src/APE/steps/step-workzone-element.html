@@ -1,9 +1,35 @@
+<link rel="import" href="./step-editor-element.html">
+<link rel="import" href="./steps-displayer-element.html">
 
 <dom-module id="step-workzone-element">
   <template>
     <style>
 
     </style>
+
+    <div id="newStep">
+      <p on-tap="_createNewStep">
+          Create new a step <iron-icon icon="add-box"></iron-icon>
+      </p>
+    </div>
+
+    <div id="openEditor">
+      <p on-tap="_openEditorNewStep">
+          Open step editor for the step current step <iron-icon icon="open-in-new"></iron-icon>
+      </p>
+    </div>
+
+    <!-- <div hidden="{{!isStepEditionEnabled}}"> -->
+    <div id="stepEditionDiv">
+      <template id="refreshEditor" is="dom-if" if="{{isStepEditionEnabled}}" restamp>
+        <step-editor-element id="stepEditor" step="{{cstep}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-editor-element>
+      </template>
+    </div>
+
+    <div id="stepsDisplayerDiv">
+      <h3>Steps Displayer</h3>
+      <steps-displayer-element id="stepsDisplayer" steps="{{steps}}"></steps-displayer-element>
+    </div>
 
   </template>
   <script>
@@ -13,10 +39,199 @@
 
         properties:
         {
+          vocab:
+          {
+            type: Object,
+          },
+          customcls://used for file-reader
+          {
+              type: Array,
+              notify: true,
+          },
+          customprops:
+          {
+              type: Array,
+              notify: true,
+          },
 
+
+          rgtes://PROVENANCE ape-elements
+          {
+            type: Array,
+            value: function(){return [];},
+            notify: true,
+          },
+
+          steps:
+          {
+            type: Array,
+            value: function(){return [];},
+            notify: true,
+          },
+
+          cstep:
+          {
+            type: Object,
+            value: function(){return new Step();},
+            notify: true,
+          },
+          isStepEditionEnabled:
+          {
+            type: Boolean,
+            value: false,
+            notify: true,
+          },
+
+          stepEditorReference:
+          {
+            type: Object,
+            value: null,
+            notify: true,
+          },
         },
 
-        //TODO use prop belongsTo 
+        //TODO use prop belongsTo
+
+        // ===NATIVE
+        attached: function()
+        {
+
+          // this.$.stepEditor.addEventListener("-CreateNewStep", function(e){
+          //    this.createNewStep();
+          //  }.bind(this));
+          //
+          //  this.$.stepEditor.addEventListener("-OutputRecomputed", function(e){
+          //    this.push('rgtes', e.detail.step.outputs);
+          //  }.bind(this));
+          //
+          //  this.$.stepEditor.addEventListener("-ReturnToWorkzone", function(e){
+          //    this._hiddeStepEditor();
+          //  }.bind(this));
+
+          this.$.stepsDisplayer.addEventListener("-STEPS_DSP_NODE_CLICKED", function(e)
+          {
+            this._updateCurrentStep(e.detail);
+          }.bind(this));
+
+          this._observer = Polymer.dom(this.$.stepEditionDiv).observeNodes(function(info)
+          {
+            for(var i in info.addedNodes)
+            {
+              if (info.addedNodes[i] != null && info.addedNodes[i].localName === 'step-editor-element')
+              {
+                this.stepEditorReference = info.addedNodes[i];
+                info.addedNodes[i].addEventListener("-CreateNewStep", function(e){
+                  this.createNewStep();
+                }.bind(this));
+
+                info.addedNodes[i].addEventListener("-OutputRecomputed", function(e){
+                  this.push('rgtes', e.detail.step.outputs);
+                }.bind(this));
+
+                info.addedNodes[i].addEventListener("-ReturnToWorkzone", function(e){
+                  this._hiddeStepEditor();
+                }.bind(this));
+
+              }
+            }
+          }.bind(this));
+        },
+
+        // === PUBLIC
+
+
+        // === EVENTS
+        useRGTE: function(rgte) //Receive rgte and forward to the step editor iff it is active
+        {
+          if(rgte == null)
+            return;
+
+          if(this.stepEditorReference == null)
+          {
+            console.error("EDITION MODE IS NOT ENABLED FOR THE STEP. RGTE IS DISCARDED.");
+            return;
+          }
+
+          this.stepEditorReference.changeRGTE(rgte);
+          this._updateDisplayer();
+        },
+
+        useOperator: function(op) //Receive rgte and forward to the step editor iff it is active
+        {
+          if(op == null)
+            return;
+
+          if(this.stepEditorReference == null)
+          {
+            console.error("EDITION MODE IS NOT ENABLED FOR THE STEP. OPERATOR IS DISCARDED.");
+            return;
+          }
+
+          this.stepEditorReference.changeOperator(op);
+        },
+
+        // === PRIVATE
+
+          // _updateStepsDependencies: function()//Compute the dependecies of the step between them
+          // {
+          //   for(var i in this.steps)
+          //   {
+          //     this._stepDependencies(this.steps[i]);
+          //   }
+          // },
+          //
+          // _stepDependencies: function(step)
+          // {
+          //   for(var i in this.steps)
+          //   {
+          //     if(this.steps[i].outputs.id == step.inputs.id)
+          //       return new Property(FOLLOWED_BY_URI, "followed by", this.steps[i].id, this.step[i]);
+          //   }
+          // },
+
+        _updateCurrentStep: function(p)
+        {
+          for(var i in this.steps)
+          {
+            if(this.steps[i].id == p.id)
+            {
+              var prevState = this.isStepEditionEnabled;
+              this.isStepEditionEnabled = false;
+
+              this.cstep = this.steps[i];
+
+              console.log(this.cstep);
+              return;
+            }
+          }
+        },
+
+        _createNewStep: function()
+        {
+          this.cstep = new Step();
+
+          this.push('steps', this.cstep);
+
+          this.isStepEditionEnabled = false;
+          // this.isStepEditionEnabled = true;
+
+          this._updateDisplayer();
+        },
+
+        _updateDisplayer: function()
+        {
+          this.$.stepsDisplayer.draw(this.steps);
+        },
+
+        _hiddeStepEditor: function()
+        {
+          this.isStepEditionEnabled = false;
+        },
+
+        _openEditorNewStep: function()
+        {
+          this.isStepEditionEnabled = true;
+        },
 
       });
   </script>

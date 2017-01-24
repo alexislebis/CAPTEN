@@ -72,12 +72,16 @@ PropertyAsyncrhonousBuilder.prototype = {
 
   verifyContainsExistence: function(smth)
   {
+    if(smth == null)
+      throw new Error("Object is null");
     if(typeof smth.contains !== "function")
       throw new Error(smth+' does not implement: contains');
   },
 
   verifyRetrieveUniqueIdentifierExistence: function(smth)
   {
+    if(smth == null)
+      throw new Error("Object is null");
     if(typeof smth.retrieveUniqueIdentifier !== 'function')
       throw new Error(smth+' does not implement: retrieveUniqueIdentifier');
   },

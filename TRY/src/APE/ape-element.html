@@ -1,5 +1,5 @@
 <link rel="import" href="../wrapper/ape-model-element.html">
-<link rel="import" href="./steps/step-editor-element.html">
+<link rel="import" href="./steps/step-workzone-element.html">
 
 <link rel="import" href="./operators/operators-workzone-element.html">
 
@@ -23,7 +23,8 @@
 
     <ape-model-element></ape-model-element>
 
-    <step-editor-element id="stepEditor"></step-editor-element>
+    <!-- <step-editor-element id="stepEditor"></step-editor-element> -->
+    <step-workzone-element id="stepWorkzone" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-workzone-element>
 
     <operators-workzone-element id="opWorkzone" currentoperator="{{currentoperator}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operators-workzone-element>
 
@@ -109,10 +110,10 @@
           }
         }.bind(this));
 
-        this.$.stepEditor.addEventListener("-OutputRecomputed", function(e)
-        {
-          this.push('rgtes', e.detail.step.outputs);
-        }.bind(this));
+        // this.$.stepEditor.addEventListener("-OutputRecomputed", function(e)
+        // {
+        //   this.push('rgtes', e.detail.step.outputs);
+        // }.bind(this));
       },
 
 // === EVENTS
@@ -135,7 +136,8 @@
       {
         var rgteIndex = parseInt(Polymer.dom(e).localTarget.id.split('rgte')[1]);
         console.log("VALIDATION FOR SWAPPING RGTE REQUIRED!");
-        this.$.stepEditor.changeRGTE(this.rgtes[rgteIndex]);
+        // this.$.stepEditor.changeRGTE(this.rgtes[rgteIndex]);
+        this.$.stepWorkzone.useRGTE(this.rgtes[rgteIndex]);
       },
 
       _currentOperatorOnChanged: function()
@@ -143,7 +145,8 @@
         if(this.currentoperator == null)
           return;
 
-        this.$.stepEditor.changeOperator(this.currentoperator);
+        // this.$.stepEditor.changeOperator(this.currentoperator);
+        this.$.stepWorkzone.useOperator(this.currentoperator);
       },
 // ===
 

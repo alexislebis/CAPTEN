@@ -14,12 +14,17 @@
             }
         </style>
 
-        <div hidden="{{disableLoadMenu}}">
+        <div hidden$="{{disableLoadMenu}}">
           <rgte-file-reader-element id="rgteReader" rgte="{{rgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-file-reader-element>
         </div>
 
-        <rte-lister-element id="rteList" vocab="{{vocab}}" rgte="{{rgte}}" customcls="{{customcls}}" customprops="{{customprops}}"></rte-lister-element>
-        <rgte-element id="rgte" rgte="{{rgte}}"></rgte-element>
+        <div hidden$="{{disableLister}}">
+          <rte-lister-element id="rteList" vocab="{{vocab}}" rgte="{{rgte}}" customcls="{{customcls}}" customprops="{{customprops}}" disable-Adding="{{disableAdding}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rte-lister-element>
+        </div>
+
+        <rgte-element id="rgte" rgte="{{rgte}}" disable-Cardinality="{{disableCardinality}}" enable-Modification="{{enableModification}}"></rgte-element>
+
+
         <div  hidden$="{{isHidden}}">
           <rgte-saver-xml-element id="xmlSaver" rgte="{{rgte}}" vocab="{{vocab}}"></rgte-saver-xml-element>
         </div>
@@ -101,6 +106,42 @@
                   notify: true,
                   value: false,
                 },
+                disableLister:
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
+                disableAdding://Used in the RGTE LISTER for prevent addition of new element
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
+                disableCardinality:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                enableModification:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                disableClassesLister:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                disablePropertiesLister:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
 
             },
 
@@ -112,12 +153,19 @@
             {
                 this.$.rteList.addEventListener('-ClassAddedToRGTE', function(e)
                 {
-                    this.$.rgte.addClass(e.detail.val);
+                    this.$.rgte.classDispatcherBehavior(e.detail.val);
                 }.bind(this));
 
                 this.$.rteList.addEventListener('-PropAddedToRGTE', function(e)
                 {
-                    this.$.rgte.addProp(e.detail.val);
+                    this.$.rgte.propertyDispatcherBehavior(e.detail.val);
+                }.bind(this));
+
+                this.$.rgte.addEventListener('MANAGE_LISTER_VISIBILITY', function(p){
+                  this.disableLister = p.detail.isListerDisable;
+                  this.disableAdding = p.detail.isListerAddingDisable;
+                  this.disableClassesLister  = p.detail.isClassesListerDisable;
+                  this.disablePropertiesLister = p.detail.isPropertiesListerDisable;
                 }.bind(this));
 
             },

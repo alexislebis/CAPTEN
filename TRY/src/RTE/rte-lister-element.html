@@ -93,17 +93,29 @@
           <rgte-custom-class-relation-element id="customRel" vocab="{{vocab}}" customcls="{{customcls}}" customproprs="{{customprops}}" rgte="{{rgte}}" selectedcls="{{selectedcls}}"></rgte-custom-class-relation-element>
         </div>
 
-        <div class$="[[_isCLSSelected(selectedcls)]]">
-          <p>Selected class (node): [[selectedcls.uri]]<iron-icon icon="add-circle" on-tap="_addClassToRGTE" class="addToRTE">add-circle</iron-icon></p>
+        <div hidden$="{{disableClassesLister}}">
+          <div class$="[[_isCLSSelected(selectedcls)]]">
+            <p>Selected class (node): [[selectedcls.uri]]
+              <span hidden$="{{disableAdding}}">
+                <iron-icon icon="add-circle" on-tap="_addClassToRGTE" class="addToRTE">add-circle</iron-icon>
+              </span>
+            </p>
+          </div>
         </div>
-        <div class$="[[_isPROPSelected(selectedprop)]]">
-          <p>Selected property (edge): [[selectedprop.uri]]<iron-icon icon="add-circle" on-tap="_addPropToRGTE" id="propRGTE" class="addToRTE">add-circle</iron-icon></p>
+        <div hidden$="{{disablePropertiesLister}}">
+          <div class$="[[_isPROPSelected(selectedprop)]]">
+            <p>Selected property (edge): [[selectedprop.uri]]
+              <span hidden$="{{disableAdding}}">
+                <iron-icon icon="add-circle" on-tap="_addPropToRGTE" id="propRGTE" class="addToRTE">add-circle</iron-icon>
+              </span>
+            </p>
+          </div>
         </div>
 
-        <div>
+        <div hidden$="{{disableClassesLister}}">
             <h2>Custom Classes</h2>
             <!-- <ul id="rdfClasses"></ul> -->
-            <iron-list id="ilCUSTCLS" items="[[customcls]]" as="item" class="flex" selection-enabled>
+            <iron-list id="ilCUSTCLS" items="{{customcls}}" as="item" class="flex" selection-enabled>
                 <template>
                     <div>
                         <div class$="[[_computeClass(selected)]]" on-tap="_custcTapped">
@@ -120,7 +132,7 @@
             </iron-list>
         </div>
 
-        <div>
+        <div hidden$="{{disablePropertiesLister}}">
             <h2>Custom Properties</h2>
             <iron-list id="ilCUSTPROPS" items="[[customprops]]" as="item" class="flex" selection-enabled>
                 <template>
@@ -139,7 +151,7 @@
             </iron-list>
         </div>
 
-        <rdf-store-lister-element id="lister" vocab="{{vocab}}"></rdf-store-lister-element>
+        <rdf-store-lister-element id="lister" vocab="{{vocab}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rdf-store-lister-element>
 
     </template>
     <script>
@@ -226,12 +238,38 @@
                   type: Boolean,
                   value: true,
                 },
+                disableAdding:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                disableClassesLister:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                  observer: '_test',
+                },
+                disablePropertiesLister:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
             },
 
             observers: [
                 "_onCustomClsChanged(customcls.splices)",
                 "_onCustomPropsChanged(customprops.splices)"
             ],
+
+            _test: function()
+            {
+              console.log('dSCL Changed - STATE:');
+              console.log(this.disableClassesLister);
+              console.log(this.disablePropertiesLister);
+            },
 
             attached: function()
             {

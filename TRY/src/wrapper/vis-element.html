@@ -88,6 +88,8 @@
                     this.fire('NETWORK_CLICKED', p);
                 }.bind(this));
 
+                this.fire('NETWORK_GENERATED');
+
             },
 
             setNodes: function(nbNodes) {
@@ -157,6 +159,21 @@
                   nodes: this.nodes,
                   edges: this.edges,
               });
+            },
+
+            addNodesAndEdges: function(n, e)
+            {
+              this.nodes = n;
+              this.edges = e;
+
+              console.log(this.edges);
+              console.log(this.network);
+              this.network.setData(
+                {
+                  nodes: this.nodes,
+                  edges: this.edges,
+                }
+              );
             },
 
             redraw: function()

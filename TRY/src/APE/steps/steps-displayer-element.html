@@ -1,0 +1,110 @@
+<link rel="import" href="../../wrapper/vis-element.html">
+
+<dom-module id="steps-displayer-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <vis-element id="stepsview"></vis-element>
+
+  </template>
+  <script>
+    Polymer(
+      {
+        is : 'steps-displayer-element',
+
+        properties:
+        {
+          steps:
+          {
+            type: Array,
+            value: function(){return [];},
+            notify: true,
+            observer: 'draw',
+          },
+
+          belongs:
+          {
+            type: Array,
+            value: function(){return [];},
+            notify: true,
+          },
+        },
+
+        // === NATIVE
+        attached: function()
+        {
+          this.$.stepsview.addEventListener('NETWORK_CLICKED', function(p){
+            this._eventDispatcher(p.detail);
+          }.bind(this));
+        },
+
+        // === PUBLIC
+        draw: function(s)
+        {
+          var stepView = this.$.stepsview;
+
+          if(stepView == null || stepView.getNetwork() == null)
+            return;
+
+          stepView.addNodes(this._stepsToNodes());
+
+          if(s != null)
+          {
+            stepView.addEdges(this._edgesDependencies());
+          }
+
+          stepView.redraw();
+        },
+
+        // === PRIVATE
+        _stepsToNodes: function()
+        {
+          var n = [];
+
+          for(var i in this.steps)
+          {
+            n.push(this._stepToNode(this.steps[i], n.length));
+          }
+
+          return n;
+        },
+        _stepToNode: function(step, numero)//Dry
+        {
+          return {'id': step.id, 'label': numero+'#Step'}
+        },
+        _edgesDependencies: function()
+        {
+          var props = [];
+          var prop = null;
+
+          for(var i in this.steps)
+          {
+            prop = this.steps[i].findDependencies(this.steps, 'to');
+            for(var j in prop)
+              props.push(prop[j]);
+          }
+
+          return props;
+        },
+        _edgeDependencies: function(belRelation)//Dry
+        {
+          throw new Error('Unimplemented function');
+        },
+        _eventDispatcher: function(params)
+        {
+          if(params.nodes.length != 0)
+          {
+            this.fire('-STEPS_DSP_NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0]});
+          }
+          else if(params.edges.length != 0)
+          {
+            this.fire('-STEPS_DSP_EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.stepsview.getNetwork().body.edges[params.edges[0]].options.label});
+          }
+        },
+      });
+  </script>
+</dom-module>
