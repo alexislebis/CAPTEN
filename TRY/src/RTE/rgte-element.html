@@ -281,16 +281,18 @@
 
               var res = this._deleteCurrentNode();
 
+              var newcls = this.addClass(cls)
+
               for(var i in res)
               {
                 if(res[i].from === this.nodeIDSelected)
                 {
                   // this.rgte.updateEdgeFromTo(res[i], addClass(this.nodeIDSelected), res[i].to);
-                  this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), this.addClass(cls), res[i].to);
+                  this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), newcls, res[i].to);
                 }
                 else if(res[i].to === this.nodeIDSelected)
                 {
-                  this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), res[i].from, this.addClass(cls));
+                  this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), res[i].from, newcls);
                 }
                 else {
                   throw new Error("Unexpected property to update");
