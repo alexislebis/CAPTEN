@@ -1,3 +1,6 @@
+<link rel="import" src="./Displayers/statement-displayer-element.html">
+<link rel="import" src="./Displayers/statement-namer-element.html">
+
 <dom-module id="narrative-block-displayer-element">
   <template>
       <style>
@@ -6,12 +9,17 @@
         }
       </style>
 
+      <statement-displayer-element statement="{{tmpsctfstmt}}"></statement-displayer-element>
+      <statement-namer-element statement="{{tmpsctfstmt}}"></statement-namer-element>
+
       <template id="narrativeBlockExists" is="dom-if" if="{{_narrativeBlockConfigured(nbConfigured)}}" restamp>
 
         <template is="dom-repeat" items="{{narrativeblock.elements}}">
 
-          <template is="dom-if" if="{{_isStatement(item.name)}}">
-            <p>YES!</p>
+          <template is="dom-if" if="{{_isStatement(item.name)}}" restamp>
+            trying to boot statement-displayer-element
+            {{tmpsctfstmt.name}}
+            <statement-displayer-element statement={{tmpsctfstmt}}></statement-displayer-element>
           </template>
 
         </template>
@@ -41,7 +49,14 @@
         type: Boolean,
         notify: true,
         value: false,
-      }
+      },
+
+      tmpsctfstmt:
+      {
+        type: Object,
+        notify: true,
+        value: function(){ val = new ScientificStatement(); val.is('Hypothesis'); return val;}
+      },
     },
 
     _narrativeBlockConfigured: function(nbConfigured)
@@ -62,7 +77,6 @@
       this.narrativeblock.elements.push(2);
 
       this.nbConfigured = !this.nbConfigured;
-
     },
 
     _isStatement: function(item)

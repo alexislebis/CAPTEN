@@ -1,0 +1,47 @@
+<dom-module id="property-namer-element.html">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <template is="dom-if" if="{{_isJustifiedBy(property)}}" restamp="true">
+      <p>is justified by</p>
+    </template>
+    <template is="dom-if" if="{{_isReliesOn(property)}}" restamp="true">
+      <p>relies on</p>
+    </template>
+
+  </template>
+  <script>
+    Polymer(
+      {
+        is : 'property-namer-element',
+
+        properties:
+        {
+          property:
+          {
+            type: Object,
+            value: function(){return new Property();},
+            notify: true,
+          }
+        },
+
+      // === TEMPLATE BEHAVIOR
+        _isJustifiedBy: function(prop)
+        {
+          if(prop == null || prop.name != "isJustifiedBy")
+            return false;
+          return true;
+        },
+        _isReliesOn: function(prop)
+        {
+          if(prop == null || prop.name != "reliesOn")
+            return false;
+          return true;
+        },
+      });
+    </script>
+  </dom-module>

@@ -1,3 +1,5 @@
+<link rel="import" href="./property-namer-element.html">
+
 <dom-module id="statement-displayer-element">
   <template>
     <style>
@@ -6,7 +8,9 @@
     }
     </style>
 
-
+    coucou displayer ?
+    <property-namer-element property={{statementproperty}}></property-namer-element>
+    <statement-namer-element statement={{statement}}></statement-namer-element>
 
   </template>
   <script>
@@ -21,6 +25,7 @@
             type: Object,
             value: function(){return new Statement();},
             notify: true,
+            observer: '_lolz',
           },
 
           statementproperty:
@@ -30,6 +35,11 @@
             notify: true,
           }
         },
+
+        _lolz: function(e)
+        {
+          console.log(this.statement);
+        },
       });
     </script>
-  </dom-module>
+</dom-module>
