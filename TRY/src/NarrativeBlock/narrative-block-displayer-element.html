@@ -1,0 +1,81 @@
+<dom-module id="narrative-block-displayer-element">
+  <template>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
+
+      <template id="narrativeBlockExists" is="dom-if" if="{{_narrativeBlockConfigured(nbConfigured)}}" restamp>
+
+        <template is="dom-repeat" items="{{narrativeblock.elements}}">
+
+          <template is="dom-if" if="{{_isStatement(item.name)}}">
+            <p>YES!</p>
+          </template>
+
+        </template>
+
+      </template>
+
+      <paper-button raised on-click='test'></paper-button>
+
+
+
+  </template>
+  <script>
+  Polymer({
+    is: 'narrative-block-displayer-element',
+
+    properties:
+    {
+      narrativeblock:
+      {
+        type: Object,
+        notify: true,
+        value: function(){return new NarrativeBlock();},
+      },
+
+      nbConfigured:
+      {
+        type: Boolean,
+        notify: true,
+        value: false,
+      }
+    },
+
+    _narrativeBlockConfigured: function(nbConfigured)
+    {
+      if(this.narrativeblock == null || this.narrativeblock.propertyEntity == null)
+        this.nbConfigured = false;
+      else
+        this.nbConfigured = true;
+
+      return this.nbConfigured;
+    },
+
+    test: function()
+    {
+      this.narrativeblock.propertyEntity = 1;
+
+      this.narrativeblock.elements.push(new Statement());
+      this.narrativeblock.elements.push(2);
+
+      this.nbConfigured = !this.nbConfigured;
+
+    },
+
+    _isStatement: function(item)
+    {
+      console.log(item);
+      if(item == null)
+        return false;
+      if(item == "Statement")
+        return true;
+      return false;
+    },
+
+  });
+  </script>
+
+</dom-module>

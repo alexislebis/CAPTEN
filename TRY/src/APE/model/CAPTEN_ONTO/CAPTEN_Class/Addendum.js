@@ -28,7 +28,7 @@ function ExampleOfUse(){
 
 ExampleOfUse.prototype = Object.create(Annotation.prototype);
 
-function Tag(){
+function Tag(){ //@TODO Should be considered as an array
     Annotation.call(this);
     this.uri = "NAU";
 
@@ -36,3 +36,12 @@ function Tag(){
 }
 
 Tag.prototype = Object.create(Annotation.prototype);
+
+function Comment(){
+  Annotation.call(this);
+  this.uri = "NAU";
+
+  this.value = null;
+}
+
+Comment.prototype = Object.create(Annotation.prototype);

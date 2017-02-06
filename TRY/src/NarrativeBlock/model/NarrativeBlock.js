@@ -62,7 +62,7 @@ NarrativeBlock.prototype = {
     if(property == null)
       return;
 
-    this.property = property;
+    this.propertyEntity = property;
   },
 
   addElement: function(element, propertyWEntity)

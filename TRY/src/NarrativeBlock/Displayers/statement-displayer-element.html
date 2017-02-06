@@ -1,0 +1,35 @@
+<dom-module id="statement-displayer-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+
+
+  </template>
+  <script>
+    Polymer(
+      {
+        is : 'statement-displayer-element',
+
+        properties:
+        {
+          statement:
+          {
+            type: Object,
+            value: function(){return new Statement();},
+            notify: true,
+          },
+
+          statementproperty:
+          {
+            type: Object,
+            value: function(){return new Property();},
+            notify: true,
+          }
+        },
+      });
+    </script>
+  </dom-module>
