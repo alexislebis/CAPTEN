@@ -30,7 +30,6 @@ function Property(uri, label, From, to, additionalConstraints){
     this.subClasses = []; //Here are the classes which inherit this
     this.subClassOf = []; //Here, the classes inherited from this
 
-
   //   this.subClasses = [
   //             {subClasses:{}, uri: 'NAU', name: 'hasPreviousStep'},
   //             {subClasses:{}, uri: 'NAU', name: 'hasPreviousVersion'},
@@ -43,6 +42,7 @@ function Property(uri, label, From, to, additionalConstraints){
 }
 
 Property.id = 0;
+
 
 Property.prototype = {
 
@@ -238,3 +238,24 @@ Property.prototype = {
   // ===
 
 };
+
+Property.prototype.constructor = Property;
+Property.namerElement = Polymer(
+  {
+    is : 'property-namer-element',
+
+    properties:
+    {
+      property:
+      {
+         type: Object,
+         value: null,
+         notify: true,
+      },
+    },
+
+    factoryImpl: function(prop)
+    {
+      this.property = prop;
+    },
+  });

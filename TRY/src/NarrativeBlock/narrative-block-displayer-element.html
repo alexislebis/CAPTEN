@@ -1,5 +1,7 @@
-<link rel="import" href="./Displayers/statement-displayer-element.html">
-<link rel="import" href="./Displayers/statement-namer-element.html">
+<!-- <link rel="import" href="../CAPTEN_ONTO/view/displayer/statement-displayer-element.html"> -->
+<link rel="import" href="../CAPTEN_ONTO/view/displayer/statement-namer-element.html">
+<link rel="import" href="../CAPTEN_ONTO/view/displayer/property-namer-element.html">
+
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <dom-module id="narrative-block-displayer-element">
@@ -11,25 +13,29 @@
       </style>
 
 
+        <!-- <template id="narrativeBlockExists" is="dom-if" if="{{_narrativeBlockConfigured(nbConfigured)}}" restamp> -->
 
-      <template id="narrativeBlockExists" is="dom-if" if="{{_narrativeBlockConfigured(nbConfigured)}}" restamp>
+          <div id="narrativeLoopItem">
 
-        <template is="dom-repeat" items="{{narrativeblock.elements}}">
+          </div>
+          <!-- <template is="dom-repeat" items="{{narrativeblock.elements}}"> -->
 
-            <property-namer-element from="{{narrativeblock.propertyEntity.from}}" to="{{item.id}}"></property-namer-element>
 
-          <template is="dom-if" if="{{_isStatement(item)}}" restamp>
-            {{plop()}}
-            <!-- <statement-displayer-element statement="{{tmpsctfstmt}}" statementproperty="{{prop}}"></statement-displayer-element> -->
-          </template>
+              <!-- <property-namer-element from="{{narrativeblock.propertyEntity.from}}" to="{{item.id}}"></property-namer-element> -->
+            <!-- <div id="narrativeitem{{item.id}}">
+              {{_addProperty(item)}}
+            </div>
+            <template is="dom-if" if="{{_isStatement(item)}}" restamp> -->
+              <!-- <statement-displayer-element statement="{{tmpsctfstmt}}" statementproperty="{{prop}}"></statement-displayer-element> -->
+            <!-- </template>
 
-          <template is="dom-if" if="{{_isUnknown(item)}}" restamp>
-            Element linked (item: {{item}}, id: {{item.id}}, uri: {{item.uri}}, name: {{item.name}} ) does not have any displaying function associated.
-          </template>
+            <template is="dom-if" if="{{_isUnknown(item)}}" restamp>
+              Element linked (item: {{item}}, id: {{item.id}}, uri: {{item.uri}}, name: {{item.name}} ) does not have any displaying function associated.
+            </template>
 
-        </template>
+          </template> -->
 
-      </template>
+        <!-- </template> -->
 
       <paper-button raised on-click='test'></paper-button>
 
@@ -73,9 +79,20 @@
 
     attached: function()
     {
+      this.narrativeblock.resetObservers();
+      this.narrativeblock.registerObserverCallbackOnChange(this, this._callbackNarrativeBlockChanged);
+
+      this.displayNarrativeBlock();
+
       var s = new Statement();//new Statement.element();
-      console.log(new (s.constructor).element());
       console.log(s);
+      console.log(s.constructor);
+      console.log(new (s.constructor).namerElement());
+      // console.log(s);
+
+      var p = new Property();
+      console.log(p.constructor);
+      console.log(new (p.constructor).namerElement());
 
       var sctf = new ScientificStatement();
       console.log(sctf instanceof Statement);
@@ -87,31 +104,128 @@
       document.body.appendChild(stmt);
     },
 
-    plop:function()
+    _callbackNarrativeBlockChanged: function()
     {
-      alert('yo');
+      this.displayNarrativeBlock();
+    },
+
+    displayNarrativeBlock: function()
+    {
+
+      if(!this._narrativeBlockConfigured())
+        return;
+
+      this._resetDisplayNarrative();
+      console.log(this.narrativeblock);
+
+      for(var i in this.narrativeblock.elements)
+      {
+        var div = document.createElement('div');
+        var item = this.narrativeblock.elements[i];
+
+        div.setAttribute('id', "narrativeItem"+item.id);
+
+        var prop = this._createPropertyElement(item.id);
+        div.appendChild(prop);
+
+        var itemElement = null;
+        console.log(item);
+        if( (item.constructor).namerElement != null)
+        {
+        console.log('OK!');
+         itemElement = new (item.constructor).namerElement(itemElement);
+         console.log(itemElement);
+         div.appendChild(itemElement);
+         console.log(div);
+       }
+
+        this.$$('#narrativeLoopItem').appendChild(div);
+      }
+    },
+
+    _resetDisplayNarrative:function()
+    {
+      var myNode = this.$$("#narrativeLoopItem");
+
+      if(myNode)
+        while (myNode.firstChild)
+            myNode.removeChild(myNode.firstChild);
     },
 
     test: function()
     {
       this.narrativeblock.propertyEntity = 1;
 
-      this.narrativeblock.elements.push(new Statement());
+      this.narrativeblock.elements.push(new Hypothesis());
       this.narrativeblock.elements.push(2);
 
-      this.nbConfigured = !this.nbConfigured;
+      this.displayNarrativeBlock();
     },
 
   // === CONDITIONAL TEMPLATE BEHAVIOR
-    _narrativeBlockConfigured: function(nbConfigured)
+    // _narrativeBlockConfigured: function(nbConfigured) //OLD
+    // {
+    //   if(this.narrativeblock == null || this.narrativeblock.propertyEntity == null)
+    //     this.nbConfigured = false;
+    //   else
+    //     this.nbConfigured = true;
+    //
+    //   return this.nbConfigured;
+    // },
+
+    _narrativeBlockConfigured: function()
     {
       if(this.narrativeblock == null || this.narrativeblock.propertyEntity == null)
-        this.nbConfigured = false;
-      else
-        this.nbConfigured = true;
+        return false;
 
-      return this.nbConfigured;
+      return true;
     },
+
+    _createPropertyElement: function(item)
+    {
+      //var props = PROPERTIES_POOL.getPropertiesByExtremities(this.narrativeblock.propertyEntity.from, item.id);
+      PROPERTIES_POOL.create("delme","delme",7777,7778);
+      var props = PROPERTIES_POOL.getPropertiesByExtremities(7777,7778);
+      if(props <= 0)
+        return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty";
+
+      var prop = props[0];
+
+      if(prop.constructor == null)
+        return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty:noNamerConstructor";
+
+      return element = new (prop.constructor).namerElement(prop);
+
+      // console.log('appending');
+      // console.log(item);
+      //   console.log(this.$$("#narrativeitem"+item.id));
+      //
+      // //this.$[item.id].appendChild(element);
+      // console.log('appended');
+    },
+
+    // _addProperty: function(item)
+    // {
+    //   //var props = PROPERTIES_POOL.getPropertiesByExtremities(this.narrativeblock.propertyEntity.from, item.id);
+    //   PROPERTIES_POOL.create("delme","delme",7777,7778);
+    //   var props = PROPERTIES_POOL.getPropertiesByExtremities(7777,7778);
+    //   if(props <= 0)
+    //     return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty";
+    //
+    //   var prop = props[0];
+    //
+    //   if(prop.constructor == null)
+    //     return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty:noNamerConstructor";
+    //
+    //   var element = new (prop.constructor).namerElement(prop);
+    //
+    //   console.log('appending');
+    //   console.log(item);
+    //     console.log(this.$$("#narrativeitem"+item.id));
+    //
+    //   //this.$[item.id].appendChild(element);
+    //   console.log('appended');
+    // },
 
     _isStatement: function(item)
     {

@@ -20,3 +20,42 @@ function ScientificStatement()
 
 ScientificStatement.prototype = new Statement();//Object.create(CAPTENClass.prototype);
 ScientificStatement.prototype.constructor = ScientificStatement;
+
+
+
+
+// ==============
+function Hypothesis()
+{
+  ScientificStatement.call(this);
+  this.uri = "NAU";
+  this.iName = "Hypothesis";
+  this.name = "Hypothesis";
+}
+
+Hypothesis.prototype = new ScientificStatement();
+Hypothesis.prototype.constructor = Hypothesis;
+Hypothesis.namerElement = Polymer(
+  {
+    is : 'hypothesis-namer-element',
+
+    properties:
+    {
+      statement:
+      {
+        type: Object,
+        value: function(){return new Statement();},
+        notify: true,
+      }
+    },
+
+    factoryImpl: function(item)
+    {
+      this.statement = item;
+    },
+
+    attached: function()
+    {
+      console.log("Hypothesis Attached");
+    },
+  });

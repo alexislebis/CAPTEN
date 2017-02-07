@@ -26,7 +26,7 @@ function Statement()
 
 Statement.prototype = new CAPTENClass();//Object.create(CAPTENClass.prototype);
 Statement.prototype.constructor = Statement;
-Statement.element = Polymer(
+Statement.namerElement = Polymer(
   {
     is : 'statement-namer-element',
 
@@ -38,6 +38,11 @@ Statement.element = Polymer(
         value: function(){return new Statement();},
         notify: true,
       }
+    },
+
+    factoryImpl: function(item)
+    {
+      this.statement = item;
     },
 
     attached: function()
