@@ -9,8 +9,15 @@ function Statement()
 
     this.addendum = null;
 
+    var inheritanceSCTFSTMT = [ {subClasses:{}, name: "Hypothesis", uri: "NAU"},
+                                {subClasses:{}, name: "Proposition", uri: "NAU"},
+                                {subClasses:{}, name: "Theory", uri: "NAU"},
+                                {subClasses:{}, name: "Defintion", uri: "NAU"},
+                                {subClasses:{}, name: "Axiom", uri: "NAU"},
+                                {subClasses:{}, name: "Conjecture", uri: "NAU"}, ];
+
     this.subClasses = [
-      {subClasses:{}, name: "ScientificStatement", uri: "NAU"},
+      {subClasses:inheritanceSCTFSTMT, name: "ScientificStatement", uri: "NAU"},
 
     ];
 }

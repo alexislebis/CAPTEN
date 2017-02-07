@@ -1,4 +1,7 @@
+<link rel="import" href="./statement-namer-element.html">
 <link rel="import" href="./property-namer-element.html">
+
+<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
 
 <dom-module id="statement-displayer-element">
   <template>
@@ -8,9 +11,10 @@
     }
     </style>
 
-    coucou displayer ?
     <property-namer-element property={{statementproperty}}></property-namer-element>
     <statement-namer-element statement={{statement}}></statement-namer-element>
+    as follow:
+    <paper-textarea label="Statement justification" value="{{statement.content}}" readonly></paper-textarea>
 
   </template>
   <script>

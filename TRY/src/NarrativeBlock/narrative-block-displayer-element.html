@@ -1,5 +1,6 @@
-<link rel="import" src="./Displayers/statement-displayer-element.html">
-<link rel="import" src="./Displayers/statement-namer-element.html">
+<link rel="import" href="./Displayers/statement-displayer-element.html">
+<link rel="import" href="./Displayers/statement-namer-element.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <dom-module id="narrative-block-displayer-element">
   <template>
@@ -8,9 +9,6 @@
           display: block;
         }
       </style>
-
-      <statement-displayer-element statement="{{tmpsctfstmt}}"></statement-displayer-element>
-      <statement-namer-element statement="{{tmpsctfstmt}}"></statement-namer-element>
 
       <template id="narrativeBlockExists" is="dom-if" if="{{_narrativeBlockConfigured(nbConfigured)}}" restamp>
 
@@ -55,8 +53,15 @@
       {
         type: Object,
         notify: true,
-        value: function(){ val = new ScientificStatement(); val.is('Hypothesis'); return val;}
+        value: function(){ val = new Statement(); val.is("ScientificStatement"); val.is('Hypothesis'); val.content="Because it is, tho!\n\n'Tis but a scratch!"; return val;}
       },
+
+      // prop:
+      // {
+      //   type: Object,
+      //   notify: true,
+      //   value: function(){val = new Property(); val.is('isJustifiedBy'); return val; },
+      // },
     },
 
     _narrativeBlockConfigured: function(nbConfigured)

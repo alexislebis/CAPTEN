@@ -1,6 +1,6 @@
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
-<dom-module id="statement-namer-element.html">
+<dom-module id="statement-namer-element">
   <template>
     <style>
     :host {
@@ -34,6 +34,11 @@
             value: function(){return new Statement();},
             notify: true,
           }
+        },
+
+        attached: function()
+        {
+          console.log("Attached");
         },
 
       // === TEMPLATE BEHAVIOR
