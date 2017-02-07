@@ -26,6 +26,9 @@ function Property(uri, label, From, to, additionalConstraints){
 
     this.inheritanceArray = [];
 
+    this.subClasses = []; //Here are the classes which inherit this
+    this.subClassOf = []; //Here, the classes inherited from this
+
 
   //   this.subClasses = [
   //             {subClasses:{}, uri: 'NAU', name: 'hasPreviousStep'},

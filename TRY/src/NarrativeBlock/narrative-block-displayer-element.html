@@ -15,9 +15,7 @@
         <template is="dom-repeat" items="{{narrativeblock.elements}}">
 
           <template is="dom-if" if="{{_isStatement(item.name)}}" restamp>
-            trying to boot statement-displayer-element
-            {{tmpsctfstmt.name}}
-            <statement-displayer-element statement={{tmpsctfstmt}}></statement-displayer-element>
+            <statement-displayer-element statement="{{tmpsctfstmt}}" statementproperty="{{prop}}"></statement-displayer-element>
           </template>
 
         </template>
@@ -56,12 +54,12 @@
         value: function(){ val = new Statement(); val.is("ScientificStatement"); val.is('Hypothesis'); val.content="Because it is, tho!\n\n'Tis but a scratch!"; return val;}
       },
 
-      // prop:
-      // {
-      //   type: Object,
-      //   notify: true,
-      //   value: function(){val = new Property(); val.is('isJustifiedBy'); return val; },
-      // },
+      prop:
+      {
+        type: Object,
+        notify: true,
+        value: function(){val = new ScientificHaecceity(); val.is('isJustifiedBy'); return val; },
+      },
     },
 
     _narrativeBlockConfigured: function(nbConfigured)

@@ -11,10 +11,12 @@
     }
     </style>
 
-    <property-namer-element property={{statementproperty}}></property-namer-element>
-    <statement-namer-element statement={{statement}}></statement-namer-element>
-    as follow:
-    <paper-textarea label="Statement justification" value="{{statement.content}}" readonly></paper-textarea>
+    <div>
+      <property-namer-element property={{statementproperty}}></property-namer-element>
+      <statement-namer-element statement={{statement}}></statement-namer-element>
+      as follow:
+      <paper-textarea label="Statement justification" value="{{statement.content}}" readonly max-rows="3"></paper-textarea>
+    </div>
 
   </template>
   <script>
@@ -29,7 +31,6 @@
             type: Object,
             value: function(){return new Statement();},
             notify: true,
-            observer: '_lolz',
           },
 
           statementproperty:
@@ -38,11 +39,6 @@
             value: function(){return new Property();},
             notify: true,
           }
-        },
-
-        _lolz: function(e)
-        {
-          console.log(this.statement);
         },
       });
     </script>
