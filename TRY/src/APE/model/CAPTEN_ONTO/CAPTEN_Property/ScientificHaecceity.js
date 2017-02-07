@@ -7,6 +7,8 @@ function ScientificHaecceity(){
   this.iName = "hasScientificHaeccity";
   this.name = this.iName;
 
+  this.inheritanceArray.push('Property');
+
   //Property.prototype.is.call(this, 'hasScientificHaeccity');
   // constructor(){
     this.subClasses = [

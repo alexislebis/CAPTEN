@@ -10,12 +10,21 @@
         }
       </style>
 
+
+
       <template id="narrativeBlockExists" is="dom-if" if="{{_narrativeBlockConfigured(nbConfigured)}}" restamp>
 
         <template is="dom-repeat" items="{{narrativeblock.elements}}">
 
-          <template is="dom-if" if="{{_isStatement(item.name)}}" restamp>
-            <statement-displayer-element statement="{{tmpsctfstmt}}" statementproperty="{{prop}}"></statement-displayer-element>
+            <property-namer-element from="{{narrativeblock.propertyEntity.from}}" to="{{item.id}}"></property-namer-element>
+
+          <template is="dom-if" if="{{_isStatement(item)}}" restamp>
+            {{plop()}}
+            <!-- <statement-displayer-element statement="{{tmpsctfstmt}}" statementproperty="{{prop}}"></statement-displayer-element> -->
+          </template>
+
+          <template is="dom-if" if="{{_isUnknown(item)}}" restamp>
+            Element linked (item: {{item}}, id: {{item.id}}, uri: {{item.uri}}, name: {{item.name}} ) does not have any displaying function associated.
           </template>
 
         </template>
@@ -62,14 +71,25 @@
       },
     },
 
-    _narrativeBlockConfigured: function(nbConfigured)
+    attached: function()
     {
-      if(this.narrativeblock == null || this.narrativeblock.propertyEntity == null)
-        this.nbConfigured = false;
-      else
-        this.nbConfigured = true;
+      var s = new Statement();//new Statement.element();
+      console.log(new (s.constructor).element());
+      console.log(s);
 
-      return this.nbConfigured;
+      var sctf = new ScientificStatement();
+      console.log(sctf instanceof Statement);
+      console.log(sctf instanceof CAPTENClass);
+      console.log(sctf instanceof Property);
+      var stmt = document.createElement('statement-namer-element');
+      stmt.statement = this.tmpsctfstmt;
+
+      document.body.appendChild(stmt);
+    },
+
+    plop:function()
+    {
+      alert('yo');
     },
 
     test: function()
@@ -82,15 +102,46 @@
       this.nbConfigured = !this.nbConfigured;
     },
 
+  // === CONDITIONAL TEMPLATE BEHAVIOR
+    _narrativeBlockConfigured: function(nbConfigured)
+    {
+      if(this.narrativeblock == null || this.narrativeblock.propertyEntity == null)
+        this.nbConfigured = false;
+      else
+        this.nbConfigured = true;
+
+      return this.nbConfigured;
+    },
+
     _isStatement: function(item)
     {
       console.log(item);
       if(item == null)
         return false;
-      if(item == "Statement")
+      if(item.name == "Statement")
         return true;
+      if(item.inheritanceArray == null)
+        return false;
+
+      for(var i in item.inheritanceArray) //Inspecting the inheritance chain in order to check if the item is a Statement
+        if(item.inheritanceArray[i] == "Statement")
+          return true;
+
       return false;
     },
+
+
+    _isUnknown: function(item)
+    {
+      if(item == null)
+        return true;
+
+      if( !this._isStatement(item) ) //&& _isSMTH
+        return true;
+
+      return false;
+    }
+  // === END CONDITIONAL TEMPLATE BEHAVIOR
 
   });
   </script>

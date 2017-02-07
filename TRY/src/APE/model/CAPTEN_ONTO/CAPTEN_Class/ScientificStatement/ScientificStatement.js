@@ -18,4 +18,5 @@ function ScientificStatement()
     ];
 }
 
-ScientificStatement.prototype = Object.create(CAPTENClass.prototype);
+ScientificStatement.prototype = new Statement();//Object.create(CAPTENClass.prototype);
+ScientificStatement.prototype.constructor = ScientificStatement;

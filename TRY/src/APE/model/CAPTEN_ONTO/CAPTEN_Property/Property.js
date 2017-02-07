@@ -8,6 +8,7 @@ function Property(uri, label, From, to, additionalConstraints){
     this.id = CAPTEN.ID++;
 
     this.iName = "Property";//Memorize the root level for inheritance
+    this.name = this.iName;
 
     if(label == null)
       this.label = this.iName;

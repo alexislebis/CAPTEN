@@ -3,6 +3,8 @@ function Statement()
   {
     CAPTENClass.call(this);
 
+    this.inheritanceArray.push("CAPTENClass");
+
     this.name = "Statement";
     this.content = null;//NOTE: Equivalent to description in CAPTEN-ONTO-After_REU_29/08/16
     this.researchObjects = null;
@@ -22,4 +24,62 @@ function Statement()
     ];
 }
 
-Statement.prototype = Object.create(CAPTENClass.prototype);
+Statement.prototype = new CAPTENClass();//Object.create(CAPTENClass.prototype);
+Statement.prototype.constructor = Statement;
+Statement.element = Polymer(
+  {
+    is : 'statement-namer-element',
+
+    properties:
+    {
+      statement:
+      {
+        type: Object,
+        value: function(){return new Statement();},
+        notify: true,
+      }
+    },
+
+    attached: function()
+    {
+      console.log("Attached");
+    },
+
+  // === TEMPLATE BEHAVIOR
+    _isHypothesis: function(statement)
+    {
+      if(statement == null || statement.name != "Hypothesis")
+        return false;
+      return true;
+    },
+    _isProposition: function(statement)
+    {
+      if(statement == null || statement.name != "Proposition")
+        return false;
+      return true;
+    },
+    _isTheory: function(statement)
+    {
+      if(statement == null || statement.name != "Theory")
+        return false;
+      return true;
+    },
+    _isDefinition: function(statement)
+    {
+      if(statement == null || statement.name != "Definition")
+        return false;
+      return true;
+    },
+    _isAxiom: function(statement)
+    {
+      if(statement == null || statement.name != "Axiom")
+        return false;
+      return true;
+    },
+    _isConjecture: function(statement)
+    {
+      if(statement == null || statement.name != "Conjecture")
+        return false;
+      return true;
+    },
+  });

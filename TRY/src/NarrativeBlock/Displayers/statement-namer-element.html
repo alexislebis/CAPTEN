@@ -7,51 +7,88 @@
       display: block;
     }
     </style>
-    
+
     <template is="dom-if" if="{{_isHypothesis(statement)}}" restamp="true">
       <p id="sctfstmt">a hypothesis</p>
     </template>
     <template is="dom-if" if="{{_isProposition(statement)}}" restamp="true">
       <p id="sctfstmt">a proposition</p>
     </template>
+    <template is="dom-if" if="{{_isTheory(statement)}}" restamp="true">
+      <p id="sctfstmt">a theory</p>
+    </template>
+    <template is="dom-if" if="{{_isDefinition(statement)}}" restamp="true">
+      <p id="sctfstmt">a definition</p>
+    </template>
+    <template is="dom-if" if="{{_isAxiom(statement)}}" restamp="true">
+      <p id="sctfstmt">a axiom</p>
+    </template>
+    <template is="dom-if" if="{{_isConjecture(statement)}}" restamp="true">
+      <p id="sctfstmt">a conjecture</p>
+    </template>
+
 
 
  <paper-tooltip for="sctfstmt" offset='0'>It is a scientific justificiation. Check research objects associated for more information (if any)</paper-tooltip>
 
   </template>
   <script>
-    Polymer(
-      {
-        is : 'statement-namer-element',
-
-        properties:
-        {
-          statement:
-          {
-            type: Object,
-            value: function(){return new Statement();},
-            notify: true,
-          }
-        },
-
-        attached: function()
-        {
-          console.log("Attached");
-        },
-
-      // === TEMPLATE BEHAVIOR
-        _isHypothesis: function(statement)
-        {
-          if(statement == null || statement.name != "Hypothesis")
-            return false;
-          return true;
-        },
-        _isProposition: function(statement)
-        {
-          if(statement == null || statement.name != "Proposition")
-            return false;
-          return true;
-        },
-      });
+    // Polymer(
+    //   {
+    //     is : 'statement-namer-element',
+    //
+    //     properties:
+    //     {
+    //       statement:
+    //       {
+    //         type: Object,
+    //         value: function(){return new Statement();},
+    //         notify: true,
+    //       }
+    //     },
+    //
+    //     attached: function()
+    //     {
+    //       console.log("Attached");
+    //     },
+    //
+    //   // === TEMPLATE BEHAVIOR
+    //     _isHypothesis: function(statement)
+    //     {
+    //       if(statement == null || statement.name != "Hypothesis")
+    //         return false;
+    //       return true;
+    //     },
+    //     _isProposition: function(statement)
+    //     {
+    //       if(statement == null || statement.name != "Proposition")
+    //         return false;
+    //       return true;
+    //     },
+    //     _isTheory: function(statement)
+    //     {
+    //       if(statement == null || statement.name != "Theory")
+    //         return false;
+    //       return true;
+    //     },
+    //     _isDefinition: function(statement)
+    //     {
+    //       if(statement == null || statement.name != "Definition")
+    //         return false;
+    //       return true;
+    //     },
+    //     _isAxiom: function(statement)
+    //     {
+    //       if(statement == null || statement.name != "Axiom")
+    //         return false;
+    //       return true;
+    //     },
+    //     _isConjecture: function(statement)
+    //     {
+    //       if(statement == null || statement.name != "Conjecture")
+    //         return false;
+    //       return true;
+    //     },
+    //   });
     </script>
   </dom-module>

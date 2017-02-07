@@ -6,13 +6,37 @@
     }
     </style>
 
-
+    PNE
 
     <template is="dom-if" if="{{_isJustifiedBy(property)}}" restamp="true">
       <p>is justified by</p>
     </template>
     <template is="dom-if" if="{{_isReliesOn(property)}}" restamp="true">
       <p>relies on</p>
+    </template>
+    <template is="dom-if" if="{{_isInconsistentWith(property)}}" restamp="true">
+      <p>is inconstitent with</p>
+    </template>
+    <template is="dom-if" if="{{_isRespects(property)}}" restamp="true">
+      <p>respects</p>
+    </template>
+    <template is="dom-if" if="{{_isCompletes(property)}}" restamp="true">
+      <p>completes</p>
+    </template>
+    <template is="dom-if" if="{{_isImplies(property)}}" restamp="true">
+      <p>implies</p>
+    </template>
+    <template is="dom-if" if="{{_isAlternativeTo(property)}}" restamp="true">
+      <p>is an alternative to</p>
+    </template>
+    <template is="dom-if" if="{{_isConditionedBy(property)}}" restamp="true">
+      <p>is conditioned by</p>
+    </template>
+    <template is="dom-if" if="{{_isDiscusses(property)}}" restamp="true">
+      <p>discusses</p>
+    </template>
+    <template is="dom-if" if="{{_isConsistentWith(property)}}" restamp="true">
+      <p>is consistent with</p>
     </template>
 
   </template>
@@ -26,9 +50,38 @@
           property:
           {
             type: Object,
-            value: function(){return new Property();},
+            value: null,
             notify: true,
-          }
+          },
+
+          from:
+          {
+            type: Number,
+            notify: true,
+            value: -1,
+            observer: "_retrieveProperty",
+          },
+
+          to:
+          {
+            type: Number,
+            notify: true,
+            value: -1,
+            observer: "_retrieveProperty",
+          },
+        },
+
+        _retrieveProperty: function()
+        {
+          if(this.from == -1 || this.to == -1)
+            return;
+
+          var props = PROPERTIES_POOL.getPropertiesByExtremities(this.from,this.to);
+          console.log(props);
+
+          if(props.length > 0)
+            this.property = props[0];
+
         },
 
       // === TEMPLATE BEHAVIOR
@@ -41,6 +94,54 @@
         _isReliesOn: function(prop)
         {
           if(prop == null || prop.name != "reliesOn")
+            return false;
+          return true;
+        },
+        _isInconsistentWith: function(prop)
+        {
+          if(prop == null || prop.name != "inconsistentWith")
+            return false;
+          return true;
+        },
+        _isRespects: function(prop)
+        {
+          if(prop == null || prop.name != "respects")
+            return false;
+          return true;
+        },
+        _isImplies: function(prop)
+        {
+          if(prop == null || prop.name != "implies")
+            return false;
+          return true;
+        },
+        _isCompletes: function(prop)
+        {
+          if(prop == null || prop.name != "completes")
+            return false;
+          return true;
+        },
+        _isAlternativeTo: function(prop)
+        {
+          if(prop == null || prop.name != "alternativeTo")
+            return false;
+          return true;
+        },
+        _isConditionedBy: function(prop)
+        {
+          if(prop == null || prop.name != "isConditionedBy")
+            return false;
+          return true;
+        },
+        _isDiscusses: function(prop)
+        {
+          if(prop == null || prop.name != "discusses")
+            return false;
+          return true;
+        },
+        _isConsistentWith: function(prop)
+        {
+          if(prop == null || prop.name != "consistentWith")
             return false;
           return true;
         },
