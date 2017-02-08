@@ -33,9 +33,9 @@ NarrativeBlockPool.prototype =
           return this.pool[i];
     },
 
-    getNarrativeBlockFor(idElement)
+    getNarrativeBlockForID(idElement)
     {
-      if(id == null || id < 0)
+      if(idElement == null || idElement < 0)
         return;
 
       var props = [];

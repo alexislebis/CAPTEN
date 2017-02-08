@@ -73,13 +73,14 @@ NarrativeBlock.prototype = {
     if(!NarrativeBlock.isPropertyHandled(propertyWEntity))
       return;
 
-    if( !(propertyWEntity.from === this.propertyEntity.from && propertyWEntity.to === element.id) )
+    if( propertyWEntity == null || !(propertyWEntity.from === this.propertyEntity.from && propertyWEntity.to === element.id) )
       return;
 
     if( this.isElementAlreadyInBlock(element) )
       return;
 
     this.elements.push(element);
+    return element;
   },
 
   isElementAlreadyInBlock: function(element)

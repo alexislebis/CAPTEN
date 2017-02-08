@@ -9,7 +9,7 @@ function Statement()
     this.content = null;//NOTE: Equivalent to description in CAPTEN-ONTO-After_REU_29/08/16
     this.researchObjects = null;
 
-    this.addendum = null;
+    this.addendum = [];
 
     // var inheritanceSCTFSTMT = [ {subClasses:{}, name: "Hypothesis", uri: "NAU"},
     //                             {subClasses:{}, name: "Proposition", uri: "NAU"},
@@ -42,16 +42,29 @@ Statement.prototype.addAddendum = function(content)
     return null;
   }
 
-  var prop = PROPERTIES_POOL.getPropertiesByExtremities(this.id, content.id);
+  var props = PROPERTIES_POOL.getPropertiesByExtremities(this.id, content.id);
+  var prop = null;
 
-  if(prop == null)
+  if(props.length <= 0)
   {
     console.log('the relation between the statement and the addendum is not referenced in the pool. Referencing...');
-    PROPERTIES_POOL.create('NAU','describedBy',this.id, content.id);
+    prop = PROPERTIES_POOL.create('NAU','describedBy',this.id, content.id);
+    console.log('done.');
+  }
+  else
+    prop = props[0];
+
+  var narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+  if(narrativeblock == null)
+  {
+    console.log('Their is no narrative block registered for the element#'+this.id+' inside the narrative block pool. Registering...');
+    narrativeblock = NARRATIVE_BLOCK_POOL.create(this);
     console.log('done.');
   }
 
-  this.content = content;
+  narrativeblock.addElement(content);//Adding the new addendum inside the corresponding narrative block
+
+  this.addendum.push(content); //update addendum array
 },
 
 Statement.prototype.constructor = Statement;
