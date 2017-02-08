@@ -8,9 +8,9 @@
    this.pool = [];
  }
 
- NarrativeBlock.POSITION = 0;
+ NarrativeBlockPool.POSITION = 0;
 
-NarrativeBlock.prototype =
+NarrativeBlockPool.prototype =
 {
     create: function(propertyEntity)
     {
