@@ -31,6 +31,7 @@ function Hypothesis()
   this.uri = "NAU";
   this.iName = "Hypothesis";
   this.name = "Hypothesis";
+  this.htmlify = "a hypothesis"; //use for html display
 }
 
 Hypothesis.prototype = new ScientificStatement();
@@ -41,17 +42,18 @@ Hypothesis.namerElement = Polymer(
 
     properties:
     {
-      statement:
+      item:
       {
         type: Object,
-        value: function(){return new Statement();},
         notify: true,
       }
     },
 
     factoryImpl: function(item)
     {
-      this.statement = item;
+      console.log(item);
+      this.item = item;
+      console.log(this.item);
     },
 
     attached: function()

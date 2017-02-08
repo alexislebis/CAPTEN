@@ -9,6 +9,8 @@ function ScientificHaecceity(){
 
   this.inheritanceArray.push('Property');
 
+  this.htmlify = "is linked by a scientific property defining the nature of";
+
   //Property.prototype.is.call(this, 'hasScientificHaeccity');
   // constructor(){
     this.subClasses = [
@@ -35,31 +37,26 @@ function ScientificHaecceity(){
 //   }
 }
 
-ScientificHaecceity.prototype = Object.create(Property.prototype);
+// ScientificHaecceity.prototype = Object.create(Property.prototype);
 
-// ScientificHaecceity.prototype = {
-//
-//   /** The is function give the possibility to this (ScientificHaecceity) to evolve according to the need of the user.
-//    * Thus, by choosing a specific subclass, the object will evolve. Note the nested evolving possibility with the subClasses value.
-//    * if newName does not belong to the subClass possibilities of this (ScientificHaecceity), then is throw an exception
-//    **/
-//   is: function(newName){
-//     var find = false;
-//
-//     this.subClasses.forEach(function(e){
-//       if(e.name === newName)
-//       {
-//         this.name = e.name;
-//         this.subClasses = e.subClasses;
-//         this.uri = e.uri;
-//         find = true;
-//       }
-//     })
-//
-//     if(!find)
-//       throw new NotSubClassException(newName, this);
-//
-//     return;
-//   },
-//
-// };
+ScientificHaecceity.prototype = new Property();
+ScientificHaecceity.prototype.constructor = ScientificHaecceity;
+
+ScientificHaecceity.namerElement = Polymer(
+  {
+    is : 'scientific-haeacceity-namer-element',
+
+    properties:
+    {
+      property:
+      {
+         type: Object,
+         notify: true,
+      },
+    },
+
+    factoryImpl: function(prop)
+    {
+      this.property = prop;
+    },
+});

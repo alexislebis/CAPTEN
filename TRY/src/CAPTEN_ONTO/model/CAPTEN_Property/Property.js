@@ -27,6 +27,8 @@ function Property(uri, label, From, to, additionalConstraints){
 
     this.inheritanceArray = [];
 
+    this.htmlify = "is linked by a property with"; //use for html display
+
     this.subClasses = []; //Here are the classes which inherit this
     this.subClassOf = []; //Here, the classes inherited from this
 

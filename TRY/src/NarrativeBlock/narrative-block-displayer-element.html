@@ -1,6 +1,5 @@
 <!-- <link rel="import" href="../CAPTEN_ONTO/view/displayer/statement-displayer-element.html"> -->
-<link rel="import" href="../CAPTEN_ONTO/view/displayer/statement-namer-element.html">
-<link rel="import" href="../CAPTEN_ONTO/view/displayer/property-namer-element.html">
+<link rel="import" href="../wrapper/capten-onto-namer-wrapper-element.html">
 
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
@@ -18,24 +17,7 @@
           <div id="narrativeLoopItem">
 
           </div>
-          <!-- <template is="dom-repeat" items="{{narrativeblock.elements}}"> -->
 
-
-              <!-- <property-namer-element from="{{narrativeblock.propertyEntity.from}}" to="{{item.id}}"></property-namer-element> -->
-            <!-- <div id="narrativeitem{{item.id}}">
-              {{_addProperty(item)}}
-            </div>
-            <template is="dom-if" if="{{_isStatement(item)}}" restamp> -->
-              <!-- <statement-displayer-element statement="{{tmpsctfstmt}}" statementproperty="{{prop}}"></statement-displayer-element> -->
-            <!-- </template>
-
-            <template is="dom-if" if="{{_isUnknown(item)}}" restamp>
-              Element linked (item: {{item}}, id: {{item.id}}, uri: {{item.uri}}, name: {{item.name}} ) does not have any displaying function associated.
-            </template>
-
-          </template> -->
-
-        <!-- </template> -->
 
       <paper-button raised on-click='test'></paper-button>
 
@@ -133,11 +115,18 @@
         if( (item.constructor).namerElement != null)
         {
         console.log('OK!');
-         itemElement = new (item.constructor).namerElement(itemElement);
+         itemElement = new (item.constructor).namerElement(item);
+         console.log(item.constructor);
          console.log(itemElement);
-         div.appendChild(itemElement);
+
          console.log(div);
        }
+       else {
+         itemElement = document.createElement("p");
+         itemElement.textContent = "Element linked does not have any displaying function associated. (item: "+JSON.stringify(item)+")";
+       }
+
+       div.appendChild(itemElement);
 
         this.$$('#narrativeLoopItem').appendChild(div);
       }
@@ -193,6 +182,9 @@
 
       if(prop.constructor == null)
         return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty:noNamerConstructor";
+
+      prop = new isJustifiedBy(7777,7778);
+      console.log(prop);
 
       return element = new (prop.constructor).namerElement(prop);
 
