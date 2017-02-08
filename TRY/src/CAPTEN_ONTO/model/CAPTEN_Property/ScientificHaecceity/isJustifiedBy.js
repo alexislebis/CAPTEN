@@ -1,4 +1,4 @@
-function isJustifiedBy(from, to){
+function isJustifiedBy(from, to,additionalConstraints){
 
   ScientificHaecceity.call(this);
 

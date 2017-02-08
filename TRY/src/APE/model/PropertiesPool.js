@@ -15,11 +15,41 @@ PropertiesPool.prototype = {
   {
     var prop = new Property(uri, label, from, to, additionalConstraints);
 
-    this.pool.push(prop);
+    this._addingToPool(prop);
+    // this.pool.push(prop);
+    //
+    // this.pool[this.pool.length-1].position = PropertiesPool.POSITION++;
+    //
+    // return this.pool[this.pool.length-1];
+  },
 
-    this.pool[this.pool.length-1].position = PropertiesPool.POSITION++;
+  createPredefined: function(name, uri, label, from, to, additionalConstraints)
+  {
+    var prop;
 
-    return this.pool[this.pool.length-1];
+    switch (name) {
+      case 'Property':
+        return this.create(uri, label, from, to, additionalConstraints);
+      case 'ScientificHaecceity':
+        return this._addingToPool(new ScientificHaecceity(from, to, additionalConstraints));
+      case 'isJustifiedBy':
+        return this._addingToPool(new isJustifiedBy(from, to, additionalConstraints));
+      default:
+        console.error("Warning, the predifined property "+name+" is NOT defined!");
+        return this.create(null, null, from, to, additionalConstraints);
+    }
+  },
+
+  _addingToPool(prop)
+  {
+    if(prop == null)
+      return null;
+
+      this.pool.push(prop);
+
+      this.pool[this.pool.length-1].position = PropertiesPool.POSITION++;
+
+      return this.pool[this.pool.length-1];
   },
 
   getByPosition: function(pos)

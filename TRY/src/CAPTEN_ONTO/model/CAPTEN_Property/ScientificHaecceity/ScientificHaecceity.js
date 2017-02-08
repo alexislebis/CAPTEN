@@ -1,6 +1,6 @@
 // class ScientificHaecceity extends Property
 
-function ScientificHaecceity(){
+function ScientificHaecceity(from, to, additionalConstraints){
 
   Property.call(this);
 
@@ -8,6 +8,11 @@ function ScientificHaecceity(){
   this.name = this.iName;
 
   this.inheritanceArray.push('Property');
+
+  if(from != null && from >= 0)
+    this.from = from;
+  if(to != null && to >= 0)
+    this.to = to;
 
   this.htmlify = "is linked by a scientific property defining the nature of";
 
