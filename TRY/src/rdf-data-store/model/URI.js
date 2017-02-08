@@ -12,3 +12,5 @@ var CUSTOM_PREFIX_URI = "http://www.CAPTEN.org/SEED/ontologies/custom/";
 var USED_AS = "http://www.CAPTEN.org/SEED/ontologies/usedAs";//TODO add it to the ontology OR locate it
 var INFLUENCES_URI = "http://www.CAPTEN.org/SEED/ontologies/influences";//TODO add it to the ontology OR locate it
 var FOLLOWED_BY_URI = "http://www.CAPTEN.org/SEED/ontologies/followedBy";
+
+var NARRATIVE_BLOCK_URI = "http://www.CAPTEN.org/SEED/ontologies/hasNarrativeBlock";//NOTE Outside the CAPTEN ontology

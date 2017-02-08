@@ -1,5 +1,6 @@
 // class ScientificHaecceity extends Property
 
+//IRRELEVANT. A specialized property does not have a special behavior
 function ScientificHaecceity(from, to, additionalConstraints){
 
   Property.call(this);

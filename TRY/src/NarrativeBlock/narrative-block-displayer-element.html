@@ -44,19 +44,19 @@
         value: false,
       },
 
-      tmpsctfstmt:
-      {
-        type: Object,
-        notify: true,
-        value: function(){ val = new Statement(); val.is("ScientificStatement"); val.is('Hypothesis'); val.content="Because it is, tho!\n\n'Tis but a scratch!"; return val;}
-      },
+      // tmpsctfstmt:
+      // {
+      //   type: Object,
+      //   notify: true,
+      //   value: function(){ val = new Statement(); val.is("ScientificStatement"); val.is('Hypothesis'); val.content="Because it is, tho!\n\n'Tis but a scratch!"; return val;}
+      // },
 
-      prop:
-      {
-        type: Object,
-        notify: true,
-        value: function(){val = new ScientificHaecceity(); val.is('isJustifiedBy'); return val; },
-      },
+      // prop:
+      // {
+      //   type: Object,
+      //   notify: true,
+      //   value: function(){val = new ScientificHaecceity(); val.is('isJustifiedBy'); return val; },
+      // },
     },
 
     attached: function()
@@ -66,24 +66,24 @@
 
       this.displayNarrativeBlock();
 
-      var s = new Statement();//new Statement.element();
-      console.log(s);
-      console.log(s.constructor);
-      console.log(new (s.constructor).namerElement());
+      // var s = new Statement();//new Statement.element();
       // console.log(s);
-
-      var p = new Property();
-      console.log(p.constructor);
-      console.log(new (p.constructor).namerElement());
-
-      var sctf = new ScientificStatement();
-      console.log(sctf instanceof Statement);
-      console.log(sctf instanceof CAPTENClass);
-      console.log(sctf instanceof Property);
-      var stmt = document.createElement('statement-namer-element');
-      stmt.statement = this.tmpsctfstmt;
-
-      document.body.appendChild(stmt);
+      // console.log(s.constructor);
+      // console.log(new (s.constructor).namerElement());
+      // // console.log(s);
+      //
+      // var p = new Property();
+      // console.log(p.constructor);
+      // console.log(new (p.constructor).namerElement());
+      //
+      // var sctf = new ScientificStatement();
+      // console.log(sctf instanceof Statement);
+      // console.log(sctf instanceof CAPTENClass);
+      // console.log(sctf instanceof Property);
+      // var stmt = document.createElement('statement-namer-element');
+      // stmt.statement = this.tmpsctfstmt;
+      //
+      // document.body.appendChild(stmt);
     },
 
     _callbackNarrativeBlockChanged: function()
@@ -145,7 +145,10 @@
     {
       this.narrativeblock.propertyEntity = 1;
 
-      this.narrativeblock.elements.push(new Hypothesis());
+      var v = new Hypothesis();
+      var a = new Description();
+      v.addAddendum(a);
+      this.narrativeblock.elements.push(v);
       this.narrativeblock.elements.push(2);
 
       this.displayNarrativeBlock();
@@ -173,7 +176,7 @@
     _createPropertyElement: function(item)
     {
       //var props = PROPERTIES_POOL.getPropertiesByExtremities(this.narrativeblock.propertyEntity.from, item.id);
-      PROPERTIES_POOL.create("delme","delme",7777,7778);
+      PROPERTIES_POOL.create(null,'isJustifiedBy',7777,7778);
       var props = PROPERTIES_POOL.getPropertiesByExtremities(7777,7778);
       if(props <= 0)
         return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty";
@@ -183,8 +186,7 @@
       if(prop.constructor == null)
         return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty:noNamerConstructor";
 
-      prop = new isJustifiedBy(7777,7778);
-      console.log(prop);
+      //console.log(PROPERTIES_POOL.getByID(57));
 
       return element = new (prop.constructor).namerElement(prop);
 

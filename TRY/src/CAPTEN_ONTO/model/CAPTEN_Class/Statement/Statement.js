@@ -11,20 +11,49 @@ function Statement()
 
     this.addendum = null;
 
-    var inheritanceSCTFSTMT = [ {subClasses:{}, name: "Hypothesis", uri: "NAU"},
-                                {subClasses:{}, name: "Proposition", uri: "NAU"},
-                                {subClasses:{}, name: "Theory", uri: "NAU"},
-                                {subClasses:{}, name: "Defintion", uri: "NAU"},
-                                {subClasses:{}, name: "Axiom", uri: "NAU"},
-                                {subClasses:{}, name: "Conjecture", uri: "NAU"}, ];
-
-    this.subClasses = [
-      {subClasses:inheritanceSCTFSTMT, name: "ScientificStatement", uri: "NAU"},
-
-    ];
+    // var inheritanceSCTFSTMT = [ {subClasses:{}, name: "Hypothesis", uri: "NAU"},
+    //                             {subClasses:{}, name: "Proposition", uri: "NAU"},
+    //                             {subClasses:{}, name: "Theory", uri: "NAU"},
+    //                             {subClasses:{}, name: "Defintion", uri: "NAU"},
+    //                             {subClasses:{}, name: "Axiom", uri: "NAU"},
+    //                             {subClasses:{}, name: "Conjecture", uri: "NAU"}, ];
+    //
+    // this.subClasses = [
+    //   {subClasses:inheritanceSCTFSTMT, name: "ScientificStatement", uri: "NAU"},
+    //
+    // ];
 }
 
 Statement.prototype = new CAPTENClass();//Object.create(CAPTENClass.prototype);
+
+Statement.prototype.addAddendum = function(content)
+{
+  console.log(content);
+
+  if(content.id == null)
+  {
+    console.error('content must have an id');
+    return null;
+  }
+
+  if(!(content instanceof Addendum))
+  {
+    console.error('content must be an Addendum');
+    return null;
+  }
+
+  var prop = PROPERTIES_POOL.getPropertiesByExtremities(this.id, content.id);
+
+  if(prop == null)
+  {
+    console.log('the relation between the statement and the addendum is not referenced in the pool. Referencing...');
+    PROPERTIES_POOL.create('NAU','describedBy',this.id, content.id);
+    console.log('done.');
+  }
+
+  this.content = content;
+},
+
 Statement.prototype.constructor = Statement;
 Statement.namerElement = Polymer(
   {

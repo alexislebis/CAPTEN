@@ -27,7 +27,7 @@ function Property(uri, label, From, to, additionalConstraints){
 
     this.inheritanceArray = [];
 
-    this.htmlify = "is linked by a property with"; //use for html display
+    this.htmlify = this._configureHTMLIFY(); //use for html display
 
     this.subClasses = []; //Here are the classes which inherit this
     this.subClassOf = []; //Here, the classes inherited from this
@@ -47,6 +47,23 @@ Property.id = 0;
 
 
 Property.prototype = {
+
+  //Since a property does not have a special behavior when it is specialized, the html must be changed according to the type of the element
+  _configureHTMLIFY: function()
+  {
+    switch (this.label) {
+      case 'Property':
+        return "is linked by a property with";
+      case 'ScientificHaecceity':
+        return 'is linked by a scientific property defining the nature of';
+      case 'isJustifiedBy':
+        return 'is justified by';
+      case 'describedBy':
+        return 'is described by';
+      default:
+        return "is linked by a "+this.name+" property with";
+    }
+  },
 
   /** The is function give the possibility to this (ScientificHaecceity) to evolve according to the need of the user.
    * Thus, by choosing a specific subclass, the object will evolve. Note the nested evolving possibility with the subClasses value.

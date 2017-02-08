@@ -1,3 +1,12 @@
+function Addendum()
+{
+  CAPTENClass.call(this);
+  this.uri = "NAU";
+}
+
+Addendum.prototype = new CAPTENClass();
+Addendum.prototype.constructor = Addendum;
+
 function Annotation()
 {
   CAPTENClass.call(this);
@@ -12,7 +21,8 @@ function Description(){
   this.uri = "NAU";
 }
 
-Description.prototype = Object.create(Annotation.prototype);
+Description.prototype = new Addendum();
+Description.prototype.constructor = Description;
 
 function ReadingInstruction(){
     Annotation.call(this);
