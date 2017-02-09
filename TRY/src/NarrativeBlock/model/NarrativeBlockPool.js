@@ -23,6 +23,23 @@ NarrativeBlockPool.prototype =
       return block;
     },
 
+    createFromElement: function(elem)
+    {
+      if(elem == null || elem.id == null)
+        return null;
+
+      var block = new NarrativeBlock();
+      var prop = PROPERTIES_POOL.create(NARRATIVE_BLOCK_URI,"hasNarrativeBlock",elem.id, block.id);
+
+      block.configure(prop);
+
+      this.pool.push(block);
+      this.pool[this.pool.length-1].position = NarrativeBlock.POSITION++;
+
+      return block;
+    },
+
+
     getByID: function(id)
     {
       if(id == null || id < 0)
@@ -41,11 +58,8 @@ NarrativeBlockPool.prototype =
       var props = [];
       for(var i in this.pool)
       {
-        props = PROPERTIES_POOL.getPropertiesByExtremities(idElement,this.pool[i].id);
-
-        for(var j in props)
-          if(props[j].uri == NARRATIVE_BLOCK_URI)
-            return this.pool[i];
+        if(this.pool[i].propertyEntity.from == idElement)
+          return this.pool[i];
       }
 
       return null;
