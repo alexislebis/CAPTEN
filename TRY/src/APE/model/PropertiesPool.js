@@ -15,7 +15,7 @@ PropertiesPool.prototype = {
   {
     var prop = new Property(uri, label, from, to, additionalConstraints);
 
-    this._addingToPool(prop);
+    return this._addingToPool(prop);
     // this.pool.push(prop);
     //
     // this.pool[this.pool.length-1].position = PropertiesPool.POSITION++;
