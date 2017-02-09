@@ -36,6 +36,18 @@ CAPTENClass.id = 0;
 
 CAPTENClass.prototype = {
 
+    hasNarrativeBlock: function()
+    {
+      console.log(this.id);
+      console.log(this.name);
+      console.log(NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id));
+      return NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id) == null ? false : true;
+    },
+    getNarrativeBlock: function()
+    {
+      return NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    },
+
     /** The is function give the possibility to this to evolve according to the need of the user.
      * Thus, by choosing a specific subclass, the object will evolve. Note the nested evolving possibility with the subClasses value.
      * if newName does not belong to the subClass possibilities of this, then is throw an exception.
