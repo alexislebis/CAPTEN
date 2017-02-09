@@ -42,7 +42,7 @@ Hypothesis.namerElement = Polymer(
 
     properties:
     {
-      item:
+      entity:
       {
         type: Object,
         notify: true,
@@ -51,13 +51,6 @@ Hypothesis.namerElement = Polymer(
 
     factoryImpl: function(item)
     {
-      console.log(item);
-      this.item = item;
-      console.log(this.item);
-    },
-
-    attached: function()
-    {
-      console.log("Hypothesis Attached");
+      this.entity = item;
     },
   });

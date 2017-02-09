@@ -58,14 +58,19 @@ Statement.prototype.addAddendum = function(content)
   if(narrativeblock == null)
   {
     console.log('Their is no narrative block registered for the element#'+this.id+' inside the narrative block pool. Registering...');
-    narrativeblock = NARRATIVE_BLOCK_POOL.create(this);
-    console.log('done.');
+    narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this);
+    console.log('done. Registered in block#'+narrativeblock.id);
   }
 
-  narrativeblock.addElement(content);//Adding the new addendum inside the corresponding narrative block
+  narrativeblock.addElement(content, prop);//Adding the new addendum inside the corresponding narrative block
 
   this.addendum.push(content); //update addendum array
 },
+
+// Statement.prototype.hasNarrativeBlock = function()
+// {
+//   return NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id) == null ? false : true;
+// },
 
 Statement.prototype.constructor = Statement;
 Statement.namerElement = Polymer(
@@ -74,7 +79,7 @@ Statement.namerElement = Polymer(
 
     properties:
     {
-      statement:
+      entity:
       {
         type: Object,
         value: function(){return new Statement();},
@@ -84,7 +89,7 @@ Statement.namerElement = Polymer(
 
     factoryImpl: function(item)
     {
-      this.statement = item;
+      this.entity = item;
     },
 
     attached: function()
