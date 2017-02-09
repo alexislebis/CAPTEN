@@ -25,7 +25,7 @@
 
   </template>
   <script>
-  Polymer({
+  Polymer({//To be deported in NarrativeBlock.prototype.narrativeblockdisplayer({})
     is: 'narrative-block-displayer-element',
 
     properties:
@@ -61,9 +61,12 @@
 
     attached: function()
     {
-      this.narrativeblock.resetObservers();
-      this.narrativeblock.registerObserverCallbackOnChange(this, this._callbackNarrativeBlockChanged);
-
+      console.log(this.narrativeblock);
+      if(this.narrativeblock)//In the case where, while cascading, there is no more narrative block
+      {
+        this.narrativeblock.resetObservers();
+        this.narrativeblock.registerObserverCallbackOnChange(this, this._callbackNarrativeBlockChanged);
+      }
       this.displayNarrativeBlock();
 
       // var s = new Statement();//new Statement.element();
@@ -94,7 +97,7 @@
     displayNarrativeBlock: function()
     {
 
-      if(!this._narrativeBlockConfigured())
+      if(this.narrativeblock == null || !this._narrativeBlockConfigured())
         return;
 
       this._resetDisplayNarrative();
@@ -102,34 +105,35 @@
 
       for(var i in this.narrativeblock.elements)
       {
-        var div = document.createElement('div');
         var item = this.narrativeblock.elements[i];
-
-        div.setAttribute('id', "narrativeItem"+item.id);
-
-        var prop = this._createPropertyElement(item.id);
-        div.appendChild(prop);
-
-        var itemElement = null;
-        console.log(item);
-        if( (item.constructor).namerElement != null)
+        var prop = this._createPropertyElement(item);
+        console.log(prop);
+        if(prop != null)//If there is no exisiing prop between narrativeblock.propertyEntity.from and item.id, then no element has to be drawn
         {
-        console.log('OK!');
-         itemElement = new (item.constructor).namerElement(item);
-         console.log(item.constructor);
+          var div = document.createElement('div');
+
+          div.setAttribute('id', "narrativeItem"+item.id);
+
+
+          div.appendChild(prop);
+
+          var itemElement = null;
+          console.log(item);
+          if( (item.constructor).namerElement != null)
+          {
+           itemElement = new (item.constructor).namerElement(item);
+         }
+         else {
+           itemElement = document.createElement("p");
+           itemElement.textContent = "Element linked does not have any displaying function associated. (item: "+JSON.stringify(item)+")";
+         }
+
          console.log(itemElement);
-
-         console.log(div);
-       }
-       else {
-         itemElement = document.createElement("p");
-         itemElement.textContent = "Element linked does not have any displaying function associated. (item: "+JSON.stringify(item)+")";
-       }
-
-       div.appendChild(itemElement);
+         div.appendChild(itemElement);
 
         this.$$('#narrativeLoopItem').appendChild(div);
       }
+    }
     },
 
     _resetDisplayNarrative:function()
@@ -143,13 +147,18 @@
 
     test: function()
     {
-      this.narrativeblock.propertyEntity = 1;
+      if(this.narrativeblock.propertyEntity == null)
+        this.narrativeblock.propertyEntity = PROPERTIES_POOL.create(NARRATIVE_BLOCK_URI,'hasNarrativeBlock',1,this.narrativeblock.id);
+
+      console.log(this.narrativeblock);
 
       var v = new Hypothesis();
+      PROPERTIES_POOL.create('TEST','isJustifiedBy',1, v.id);
       var a = new Description();
+      a.setContent("Hi :3 I'm a description. 'Tis but a scratch!'");
       v.addAddendum(a);
       this.narrativeblock.elements.push(v);
-      this.narrativeblock.elements.push(2);
+      //this.narrativeblock.elements.push(2);
 
       this.displayNarrativeBlock();
     },
@@ -175,20 +184,24 @@
 
     _createPropertyElement: function(item)
     {
-      //var props = PROPERTIES_POOL.getPropertiesByExtremities(this.narrativeblock.propertyEntity.from, item.id);
-      PROPERTIES_POOL.create(null,'isJustifiedBy',7777,7778);
-      var props = PROPERTIES_POOL.getPropertiesByExtremities(7777,7778);
+      var props = PROPERTIES_POOL.getPropertiesByExtremities(this.narrativeblock.propertyEntity.from, item.id);
+      console.log(props);
+      // PROPERTIES_POOL.create(null,'isJustifiedBy',7777,7778);
+      // var props = PROPERTIES_POOL.getPropertiesByExtremities(7777,7778);
       if(props <= 0)
-        return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty";
+      { // return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty";
+        return null;
+      }
 
       var prop = props[0];
 
-      if(prop.constructor == null)
-        return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty:noNamerConstructor";
+      if(prop.constructor == null || (prop.constructor).namerElement == null)
+        // return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty:noNamerConstructor";
+        return null;
 
       //console.log(PROPERTIES_POOL.getByID(57));
 
-      return element = new (prop.constructor).namerElement(prop);
+      return new (prop.constructor).namerElement(prop);
 
       // console.log('appending');
       // console.log(item);
