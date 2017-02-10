@@ -1,0 +1,115 @@
+<!-- narrative-block-cascader-display-element allow to encapsulate the behavior of signaling to display the narrative block
+of the element when clicked  -->
+
+<!-- <link rel="import" href="./narrative-block-displayer-element.html"> -->
+
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-badge/paper-badge.html">
+
+<dom-module id="narrative-block-cascader-display-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <template is="dom-if" if="{{hasNarrativeBlock}}" restamp="true">
+      <template is="dom-if" if="{{!isDisplayActivated}}" restamp="true">
+        <paper-icon-button id="cascadeBlck" icon="icons:chevron-right" on-click="_notifyCascade"></paper-icon-button>
+        <paper-badge id="badge" for="cascadeBlck" label="{{_getNarrativeBlockLength()}}"></paper-badge>
+      </template>
+      <template is="dom-if" if="{{isDisplayActivated}}" restamp="true">
+        <paper-icon-button icon="icons:undo" on-click="_notifyCascade"></paper-icon-button>
+        <narrative-block-displayer-element id="narrativeBlock" narrativeblock="{{narrativeblock}}"}></narrative-block-displayer-element>
+      </template>
+    </template>
+
+    <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
+
+  </template>
+  <script>
+    Polymer({
+      is : "narrative-block-cascader-display-element",
+
+      properties:
+      {
+        entity:
+        {
+          type: Object,
+          notify: true,
+          observer: "_updateNarrativeBlock4Element",
+        },
+        isDisplayActivated:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        hasNarrativeBlock:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        narrativeblock:
+        {
+          type: Object,
+          notify: true,
+        },
+      },
+
+      attached: function()
+      {
+        this.$.adder.addEventListener('-NewElementNarrative', function(e){
+          this.$.adder.toggleCreation = false;
+          if(Polymer.dom(this.root).querySelector('#badge'))
+            Polymer.dom(this.root).querySelector('#badge').label = this._getNarrativeBlockLength();
+
+          if(Polymer.dom(this.root).querySelector('#narrativeBlock'))
+            Polymer.dom(this.root).querySelector('#narrativeBlock').displayNarrativeBlock();
+        }.bind(this));
+      },
+
+      _notifyCascade: function()
+      {
+        this._updateNarrativeBlock4Element();
+        this.isDisplayActivated = !this.isDisplayActivated;
+      },
+
+      //IMPORTANT ! this function WILL CREATE a narrativeblock for the entity if it not already exists
+      _updateNarrativeBlock4Element: function()
+      {
+        if(this.entity == null)
+          return;
+
+        this.narrativeblock = this.entity.getNarrativeBlock();
+
+        if(this.narrativeblock != null)
+        {
+          this.hasNarrativeBlock = true;
+          return;
+        }
+        // else
+        //   this.hasNarrativeBlock = false;
+        this.narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this.entity);
+
+        if(this.narrativeblock != null)
+          this.hasNarrativeBlock = true;
+        else
+         this.hasNarrativeBlock = false;
+      },
+
+      _getNarrativeBlockLength: function()
+      {
+        if(this.narrativeblock == null)
+          return -1;
+
+        return this.narrativeblock.getLength();
+      },
+
+    });
+    </script>
+  </dom-module>

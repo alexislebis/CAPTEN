@@ -55,7 +55,7 @@ Property.prototype = {
       case 'Property':
         return "is linked by a property with";
       case 'ScientificHaecceity':
-        return 'is linked by a scientific property defining the nature of';
+        return 'has a scientific property with';
       case 'isJustifiedBy':
         return 'is justified by';
       case 'describedBy':

@@ -30,6 +30,7 @@ function Hypothesis()
   ScientificStatement.call(this);
   this.uri = "NAU";
   this.iName = "Hypothesis";
+  this.label = this.iName;
   this.name = "Hypothesis";
   this.htmlify = "a hypothesis"; //use for html display
 }

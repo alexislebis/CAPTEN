@@ -65,6 +65,25 @@ NarrativeBlock.prototype = {
     this.propertyEntity = property;
   },
 
+  getLength: function()
+  {
+    return this.elements.length;
+  },
+
+  getOrigin: function()
+  {
+    return this.propertyEntity.from;
+  },
+
+  getElementById: function(id)
+  {
+    for(var i in this.elements)
+      if(this.elements[i].id == id)
+        return this.elements[i];
+
+    return null;
+  },
+
   addElement: function(element, propertyWEntity)
   {
     if(this.propertyEntity == null) //Abort because NarrativeBlock is not well configurated
@@ -99,14 +118,12 @@ NarrativeBlock.prototype = {
     {
       if(this.elements[i].id == element.id)
       {
-        var props = PROPERTIES_POOL.getPropertiesByExtremities(this.propertyEntity.id, element.id);
+        var props = PROPERTIES_POOL.getPropertiesByExtremities(this.propertyEntity.from, element.id);
 
         for(var i in props)
           PROPERTIES_POOL.remove(props[i]);
 
-        delete this.elements[i];
-        this.elements.length -= 1;
-
+        this.elements.splice(i,1);
         return true;
       }
     }

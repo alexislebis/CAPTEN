@@ -1,4 +1,5 @@
-<link rel="import" href="../../../../NarrativeBlock/narrative-block-cascader-display-element.html">
+<!-- <link rel="import" href="../../../../NarrativeBlock/view/narrative-block-cascader-display-element.html"> -->
+<link rel="import" href="../../../../../bower_components/paper-input/paper-textarea.html">
 
 <dom-module id="description-namer-element">
   <template>
@@ -8,7 +9,8 @@
     }
     </style>
 
-    {{entity.htmlify}}
+    <!-- {{entity.htmlify}} -->
+    <paper-textarea label="Description addendum" value="{{entity.htmlify}}" readonly max-rows="3"></paper-textarea>
 
     <narrative-block-cascader-display-element entity="{{entity}}"></narrative-block-cascader-display-element>
     <!-- <template is="dom-if" if="{{item::hasNarrativeBlock}}" restamp="true">

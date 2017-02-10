@@ -66,5 +66,16 @@ NarrativeBlockPool.prototype =
     },
 }
 
+NarrativeBlockPool.prototype.listCompilantNarrativeBlockProperties =
+         [
+            {uri: 'isJustifiedBy', label: 'isJustifiedBy'},
+            {uri: 'sctfStmt', label: "ScientificHaecceity"},
+         ];
+
+NarrativeBlockPool.prototype.listCompilantNarrativeBlockEntities =
+        [
+          {uri: '#hypothesis', label:'Hypothesis'},
+          {uri: '#description', label: 'Description'},
+        ];
 
  var NARRATIVE_BLOCK_POOL = new NarrativeBlockPool();

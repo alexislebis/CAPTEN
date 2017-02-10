@@ -1,7 +1,7 @@
 <!-- <link rel="import" href="../CAPTEN_ONTO/view/displayer/statement-displayer-element.html"> -->
-<link rel="import" href="../wrapper/capten-onto-namer-wrapper-element.html">
+<!-- <link rel="import" href="../../wrapper/capten-onto-namer-wrapper-element.html"> -->
 
-<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
 
 <dom-module id="narrative-block-displayer-element">
   <template>
@@ -21,7 +21,17 @@
 
       <paper-button raised on-click='test'></paper-button>
 
-
+      <paper-dialog on-iron-overlay-closed="_isRemovalConfirmed" id="removeModal" modal>
+          <h2>Remove the item?</h2>
+          <p>Do you really want to remove this item? This cannot be undone.</p>
+          <p>Please not that the descriptive elements attached to this item WILL NOT BE removed. Thus, binding this item with another element of the application
+             will provide the same information structure.
+          </p>
+          <div class="buttons">
+              <paper-button dialog-dismiss>Decline</paper-button>
+              <paper-button dialog-confirm autofocus>Accept</paper-button>
+          </div>
+      </paper-dialog>
 
   </template>
   <script>
@@ -42,6 +52,19 @@
         type: Boolean,
         notify: true,
         value: false,
+      },
+
+      disableDeletion:
+      {
+        type: Boolean,
+        notify: true,
+        value: false,
+      },
+
+      tmpToRemove:
+      {
+        type: Object,
+        notify: true,
       },
 
       // tmpsctfstmt:
@@ -128,8 +151,20 @@
            itemElement.textContent = "Element linked does not have any displaying function associated. (item: "+JSON.stringify(item)+")";
          }
 
-         console.log(itemElement);
          div.appendChild(itemElement);
+
+
+         if(!this.disableDeletion)
+        {
+          var delIcon = document.createElement('paper-icon-button');
+          delIcon.setAttribute('icon', 'icons:highlight-off');
+          delIcon.setAttribute('idEntity', item.id)
+          delIcon.addEventListener('click', function(e){
+            this._removeItem(e.target.getAttribute('idEntity'));
+          }.bind(this));
+          div.appendChild(delIcon);
+        }
+
 
         this.$$('#narrativeLoopItem').appendChild(div);
       }
@@ -143,6 +178,22 @@
       if(myNode)
         while (myNode.firstChild)
             myNode.removeChild(myNode.firstChild);
+    },
+
+    _removeItem: function(itemID)
+    {
+      this.tmpToRemove = itemID;
+      this.$.removeModal.open();
+    },
+
+    _isRemovalConfirmed: function(e)
+    {
+      if(e.detail.confirmed)
+      {
+        console.log(this.narrativeblock.getElementById(this.tmpToRemove));
+        this.narrativeblock.removeElement(this.narrativeblock.getElementById(this.tmpToRemove));
+        this.displayNarrativeBlock();
+      }
     },
 
     test: function()
