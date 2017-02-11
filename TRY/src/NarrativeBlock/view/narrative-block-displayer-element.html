@@ -9,6 +9,12 @@
         :host {
           display: block;
         }
+
+        .narrativeBlockItem{
+          border-left: 6px solid #e91e63;
+          margin-left: 10px;
+          margin-bottom: 15px;
+        }
       </style>
 
 
@@ -136,7 +142,7 @@
           var div = document.createElement('div');
 
           div.setAttribute('id', "narrativeItem"+item.id);
-
+          div.setAttribute('class', 'narrativeBlockItem');
 
           div.appendChild(prop);
 

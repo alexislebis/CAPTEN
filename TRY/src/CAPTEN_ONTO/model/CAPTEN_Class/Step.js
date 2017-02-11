@@ -27,24 +27,25 @@ function Step() {
       this.propAsyncBuild.registerObserverCallbackOnUncompletion(this, this._callbackUCIUncompletion);
 }
 
-Step.prototype = Object.create(CAPTENClass.prototype);
+Step.prototype = new CAPTENClass();
+Step.prototype.constructor = Step;
 
-Step.prototype = {
+
 
   // === OBSERVATION
-    resetAllObservers: function()
+    Step.prototype.resetAllObservers = function()
     {
       this.observers = [];
       this.observersUnc = [];
-    },
+    }
     // === COMPUTATION
-    registerObserverCallbackOnOutputsComputation: function(objCallback, callback)
+    Step.prototype.registerObserverCallbackOnOutputsComputation = function(objCallback, callback)
     {
       this.observers.push([objCallback,callback]);
-    },
+    }
 
       // === NOTIFICATION
-      notifyOutputsComputation: function()
+      Step.prototype.notifyOutputsComputation = function()
       {
         this.observers.forEach(function(e)
         {
@@ -53,16 +54,16 @@ Step.prototype = {
               e[1].call(e[0]);//e[0] define the `this` context for e[1]
             }
         });
-      },
+      }
 
       // === UNCOMPLETION
-      registerObserverCallbackOnUncompletion: function(objCallback, callback)
+      Step.prototype.registerObserverCallbackOnUncompletion = function(objCallback, callback)
       {
         this.observersUnc.push([objCallback,callback]);
-      },
+      }
 
         // === NOTIFICATION
-        notifyUncompletion: function()
+        Step.prototype.notifyUncompletion = function()
         {
           this.observersUnc.forEach(function(e)
           {
@@ -71,16 +72,16 @@ Step.prototype = {
                 e[1].call(e[0]);//e[0] define the `this` context for e[1]
               }
           });
-        },
+        }
     // ===
 
   // === CALLBACK BEHAVIORS FROM PROPASYNC
-  _callbackUsedConceptsInputComplete: function()
+  Step.prototype._callbackUsedConceptsInputComplete = function()
   {
     this._computeOutput();
-  },
+  }
 
-  _computeOutput: function()
+  Step.prototype._computeOutput = function()
   {
       // console.log("COMPLETE");
       var outObs = null;
@@ -107,16 +108,16 @@ Step.prototype = {
 
       this.isStateComputed = true;
       this.notifyOutputsComputation();
-  },
+  }
 
-  _callbackUCIUncompletion: function()
+  Step.prototype._callbackUCIUncompletion = function()
   {
     this.notifyUncompletion();
-  },
+  }
   // ===
 
   // === PUBLIC
-  changeOperator: function(op)
+  Step.prototype.changeOperator = function(op)
   {
       if (op == null)
           return;
@@ -130,9 +131,9 @@ Step.prototype = {
       }
 
       this.displayOperatorInputs = true;
-  },
+  }
 
-  changeRGTE: function(rgte)
+  Step.prototype.changeRGTE = function(rgte)
   {
       if (rgte == null)
           return;
@@ -142,9 +143,9 @@ Step.prototype = {
       this.propAsyncBuild.setFirstObject(this.inputs);
 
       this.displayRGTE = true;
-  },
+  }
 
-  bindRGTENOP: function(params)
+  Step.prototype.bindRGTENOP = function(params)
   {
       if (this.isStateComputed)
       {
@@ -161,13 +162,13 @@ Step.prototype = {
       this.propAsyncBuild.bind(obj, USED_AS, 'usedAs');
 
       return;
-  },
+  }
 
-  bindRGTEParams: function(params) {
+  Step.prototype.bindRGTEParams = function(params) {
 
-  },
+  }
 
-  findDependencies: function(steps, arrows)
+  Step.prototype.findDependencies = function(steps, arrows)
   {
     if(this.inputs == null)
       return null;
@@ -186,12 +187,12 @@ Step.prototype = {
     }
 
     return props;
-  },
+  }
 
   /* _updateUsedConcepts reset the usedComputationInput and usedConceptsParams
       arrays with the number of excepted concept
       (number of rgte classes) of the operator input and parameters*/
-  _updateUsedConcepts: function()
+  Step.prototype._updateUsedConcepts = function()
   {
       if (this.operator == null || this.operator.behaviors == null)
           return;
@@ -210,8 +211,8 @@ Step.prototype = {
       }
 
       // this.propAsyncBuild.setArray(this.usedComputationInput);
-  },
-  _updateUsedConceptsKeyed: function(key)
+  }
+  Step.prototype._updateUsedConceptsKeyed = function(key)
   {
       var array = [];
       var nodes = this.operator.behaviors[key].getNodes();
@@ -226,9 +227,9 @@ Step.prototype = {
 
       this.usedComputationInput = [];
       this.usedComputationInput = array;
-  },
+  }
 
-  isArrayFullyCompleted: function(array) //Check only the 1st level
+  Step.prototype.isArrayFullyCompleted = function(array) //Check only the 1st level
       {
           if (array == null)
               return false;
@@ -240,6 +241,4 @@ Step.prototype = {
           }
 
           return true;
-      },
-
-};
+      }

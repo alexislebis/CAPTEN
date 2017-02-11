@@ -19,23 +19,28 @@ of the element when clicked  -->
       border-left: 6px solid red;
       background-color: lightgrey;
       margin-left: 15px;
+      padding-top: 5px;
+      padding-bottom: 2px;
     }
     </style>
 
-    <div class="cascadeNarrative">
-      <template is="dom-if" if="{{_isEntityNotNull(entity)}}" restamp="true">
-        <template is="dom-if" if="{{hasNarrativeBlock}}" restamp="true">
-          <template is="dom-if" if="{{!isDisplayActivated}}" restamp="true">
-            <paper-icon-button id="cascadeBlck" icon="icons:chevron-right" on-click="_notifyCascade"></paper-icon-button>
-            <paper-badge id="badge" for="cascadeBlck" label="{{_getNarrativeBlockLength()}}"></paper-badge>
-          </template>
-          <template is="dom-if" if="{{isDisplayActivated}}" restamp="true">
-            <paper-icon-button icon="icons:undo" on-click="_notifyCascade"></paper-icon-button>
-            <narrative-block-displayer-element id="narrativeBlock" narrativeblock="{{narrativeblock}}"}></narrative-block-displayer-element>
-          </template>
-          <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
+    <div class="cascadeNarrative" hidden="{{_isEntityNull(entity)}}">
+
+      <template is="dom-if" if="{{hasNarrativeBlock}}" restamp="true">
+        <template is="dom-if" if="{{!isDisplayActivated}}" restamp="true">
+          <paper-icon-button id="cascadeBlck" icon="icons:chevron-right" on-click="_notifyCascade"></paper-icon-button>
+          <paper-badge id="badge" for="cascadeBlck" label="{{_getNarrativeBlockLength()}}"></paper-badge>
+        </template>
+        <template is="dom-if" if="{{isDisplayActivated}}" restamp="true">
+          <paper-icon-button icon="icons:expand-more" on-click="_notifyCascade"></paper-icon-button>
+          <narrative-block-displayer-element id="narrativeBlock" narrativeblock="{{narrativeblock}}"}></narrative-block-displayer-element>
         </template>
       </template>
+
+      <div hidden="{{_isEntityNull(entity)}}">
+        <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
+      </div>
+
     </template>
   </div>
   <script>
@@ -71,12 +76,14 @@ of the element when clicked  -->
 
       attached: function()
       {
+
         if(Polymer.dom(this.root).querySelector('#adder') != null)
         {
           Polymer.dom(this.root).querySelector('#adder').addEventListener('-NewElementNarrative', function(e){
+            console.log("even proc");
             Polymer.dom(this.root).querySelector('#adder').toggleCreation = false;
-            if(Polymer.dom(this.root).querySelector('#badge'))
-              Polymer.dom(this.root).querySelector('#badge').label = this._getNarrativeBlockLength();
+
+            this._updateBadge();
 
             if(Polymer.dom(this.root).querySelector('#narrativeBlock'))
               Polymer.dom(this.root).querySelector('#narrativeBlock').displayNarrativeBlock();
@@ -90,9 +97,9 @@ of the element when clicked  -->
         this.isDisplayActivated = !this.isDisplayActivated;
       },
 
-      _isEntityNotNull: function(entity)
+      _isEntityNull: function(entity)
       {
-        return !(entity == null);
+        return (entity == null);
       },
 
       //IMPORTANT ! this function WILL CREATE a narrativeblock for the entity if it not already exists
@@ -110,6 +117,7 @@ of the element when clicked  -->
         if(this.narrativeblock != null)
         {
           this.hasNarrativeBlock = true;
+          this._updateBadge();
           return;
         }
         // else
@@ -117,9 +125,18 @@ of the element when clicked  -->
         this.narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this.entity);
 
         if(this.narrativeblock != null)
-          this.hasNarrativeBlock = true;
+        {
+            this.hasNarrativeBlock = true;
+            this._updateBadge();
+          }
         else
          this.hasNarrativeBlock = false;
+      },
+
+      _updateBadge: function()
+      {
+        if(Polymer.dom(this.root).querySelector('#badge'))
+          Polymer.dom(this.root).querySelector('#badge').label = this._getNarrativeBlockLength();
       },
 
       _getNarrativeBlockLength: function()
@@ -127,6 +144,7 @@ of the element when clicked  -->
         if(this.narrativeblock == null)
           return -1;
 
+          console.log(this.narrativeblock.getLength());
         return this.narrativeblock.getLength();
       },
 
