@@ -11,9 +11,14 @@
         }
 
         .narrativeBlockItem{
-          border-left: 6px solid #e91e63;
+          border-left: 6px solid #ec407a;
           margin-left: 10px;
           margin-bottom: 15px;
+        }
+
+        .narrativeItem
+        {
+          display: inline-block;
         }
       </style>
 
@@ -144,6 +149,19 @@
           div.setAttribute('id', "narrativeItem"+item.id);
           div.setAttribute('class', 'narrativeBlockItem');
 
+          prop.setAttribute('class', 'narrativeItem');
+
+          if(!this.disableDeletion)
+         {
+           var delIcon = document.createElement('paper-icon-button');
+           delIcon.setAttribute('icon', 'icons:highlight-off');
+           delIcon.setAttribute('idEntity', item.id)
+           delIcon.addEventListener('click', function(e){
+             this._removeItem(e.target.getAttribute('idEntity'));
+           }.bind(this));
+           div.appendChild(delIcon);
+         }
+
           div.appendChild(prop);
 
           var itemElement = null;
@@ -157,19 +175,11 @@
            itemElement.textContent = "Element linked does not have any displaying function associated. (item: "+JSON.stringify(item)+")";
          }
 
+         itemElement.setAttribute('class', 'narrativeItem');
          div.appendChild(itemElement);
 
 
-         if(!this.disableDeletion)
-        {
-          var delIcon = document.createElement('paper-icon-button');
-          delIcon.setAttribute('icon', 'icons:highlight-off');
-          delIcon.setAttribute('idEntity', item.id)
-          delIcon.addEventListener('click', function(e){
-            this._removeItem(e.target.getAttribute('idEntity'));
-          }.bind(this));
-          div.appendChild(delIcon);
-        }
+
 
 
         this.$$('#narrativeLoopItem').appendChild(div);
