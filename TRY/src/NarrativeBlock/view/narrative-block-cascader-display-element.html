@@ -14,22 +14,30 @@ of the element when clicked  -->
     :host {
       display: block;
     }
+
+    .cascadeNarrative {
+      border-left: 6px solid red;
+      background-color: lightgrey;
+      margin-left: 15px;
+    }
     </style>
 
-    <template is="dom-if" if="{{hasNarrativeBlock}}" restamp="true">
-      <template is="dom-if" if="{{!isDisplayActivated}}" restamp="true">
-        <paper-icon-button id="cascadeBlck" icon="icons:chevron-right" on-click="_notifyCascade"></paper-icon-button>
-        <paper-badge id="badge" for="cascadeBlck" label="{{_getNarrativeBlockLength()}}"></paper-badge>
-      </template>
-      <template is="dom-if" if="{{isDisplayActivated}}" restamp="true">
-        <paper-icon-button icon="icons:undo" on-click="_notifyCascade"></paper-icon-button>
-        <narrative-block-displayer-element id="narrativeBlock" narrativeblock="{{narrativeblock}}"}></narrative-block-displayer-element>
+    <div class="cascadeNarrative">
+      <template is="dom-if" if="{{_isEntityNotNull(entity)}}" restamp="true">
+        <template is="dom-if" if="{{hasNarrativeBlock}}" restamp="true">
+          <template is="dom-if" if="{{!isDisplayActivated}}" restamp="true">
+            <paper-icon-button id="cascadeBlck" icon="icons:chevron-right" on-click="_notifyCascade"></paper-icon-button>
+            <paper-badge id="badge" for="cascadeBlck" label="{{_getNarrativeBlockLength()}}"></paper-badge>
+          </template>
+          <template is="dom-if" if="{{isDisplayActivated}}" restamp="true">
+            <paper-icon-button icon="icons:undo" on-click="_notifyCascade"></paper-icon-button>
+            <narrative-block-displayer-element id="narrativeBlock" narrativeblock="{{narrativeblock}}"}></narrative-block-displayer-element>
+          </template>
+          <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
+        </template>
       </template>
     </template>
-
-    <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
-
-  </template>
+  </div>
   <script>
     Polymer({
       is : "narrative-block-cascader-display-element",
@@ -63,14 +71,17 @@ of the element when clicked  -->
 
       attached: function()
       {
-        this.$.adder.addEventListener('-NewElementNarrative', function(e){
-          this.$.adder.toggleCreation = false;
-          if(Polymer.dom(this.root).querySelector('#badge'))
-            Polymer.dom(this.root).querySelector('#badge').label = this._getNarrativeBlockLength();
+        if(Polymer.dom(this.root).querySelector('#adder') != null)
+        {
+          Polymer.dom(this.root).querySelector('#adder').addEventListener('-NewElementNarrative', function(e){
+            Polymer.dom(this.root).querySelector('#adder').toggleCreation = false;
+            if(Polymer.dom(this.root).querySelector('#badge'))
+              Polymer.dom(this.root).querySelector('#badge').label = this._getNarrativeBlockLength();
 
-          if(Polymer.dom(this.root).querySelector('#narrativeBlock'))
-            Polymer.dom(this.root).querySelector('#narrativeBlock').displayNarrativeBlock();
-        }.bind(this));
+            if(Polymer.dom(this.root).querySelector('#narrativeBlock'))
+              Polymer.dom(this.root).querySelector('#narrativeBlock').displayNarrativeBlock();
+          }.bind(this));
+        }
       },
 
       _notifyCascade: function()
@@ -79,10 +90,19 @@ of the element when clicked  -->
         this.isDisplayActivated = !this.isDisplayActivated;
       },
 
+      _isEntityNotNull: function(entity)
+      {
+        return !(entity == null);
+      },
+
       //IMPORTANT ! this function WILL CREATE a narrativeblock for the entity if it not already exists
       _updateNarrativeBlock4Element: function()
       {
         if(this.entity == null)
+          return;
+
+          console.log(this.entity);
+        if(this.entity.getNarrativeBlock == null)
           return;
 
         this.narrativeblock = this.entity.getNarrativeBlock();

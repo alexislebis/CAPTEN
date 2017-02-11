@@ -38,7 +38,7 @@
         attached: function()
         {
           this.$.stepsview.addEventListener('NETWORK_CLICKED', function(p){
-            this._eventDispatcher(p.detail);
+              this._eventDispatcher(p.detail);
           }.bind(this));
         },
 
@@ -98,11 +98,11 @@
         {
           if(params.nodes.length != 0)
           {
-            this.fire('-STEPS_DSP_NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0]});
+            this.fire('-STEPS_DSP_NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0], 'event':params.event});
           }
           else if(params.edges.length != 0)
           {
-            this.fire('-STEPS_DSP_EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.stepsview.getNetwork().body.edges[params.edges[0]].options.label});
+            this.fire('-STEPS_DSP_EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.stepsview.getNetwork().body.edges[params.edges[0]].options.label, 'event':params.event});
           }
         },
       });
