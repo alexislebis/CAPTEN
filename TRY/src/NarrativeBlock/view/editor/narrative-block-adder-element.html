@@ -168,11 +168,18 @@
       if(Polymer.dom(this.root).querySelector('#configuringSelectedEntity') == null)
         return;
 
-      console.error("CLEAN ME !!");
+      this._resetDivConfiguringSelectedEntity();
+
       console.error("WARNING: only test function. Must be extends and overwrite _addNewElement function");
-      if(this.elem == 0)
-      {
-        this.tmpEntity = new Hypothesis();
+      switch (this.elem) {
+        case 0:
+          this.tmpEntity = new Hypothesis();
+          break;
+        case 1:
+          this.tmpEntity = new Description();
+          break;
+        default:
+          this.tmpEntity = null;
       }
 
       if(this.tmpEntity == null || (this.tmpEntity.constructor).configurerElement == null)
@@ -217,22 +224,23 @@
       var entity;
 
       // WARNING switch case procedure not reliable !!!!!
-      if(this.tmpEntity != null)
-      {
-        entity = this.tmpEntity;
-        this.elem = null;
-      }
-      else
-        switch (this.elem) {
-          case 0:
-            entity = new Hypothesis();
-            break;
-          case 1:
-            entity = new Description();
-            break;
-          default:
-            entity = new CAPTENClass();
-        }
+      entity = this.tmpEntity;
+      // if(this.tmpEntity != null)
+      // {
+      //   entity = this.tmpEntity;
+      // }
+      // else{
+      //   switch (this.elem) {
+      //     case 0:
+      //       entity = new Hypothesis();
+      //       break;
+      //     case 1:
+      //       entity = new Description();
+      //       break;
+      //     default:
+      //       entity = new CAPTENClass();
+      //   }
+      // }
 
       console.log(this.narrativeblock);
 
@@ -240,8 +248,21 @@
       var props = NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockProperties;
       var prop = PROPERTIES_POOL.create(props[this.prop].uri, props[this.prop].label, this.narrativeblock.getOrigin(), entity.id);
 
+      this.elem = null;
+      this.prop = null;
+      this.tmpEntity = null;
+
       this.narrativeblock.addElement(entity, prop);
       console.log("adding done.");
+    },
+
+    _resetDivConfiguringSelectedEntity:function()
+    {
+      var myNode = this.$$("#configuringSelectedEntity");
+
+      if(myNode)
+        while (myNode.firstChild)
+            myNode.removeChild(myNode.firstChild);
     },
 
   });
