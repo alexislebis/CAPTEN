@@ -37,21 +37,44 @@ function Hypothesis()
 
 Hypothesis.prototype = new ScientificStatement();
 Hypothesis.prototype.constructor = Hypothesis;
-Hypothesis.namerElement = Polymer(
-  {
-    is : 'hypothesis-namer-element',
-
-    properties:
+// === POLYMER ELEMENT
+  // === NAMER ELEMENT
+  Hypothesis.namerElement = Polymer(
     {
-      entity:
+      is : 'hypothesis-namer-element',
+
+      properties:
       {
-        type: Object,
-        notify: true,
-      }
-    },
+        entity:
+        {
+          type: Object,
+          notify: true,
+        }
+      },
 
-    factoryImpl: function(item)
-    {
-      this.entity = item;
-    },
-  });
+      factoryImpl: function(item)
+      {
+        this.entity = item;
+      },
+    });
+    // === END NAMER ELEMENT
+
+    // === CONFIGURER ELEMENT
+    Hypothesis.configurerElement = Polymer({
+      is : "hypothesis-configurer-element",
+
+      properties:
+      {
+        entity:
+        {
+          type: Object,
+          notify: true,
+        }
+      },
+
+      factoryImpl: function(item)
+      {
+        this.entity = item;
+      },
+    });
+    // === END CONFIGURER ELEMENT

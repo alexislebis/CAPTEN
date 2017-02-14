@@ -9,6 +9,11 @@ function Addendum()
 
 Addendum.prototype = new CAPTENClass();
 Addendum.prototype.constructor = Addendum;
+
+var ADDENDUM_AVAILABLE_TYPES = [
+                            "Description",
+                          ];
+
 Addendum.prototype.setContent = function(content)
 {
   if(content == null)
@@ -36,26 +41,70 @@ function Description(){
 
 Description.prototype = new Addendum();
 Description.prototype.constructor = Description;
+Description.prototype.updateHTML = function(){
+  this.htmlify = this.content;
+};
   // === POLYMER ELEMENT
-  Description.namerElement = Polymer(
-  {
-    is : 'description-namer-element',
-
-    properties:
+    // === NAMER ELEMENT
+    Description.namerElement = Polymer(
     {
-      entity:
+      is : 'description-namer-element',
+
+      properties:
       {
-        type: Object,
-        notify: true,
-      }
-    },
+        entity:
+        {
+          type: Object,
+          notify: true,
+        }
+      },
 
-    factoryImpl: function(item)
-    {
-      this.entity = item;
-      console.log(this.entity);
-    },
-  });
+      factoryImpl: function(item)
+      {
+        this.entity = item;
+        console.log(this.entity);
+      },
+    });
+    // === END NAMER ELEMENT
+
+    // === CONFIGURER ELEMENT
+    Description.configurerElement = Polymer({
+        is : "description-configurer-element",
+
+        properties:
+        {
+          entity:
+          {
+            type: Object,
+            notify: true,
+          },
+
+          val:
+          {
+            type: Object,
+            notify: true,
+            val: function(){if(this.entity != null)this.val = this.entity.content;},
+            observer: "_updateEntityHTML",
+          },
+        },
+
+        factoryImpl: function(item)
+        {
+          this.entity = item;
+          console.log(this.entity);
+        },
+
+        _updateEntityHTML: function(e)
+        {
+          if(this.entity == null)
+            return null;
+
+          this.entity.content = this.val;
+
+          this.entity.updateHTML();
+        },
+      });
+    // === END CONFIGURER ELEMENT
   // === END POLYMER ELEMENT
 
 

@@ -1,0 +1,30 @@
+<dom-module id="statement-configurer-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <!-- CAPTEN CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
+    <template is="dom-if" if="{{_isEntityAStatement(entity)}}" restamp="true">
+      {{_loadAppropriateAddendum()}}
+
+      <div id="addendumConfig">
+        <!--  If addendum : même demarche que narrative displayer, charger le bon objet en affichage -->
+      </div>
+
+      <paper-icon-button id="cascadeBlck" icon="icons:add" on-click="_toggleCreation"></paper-icon-button> Create new addendum
+
+      <template is="dom-if" if="{{isCreationActive}}" restamp="true">
+        <addendum-creator-element addendum='{{newAddendum}}'></addendum-creator-element>
+      </template>
+
+    </template>
+
+
+  </template>
+  <script>
+
+    </script>
+  </dom-module>

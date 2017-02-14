@@ -2,6 +2,9 @@
 <link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 
+<!-- <link rel="import" href="../../../CAPTEN_ONTO/model/CAPTEN_Class/ScientificStatement/ScientificStatement.js"> -->
+
+
 <dom-module id="narrative-block-adder-element">
   <template>
       <style>
@@ -43,6 +46,10 @@
                     </paper-menu>
                 </paper-dropdown-menu>
               </template>
+
+              <div id="configuringSelectedEntity">
+
+              </div>
 
               <template is="dom-if" if="{{isExistingChoosed}}" restamp="true">
 
@@ -103,6 +110,13 @@
       {
         type: Object,
         notify: true,
+        observer: "_displayConfigurerForNewElmt",
+      },
+
+      tmpEntity://Used for display configurer
+      {
+        type: Object,
+        notify: true,
       },
 
       //TEMPLATE IF
@@ -147,6 +161,32 @@
       return isOpened ? 'icons:close' : 'icons:add';
     },
 
+    _displayConfigurerForNewElmt: function(e)
+    {
+      if(this.elem == null || this.elem < 0)
+        return;
+
+      if(Polymer.dom(this.root).querySelector('#configuringSelectedEntity') == null)
+        return;
+
+      console.error("CLEAN ME !!");
+      console.error("WARNING: only test function. Must be extends and overwrite _addNewElement function");
+      if(this.elem == 0)
+      {
+        this.tmpEntity = new Hypothesis();
+      }
+
+      if(this.tmpEntity == null || (this.tmpEntity.constructor).configurerElement == null)
+        return;
+
+      var div = document.createElement("div");
+      var newElmt = new (this.tmpEntity.constructor).configurerElement(this.tmpEntity);
+      console.log(newElmt);
+      div.appendChild(newElmt);
+
+      Polymer.dom(this.root).querySelector('#configuringSelectedEntity').appendChild(div);
+    },
+
     submit: function(event)
     {
       if(!this.isNewChoosed && !this.isExistingChoosed)
@@ -177,16 +217,23 @@
 
       var entity;
 
-      switch (this.elem) {
-        case 0:
-          entity = new Hypothesis();
-          break;
-        case 1:
-          entity = new Description();
-          break;
-        default:
-          entity = new CAPTENClass();
+      // WARNING switch case procedure not reliable !!!!!
+      if(this.tmpEntity != null)
+      {
+        entity = this.tmpEntity;
+        this.elem = null;
       }
+      else
+        switch (this.elem) {
+          case 0:
+            entity = new Hypothesis();
+            break;
+          case 1:
+            entity = new Description();
+            break;
+          default:
+            entity = new CAPTENClass();
+        }    
 
       console.log(this.narrativeblock);
 

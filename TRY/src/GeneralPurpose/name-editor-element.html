@@ -1,0 +1,30 @@
+<dom-module id="name-editor-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <div>
+      Name: <paper-input label="Name" value="{{name}}" char-counter maxlength="60"></paper-input>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is : "name-editor-element",
+
+      properties:
+      {
+        name:
+        {
+          type: String,
+          notify: true,
+        },
+
+      },
+
+    });
+    </script>
+  </dom-module>

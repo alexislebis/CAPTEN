@@ -62,6 +62,7 @@ Statement.prototype.addAddendum = function(content)
     console.log('done. Registered in block#'+narrativeblock.id);
   }
 
+  console.log(narrativeblock);
   narrativeblock.addElement(content, prop);//Adding the new addendum inside the corresponding narrative block
 
   this.addendum.push(content); //update addendum array
@@ -73,65 +74,158 @@ Statement.prototype.addAddendum = function(content)
 // },
 
 Statement.prototype.constructor = Statement;
-Statement.namerElement = Polymer(
-  {
-    is : 'statement-namer-element',
 
-    properties:
-    {
-      entity:
+// === POLYMER ELEMENT
+  // === NAMER ELEMENT
+    Statement.namerElement = Polymer(
       {
-        type: Object,
-        value: function(){return new Statement();},
-        notify: true,
-      }
-    },
+        is : 'statement-namer-element',
 
-    factoryImpl: function(item)
-    {
-      this.entity = item;
-    },
+        properties:
+        {
+          entity:
+          {
+            type: Object,
+            value: function(){return new Statement();},
+            notify: true,
+          }
+        },
 
-    attached: function()
-    {
-      console.log("Attached");
-    },
+        factoryImpl: function(item)
+        {
+          this.entity = item;
+        },
 
-  // === TEMPLATE BEHAVIOR
-    _isHypothesis: function(statement)
-    {
-      if(statement == null || statement.name != "Hypothesis")
-        return false;
-      return true;
-    },
-    _isProposition: function(statement)
-    {
-      if(statement == null || statement.name != "Proposition")
-        return false;
-      return true;
-    },
-    _isTheory: function(statement)
-    {
-      if(statement == null || statement.name != "Theory")
-        return false;
-      return true;
-    },
-    _isDefinition: function(statement)
-    {
-      if(statement == null || statement.name != "Definition")
-        return false;
-      return true;
-    },
-    _isAxiom: function(statement)
-    {
-      if(statement == null || statement.name != "Axiom")
-        return false;
-      return true;
-    },
-    _isConjecture: function(statement)
-    {
-      if(statement == null || statement.name != "Conjecture")
-        return false;
-      return true;
-    },
-  });
+        attached: function()
+        {
+          console.log("Attached");
+        },
+
+      // === TEMPLATE BEHAVIOR
+        _isHypothesis: function(statement)
+        {
+          if(statement == null || statement.name != "Hypothesis")
+            return false;
+          return true;
+        },
+        _isProposition: function(statement)
+        {
+          if(statement == null || statement.name != "Proposition")
+            return false;
+          return true;
+        },
+        _isTheory: function(statement)
+        {
+          if(statement == null || statement.name != "Theory")
+            return false;
+          return true;
+        },
+        _isDefinition: function(statement)
+        {
+          if(statement == null || statement.name != "Definition")
+            return false;
+          return true;
+        },
+        _isAxiom: function(statement)
+        {
+          if(statement == null || statement.name != "Axiom")
+            return false;
+          return true;
+        },
+        _isConjecture: function(statement)
+        {
+          if(statement == null || statement.name != "Conjecture")
+            return false;
+          return true;
+        },
+      });
+    // === END NAMER ELEMENT
+
+    // === CONFIGURER ELEMENT
+      Polymer({
+        is : "statement-configurer-element",
+
+        properties:
+        {
+          entity:
+          {
+            type: Object,
+            notify: true,
+          },
+
+          addendum: //Its an array !
+          {
+            type: Object,
+            notify: true,
+          },
+
+          newAddendum:
+          {
+            type: Object,
+            notify: true,
+            value: null,
+            observer: "_onNewAddendum",
+          },
+
+          isCreationActive:
+          {
+            type: Boolean,
+            notify: true,
+            value: false,
+          },
+
+        },
+
+        factoryImpl: function(item)
+        {
+          this.entity = item;
+        },
+
+        _isEntityAStatement: function(entity)
+        {
+          console.log(entity);
+          if(this.entity instanceof Statement)
+            return true;
+
+          return false;
+        },
+
+        _loadAppropriateAddendum: function()
+        {
+          if(this.entity == null)
+            return null;
+
+          for(var i in this.entity.addendum)
+          {
+            if( (this.entity.addendum[i].constructor).configurerElement == null ) //There is no configurer element, thus aborting
+              return null;
+
+            var div = document.createElement('div');
+            var createdElmt = new (this.entity.addendum[i].constructor).configurerElement(this.entity.addendum[i]);
+
+            div.appendChild(createdElmt);
+
+            if(Polymer.dom(this.root).querySelector('#addendumConfig') == null)
+              return;
+
+            Polymer.dom(this.root).querySelector('#addendumConfig').appendChild(div);
+          }
+        },
+
+        _toggleCreation: function()
+        {
+          console.log(this.isCreationActive);
+          this.isCreationActive = !this.isCreationActive;
+          console.log(this.isCreationActive);
+        },
+
+        _onNewAddendum: function(e)
+        {
+          if(this.newAddendum == null)
+            return;
+
+            console.log('onChange Addendum !');
+          this.entity.addAddendum(this.newAddendum);
+        },
+      });
+    // === END CONFIGURER ELEMENT
