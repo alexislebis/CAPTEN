@@ -45,11 +45,10 @@
                         </template>
                     </paper-menu>
                 </paper-dropdown-menu>
+                <div id="configuringSelectedEntity">
+
+                </div>
               </template>
-
-              <div id="configuringSelectedEntity">
-
-              </div>
 
               <template is="dom-if" if="{{isExistingChoosed}}" restamp="true">
 
@@ -233,7 +232,7 @@
             break;
           default:
             entity = new CAPTENClass();
-        }    
+        }
 
       console.log(this.narrativeblock);
 

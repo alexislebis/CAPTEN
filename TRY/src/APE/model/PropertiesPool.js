@@ -75,13 +75,14 @@ PropertiesPool.prototype = {
 
     for(var i = 0; i < this.pool.length; i++)
       if(this.pool[i] === prop)
+      {
         index = i;
-
+        this.pool.splice(index,1);
+        return true;
+      }
+      
     if(index == -1)
       return;
-
-    this.pool.splice(index,1);
-    return true;
   },
 
   relatedProperties: function(extremityID)

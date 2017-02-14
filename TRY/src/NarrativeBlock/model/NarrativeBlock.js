@@ -120,8 +120,8 @@ NarrativeBlock.prototype = {
       {
         var props = PROPERTIES_POOL.getPropertiesByExtremities(this.propertyEntity.from, element.id);
 
-        for(var i in props)
-          PROPERTIES_POOL.remove(props[i]);
+        for(var j in props)
+          PROPERTIES_POOL.remove(props[j]);
 
         this.elements.splice(i,1);
         return true;

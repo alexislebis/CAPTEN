@@ -207,7 +207,9 @@
       if(e.detail.confirmed)
       {
         console.log(this.narrativeblock.getElementById(this.tmpToRemove));
+        console.log(this.narrativeblock);
         this.narrativeblock.removeElement(this.narrativeblock.getElementById(this.tmpToRemove));
+        console.log(this.narrativeblock);
         this.displayNarrativeBlock();
       }
     },
