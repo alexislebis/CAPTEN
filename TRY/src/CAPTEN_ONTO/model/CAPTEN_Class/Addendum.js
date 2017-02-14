@@ -94,6 +94,14 @@ Description.prototype.updateHTML = function(){
           console.log(this.entity);
         },
 
+        attached: function()
+        {
+          if(this.entity == null)
+            return;
+            
+          this.val = this.entity.content;
+        },
+
         _updateEntityHTML: function(e)
         {
           if(this.entity == null)

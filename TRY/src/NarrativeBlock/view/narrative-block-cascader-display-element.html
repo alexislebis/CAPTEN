@@ -34,8 +34,12 @@ of the element when clicked  -->
         </template>
         <template is="dom-if" if="{{isDisplayActivated}}" restamp="true">
           <paper-icon-button icon="icons:expand-more" on-click="_notifyCascade"></paper-icon-button>
-          <narrative-block-displayer-element id="narrativeBlock" narrativeblock="{{narrativeblock}}"}></narrative-block-displayer-element>
+          <narrative-block-displayer-element id="narrativeBlock" entity="{{entity}}" narrativeblock="{{narrativeblock}}"}></narrative-block-displayer-element>
         </template>
+        {{_generateEdit}}
+        <div id="editZone">
+
+        </div>
       </template>
 
       <div hidden="{{_isEntityNull(entity)}}">
@@ -101,6 +105,45 @@ of the element when clicked  -->
       _isEntityNull: function(entity)
       {
         return (entity == null);
+      },
+
+      _generateEdit: function()
+      {
+        var divGlob = document.createElement('div');
+
+        var divEdit = document.createElement('div');
+        divEdit.setAttribute('id', 'edit'+this.id);
+        divEdit.setAttribute('hidden', 'true');
+
+        var editIcon = document.createElement('paper-icon-button');
+        var divEdit = document.createElement('div');
+        var editElement = null;
+
+        console.log(this.entity);
+        if( (this.entity.constructor).configurerElement != null)
+        {
+         editElement = new (this.entity.constructor).configurerElement(this.entity);
+         divEdit.setAttribute('id', 'edit'+this.entity.id);
+         divEdit.setAttribute('hidden', 'true');
+
+
+         editIcon.setAttribute('icon', 'icons:settings');
+         editIcon.setAttribute('idEdit', this.entity.id);
+         editIcon.addEventListener('click', function(e){
+           this._displayEditButton(e.target.getAttribute('idEdit'));
+         }.bind(this));
+
+        }
+        else {
+          editElement = document.createElement("p");
+          editElement.textContent = "Element linked does not have any associated editing function! (item:"+this.entity.label+")";
+        }
+
+        divGlob.appendChild(editIcon);
+        divEdit.appendChild(editElement);
+        divGlob.appendChild(divEdit);
+
+        Polymer.dom(this.root).querySelector('#editZone').appendChild(divGlob);
       },
 
       //IMPORTANT ! this function WILL CREATE a narrativeblock for the entity if it not already exists

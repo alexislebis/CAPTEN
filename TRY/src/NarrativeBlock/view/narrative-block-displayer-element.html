@@ -58,6 +58,12 @@
         value: function(){return new NarrativeBlock();},
       },
 
+      entity:
+      {
+        type: Object,
+        notify: true,
+      },
+
       nbConfigured:
       {
         type: Boolean,
@@ -131,60 +137,118 @@
     displayNarrativeBlock: function()
     {
 
-      if(this.narrativeblock == null || !this._narrativeBlockConfigured())
-        return;
+        if(this.narrativeblock == null || !this._narrativeBlockConfigured())
+          return;
 
-      this._resetDisplayNarrative();
-      console.log(this.narrativeblock);
+        this._resetDisplayNarrative();
+        console.log(this.narrativeblock);
+        console.log(this.entity);
 
-      for(var i in this.narrativeblock.elements)
-      {
-        var item = this.narrativeblock.elements[i];
-        var prop = this._createPropertyElement(item);
-        console.log(prop);
-        if(prop != null)//If there is no exisiing prop between narrativeblock.propertyEntity.from and item.id, then no element has to be drawn
+        //If no element, the for loop will not build the configurer, thus this case is handled by the following if
+          // var divGlob = documennt.createElement('div');
+          // var divEdit = document.createElement('div');
+          // divEdit.setAttribute('id', 'edit'+this.id);
+          // divEdit.setAttribute('hidden', 'true');
+          //
+          // var editIcon = document.createElement('paper-icon-button');
+          // var divEdit = document.createElement('div');
+          // var editElement = null;
+          //
+          // console.log(this.entity);
+          // if( (this.entity.constructor).configurerElement != null)
+          // {
+          //  editElement = new (this.entity.constructor).configurerElement(this.entity);
+          //  divEdit.setAttribute('id', 'edit'+this.entity.id);
+          //  divEdit.setAttribute('hidden', 'true');
+          //
+          //
+          //  editIcon.setAttribute('icon', 'icons:settings');
+          //  editIcon.setAttribute('idEdit', this.entity.id);
+          //  editIcon.addEventListener('click', function(e){
+          //    this._displayEditButton(e.target.getAttribute('idEdit'));
+          //  }.bind(this));
+          //  div.appendChild(editIcon);
+          // }
+          // else {
+          //   editElement = document.createElement("p");
+          //   editElement.textContent = "Element linked does not have any associated editing function! (item:"+this.entity.label+")";
+          // }
+          //
+          // divEdit.appendChild(editElement);
+          // this.$$('#narrativeLoopItem').appendChild(divEdit);
+
+
+        for(var i in this.narrativeblock.elements)
         {
-          var div = document.createElement('div');
-
-          div.setAttribute('id', "narrativeItem"+item.id);
-          div.setAttribute('class', 'narrativeBlockItem');
-
-          prop.setAttribute('class', 'narrativeItem');
-
-          if(!this.disableDeletion)
-         {
-           var delIcon = document.createElement('paper-icon-button');
-           delIcon.setAttribute('icon', 'icons:highlight-off');
-           delIcon.setAttribute('idEntity', item.id)
-           delIcon.addEventListener('click', function(e){
-             this._removeItem(e.target.getAttribute('idEntity'));
-           }.bind(this));
-           div.appendChild(delIcon);
-         }
-
-          div.appendChild(prop);
-
-          var itemElement = null;
-          console.log(item);
-          if( (item.constructor).namerElement != null)
+          var item = this.narrativeblock.elements[i];
+          var prop = this._createPropertyElement(item);
+          console.log(prop);
+          if(prop != null)//If there is no exisiing prop between narrativeblock.propertyEntity.from and item.id, then no element has to be drawn
           {
-           itemElement = new (item.constructor).namerElement(item);
-         }
-         else {
-           itemElement = document.createElement("p");
-           itemElement.textContent = "Element linked does not have any displaying function associated. (item: "+JSON.stringify(item)+")";
-         }
+            var div = document.createElement('div');
 
-         itemElement.setAttribute('class', 'narrativeItem');
-         div.appendChild(itemElement);
+            div.setAttribute('id', "narrativeItem"+item.id);
+            div.setAttribute('class', 'narrativeBlockItem');
 
+            prop.setAttribute('class', 'narrativeItem');
 
+            if(!this.disableDeletion)
+           {
+             var delIcon = document.createElement('paper-icon-button');
+             delIcon.setAttribute('icon', 'icons:highlight-off');
+             delIcon.setAttribute('idEntity', item.id)
+             delIcon.addEventListener('click', function(e){
+               this._removeItem(e.target.getAttribute('idEntity'));
+             }.bind(this));
+             div.appendChild(delIcon);
+           }
 
+            div.appendChild(prop);
 
+            var itemElement = null;
+            console.log(item);
+            if( (item.constructor).namerElement != null)
+            {
+             itemElement = new (item.constructor).namerElement(item);
+           }
+           else {
+             itemElement = document.createElement("p");
+             itemElement.textContent = "Element linked does not have any displaying function associated. (item: "+JSON.stringify(item)+")";
+           }
 
-        this.$$('#narrativeLoopItem').appendChild(div);
+            itemElement.setAttribute('class', 'narrativeItem');
+            div.appendChild(itemElement);
+
+          //  var divEdit = document.createElement('div');
+          //  var editElement = null;
+          //  var editIcon = document.createElement('paper-icon-button');
+           //
+          //  if( (item.constructor).configurerElement != null)
+          //  {
+          //   editElement = new (item.constructor).configurerElement(item);
+          //   divEdit.setAttribute('id', 'edit'+item.id);
+          //   divEdit.setAttribute('hidden', 'true');
+           //
+           //
+          //   editIcon.setAttribute('icon', 'icons:settings');
+          //   editIcon.setAttribute('idEdit', item.id);
+          //   editIcon.addEventListener('click', function(e){
+          //     this._displayEditButton(e.target.getAttribute('idEdit'));
+          //   }.bind(this));
+          //   div.appendChild(editIcon);
+          //  }
+          //  else {
+          //    editElement = document.createElement("p");
+          //    editElement.textContent = "Element linked does not have any associated editing function! (item:"+JSON.stringify(item)+")";
+          //  }
+           //
+          //  divEdit.appendChild(editElement);
+
+          //  div.appendChild(divEdit);
+
+          this.$$('#narrativeLoopItem').appendChild(div);
+        }
       }
-    }
     },
 
     _resetDisplayNarrative:function()
@@ -194,6 +258,25 @@
       if(myNode)
         while (myNode.firstChild)
             myNode.removeChild(myNode.firstChild);
+    },
+
+    _displayEditButton: function(idDiv)
+    {
+      console.log(idDiv);
+      var elmt = Polymer.dom(this.root).querySelector('#edit'+idDiv);
+
+      console.log(elmt);
+
+      if(elmt == null)
+        return;
+
+      if( elmt.getAttribute('hidden') )
+      {
+        elmt.removeAttribute('hidden');
+      }
+      else {
+        elmt.setAttribute('hidden', 'true');
+      }
     },
 
     _removeItem: function(itemID)
