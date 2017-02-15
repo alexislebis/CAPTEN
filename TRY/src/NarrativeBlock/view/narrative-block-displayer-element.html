@@ -109,24 +109,6 @@
       }
       this.displayNarrativeBlock();
 
-      // var s = new Statement();//new Statement.element();
-      // console.log(s);
-      // console.log(s.constructor);
-      // console.log(new (s.constructor).namerElement());
-      // // console.log(s);
-      //
-      // var p = new Property();
-      // console.log(p.constructor);
-      // console.log(new (p.constructor).namerElement());
-      //
-      // var sctf = new ScientificStatement();
-      // console.log(sctf instanceof Statement);
-      // console.log(sctf instanceof CAPTENClass);
-      // console.log(sctf instanceof Property);
-      // var stmt = document.createElement('statement-namer-element');
-      // stmt.statement = this.tmpsctfstmt;
-      //
-      // document.body.appendChild(stmt);
     },
 
     _callbackNarrativeBlockChanged: function()
@@ -141,42 +123,6 @@
           return;
 
         this._resetDisplayNarrative();
-        // console.log(this.narrativeblock);
-        // console.log(this.entity);
-
-        //If no element, the for loop will not build the configurer, thus this case is handled by the following if
-          // var divGlob = documennt.createElement('div');
-          // var divEdit = document.createElement('div');
-          // divEdit.setAttribute('id', 'edit'+this.id);
-          // divEdit.setAttribute('hidden', 'true');
-          //
-          // var editIcon = document.createElement('paper-icon-button');
-          // var divEdit = document.createElement('div');
-          // var editElement = null;
-          //
-          // console.log(this.entity);
-          // if( (this.entity.constructor).configurerElement != null)
-          // {
-          //  editElement = new (this.entity.constructor).configurerElement(this.entity);
-          //  divEdit.setAttribute('id', 'edit'+this.entity.id);
-          //  divEdit.setAttribute('hidden', 'true');
-          //
-          //
-          //  editIcon.setAttribute('icon', 'icons:settings');
-          //  editIcon.setAttribute('idEdit', this.entity.id);
-          //  editIcon.addEventListener('click', function(e){
-          //    this._displayEditButton(e.target.getAttribute('idEdit'));
-          //  }.bind(this));
-          //  div.appendChild(editIcon);
-          // }
-          // else {
-          //   editElement = document.createElement("p");
-          //   editElement.textContent = "Element linked does not have any associated editing function! (item:"+this.entity.label+")";
-          // }
-          //
-          // divEdit.appendChild(editElement);
-          // this.$$('#narrativeLoopItem').appendChild(divEdit);
-
 
         for(var i in this.narrativeblock.elements)
         {
@@ -218,33 +164,6 @@
 
             itemElement.setAttribute('class', 'narrativeItem');
             div.appendChild(itemElement);
-
-          //  var divEdit = document.createElement('div');
-          //  var editElement = null;
-          //  var editIcon = document.createElement('paper-icon-button');
-           //
-          //  if( (item.constructor).configurerElement != null)
-          //  {
-          //   editElement = new (item.constructor).configurerElement(item);
-          //   divEdit.setAttribute('id', 'edit'+item.id);
-          //   divEdit.setAttribute('hidden', 'true');
-           //
-           //
-          //   editIcon.setAttribute('icon', 'icons:settings');
-          //   editIcon.setAttribute('idEdit', item.id);
-          //   editIcon.addEventListener('click', function(e){
-          //     this._displayEditButton(e.target.getAttribute('idEdit'));
-          //   }.bind(this));
-          //   div.appendChild(editIcon);
-          //  }
-          //  else {
-          //    editElement = document.createElement("p");
-          //    editElement.textContent = "Element linked does not have any associated editing function! (item:"+JSON.stringify(item)+")";
-          //  }
-           //
-          //  divEdit.appendChild(editElement);
-
-          //  div.appendChild(divEdit);
 
           this.$$('#narrativeLoopItem').appendChild(div);
         }
