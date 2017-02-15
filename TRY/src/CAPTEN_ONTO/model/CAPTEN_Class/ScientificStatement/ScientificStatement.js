@@ -2,7 +2,7 @@
 
 function ScientificStatement()
   {
-    CAPTENClass.call(this);
+    Statement.call(this);
 
     this.name = "ScientificStatement";
     this.content = null;//NOTE: Equivalent to description in CAPTEN-ONTO-After_REU_29/08/16

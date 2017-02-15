@@ -141,8 +141,8 @@
           return;
 
         this._resetDisplayNarrative();
-        console.log(this.narrativeblock);
-        console.log(this.entity);
+        // console.log(this.narrativeblock);
+        // console.log(this.entity);
 
         //If no element, the for loop will not build the configurer, thus this case is handled by the following if
           // var divGlob = documennt.createElement('div');
@@ -258,25 +258,6 @@
       if(myNode)
         while (myNode.firstChild)
             myNode.removeChild(myNode.firstChild);
-    },
-
-    _displayEditButton: function(idDiv)
-    {
-      console.log(idDiv);
-      var elmt = Polymer.dom(this.root).querySelector('#edit'+idDiv);
-
-      console.log(elmt);
-
-      if(elmt == null)
-        return;
-
-      if( elmt.getAttribute('hidden') )
-      {
-        elmt.removeAttribute('hidden');
-      }
-      else {
-        elmt.setAttribute('hidden', 'true');
-      }
     },
 
     _removeItem: function(itemID)

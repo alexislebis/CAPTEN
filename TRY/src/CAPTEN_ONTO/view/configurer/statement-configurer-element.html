@@ -7,12 +7,11 @@
     </style>
 
     <!-- CAPTEN CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
+    <div id="addendumConfig">
+      <!--  If addendum : même demarche que narrative displayer, charger le bon objet en affichage -->
+    </div>
     <template is="dom-if" if="{{_isEntityAStatement(entity)}}" restamp="true">
       {{_loadAppropriateAddendum()}}
-
-      <div id="addendumConfig">
-        <!--  If addendum : même demarche que narrative displayer, charger le bon objet en affichage -->
-      </div>
 
       <paper-icon-button id="cascadeBlck" icon="icons:add" on-click="_toggleCreation"></paper-icon-button> Create new addendum
 

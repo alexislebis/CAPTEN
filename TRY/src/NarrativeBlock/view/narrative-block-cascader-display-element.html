@@ -36,11 +36,12 @@ of the element when clicked  -->
           <paper-icon-button icon="icons:expand-more" on-click="_notifyCascade"></paper-icon-button>
           <narrative-block-displayer-element id="narrativeBlock" entity="{{entity}}" narrativeblock="{{narrativeblock}}"}></narrative-block-displayer-element>
         </template>
-        {{_generateEdit}}
-        <div id="editZone">
-
-        </div>
+        {{_generateEdit()}}
       </template>
+
+      <div id="editZone">
+
+      </div>
 
       <div hidden="{{_isEntityNull(entity)}}">
         <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
@@ -92,6 +93,8 @@ of the element when clicked  -->
 
             if(Polymer.dom(this.root).querySelector('#narrativeBlock'))
               Polymer.dom(this.root).querySelector('#narrativeBlock').displayNarrativeBlock();
+
+            Polymer.dom(this.root).querySelector('#adder').resetState();
           }.bind(this));
         }
       },
@@ -109,6 +112,11 @@ of the element when clicked  -->
 
       _generateEdit: function()
       {
+        if(Polymer.dom(this.root).querySelector('#editZone') == null)
+        {
+          return;
+        }
+
         var divGlob = document.createElement('div');
 
         var divEdit = document.createElement('div');
@@ -136,7 +144,7 @@ of the element when clicked  -->
         }
         else {
           editElement = document.createElement("p");
-          editElement.textContent = "Element linked does not have any associated editing function! (item:"+this.entity.label+")";
+          editElement.textContent = "Element linked does not have any associated editing function! (itemid:"+this.entity.id+", item:"+this.entity.label+")";
         }
 
         divGlob.appendChild(editIcon);
@@ -144,6 +152,22 @@ of the element when clicked  -->
         divGlob.appendChild(divEdit);
 
         Polymer.dom(this.root).querySelector('#editZone').appendChild(divGlob);
+      },
+
+      _displayEditButton: function(idDiv)
+      {
+        var elmt = Polymer.dom(this.root).querySelector('#edit'+idDiv);
+
+        if(elmt == null)
+          return;
+
+        if( elmt.getAttribute('hidden') )
+        {
+          elmt.removeAttribute('hidden');
+        }
+        else {
+          elmt.setAttribute('hidden', 'true');
+        }
       },
 
       //IMPORTANT ! this function WILL CREATE a narrativeblock for the entity if it not already exists

@@ -182,6 +182,10 @@
           this.tmpEntity = null;
       }
 
+      console.log("=====");
+      console.log(this.tmpEntity);
+      console.log("=====");
+
       if(this.tmpEntity == null || (this.tmpEntity.constructor).configurerElement == null)
         return;
 
@@ -214,6 +218,14 @@
         return;
 
       this.fire("-NewElementNarrative");
+    },
+
+    resetState: function()
+    {
+      this.toggleCreation = false;
+      this.prop = null;
+      this.elem = null;
+      this.tmpEntity = null;
     },
 
     _addNewElement: function()

@@ -195,6 +195,7 @@ Statement.prototype.constructor = Statement;
           if(this.entity == null)
             return null;
 
+          console.log(this.entity);
           for(var i in this.entity.addendum)
           {
             if( (this.entity.addendum[i].constructor).configurerElement == null ) //There is no configurer element, thus aborting
