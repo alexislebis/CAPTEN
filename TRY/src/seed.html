@@ -38,7 +38,8 @@
       <div name="ape"><ape-element id="apeElem" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></ape-element></div>
     </iron-pages>
 
-    <narrative-block-cascader-display-element id="rootNarrativeBlockDisplayer" entity="{{narrativeentity}}"></narrative-block-cascader-display-element>
+    <!-- <narrative-block-cascader-display-element id="rootNarrativeBlockDisplayer" entity="{{narrativeentity}}"></narrative-block-cascader-display-element> -->
+    <narrative-block-cascading-element id="rootNarrativeBlockDisplayer"></narrative-block-cascading-element>
 
     <h1>{{data.page}}</h1>
 
@@ -103,7 +104,7 @@
 
         this.$.apeElem.addEventListener(NARRATIVE_BLOCK_NOTIFY_SIGNAL_ID, function(e)
         {
-          this.narrativeentity = e.detail.entity;
+          Polymer.dom(this.root).querySelector('#rootNarrativeBlockDisplayer').setEntity(e.detail.entity);
         }.bind(this));
       },
 
