@@ -11,6 +11,8 @@ function Step() {
     this.outputs = null;
     this.relationOrder = null; //Integer. Representing the place of this in the IAP.
 
+    this.name = null; //The name of the step //WARNING potential conflict
+
     this.context = null; //TODO define CONTEXT notion
     this.treatmentType = null;
 
@@ -189,6 +191,78 @@ Step.prototype.constructor = Step;
     return props;
   }
 
+  Step.prototype.setName = function(name)
+  {
+    this.name = name;
+  }
+
+  Step.prototype.setAuthor = function(author)
+  {
+    if(author.id == null)
+    {
+      console.error('content must have an id');
+      return null;
+    }
+
+    if(!(author instanceof Author))
+    {
+      console.error('content must be an Author');
+      return null;
+    }
+
+    var narrativeblock = null;
+    if(this.author)//If an author already exist, it must be replaced
+    {
+      narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+
+      if(narrativeblock == null)
+      {
+        console.log('A narrative block should be present. Aborting...');
+        return;
+      }
+
+      narrativeblock.removeElement(this.author);
+    }
+
+    narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    if(narrativeblock == null)
+    {
+      console.log('Their is no narrative block registered for the element#'+this.id+' inside the narrative block pool. Registering...');
+      narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this);
+      console.log('done. Registered in block#'+narrativeblock.id);
+    }
+
+    var props = PROPERTIES_POOL.getPropertiesByExtremities(this.id, author.id);
+    var prop = null;
+
+    if(props.length <= 0)
+    {
+      console.log('the relation between the step and the author is not referenced in the pool. Referencing...');
+      prop = PROPERTIES_POOL.create('NAU',HAS_AUTHOR_URI,this.id, author.id);
+      console.log('done.');
+    }
+    else
+      prop = props[0];
+
+    console.log(narrativeblock);
+    narrativeblock.addElement(author, prop);//Adding the new addendum inside the corresponding narrative block
+
+    this.author = author;
+  }
+
+  Step.prototype.addObjective = function(objective)
+  {
+    console.error("ADD OBJECTIVE Object !");
+    this.objective = objective;
+    //ADD IN NARRATIVE BLOCK AND PROPERTY POOL HAS_OBJECTIVE
+  }
+
+  Step.prototype.addContext = function(context)
+  {
+      this.context = context;
+      //ADD IN NARRATIVE BLOCK AND PROPERTU POOL HAS_CONTEXT
+  }
+
   /* _updateUsedConcepts reset the usedComputationInput and usedConceptsParams
       arrays with the number of excepted concept
       (number of rgte classes) of the operator input and parameters*/
@@ -242,3 +316,84 @@ Step.prototype.constructor = Step;
 
           return true;
       }
+
+// === POLYMER ELEMENTS
+  // === CONFIGURER ELEMENT
+    Step.configurerElement =  Polymer(
+    {
+        is: "step-configurer-element",
+
+        properties:
+        {
+            entity:
+            {
+                type: Object,
+                notify: true,
+                observer: "_updateField",
+            },
+            name:
+            {
+                type: Object,
+                notify: true,
+            },
+            objective:
+            {
+                type: Object,
+                notify: true,
+            },
+            context:
+            {
+                type: Object,
+                notify: true,
+            },
+            author:
+            {
+              type: Object,
+              notify: true,
+              value: function(){return new Author();},
+            }
+        },
+
+        factoryImpl: function(item)
+        {
+          this.author = new Author();
+          this.entity = item;
+        },
+
+        attached: function()
+        {
+            console.error("WARNING. OBJECTIVE, CONTEXTE AND OTHER MUST USE THEIR OWN CONFIGURER: THEY SHOULD NOT BE HARDCODED");
+        },
+
+        _updateStep: function(e)
+        {
+          if(this.entity == null)
+            return;
+
+          this.entity.setName(this.name);
+          this.entity.addObjective(this.objective);
+          this.entity.addContext(this.context);
+
+          this.$.authorConfigurer._updateAuthor();
+            this.entity.setAuthor(this.author);
+
+          CONFIGURER_NOTIFY_VALIDATION_SIGNAL_BUILDER(this, this.entity, e);
+        },
+        _updateField: function()
+        {
+          if(this.entity == null)
+            return;
+
+          this.name = this.entity.name;
+
+          if(this.entity.objective)
+            this.objective = this.entity.objective;
+
+          if(this.entity.context)
+            this.context = this.entity.context;
+
+          if(this.entity.author)
+            this.author = this.entity.author;
+        },
+    });
+  // === END CONFIGURER ELEMENT

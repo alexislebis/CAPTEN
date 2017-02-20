@@ -36,7 +36,6 @@ of the element when clicked  -->
           <paper-icon-button icon="icons:expand-more" on-click="_notifyCascade"></paper-icon-button>
           <narrative-block-displayer-element id="narrativeBlock" entity="{{entity}}" narrativeblock="{{narrativeblock}}"}></narrative-block-displayer-element>
         </template>
-        {{_generateEdit()}}
       </template>
 
       <div id="editZone">
@@ -117,6 +116,8 @@ of the element when clicked  -->
           return;
         }
 
+        this._resetDivEditing();
+
         var divGlob = document.createElement('div');
 
         var divEdit = document.createElement('div');
@@ -139,6 +140,12 @@ of the element when clicked  -->
          editIcon.setAttribute('idEdit', this.entity.id);
          editIcon.addEventListener('click', function(e){
            this._displayEditButton(e.target.getAttribute('idEdit'));
+         }.bind(this));
+
+         editElement.addEventListener(CONFIGURER_NOTIFY_VALIDATION_SIGNAL_ID, function(e)
+         {
+           this._updateBadge();
+           this._resetDivEditing();
          }.bind(this));
 
         }
@@ -170,6 +177,16 @@ of the element when clicked  -->
         }
       },
 
+      _resetDivEditing:function()
+      {
+        var myNode = this.$$("#editZone");
+
+        if(myNode)
+          while (myNode.firstChild)
+              myNode.removeChild(myNode.firstChild);
+      },
+
+
       //IMPORTANT ! this function WILL CREATE a narrativeblock for the entity if it not already exists
       _updateNarrativeBlock4Element: function()
       {
@@ -186,6 +203,7 @@ of the element when clicked  -->
         {
           this.hasNarrativeBlock = true;
           this._updateBadge();
+          this._generateEdit();
           return;
         }
         // else
@@ -196,6 +214,7 @@ of the element when clicked  -->
         {
             this.hasNarrativeBlock = true;
             this._updateBadge();
+            this._generateEdit();
           }
         else
          this.hasNarrativeBlock = false;

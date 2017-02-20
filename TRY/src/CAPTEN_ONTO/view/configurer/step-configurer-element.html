@@ -1,0 +1,31 @@
+<dom-module id="step-configurer-element">
+    <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <div id="stepName">
+      <paper-input label="Name of the step" char-counter maxlength="70" value="{{name}}"></paper-input>
+    </div>
+
+    <div id="stepObjective">
+      <paper-textarea id="stepObjTxt" label="Objective of the step" value="{{objective}}" max-rows="3"></paper-textarea>
+    </div>
+
+    <div id="stepContext">
+      <paper-textarea id="stepContextTxt" label="Context of the step" value="{{context}}" max-rows="3"></paper-textarea>
+    </div>
+
+    <div id="stepAuthor">
+      <author-configurer-element id="authorConfigurer" entity="{{author}}" cascaded></author-configurer-element>
+    </div>
+
+    <paper-icon-button icon="icons:done" on-click="_updateStep"></paper-icon-button>
+
+  </template>
+    <script>
+
+    </script>
+</dom-module>
