@@ -16,35 +16,54 @@ of the element when clicked  -->
     }
 
     .cascadeNarrative {
-      border-left: 6px solid red;
+      /*border-left: 6px solid red;*/
       background-color: lightgrey;
-      margin-left: 15px;
+      margin-left: auto;
+      margin-right: auto;
+      /*margin-left: 15px;*/
       padding-top: 5px;
       padding-bottom: 2px;
+    }
+
+    #cascadeZone{
+      display: inline-block;
+      background-color: pink;
+    }
+
+    #editZone{
+      display:inline-block;
+      background-color: purple;
+    }
+
+    #addZone{
+      display: inline-block;
+      background-color: orange;
     }
     </style>
 
     <div class="cascadeNarrative" hidden="{{_isEntityNull(entity)}}">
       <!-- <h3>Narrative block</h3> -->
 
+      <div id="editZone">
+
+      </div>
+
+      <div id="addZone" hidden="{{_isEntityNull(entity)}}">
+        <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
+      </div>
+
       <template is="dom-if" if="{{hasNarrativeBlock}}" restamp="true">
         <template is="dom-if" if="{{!isDisplayActivated}}" restamp="true">
-          <paper-icon-button id="cascadeBlck" icon="icons:chevron-right" on-click="_notifyCascade"></paper-icon-button>
-          <paper-badge id="badge" for="cascadeBlck" label="{{_getNarrativeBlockLength()}}"></paper-badge>
+          <div id="cascadeZone">
+            <paper-icon-button id="cascadeBlck" icon="icons:chevron-right" on-click="_notifyCascade"></paper-icon-button>
+            <paper-badge id="badge" for="cascadeBlck" label="{{_getNarrativeBlockLength()}}"></paper-badge>
+          </div>
         </template>
         <template is="dom-if" if="{{isDisplayActivated}}" restamp="true">
           <paper-icon-button icon="icons:expand-more" on-click="_notifyCascade"></paper-icon-button>
           <narrative-block-displayer-element id="narrativeBlock" entity="{{entity}}" narrativeblock="{{narrativeblock}}"}></narrative-block-displayer-element>
         </template>
       </template>
-
-      <div id="editZone">
-
-      </div>
-
-      <div hidden="{{_isEntityNull(entity)}}">
-        <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
-      </div>
 
     </template>
   </div>

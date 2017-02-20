@@ -99,6 +99,9 @@ NarrativeBlock.prototype = {
       return;
 
     this.elements.push(element);
+
+    this.notifyChange();
+
     return element;
   },
 
@@ -124,6 +127,7 @@ NarrativeBlock.prototype = {
           PROPERTIES_POOL.remove(props[j]);
 
         this.elements.splice(i,1);
+        this.notifyChange();
         return true;
       }
     }

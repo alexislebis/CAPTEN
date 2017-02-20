@@ -27,6 +27,8 @@ function Step() {
     this.propAsyncBuild = new PropertyAsyncrhonousBuilder();
       this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackUsedConceptsInputComplete);
       this.propAsyncBuild.registerObserverCallbackOnUncompletion(this, this._callbackUCIUncompletion);
+
+    this.htmlify = "a step";
 }
 
 Step.prototype = new CAPTENClass();
@@ -475,6 +477,26 @@ Step.prototype.constructor = Step;
       }
 
 // === POLYMER ELEMENTS
+  // === NAMER ELEMENT
+  Step.namerElement = Polymer(
+  {
+    is : 'step-namer-element',
+
+    properties:
+    {
+      entity:
+      {
+        type: Object,
+        notify: true,
+      },
+    },
+
+    factoryImpl: function(item)
+    {
+      this.entity = item;
+    },
+  });
+  // === END NAMER ELEMENT
   // === CONFIGURER ELEMENT
     Step.configurerElement =  Polymer(
     {
