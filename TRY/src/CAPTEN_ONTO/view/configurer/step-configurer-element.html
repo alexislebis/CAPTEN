@@ -11,7 +11,8 @@
     </div>
 
     <div id="stepObjective">
-      <paper-textarea id="stepObjTxt" label="Objective of the step" value="{{objective}}" max-rows="3"></paper-textarea>
+      <!-- <paper-textarea id="stepObjTxt" label="Objective of the step" value="{{objective}}" max-rows="3"></paper-textarea> -->
+      <objective-configurer-element id="objectiveConfigurer" entity="{{objective}}" cascaded></objective-configurer-element>
     </div>
 
     <div id="stepContext">
@@ -22,7 +23,9 @@
       <author-configurer-element id="authorConfigurer" entity="{{author}}" cascaded></author-configurer-element>
     </div>
 
-    <paper-icon-button icon="icons:done" on-click="_updateStep"></paper-icon-button>
+    <div hidden="{{cascaded}}">
+      <paper-icon-button icon="icons:done" on-click="_updateStep"></paper-icon-button>
+    </div>
 
   </template>
     <script>

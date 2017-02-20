@@ -250,9 +250,57 @@ Step.prototype.constructor = Step;
     this.author = author;
   }
 
-  Step.prototype.addObjective = function(objective)
+  Step.prototype.setObjective = function(objective)
   {
-    console.error("ADD OBJECTIVE Object !");
+    if(objective.id == null)
+    {
+      console.error('objective must have an id');
+      return null;
+    }
+
+    if(!(objective instanceof Objective))
+    {
+      console.error('objective must be an Objective');
+      return null;
+    }
+
+    var narrativeblock = null;
+    if(this.objective)//If an author already exist, it must be replaced
+    {
+      narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+
+      if(narrativeblock == null)
+      {
+        console.log('A narrative block should be present. Aborting...');
+        return;
+      }
+
+      narrativeblock.removeElement(this.objective);
+    }
+
+    narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    if(narrativeblock == null)
+    {
+      console.log('Their is no narrative block registered for the element#'+this.id+' inside the narrative block pool. Registering...');
+      narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this);
+      console.log('done. Registered in block#'+narrativeblock.id);
+    }
+
+    var props = PROPERTIES_POOL.getPropertiesByExtremities(this.id, objective.id);
+    var prop = null;
+
+    if(props.length <= 0)
+    {
+      console.log('the relation between the step and the author is not referenced in the pool. Referencing...');
+      prop = PROPERTIES_POOL.create(IS_DESCRIBED_BY_URI,'describedBy',this.id, objective.id);
+      console.log('done.');
+    }
+    else
+      prop = props[0];
+
+    console.log(narrativeblock);
+    narrativeblock.addElement(objective, prop);//Adding the new addendum inside the corresponding narrative block
+
     this.objective = objective;
     //ADD IN NARRATIVE BLOCK AND PROPERTY POOL HAS_OBJECTIVE
   }
@@ -340,6 +388,7 @@ Step.prototype.constructor = Step;
             {
                 type: Object,
                 notify: true,
+                value: function(){return new Objective();},
             },
             context:
             {
@@ -371,7 +420,10 @@ Step.prototype.constructor = Step;
             return;
 
           this.entity.setName(this.name);
-          this.entity.addObjective(this.objective);
+
+          this.$.objectiveConfigurer._updateObjective();
+            this.entity.setObjective(this.objective);
+            
           this.entity.addContext(this.context);
 
           this.$.authorConfigurer._updateAuthor();
