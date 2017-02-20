@@ -14,6 +14,13 @@ function Objective ()
 Objective.prototype = new CAPTENClass();
 Objective.prototype.constructor = Objective;
 
+Objective.prototype.isEmpty = function()
+{
+  if(this.addendum == null || this.addendum.length == 0)
+    return true;
+  return false;
+},
+
 Objective.prototype.addAddendum = function(content)
 {
   console.log(content);
@@ -174,7 +181,8 @@ Objective.prototype.addAddendum = function(content)
 
       _updateObjective: function()
       {
-        Polymer.dom(this.root).querySelector('#addendumCrt')._update();
+        if(Polymer.dom(this.root).querySelector('#addendumCrt'))
+          Polymer.dom(this.root).querySelector('#addendumCrt')._update();
       },
     });
   // === END CONFIGURER ELEMENT

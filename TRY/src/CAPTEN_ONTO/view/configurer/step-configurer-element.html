@@ -7,7 +7,8 @@
     </style>
 
     <div id="stepName">
-      <paper-input label="Name of the step" char-counter maxlength="70" value="{{name}}"></paper-input>
+      <entity-name-configurer-element id="nameConfigurer" entity="{{name}}" cascaded></entity-name-configurer-element>
+      <!-- <paper-input label="Name of the step" char-counter maxlength="70" value="{{name}}"></paper-input> -->
     </div>
 
     <div id="stepObjective">
@@ -16,7 +17,8 @@
     </div>
 
     <div id="stepContext">
-      <paper-textarea id="stepContextTxt" label="Context of the step" value="{{context}}" max-rows="3"></paper-textarea>
+      <context-configurer-element id="contextConfigurer" entity="{{context}}" cascaded></context-configurer-element>
+      <!-- <paper-textarea id="stepContextTxt" label="Context of the step" value="{{context}}" max-rows="3"></paper-textarea> -->
     </div>
 
     <div id="stepAuthor">

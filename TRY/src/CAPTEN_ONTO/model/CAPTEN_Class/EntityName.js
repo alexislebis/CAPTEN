@@ -1,29 +1,32 @@
 /**
-* It is the implementation of the FOAF Agent class. An author is an agent creating something. Here in CAPTEN,
-* it concerns AP, step, IndepOp, etc...
+ * EntityName represents the name that an user can give to an entity. For example : for a step, an entityname could be "My favorite step"
  */
-function Author(authorName)
-  {
-    CAPTENClass.call(this);
-    this.uri = "http://xmlns.com/foaf/0.1/Agent";
-    this.authorName = null;
+
+ function EntityName()
+{
+  CAPTENClass.call(this);
+  this.name = null;
 }
 
-Author.prototype = new CAPTENClass();
-Author.prototype.constructor = Author;
+EntityName.prototype = new CAPTENClass();
+EntityName.prototype.constructor = EntityName;
 
-Author.prototype.isEmpty = function()
+EntityName.prototype.setName = function(name)
 {
-  if(this.authorName)
+  this.name = name;
+}
+
+EntityName.prototype.isEmpty = function()
+{
+  if(this.name)
     return false;
   return true;
 },
-
 // === POLYMER ELEMENT
   // === NAMER ELEMENT
-  Author.namerElement = Polymer(
+  EntityName.namerElement = Polymer(
   {
-    is : 'author-namer-element',
+    is : 'entity-name-namer-element',
 
     properties:
     {
@@ -41,9 +44,9 @@ Author.prototype.isEmpty = function()
   });
   // === END NAMER ELEMENT
   // === CONFIGURER ELEMENT
-    Author.configurerElement =  Polymer(
+    EntityName.configurerElement =  Polymer(
     {
-        is: "author-configurer-element",
+        is: "entity-name-configurer-element",
 
         properties:
         {
@@ -53,7 +56,7 @@ Author.prototype.isEmpty = function()
                 notify: true,
                 observer: "_updateField",
             },
-            authName:
+            name:
             {
                 type: Object,
                 notify: true,
@@ -71,12 +74,12 @@ Author.prototype.isEmpty = function()
           this.entity = item;
         },
 
-        _updateAuthor: function(e)
+        _update: function(e)
         {
           if(this.entity == null)
             return;
 
-          this.entity.authorName = this.authName;
+          this.entity.setName(this.name);
 
           CONFIGURER_NOTIFY_CLOSE_SIGNAL_BUILDER(this, this.entity, e);
         },
@@ -86,7 +89,7 @@ Author.prototype.isEmpty = function()
           if(this.entity == null)
             return;
 
-          this.authName = this.entity.authorName;
+          this.name = this.entity.name;
         },
     });
   // === END CONFIGURER ELEMENT

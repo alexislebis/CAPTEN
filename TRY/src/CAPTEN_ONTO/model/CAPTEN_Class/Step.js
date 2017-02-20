@@ -193,11 +193,66 @@ Step.prototype.constructor = Step;
 
   Step.prototype.setName = function(name)
   {
+    if(name == null)
+      return;
+
+    if(name.id == null)
+    {
+      console.error('content must have an id');
+      return null;
+    }
+
+    if(!(name instanceof EntityName))
+    {
+      console.error('content must be an EntityName');
+      return null;
+    }
+
+    var narrativeblock = null;
+    if(this.name)//If a name already exist, it must be replaced
+    {
+      narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+
+      if(narrativeblock == null)
+      {
+        console.log('A narrative block should be present. Aborting...');
+        return;
+      }
+
+      narrativeblock.removeElement(this.name);
+    }
+
+    narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    if(narrativeblock == null)
+    {
+      console.log('Their is no narrative block registered for the element#'+this.id+' inside the narrative block pool. Registering...');
+      narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this);
+      console.log('done. Registered in block#'+narrativeblock.id);
+    }
+
+    var props = PROPERTIES_POOL.getPropertiesByExtremities(this.id, name.id);
+    var prop = null;
+
+    if(props.length <= 0)
+    {
+      console.log('the relation between the step and the name is not referenced in the pool. Referencing...');
+      prop = PROPERTIES_POOL.create(HAS_NAME_URI,'hasName',this.id, name.id);
+      console.log('done.');
+    }
+    else
+      prop = props[0];
+
+    console.log(narrativeblock);
+    narrativeblock.addElement(name, prop);//Adding the new addendum inside the corresponding narrative block
+
     this.name = name;
   }
 
   Step.prototype.setAuthor = function(author)
   {
+    if(author == null)
+      return;
+
     if(author.id == null)
     {
       console.error('content must have an id');
@@ -252,6 +307,9 @@ Step.prototype.constructor = Step;
 
   Step.prototype.setObjective = function(objective)
   {
+    if(objective == null)
+      return;
+
     if(objective.id == null)
     {
       console.error('objective must have an id');
@@ -305,8 +363,59 @@ Step.prototype.constructor = Step;
     //ADD IN NARRATIVE BLOCK AND PROPERTY POOL HAS_OBJECTIVE
   }
 
-  Step.prototype.addContext = function(context)
+  Step.prototype.setContext = function(context)
   {
+    if(context == null)
+      return;
+
+    if(context.id == null)
+    {
+      console.error('context must have an id');
+      return null;
+    }
+
+    if(!(context instanceof Context))
+    {
+      console.error('context must be an Objective');
+      return null;
+    }
+
+    var narrativeblock = null;
+    if(this.context)//If a context already exist, it must be replaced
+    {
+      narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+
+      if(narrativeblock == null)
+      {
+        console.log('A narrative block should be present. Aborting...');
+        return;
+      }
+
+      narrativeblock.removeElement(this.context);
+    }
+
+    narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    if(narrativeblock == null)
+    {
+      console.log('Their is no narrative block registered for the element#'+this.id+' inside the narrative block pool. Registering...');
+      narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this);
+      console.log('done. Registered in block#'+narrativeblock.id);
+    }
+
+    var props = PROPERTIES_POOL.getPropertiesByExtremities(this.id, context.id);
+    var prop = null;
+
+    if(props.length <= 0)
+    {
+      console.log('the relation between the step and the author is not referenced in the pool. Referencing...');
+      prop = PROPERTIES_POOL.create(IS_DESCRIBED_BY_URI,'describedBy',this.id, context.id);
+      console.log('done.');
+    }
+    else
+      prop = props[0];
+
+    console.log(narrativeblock);
+    narrativeblock.addElement(context, prop);//Adding the new addendum inside the corresponding narrative block
       this.context = context;
       //ADD IN NARRATIVE BLOCK AND PROPERTU POOL HAS_CONTEXT
   }
@@ -383,6 +492,7 @@ Step.prototype.constructor = Step;
             {
                 type: Object,
                 notify: true,
+                value: function(){return new EntityName();},
             },
             objective:
             {
@@ -394,6 +504,7 @@ Step.prototype.constructor = Step;
             {
                 type: Object,
                 notify: true,
+                value: function(){return new Context();},
             },
             author:
             {
@@ -419,15 +530,21 @@ Step.prototype.constructor = Step;
           if(this.entity == null)
             return;
 
-          this.entity.setName(this.name);
+          this.$.nameConfigurer._update();
+            if( ! IS_EMPTY(this.name) )
+              this.entity.setName(this.name);
 
           this.$.objectiveConfigurer._updateObjective();
-            this.entity.setObjective(this.objective);
-            
-          this.entity.addContext(this.context);
+            if( ! IS_EMPTY(this.objective) )
+              this.entity.setObjective(this.objective);
+
+          this.$.contextConfigurer._update();
+            if(!IS_EMPTY(this.context))
+              this.entity.setContext(this.context);
 
           this.$.authorConfigurer._updateAuthor();
-            this.entity.setAuthor(this.author);
+            if( ! IS_EMPTY(this.author) )
+              this.entity.setAuthor(this.author);
 
           CONFIGURER_NOTIFY_VALIDATION_SIGNAL_BUILDER(this, this.entity, e);
         },
@@ -436,7 +553,8 @@ Step.prototype.constructor = Step;
           if(this.entity == null)
             return;
 
-          this.name = this.entity.name;
+          if(this.entity.name)
+            this.name = this.entity.name;
 
           if(this.entity.objective)
             this.objective = this.entity.objective;

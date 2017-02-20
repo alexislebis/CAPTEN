@@ -1,0 +1,20 @@
+<dom-module id="entity-name-configurer-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <!-- ROOT CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
+    Name: <paper-input id="name" label="Name" value="{{name}}" char-counter maxlength="70"></paper-input>
+
+    <div hidden="{{cascaded}}">
+      <paper-icon-button icon="icons:done" on-click="_updateAuthor"></paper-icon-button>
+    </div>
+
+  </template>
+  <script>
+
+    </script>
+  </dom-module>

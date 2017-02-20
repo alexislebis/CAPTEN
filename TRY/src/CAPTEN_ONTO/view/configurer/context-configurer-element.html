@@ -1,0 +1,34 @@
+<dom-module id="context-configurer-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <!-- CAPTEN CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
+    <div id="addendumConfig">
+      <!--  If addendum : même demarche que narrative displayer, charger le bon objet en affichage -->
+    </div>
+    <template is="dom-if" if="{{_isEntityAContext(entity)}}" restamp="true">
+      Context of the step :
+      {{_loadAppropriateAddendum()}}
+
+      <paper-icon-button id="cascadeBlck" icon="icons:add" on-click="_toggleCreation"></paper-icon-button> Create new addendum
+
+      <template is="dom-if" if="{{isCreationActive}}" restamp="true">
+        <addendum-creator-element id="addendumCrt" addendum='{{newAddendum}}' cascaded></addendum-creator-element>
+      </template>
+
+    </template>
+
+    <div hidden="{{cascaded}}">
+      <paper-icon-button icon="icons:done" on-click="_update"></paper-icon-button>
+    </div>
+
+
+  </template>
+  <script>
+
+    </script>
+  </dom-module>

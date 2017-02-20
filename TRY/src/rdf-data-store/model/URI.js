@@ -14,6 +14,9 @@ var USED_AS = "http://www.CAPTEN.org/SEED/ontologies/usedAs";//TODO add it to th
 var INFLUENCES_URI = "http://www.CAPTEN.org/SEED/ontologies/influences";//TODO add it to the ontology OR locate it
 var FOLLOWED_BY_URI = "http://www.CAPTEN.org/SEED/ontologies/followedBy";
 var HAS_AUTHOR_URI = "http://xmlns.com/foaf/0.1/hasAgent";
-var IS_DESCRIBED_BY_URI = "http://www.CAPTEN.org.SEED/ontologies/isDescribedBy";
+var IS_DESCRIBED_BY_URI = "http://www.CAPTEN.org/SEED/ontologies/isDescribedBy";
+var HAS_NAME_URI = "http://www.CAPTEN.org/SEED/ontologies/hasName";
+var HAS_CONTEXT_URI = "http://www.CAPTEN.org/SEED/ontologies/hasContext";
+var HAS_OBJECTIVE_URI = "http://www.CAPTEN.org/SEED/ontologies/hasObjective";
 
 var NARRATIVE_BLOCK_URI = "http://www.CAPTEN.org/SEED/ontologies/hasNarrativeBlock";//NOTE Outside the CAPTEN ontology
