@@ -174,7 +174,7 @@ Objective.prototype.addAddendum = function(content)
 
       _updateObjective: function()
       {
-        console.log("TODO : modify addendum creation");
+        Polymer.dom(this.root).querySelector('#addendumCrt')._update();
       },
     });
   // === END CONFIGURER ELEMENT

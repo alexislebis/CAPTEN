@@ -48,6 +48,11 @@
         notify: true,
         observer: "_displayCorrespondingCreator",
       },
+      cascaded:
+      {
+        type: Boolean,
+        notify: true,
+      }
     },
 
     _displayCorrespondingCreator: function(e)
@@ -71,6 +76,9 @@
         return;
 
       var spz = new (this.addendum.constructor).configurerElement(this.addendum);
+      spz.cascaded = this.cascaded;
+      spz.setAttribute('id', 'spz');
+
       div.appendChild(spz);
       this.$.specializingAddendum.appendChild(div);
     },
@@ -82,6 +90,11 @@
       if(myNode)
         while (myNode.firstChild)
             myNode.removeChild(myNode.firstChild);
+    },
+
+    _update: function()
+    {
+      Polymer.dom(this.root).querySelector('#spz')._update();
     },
 
   });

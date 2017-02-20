@@ -98,11 +98,21 @@ Description.prototype.updateHTML = function(){
         {
           if(this.entity == null)
             return;
-            
+
           this.val = this.entity.content;
         },
 
         _updateEntityHTML: function(e)
+        {
+          // if(this.entity == null)
+          //   return null;
+          //
+          // this.entity.content = this.val;
+          //
+          // this.entity.updateHTML();
+        },
+
+        _update: function()
         {
           if(this.entity == null)
             return null;
