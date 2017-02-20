@@ -236,7 +236,7 @@ Step.prototype.constructor = Step;
     if(props.length <= 0)
     {
       console.log('the relation between the step and the name is not referenced in the pool. Referencing...');
-      prop = PROPERTIES_POOL.create(HAS_NAME_URI,'hasName',this.id, name.id);
+      prop = PROPERTIES_POOL.create(HAS_NAME_URI, URI_TO_LABEL(HAS_NAME_URI) ,this.id, name.id);
       console.log('done.');
     }
     else
@@ -293,7 +293,7 @@ Step.prototype.constructor = Step;
     if(props.length <= 0)
     {
       console.log('the relation between the step and the author is not referenced in the pool. Referencing...');
-      prop = PROPERTIES_POOL.create(HAS_AUTHOR_URI,'hasAuthor',this.id, author.id);
+      prop = PROPERTIES_POOL.create(HAS_AUTHOR_URI, URI_TO_LABEL(HAS_AUTHOR_URI),this.id, author.id);
       console.log('done.');
     }
     else
@@ -350,7 +350,7 @@ Step.prototype.constructor = Step;
     if(props.length <= 0)
     {
       console.log('the relation between the step and the author is not referenced in the pool. Referencing...');
-      prop = PROPERTIES_POOL.create(HAS_OBJECTIVE_URI,'hasObjective',this.id, objective.id);
+      prop = PROPERTIES_POOL.create(HAS_OBJECTIVE_URI, URI_TO_LABEL(HAS_OBJECTIVE_URI),this.id, objective.id);
       console.log('done.');
     }
     else
@@ -408,7 +408,7 @@ Step.prototype.constructor = Step;
     if(props.length <= 0)
     {
       console.log('the relation between the step and the author is not referenced in the pool. Referencing...');
-      prop = PROPERTIES_POOL.create(HAS_CONTEXT_URI,'hasContext',this.id, context.id);
+      prop = PROPERTIES_POOL.create(HAS_CONTEXT_URI,URI_TO_LABEL(HAS_CONTEXT_URI),this.id, context.id);
       console.log('done.');
     }
     else

@@ -43,7 +43,7 @@ Objective.prototype.addAddendum = function(content)
   if(props.length <= 0)
   {
     console.log('the relation between the objective and the addendum is not referenced in the pool. Referencing...');
-    prop = PROPERTIES_POOL.create('NAU','describedBy',this.id, content.id);
+    prop = PROPERTIES_POOL.create(IS_DESCRIBED_BY_URI,URI_TO_LABEL(IS_DESCRIBED_BY_URI),this.id, content.id);
     console.log('done.');
   }
   else

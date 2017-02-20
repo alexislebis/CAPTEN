@@ -51,18 +51,19 @@ Property.prototype = {
   //Since a property does not have a special behavior when it is specialized, the html must be changed according to the type of the element
   _configureHTMLIFY: function()
   {
-    switch (this.label) {
-      case 'Property':
-        return "is linked by a property with";
-      case 'ScientificHaecceity':
-        return 'has a scientific property with';
-      case 'isJustifiedBy':
-        return 'is justified by';
-      case 'describedBy':
-        return 'is described by';
-      default:
-        return "is linked by a "+this.name+" property with";
-    }
+    return this.label;
+    // switch (this.label) {
+    //   case 'Property':
+    //     return "is linked by a property with";
+    //   case 'ScientificHaecceity':
+    //     return 'has a scientific property with';
+    //   case 'isJustifiedBy':
+    //     return 'is justified by';
+    //   case 'describedBy':
+    //     return 'is described by';
+    //   default:
+    //     return "is linked by a "+this.name+" property with";
+    // }
   },
 
   /** The is function give the possibility to this (ScientificHaecceity) to evolve according to the need of the user.
