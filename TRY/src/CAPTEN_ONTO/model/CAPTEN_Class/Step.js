@@ -350,7 +350,7 @@ Step.prototype.constructor = Step;
     if(props.length <= 0)
     {
       console.log('the relation between the step and the author is not referenced in the pool. Referencing...');
-      prop = PROPERTIES_POOL.create(HAS_OBJECTIVE,'hasObjective',this.id, objective.id);
+      prop = PROPERTIES_POOL.create(HAS_OBJECTIVE_URI,'hasObjective',this.id, objective.id);
       console.log('done.');
     }
     else
@@ -408,7 +408,7 @@ Step.prototype.constructor = Step;
     if(props.length <= 0)
     {
       console.log('the relation between the step and the author is not referenced in the pool. Referencing...');
-      prop = PROPERTIES_POOL.create(HAS_CONTEXT,'hasContext',this.id, context.id);
+      prop = PROPERTIES_POOL.create(HAS_CONTEXT_URI,'hasContext',this.id, context.id);
       console.log('done.');
     }
     else
@@ -518,11 +518,6 @@ Step.prototype.constructor = Step;
         {
           this.author = new Author();
           this.entity = item;
-        },
-
-        attached: function()
-        {
-            console.error("WARNING. OBJECTIVE, CONTEXTE AND OTHER MUST USE THEIR OWN CONFIGURER: THEY SHOULD NOT BE HARDCODED");
         },
 
         _updateStep: function(e)
