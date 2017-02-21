@@ -582,7 +582,7 @@ _isIdEquivalenceExists: function(location,ID)
         for(var j in affectedProps)
           this._removeEdge(affectedProps[j]);
 
-        delete this.nodes[i];
+        this.nodes.splice(i,1);
         return affectedProps;
       }
     }
@@ -605,7 +605,7 @@ _isIdEquivalenceExists: function(location,ID)
         affectedNodes.push(this.edges[i].from);
         affectedNodes.push(this.edges[i].to);
 
-        delete this.edges[i];
+        this.edges.splice(i,1);
         return affectedNodes;
       }
     }
