@@ -228,5 +228,11 @@ Statement.prototype.constructor = Statement;
             console.log('onChange Addendum !');
           this.entity.addAddendum(this.newAddendum);
         },
+
+        _update: function()
+        {
+          if(Polymer.dom(this.root).querySelector('#addendumCrt'))
+            Polymer.dom(this.root).querySelector('#addendumCrt')._update();
+        },
       });
     // === END CONFIGURER ELEMENT

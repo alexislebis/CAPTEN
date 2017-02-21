@@ -217,7 +217,9 @@
       else
         return;
 
-      this.fire("-NewElementNarrative");
+      this.fire(ADDER_NOTIFY_VALIDATION_SIGNAL_ID);
+      this.resetState();
+      // this.fire("-NewElementNarrative");
     },
 
     resetState: function()

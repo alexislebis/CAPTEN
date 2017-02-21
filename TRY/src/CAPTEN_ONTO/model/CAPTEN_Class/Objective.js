@@ -145,7 +145,9 @@ Objective.prototype.addAddendum = function(content)
         if(this.entity == null)
           return null;
 
-        console.log(this.entity);
+        if( IS_EMPTY(this.entity.addendum) )
+          this._deleteCurrentAddendum();
+
         for(var i in this.entity.addendum)
         {
           if( (this.entity.addendum[i].constructor).configurerElement == null ) //There is no configurer element, thus aborting
@@ -161,6 +163,15 @@ Objective.prototype.addAddendum = function(content)
 
           Polymer.dom(this.root).querySelector('#addendumConfig').appendChild(div);
         }
+      },
+
+      _deleteCurrentAddendum: function()
+      {
+        var myNode = this.$$("#currentAddendum");
+
+        if(myNode)
+          while (myNode.firstChild)
+              myNode.removeChild(myNode.firstChild);
       },
 
       _toggleCreation: function()
@@ -183,6 +194,9 @@ Objective.prototype.addAddendum = function(content)
       {
         if(Polymer.dom(this.root).querySelector('#addendumCrt'))
           Polymer.dom(this.root).querySelector('#addendumCrt')._update();
+
+        if(!this.cascaded)
+          CONFIGURER_NOTIFY_VALIDATION_SIGNAL_BUILDER(this, this.entity, null);
       },
     });
   // === END CONFIGURER ELEMENT

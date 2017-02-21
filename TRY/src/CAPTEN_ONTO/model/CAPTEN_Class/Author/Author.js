@@ -78,7 +78,8 @@ Author.prototype.isEmpty = function()
 
           this.entity.authorName = this.authName;
 
-          CONFIGURER_NOTIFY_CLOSE_SIGNAL_BUILDER(this, this.entity, e);
+          if(!this.cascaded)
+            CONFIGURER_NOTIFY_VALIDATION_SIGNAL_BUILDER(this, this.entity, e);
         },
 
         _updateField: function()

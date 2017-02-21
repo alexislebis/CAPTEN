@@ -120,6 +120,9 @@ Description.prototype.updateHTML = function(){
           this.entity.content = this.val;
 
           this.entity.updateHTML();
+
+          if(!this.cascaded)
+            CONFIGURER_NOTIFY_VALIDATION_SIGNAL_BUILDER(this, this.entity, null);
         },
       });
     // === END CONFIGURER ELEMENT

@@ -16,7 +16,7 @@
       <paper-icon-button id="cascadeBlck" icon="icons:add" on-click="_toggleCreation"></paper-icon-button> Create new addendum
 
       <template is="dom-if" if="{{isCreationActive}}" restamp="true">
-        <addendum-creator-element addendum='{{newAddendum}}'></addendum-creator-element>
+        <addendum-creator-element id="addendumCrt" addendum='{{newAddendum}}' cascaded></addendum-creator-element>
       </template>
 
     </template>

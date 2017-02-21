@@ -563,7 +563,8 @@ Step.prototype.constructor = Step;
             if( ! IS_EMPTY(this.author) )
               this.entity.setAuthor(this.author);
 
-          CONFIGURER_NOTIFY_VALIDATION_SIGNAL_BUILDER(this, this.entity, e);
+          if(!this.cascaded)
+            CONFIGURER_NOTIFY_VALIDATION_SIGNAL_BUILDER(this, this.entity, e);
         },
         _updateField: function()
         {

@@ -7,12 +7,16 @@
     </style>
 
     <!-- ROOT CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
-    Name: <paper-input id="name" label="Name" value="{{name}}" char-counter maxlength="70"></paper-input>
 
-    <div hidden="{{cascaded}}">
-      <paper-icon-button icon="icons:done" on-click="_updateAuthor"></paper-icon-button>
-    </div>
+    <paper-card heading="Name">
+      <div class="card-content">
+        <paper-input id="name" label="Name" value="{{name}}" char-counter maxlength="70"></paper-input>
+      </div>
+      <div class="card-actions" hidden="{{cascaded}}">
+        <paper-icon-button icon="icons:done" on-click="_update"></paper-icon-button>
+      </div>
 
+    </paper-card>
   </template>
   <script>
 

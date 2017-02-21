@@ -69,12 +69,26 @@ Hypothesis.prototype.constructor = Hypothesis;
         {
           type: Object,
           notify: true,
-        }
+        },
+
+        cascaded:
+        {
+          type: Object,
+          notify: true,
+        },
       },
 
       factoryImpl: function(item)
       {
         this.entity = item;
+      },
+
+      _update: function()
+      {
+        this.$.inheritedStmt._update();
+
+        if(!this.cascaded)
+          CONFIGURER_NOTIFY_VALIDATION_SIGNAL_BUILDER(this, this.entity, null);
       },
     });
     // === END CONFIGURER ELEMENT

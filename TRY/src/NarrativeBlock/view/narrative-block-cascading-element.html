@@ -1,9 +1,17 @@
+<link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
+
 <dom-module id="narrative-block-cascading-element">
   <template>
     <style>
     :host {
       display: block;
     }
+
+    .toastButton {
+      text-transform: none;
+      color: #eeff41;
+    }
+
     </style>
 
     <div id="narrativeBlock" hidden="true">
@@ -37,6 +45,17 @@
     </div>
 
 
+    <paper-toast id="toastEditOk" text="Element ({{entity.htmlify}}) updated">
+      <paper-button onclick="toastEditOk.toggle()"  class="toastButton">CLOSE NOW</paper-button>
+    </paper-toast>
+
+    <paper-toast id="toastAddOk" text="New justification added to the element ({{entity.htmlify}})">
+      <paper-button onclick="toastAddOk.toggle()"  class="toastButton">CLOSE NOW</paper-button>
+    </paper-toast>
+
+    <paper-toast id="toastDelOk" text="Attribute deleted">
+      <paper-button on-click="_toastUndoDeletion" class="toastButton">UNDO</paper-button>
+    </paper-toast>
 
     <paper-dialog on-iron-overlay-closed="_isRemovalConfirmed" id="removeModal" modal>
         <h2>Remove the item?</h2>
@@ -85,6 +104,23 @@
           type: Object,
           notify: true,
         },
+        previousProp:
+        {
+          type: Object,
+          notify: true,
+        },
+        previousElement:
+        {
+          type: Object,
+          notify: true,
+        },
+      },
+
+      attached: function()
+      {
+        this.$.adder.addEventListener(ADDER_NOTIFY_VALIDATION_SIGNAL_ID, function(e){
+          this.$.toastAddOk.open();
+        }.bind(this));
       },
 
       setEntity: function(entity)
@@ -168,8 +204,17 @@
          editElement.addEventListener(CONFIGURER_NOTIFY_VALIDATION_SIGNAL_ID, function(e)
          {
            //this._updateBadge();
+           this.$.toastEditOk.open();
            this._resetEditZone();
+
            this._resetNarrativeZone();
+
+           if(!this._controlNarrativeBlockExistence())
+           {
+             this._resetEntityNamer();
+             this._updateEntityName();
+           }
+
          }.bind(this));
        }
        else {
@@ -277,7 +322,8 @@
       {
         console.error("NEED TO EXTEND LEAF CONTROL");
         if(
-            entity instanceof Description ||
+            entity instanceof Description   ||
+            entity instanceof EntityName    ||
             entity instanceof Author )
           return false;
 
@@ -315,6 +361,9 @@
 
       _updateNarrativeChevron: function()
       {
+        if(Polymer.dom(this.root).querySelector('#cascadeIcon') == null)
+          return;
+
         if(this.isNarrativeBlockOpened)
         {
           Polymer.dom(this.root).querySelector('#cascadeIcon').setAttribute('icon', 'icons:expand-more');
@@ -398,9 +447,22 @@
       {
         if(e.detail.confirmed)
         {
+          this.previousElement = this.narrativeblock.getElementById(this.tmpToRemove);
+          this.previousProp = this.narrativeblock.getPropertyOfElement(this.previousElement);
           this.narrativeblock.removeElement(this.narrativeblock.getElementById(this.tmpToRemove));
           this._resetNarrativeZone();
+
+          this.$.toastDelOk.open();
         }
+      },
+
+      _toastUndoDeletion: function()
+      {
+        if(this.previousProp == null || this.previousElement == null)
+          return;
+
+        this.narrativeblock.addElement(this.previousElement, PROPERTIES_POOL.create(this.previousProp.uri, this.previousProp.label, this.previousProp.from, this.previousProp.to, this.previousProp.additionalConstraints));
+        this._updateNarrativeBlock();
       },
 
     });

@@ -131,6 +131,23 @@ NarrativeBlock.prototype = {
         return true;
       }
     }
-  }
+  },
+
+  //Search the relation of the element of the narrative block, such as "qualify"
+  getPropertyOfElement: function(element)
+  {
+    if(element == null)
+      return;
+
+    if(this.getElementById(element.id) == null)
+      return;
+
+    var props = PROPERTIES_POOL.getPropertiesByExtremities(this.propertyEntity.from, element.id);
+
+    if(props == null || props.length == 0)
+      return;
+
+    return props[0];
+  },
 
 };
