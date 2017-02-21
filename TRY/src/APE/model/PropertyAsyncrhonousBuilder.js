@@ -180,6 +180,16 @@ PropertyAsyncrhonousBuilder.prototype = {
     return this.arrayToFill;
   },
 
+  getArrayToFillCurrentLength: function()
+  {
+    var counter = 0;
+
+    for(var i in this.arrayToFill)
+      counter++;
+
+    return counter;
+  },
+
   _setObjects: function(A, B)
   {
     if(A != null)
