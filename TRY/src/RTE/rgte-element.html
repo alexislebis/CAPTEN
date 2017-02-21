@@ -8,6 +8,7 @@
 
 <dom-module id="rgte-element">
     <template>
+      <style include="toasty-style"></style>
         <style>
              :host {
                 display: block;
@@ -235,12 +236,17 @@
                   notify: true,
                 },
 
-                // TOASTY
-                previousRGTENode:
-                {
-                  type: Object,
-                  notify: true,
-                },
+                // === TOASTY
+                  previousRGTENode:
+                  {
+                    type: Object,
+                    notify: true,
+                  },
+                  previousRGTEEdge:
+                  {
+                    type: Object,
+                    notify: true,
+                  },
             },
 
             attached: function()
@@ -470,11 +476,14 @@
 
                   prop.from = prop.from.retrieveUniqueIdentifier();//Assured that from has retrieveUniqueIdentifier since it comes from the asyncBuilder
                   prop.to = prop.to.retrieveUniqueIdentifier();
-                  this.rgte.addVisProperty(prop, "to");
+                  var propriID = this.rgte.addVisProperty(prop, "to");
 
                   this.propAsyncBuild.reset();
 
                   this.isWaitingPropertyBinding = false;
+
+                  this.previousRGTEEdge = this.rgte.getEdgeById(propriID);
+                  this.$.toastPropertyAdded.open();
                 },
 
             //Define the behavior of the RGTE on click
@@ -611,6 +620,15 @@
 
                 this.rgte.removeNode(this.previousRGTENode.id);
                 this.previousRGTENode = null;
+              },
+
+              _rollbackAddProperty: function()
+              {
+                if(this.previousRGTEEdge == null)
+                  return;
+
+                this.rgte.removeEdge(this.previousRGTEEdge.id);
+                this.previousRGTEEdge = null;
               },
             // === END TOASTY
 

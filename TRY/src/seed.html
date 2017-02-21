@@ -14,20 +14,17 @@
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
 
+<!-- THEMES -->
+  <link rel="import" href="GeneralPurpose/view/theme/toasty-style.html">
+
 
 
 <dom-module id="main-seed">
   <template>
+    <style include="toasty-style"></style>
     <style>
       :host {
         display: block;
-      }
-      .toastButton {
-        text-transform: none;
-        color: #eeff41;
-      }
-      #toastNewFocus > a{
-        text-decoration: none;
       }
     </style>
 
