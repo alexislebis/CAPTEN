@@ -50,9 +50,10 @@
 
     <paper-toast id="toastNewFocus" text="New element focused ({{narrativeentity.htmlify}})">
       <paper-button  on-click="_rollbackNarrativeEntity" class="toastButton">UNDO</paper-button>
-      <!-- <a href="#rootNarrativeBlockDisplayer"> -->
-        <!-- <paper-button  class="toastButton">View More!</paper-button> -->
-      <!-- </a> -->
+    </paper-toast>
+
+    <paper-toast id="toastAddBag" text='Graph copied to the "APE" section'>
+      <paper-button on-click="_rollbackBagAdd" class="toastButton">UNDO</paper-button>
     </paper-toast>
 
     <h1>{{data.page}}</h1>
@@ -105,11 +106,17 @@
           value: null,
         },
 
-        previousNarrativeEntity:
-        {
-          type: Object,
-          notify: true,
-        },
+        // === TOASTY
+          previousNarrativeEntity:
+          {
+            type: Object,
+            notify: true,
+          },
+          previousRGTE:
+          {
+            type: Object,
+            notify: true,
+          },
 
       },
 
@@ -117,9 +124,14 @@
       {
         this.$.rteElem.addEventListener("-RGTEAddedToTheBag", function(e)
         {
-          console.log("WARNING: Currently, only one RGTE can be used simultaneously.");//TODO
+          // console.log("WARNING: Currently, only one RGTE can be used simultaneously.");//TODO
           // this.rgtes = [];
-          this.push('rgtes', e.detail);
+          this.previousRGTE = e.detail.copy();//Copy for new edition
+
+          this.push('rgtes', this.previousRGTE);
+
+          this.$.toastAddBag.open();
+
         }.bind(this));
 
         this.$.apeElem.addEventListener(NARRATIVE_BLOCK_NOTIFY_SIGNAL_ID, function(e)
@@ -139,6 +151,22 @@
         this.$.toastNewFocus.close();
         this.narrativeentity = this.previousNarrativeEntity;
         Polymer.dom(this.root).querySelector('#rootNarrativeBlockDisplayer').setEntity(this.narrativeentity);
+      },
+
+      _rollbackBagAdd: function()
+      {
+        if(this.previousRGTE == null)
+          return;
+
+        var index;
+        for(var i in this.rgtes)
+          if(this.rgtes[i].id == this.previousRGTE.id)
+            index = i;
+
+        if(index == null)
+          return;
+
+        this.splice('rgtes', index, 1);
       },
 
 

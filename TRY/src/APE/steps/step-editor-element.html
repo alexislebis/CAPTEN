@@ -19,6 +19,10 @@
       </p>
     </div>
 
+    <div id="stepState">
+
+    </div>
+
     <template is="dom-if" if="{{isBindingRGTENOP}}">
       <iron-icon icon="lightbulb-outline"></iron-icon> Clicking on a node in the RGTE and the operator input will bind them.
     </template>
@@ -331,6 +335,8 @@
 
             _onDisplayersChanged: function()
             {
+              this._computeStepStateDisplay();
+
                 if (this.displayOperatorInputs && this.displayRGTE)
                     this._automaticallyCompute();
             },
@@ -348,6 +354,8 @@
             {
                 // this._computeOutput();
                 // this.displayOperatorOutputs = true;
+                this._resetStepStateDisplay();
+
                 this._computeDisplayingOutputsStep();
                 this.fireOutput();
             },
@@ -356,9 +364,48 @@
             {
               // this.displayOperatorOutputs = false;
               this.displayStepOutputs = false;
+              this._computeStepStateDisplay();
             },
 
+
             // === PRIVATE METHODS
+            _computeStepStateDisplay: function()
+            {
+              this._resetStepStateDisplay();
+
+              var ul = document.createElement('ul');
+              var li;
+
+              if(this.step.inputs == null)
+              {
+                li = document.createElement('li');
+                li.textContent = "No inputs concepts are selected";
+                ul.appendChild(li);
+              }
+              if(this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
+              {
+                li = document.createElement('li');
+                li.textContent = "No operation is selected";
+                ul.appendChild(li);
+              }
+              if(this.step.propAsyncBuild.lengthArray != 0 && this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength() > 0)
+              {
+                li = document.createElement('li');
+                li.textContent = this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength()+" remaining concepts to bind between operator and inputs concepts";
+                ul.appendChild(li);
+              }
+              //if PARAM
+
+              this.$.stepState.appendChild(ul);
+            },
+            _resetStepStateDisplay: function()
+            {
+              var myNode = this.$$("#stepState");
+
+              if(myNode)
+                while (myNode.firstChild)
+                    myNode.removeChild(myNode.firstChild);
+            },
             // === BEHAVIORS METHODS
             _behaviorSelectorWhenGraphsClicked: function(params)
             {
