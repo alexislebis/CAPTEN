@@ -109,6 +109,30 @@
           <rgte-cardinality-form-element id="rgteCard" rgte="{{rgte}}" edgeid="{{edgeIDSelected}}"></rgte-cardinality-form-element>
         </div>
 
+
+        <!-- TOASTY -->
+          <paper-toast id="toastClassAdded" text="Class added">
+            <paper-button on-click="_rollbackAddClass" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastClassReplaced" text="Class replaced">
+            <paper-button on-click="_rollbackReplaceClass" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastPropertyAdded" text="Property added">
+            <paper-button on-click="_rollbackAddProperty" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastPropertyReplace" text="Property replaced">
+            <paper-button on-click="_rollbackReplaceProperty" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastPropertyRelinked" text="Property relinked">
+            <paper-button on-click="_rollbackRelinkProperty" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+        <!-- END TOASTY -->
+
+
     </template>
     <script>
     (
@@ -210,6 +234,13 @@
                   value: false,
                   notify: true,
                 },
+
+                // TOASTY
+                previousRGTENode:
+                {
+                  type: Object,
+                  notify: true,
+                },
             },
 
             attached: function()
@@ -268,7 +299,12 @@
 
             addClass: function(cls) //From rte-lister-element redirected by rgte-workzone-element
             {
-              return this.rgte.addVisNode(cls);
+              var nodeID = this.rgte.addVisNode(cls);
+
+              this.previousRGTENode = this.rgte.getNodeById(nodeID);
+              this.$.toastClassAdded.open();
+
+              return nodeID;
             },
 
             _updateCurrentNode: function(cls)//@CHECK PROPERTIES_POOL Related
@@ -566,6 +602,17 @@
             {
               this.fire('MANAGE_LISTER_VISIBILITY', {isListerDisable:lister, isListerAddingDisable: adding, isClassesListerDisable: classes, isPropertiesListerDisable: properties});
             },
+
+            // === TOASTY BEHAVIORS
+              _rollbackAddClass: function()
+              {
+                if(this.previousRGTENode == null)
+                  return;
+
+                this.rgte.removeNode(this.previousRGTENode.id);
+                this.previousRGTENode = null;
+              },
+            // === END TOASTY
 
             //=== BUTTONS
               _create: function()

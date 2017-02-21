@@ -4,18 +4,21 @@
 <dom-module id="step-workzone-element">
   <template>
     <style>
-
+    .toastButton {
+      text-transform: none;
+      color: #eeff41;
+    }
     </style>
 
     <div id="newStep">
-      <p on-tap="_createNewStep">
-          Create new a step <iron-icon icon="add-box"></iron-icon>
+      <p>
+          Create new a step paper: <paper-icon-button on-click="_createNewStep" icon="icons:add-box"></paper-icon-button>
       </p>
     </div>
 
     <div id="openEditor">
-      <p on-tap="_openEditorNewStep">
-          Open step editor for the step current step <iron-icon icon="open-in-new"></iron-icon>
+      <p>
+          Open step editor for the step current step <paper-icon-button icon="icons:open-in-new" on-click="_openEditorNewStep"></paper-icon-button>
       </p>
     </div>
 
@@ -30,6 +33,15 @@
       <h3>Steps Displayer</h3>
       <steps-displayer-element id="stepsDisplayer" steps="{{steps}}"></steps-displayer-element>
     </div>
+
+
+    <paper-toast id="toastNewStep" text="Step created">
+      <paper-button on-click="_rollbackNewStep" class="toastButton">UNDO</paper-button>
+    </paper-toast>
+
+    <paper-toast id="toastNoStepSelected" text="No step selected"></paper-toast>
+
+
 
   </template>
   <script>
@@ -72,7 +84,7 @@
           cstep:
           {
             type: Object,
-            value: function(){return new Step();},
+            // value: function(){return new Step();},
             notify: true,
           },
           isStepEditionEnabled:
@@ -86,6 +98,13 @@
           {
             type: Object,
             value: null,
+            notify: true,
+          },
+
+          //For rollback
+          rollbackStep:
+          {
+            type: Object,
             notify: true,
           },
         },
@@ -223,12 +242,13 @@
         _createNewStep: function()
         {
           this.cstep = new Step();
+          this.rollbackStep = this.cstep;
 
           this.push('steps', this.cstep);
 
           this.isStepEditionEnabled = false;
           // this.isStepEditionEnabled = true;
-
+          this.$.toastNewStep.open();
           this._updateDisplayer();
         },
 
@@ -244,7 +264,29 @@
 
         _openEditorNewStep: function()
         {
+          if(this.cstep == null)
+          {
+            this.$.toastNoStepSelected.open();
+            return;
+          }
           this.isStepEditionEnabled = true;
+        },
+
+        _rollbackNewStep: function()
+        {
+          if(this.rollbackStep == null)
+            return;
+
+          var index;
+          for(var i in this.steps)
+            if(this.steps[i].id == this.rollbackStep)
+              index = i;
+
+          this.splice('steps', index, 1);
+
+          this.cstep = null;
+          this.rollbackStep = null;
+          this._updateDisplayer();
         },
 
       });

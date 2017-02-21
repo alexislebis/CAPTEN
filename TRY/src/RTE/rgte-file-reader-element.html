@@ -17,6 +17,9 @@
           <file-reader id="fileReaderElement">RGTE File</file-reader>
         </div>
 
+        <paper-toast id="toastLoadOk" text="Graph of concepts successfully loaded"></paper-toast>
+
+
     </template>
     <script>
         Polymer(
@@ -112,6 +115,8 @@
 
               this.customcls = cust;
               this.customprops = pro;
+
+              this.$.toastLoadOk.open();
             },
         });
     </script>
