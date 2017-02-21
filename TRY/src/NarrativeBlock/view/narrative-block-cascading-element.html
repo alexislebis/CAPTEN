@@ -13,37 +13,32 @@
     }
 
     .outer{
-      border: 1px dotted;
-       display:inline-block;
-       width: 100%
+       /*display:inline-block;*/
+       margin-left: 20px;
     }
 
     .align{
-      /*width: fit-content;
-      margin-right: auto;
-      float: left;*/
       position: relative;
       border: 1px solid;
-      float:left;
       width: fit-content;
     }
 
-    .subNarrative{
+    /*.subNarrative{
       margin-left: 10px;
-    }
+    }*/
 
     </style>
 
     <div id="narrativeBlock" class="outer" hidden="true">
       <div id="entityBlock" class="align">
         <div id="managingButtons" class="align">
-          <div id="editZone" class="align">
+          <div id="editZone">
             <paper-icon-button icon="icons:settings" on-click="_toggleEditingZone"></paper-icon-button>
             <div id="editEntity">
 
             </div>
           </div>
-          <div id="addZone" class="align">
+          <div id="addZone">
             <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
           </div>
         </div>
@@ -489,6 +484,7 @@
 
         this.narrativeblock.addElement(this.previousElement, PROPERTIES_POOL.create(this.previousProp.uri, this.previousProp.label, this.previousProp.from, this.previousProp.to, this.previousProp.additionalConstraints));
         this._updateNarrativeBlock();
+        this.$.toastDelOk.close();
       },
 
     });
