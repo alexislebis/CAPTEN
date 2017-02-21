@@ -12,32 +12,54 @@
       color: #eeff41;
     }
 
+    .outer{
+      border: 1px dotted;
+       display:inline-block;
+       width: 100%
+    }
+
+    .align{
+      /*width: fit-content;
+      margin-right: auto;
+      float: left;*/
+      position: relative;
+      border: 1px solid;
+      float:left;
+      width: fit-content;
+    }
+
+    .subNarrative{
+      margin-left: 10px;
+    }
+
     </style>
 
-    <div id="narrativeBlock" hidden="true">
-      <div id="managingButtons">
-        <div id="editZone">
-          <paper-icon-button icon="icons:settings" on-click="_toggleEditingZone"></paper-icon-button>
-          <div id="editEntity">
+    <div id="narrativeBlock" class="outer" hidden="true">
+      <div id="entityBlock" class="align">
+        <div id="managingButtons" class="align">
+          <div id="editZone" class="align">
+            <paper-icon-button icon="icons:settings" on-click="_toggleEditingZone"></paper-icon-button>
+            <div id="editEntity">
 
+            </div>
+          </div>
+          <div id="addZone" class="align">
+            <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
           </div>
         </div>
-        <div id="addZone">
-          <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
+        <div id="entityNamer" class="align">
+
         </div>
       </div>
-      <div id="entityNamer">
 
-      </div>
-
-      <div id="cascadeZone">
-        <div id="cascadeButton">
+      <div id="cascadeZone" class="">
+        <div id="cascadeButton" class="">
           <paper-icon-button id="cascadeIcon" icon="icons:chevron-right" on-click="_toggleCascadeZone"></paper-icon-button>
           <div id="divBage">
             <paper-badge id="badge" for="cascadeIcon" label="{{_getNarrativeBlockLength()}}"></paper-badge>
           </div>
         </div>
-        <div id="cascadeEntities">
+        <div id="cascadeEntities" class="">
 
         </div>
       </div>
@@ -418,16 +440,20 @@
           else {
             prop = new (props[0].constructor).namerElement(props[0]);
           }
+          // prop.setAttribute('class','floater');
 
           iconDelProp = document.createElement('paper-icon-button');
           iconDelProp.setAttribute('icon', 'icons:highlight-off');
           iconDelProp.setAttribute('idEntity', this.narrativeblock.elements[i].id)
+          // iconDelProp.setAttribute('class','floater');
           iconDelProp.addEventListener('click', function(e){
             this._removeItem(e.target.getAttribute('idEntity'));
           }.bind(this));
 
           nbckCascading = document.createElement('narrative-block-cascading-element');
           nbckCascading.setEntity(this.narrativeblock.elements[i]);
+
+          nbckCascading.setAttribute('class', 'subNarrative');
 
           div.appendChild(iconDelProp);
           div.appendChild(prop);
