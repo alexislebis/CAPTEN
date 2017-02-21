@@ -1,0 +1,285 @@
+<link rel="import" href="../../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<!-- <link rel="import" href="../../../CAPTEN_ONTO/model/CAPTEN_Class/ScientificStatement/ScientificStatement.js"> -->
+
+
+<dom-module id="narrative-block-adder-element">
+  <template>
+      <style>
+        :host {
+          display: block;
+        }
+      </style>
+
+      <paper-icon-button icon="{{_displayIcons(toggleCreation)}}" on-click="_toggleCreation"></paper-icon-button>
+
+      <template is="dom-if" if="{{toggleCreation}}" restamp="true">
+        <form is="iron-form" method="get" action="/" id="NarrBlockForm" on-iron-form-submit="submitForm">
+          <div>
+            <div>
+              <h4>Select the relation</h4>
+
+              <paper-dropdown-menu label="Relation" name="relation" required>
+                  <paper-menu class="dropdown-content" selected="{{prop}}" id="RelationDropdown">
+                      <template is="dom-repeat" items="[[relItems]]" as="item">
+                          <paper-item value$="[[item]]">[[item.label]]</paper-item>
+                      </template>
+                  </paper-menu>
+              </paper-dropdown-menu>
+
+
+            </div>
+            <div>
+              <h4>Select the kind of element</h4>
+
+              <paper-button id="newElmt" raised on-click='_newElementChoosed'><iron-icon icon="icons:add"></iron-icon>New Element</paper-button>
+              <paper-button id="existElmt" raised on-click='_existingElementChoosed'><iron-icon icon="icons:search"></iron-icon>Research Element</paper-button>
+
+              <template is="dom-if" if="{{isNewChoosed}}" restamp="true">
+                <paper-dropdown-menu label="Entity" name="entity" required>
+                    <paper-menu class="dropdown-content" selected="{{elem}}" id="EntityDropdown">
+                        <template is="dom-repeat" items="[[entItems]]" as="item">
+                            <paper-item value$="[[item]]">[[item.label]]</paper-item>
+                        </template>
+                    </paper-menu>
+                </paper-dropdown-menu>
+                <div id="configuringSelectedEntity">
+
+                </div>
+              </template>
+
+              <template is="dom-if" if="{{isExistingChoosed}}" restamp="true">
+
+              </template>
+
+            </div>
+          </div>
+          <paper-button raised on-click="submit">Submit</paper-button>
+          <paper-button raised on-click="reset">Reset</paper-button>
+        </form>
+      </template>
+
+      <paper-dialog id="formError" modal>
+        <h2>Information</h2>
+        <p>An element must be selected! You can either click on the New button to create one or on the Research button to designate an appropriate one.</p>
+        <div class="buttons">
+          <paper-button dialog-confirm autofocus>Tap me to close</paper-button>
+        </div>
+      </paper-dialog>
+
+  </template>
+  <script>
+  Polymer({//To be deported in NarrativeBlock.prototype.narrativeblockdisplayer({})
+    is: 'narrative-block-adder-element',
+
+    properties:
+    {
+      narrativeblock:
+      {
+        type: Object,
+        notify: true,
+      },
+      toggleCreation:
+      {
+        type: Boolean,
+        notify: true,
+        value: false,
+      },
+      relItems:
+      {
+        type: Array,
+        notify: true,
+        value: function(){return NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockProperties;},
+      },
+      entItems:
+      {
+        type: Array,
+        notify: true,
+        value: function(){return NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockEntities;},
+      },
+
+      prop:
+      {
+        type: Object,
+        notify: true,
+      },
+      elem:
+      {
+        type: Object,
+        notify: true,
+        observer: "_displayConfigurerForNewElmt",
+      },
+
+      tmpEntity://Used for display configurer
+      {
+        type: Object,
+        notify: true,
+      },
+
+      //TEMPLATE IF
+      isNewChoosed:
+      {
+        type: Boolean,
+        notify: true,
+        value: false,
+      },
+      isExistingChoosed:
+      {
+        type: Boolean,
+        notify: true,
+        value: false,
+      }
+    },
+
+    _toggleCreation: function(e)
+    {
+      this.toggleCreation = !this.toggleCreation;
+    },
+
+    _getRelationItems: function()
+    {
+      return PROPERTIES_POOL.listCompilantNarrativeBlockProperties();
+    },
+
+    _newElementChoosed: function()
+    {
+      this.isNewChoosed = !this.isNewChoosed;
+      this.isExistingChoosed = false;
+    },
+
+    _existingElementChoosed: function()
+    {
+      this.isExistingChoosed = !this.isExistingChoosed;
+      this.isNewChoosed = false;
+    },
+
+    _displayIcons: function(isOpened)
+    {
+      return isOpened ? 'icons:close' : 'icons:add';
+    },
+
+    _displayConfigurerForNewElmt: function(e)
+    {
+      if(this.elem == null || this.elem < 0)
+        return;
+
+      if(Polymer.dom(this.root).querySelector('#configuringSelectedEntity') == null)
+        return;
+
+      this._resetDivConfiguringSelectedEntity();
+
+      console.error("WARNING: only test function. Must be extends and overwrite _addNewElement function");
+      switch (this.elem) {
+        case 0:
+          this.tmpEntity = new Hypothesis();
+          break;
+        case 1:
+          this.tmpEntity = new Description();
+          break;
+        default:
+          this.tmpEntity = null;
+      }
+
+      console.log("=====");
+      console.log(this.tmpEntity);
+      console.log("=====");
+
+      if(this.tmpEntity == null || (this.tmpEntity.constructor).configurerElement == null)
+        return;
+
+      var div = document.createElement("div");
+      var newElmt = new (this.tmpEntity.constructor).configurerElement(this.tmpEntity);
+      console.log(newElmt);
+      div.appendChild(newElmt);
+
+      Polymer.dom(this.root).querySelector('#configuringSelectedEntity').appendChild(div);
+    },
+
+    submit: function(event)
+    {
+      if(!this.isNewChoosed && !this.isExistingChoosed)
+      {
+        this.$.formError.open();
+        return;
+      }
+
+      Polymer.dom(event).localTarget.parentElement.submit();
+    },
+
+    submitForm: function(event)
+    {
+      if(this.isNewChoosed)
+        this._addNewElement();
+      else if(this.isExistingChoosed)
+        this._addExistingElement();
+      else
+        return;
+
+      this.fire(ADDER_NOTIFY_VALIDATION_SIGNAL_ID);
+      this.resetState();
+      // this.fire("-NewElementNarrative");
+    },
+
+    resetState: function()
+    {
+      this.toggleCreation = false;
+      this.prop = null;
+      this.elem = null;
+      this.tmpEntity = null;
+    },
+
+    _addNewElement: function()
+    {
+      console.error('Temporary creation system. Redo with the ELEMENT_POOL');
+      //The creation with the element POOL must be linked with the uri etc... from NARRATIVE POOL
+
+      var entity;
+
+      // WARNING switch case procedure not reliable !!!!!
+      entity = this.tmpEntity;
+      // if(this.tmpEntity != null)
+      // {
+      //   entity = this.tmpEntity;
+      // }
+      // else{
+      //   switch (this.elem) {
+      //     case 0:
+      //       entity = new Hypothesis();
+      //       break;
+      //     case 1:
+      //       entity = new Description();
+      //       break;
+      //     default:
+      //       entity = new CAPTENClass();
+      //   }
+      // }
+
+      console.log(this.narrativeblock);
+
+      //Create from PROPERTIES POOL the property
+      var props = NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockProperties;
+      var prop = PROPERTIES_POOL.create(props[this.prop].uri, props[this.prop].label, this.narrativeblock.getOrigin(), entity.id);
+
+      this.elem = null;
+      this.prop = null;
+      this.tmpEntity = null;
+
+      this.narrativeblock.addElement(entity, prop);
+      console.log("adding done.");
+    },
+
+    _resetDivConfiguringSelectedEntity:function()
+    {
+      var myNode = this.$$("#configuringSelectedEntity");
+
+      if(myNode)
+        while (myNode.firstChild)
+            myNode.removeChild(myNode.firstChild);
+    },
+
+  });
+  </script>
+
+</dom-module>

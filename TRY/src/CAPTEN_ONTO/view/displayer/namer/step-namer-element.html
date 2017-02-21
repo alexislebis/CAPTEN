@@ -1,0 +1,29 @@
+<link rel="import" href="../../theme/namer/namer-style.html">
+
+<dom-module id="step-namer-element">
+  <template>
+    <style include="namer-style"></style>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <!-- {{entity.htmlify}} -->
+    <div class="global">
+      <div class="entity">
+        {{entity.htmlify}}
+      </div>
+      <!-- <div class="cascader">
+        <narrative-block-cascader-display-element entity="{{entity}}"></narrative-block-cascader-display-element>
+      </div> -->
+    </div>
+    <!-- <template is="dom-if" if="{{item::hasNarrativeBlock}}" restamp="true">
+      <iron-icon icon="icons:arrow-drop-down-circle"></iron-icon>
+    </template> -->
+
+  </template>
+  <script>
+
+    </script>
+  </dom-module>

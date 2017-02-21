@@ -1,0 +1,24 @@
+<dom-module id="hypothesis-configurer-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <!-- STATEMENT CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
+    <paper-card heading="Hypothesis edition">
+      <div class="card-content">
+
+        <statement-configurer-element id="inheritedStmt" entity="{{entity}}"><statement-configurer-element>
+      </div>
+
+      <div class="card-actions" hidden="{{cascaded}}">
+        <paper-icon-button icon="icons:done" on-click="_update"></paper-icon-button>
+      </div>
+    </paper-card>
+  </template>
+  <script>
+
+    </script>
+  </dom-module>

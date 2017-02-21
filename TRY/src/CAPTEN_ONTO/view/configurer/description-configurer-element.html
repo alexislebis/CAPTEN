@@ -1,0 +1,23 @@
+<dom-module id="description-configurer-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <!-- ROOT CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
+    <paper-card heading="Descriptive addendum edition">
+      <div class="card-content">
+
+      Description: <paper-textarea id="descrTxt" label="Description" value="{{val}}" max-rows="3"></paper-textarea>
+      </div>
+    <div class="card-actions" hidden="{{cascaded}}">
+      <paper-icon-button icon="icons:done" on-click="_update"></paper-icon-button>
+    </div>
+  </paper-card>
+  </template>
+  <script>
+
+    </script>
+  </dom-module>

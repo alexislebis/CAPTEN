@@ -110,7 +110,10 @@
 
           this.$.stepsDisplayer.addEventListener("-STEPS_DSP_NODE_CLICKED", function(e)
           {
-            this._updateCurrentStep(e.detail);
+            if(TOOL_EVENT.isCtrlLeftClick(e.detail.event))
+              this._notifyStepNarrativeBlock(e.detail);
+            else
+              this._updateCurrentStep(e.detail);
           }.bind(this));
 
           this._observer = Polymer.dom(this.$.stepEditionDiv).observeNodes(function(info)
@@ -135,6 +138,17 @@
               }
             }
           }.bind(this));
+        },
+
+        // === NARRATIVE BLOCK NOTIFICATION
+        _notifyStepNarrativeBlock: function(param)
+        {
+          for(var i in this.steps)
+            if(this.steps[i].id == param.id)
+            {
+              NARRATIVE_BLOCK_NOTIFY_SIGNAL_BUILDER(this, this.steps[i], param);
+              return true;
+            }
         },
 
         // === PUBLIC

@@ -1,0 +1,23 @@
+<link rel="import" href="../../theme/namer/namer-style.html">
+
+<dom-module id="entity-name-namer-element">
+  <template>
+    <style include="namer-style"></style>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <!-- {{entity.htmlify}} -->
+    <div class="global">
+      <div class="entity">
+        <paper-input label="Name" value="{{entity.name}}" readonly></paper-textarea>
+      </div>
+    </div>
+
+  </template>
+  <script>
+
+    </script>
+  </dom-module>

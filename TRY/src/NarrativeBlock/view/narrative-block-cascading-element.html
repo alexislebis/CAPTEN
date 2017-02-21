@@ -1,0 +1,492 @@
+<link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
+
+<dom-module id="narrative-block-cascading-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+
+    .toastButton {
+      text-transform: none;
+      color: #eeff41;
+    }
+
+    .outer{
+       /*display:inline-block;*/
+       margin-left: 20px;
+    }
+
+    .align{
+      position: relative;
+      border: 1px solid;
+      width: fit-content;
+    }
+
+    /*.subNarrative{
+      margin-left: 10px;
+    }*/
+
+    </style>
+
+    <div id="narrativeBlock" class="outer" hidden="true">
+      <div id="entityBlock" class="align">
+        <div id="managingButtons" class="align">
+          <div id="editZone">
+            <paper-icon-button icon="icons:settings" on-click="_toggleEditingZone"></paper-icon-button>
+            <div id="editEntity">
+
+            </div>
+          </div>
+          <div id="addZone">
+            <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
+          </div>
+        </div>
+        <div id="entityNamer" class="align">
+
+        </div>
+      </div>
+
+      <div id="cascadeZone" class="">
+        <div id="cascadeButton" class="">
+          <paper-icon-button id="cascadeIcon" icon="icons:chevron-right" on-click="_toggleCascadeZone"></paper-icon-button>
+          <div id="divBage">
+            <paper-badge id="badge" for="cascadeIcon" label="{{_getNarrativeBlockLength()}}"></paper-badge>
+          </div>
+        </div>
+        <div id="cascadeEntities" class="">
+
+        </div>
+      </div>
+
+    </div>
+
+
+    <paper-toast id="toastEditOk" text="Element ({{entity.htmlify}}) updated">
+      <paper-button onclick="toastEditOk.toggle()"  class="toastButton">CLOSE NOW</paper-button>
+    </paper-toast>
+
+    <paper-toast id="toastAddOk" text="New justification added to the element ({{entity.htmlify}})">
+      <paper-button onclick="toastAddOk.toggle()"  class="toastButton">CLOSE NOW</paper-button>
+    </paper-toast>
+
+    <paper-toast id="toastDelOk" text="Attribute deleted">
+      <paper-button on-click="_toastUndoDeletion" class="toastButton">UNDO</paper-button>
+    </paper-toast>
+
+    <paper-dialog on-iron-overlay-closed="_isRemovalConfirmed" id="removeModal" modal>
+        <h2>Remove the item?</h2>
+        <p>Do you really want to remove this item? This cannot be undone.</p>
+        <p>Please not that the descriptive elements attached to this item WILL NOT BE removed. Thus, binding this item with another element of the application
+           will provide the same information structure.
+        </p>
+        <div class="buttons">
+            <paper-button dialog-dismiss>Decline</paper-button>
+            <paper-button dialog-confirm autofocus>Accept</paper-button>
+        </div>
+    </paper-dialog>
+
+  </template>
+  <script>
+    Polymer({
+      is : 'narrative-block-cascading-element',
+
+      propeties:
+      {
+        entity:
+        {
+          type: Object,
+          notify: true,
+          observer: '_onEntityChange',
+        },
+
+        narrativeblock:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        isNarrativeBlockOpened:
+        {
+          type: Boolean,
+          notify: true,
+        },
+        isEditZoneOpened:
+        {
+          type: Boolean,
+          notify: true,
+        },
+        tmpToRemove:
+        {
+          type: Object,
+          notify: true,
+        },
+        previousProp:
+        {
+          type: Object,
+          notify: true,
+        },
+        previousElement:
+        {
+          type: Object,
+          notify: true,
+        },
+      },
+
+      attached: function()
+      {
+        this.$.adder.addEventListener(ADDER_NOTIFY_VALIDATION_SIGNAL_ID, function(e){
+          this.$.toastAddOk.open();
+        }.bind(this));
+      },
+
+      setEntity: function(entity)
+      {
+        this.entity = entity;
+        this._onEntityChange();
+      },
+
+      _onEntityChange: function()
+      {
+        this._resetEntityNamer();
+
+        this._delockNarrativeZone();
+        var narrativeBlockCreated = this._controlNarrativeBlockExistence();
+
+        if(!narrativeBlockCreated) //Non authorized to have a narrative block
+        {
+          // this._deleteEditZone();
+          this._deleteAddZone();
+          this._deleteCascadeZone();
+        }
+        else {
+          this.narrativeblock.resetObservers();
+          this.narrativeblock.registerObserverCallbackOnChange(this, this._updateNarrativeBlock);
+          this._updateBadge();
+        }
+
+        this._updateEntityName();
+
+        if(this.isNarrativeBlockOpened)
+          this._updateNarrativeBlock();
+      },
+
+      _delockNarrativeZone: function()
+      {
+        if(this.entity == null)
+          return;
+
+        var elmt = Polymer.dom(this.root).querySelector('#narrativeBlock');
+        if( elmt.getAttribute('hidden') )
+          elmt.removeAttribute('hidden');
+      },
+
+      _getNarrativeBlockLength: function()
+      {
+        if(this.narrativeblock == null)
+          return -1;
+
+        return this.narrativeblock.getLength();
+      },
+
+      _toggleEditingZone: function(e)
+      {
+        this.isEditZoneOpened = !this.isEditZoneOpened;
+        this._updateEditZone();
+      },
+
+      _updateBadge: function()
+      {
+        if(Polymer.dom(this.root).querySelector('#badge'))
+          Polymer.dom(this.root).querySelector('#badge').label = this._getNarrativeBlockLength();
+      },
+
+      _updateEditZone: function()
+      {
+        if(!this.isEditZoneOpened)
+        {
+          this._resetEditZone();
+          return;
+        }
+
+        if(Polymer.dom(this.root).querySelector('#editEntity') == null)
+          return;
+
+        var editElement = null;
+
+        console.log(this.entity);
+        if( (this.entity.constructor).configurerElement != null)
+        {
+         editElement = new (this.entity.constructor).configurerElement(this.entity);
+         editElement.addEventListener(CONFIGURER_NOTIFY_VALIDATION_SIGNAL_ID, function(e)
+         {
+           //this._updateBadge();
+           this.$.toastEditOk.open();
+           this._resetEditZone();
+
+           this._resetNarrativeZone();
+
+           if(!this._controlNarrativeBlockExistence())
+           {
+             this._resetEntityNamer();
+             this._updateEntityName();
+           }
+
+         }.bind(this));
+       }
+       else {
+         editElement = document.createElement("p");
+         editElement.textContent = "Element linked does not have any associated editing function! (itemid:"+this.entity.id+", item:"+this.entity.label+")";
+       }
+
+       Polymer.dom(this.root).querySelector('#editEntity').appendChild(editElement);
+      },
+
+      _resetEntityNamer: function()
+      {
+        var myNode = this.$$("#entityNamer");
+
+        if(myNode)
+          while (myNode.firstChild)
+              myNode.removeChild(myNode.firstChild);
+      },
+
+      _resetEditZone:function()
+      {
+        var myNode = this.$$("#editEntity");
+
+        if(myNode)
+          while (myNode.firstChild)
+              myNode.removeChild(myNode.firstChild);
+
+        this.isEditZoneOpened = false;
+      },
+
+      _resetNarrativeZone: function()
+      {
+        var myNode = this.$$("#cascadeEntities");
+
+        if(myNode)
+          while (myNode.firstChild)
+              myNode.removeChild(myNode.firstChild);
+
+        this.isNarrativeBlockOpened = false;
+
+        this._updateNarrativeChevron();
+      },
+
+      _deleteCascadeZone: function()
+      {
+        var myNode = this.$$("#cascadeZone");
+
+        if(myNode)
+          while (myNode.firstChild)
+              myNode.removeChild(myNode.firstChild);
+      },
+
+      _deleteEditZone: function()
+      {
+        var myNode = this.$$("#editZone");
+
+        if(myNode)
+          while (myNode.firstChild)
+              myNode.removeChild(myNode.firstChild);
+      },
+
+      _deleteAddZone: function()
+      {
+        var myNode = this.$$("#addZone");
+
+        if(myNode)
+          while (myNode.firstChild)
+              myNode.removeChild(myNode.firstChild);
+      },
+
+      _controlNarrativeBlockExistence: function() //Create a new NarrativeBlock if it is missing and this.entity is authorized to have one
+      {
+        if(this.entity == null)
+          return false;
+
+        if(!this._canHaveLeaf(this.entity))
+          return false;
+
+        if(this.entity.getNarrativeBlock == null)
+          return false;
+
+        this.narrativeblock = this.entity.getNarrativeBlock();
+
+        if(this.narrativeblock != null)
+        {
+          this.hasNarrativeBlock = true;
+          return true;
+        }
+        // else
+        //   this.hasNarrativeBlock = false;
+        this.narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this.entity);
+
+        if(this.narrativeblock != null)
+        {
+            this.hasNarrativeBlock = true;
+            return true;
+        }
+        else
+         this.hasNarrativeBlock = false;
+
+        return false;
+      },
+
+      _canHaveLeaf: function(entity) //Test if an entity can have a narrative block as leaf. If not, return false; Example : if(entity instanceof Addendum)return false;
+      {
+        console.error("NEED TO EXTEND LEAF CONTROL");
+        if(
+            entity instanceof Description   ||
+            entity instanceof EntityName    ||
+            entity instanceof Author )
+          return false;
+
+        return true;
+      },
+
+      _updateEntityName: function()
+      {
+        if(Polymer.dom(this.root).querySelector('#entityNamer') == null)
+          return;
+
+        var eNamer = null;
+
+        if( (this.entity.constructor).namerElement != null )
+        {
+          eNamer = new (this.entity.constructor).namerElement(this.entity);
+          // eNamer.addEventListener('click', function(e){
+          //   this._displayEditButton(e.target.getAttribute('idEdit'));
+          // }.bind(this));
+        }
+        else {
+          eNamer = document.createElement("p");
+          eNamer.textContent = "Element linked does not have any associated displaying function! (itemid:"+this.entity.id+", item:"+this.entity.label+")";
+        }
+
+        Polymer.dom(this.root).querySelector('#entityNamer').appendChild(eNamer);
+      },
+
+      _toggleCascadeZone: function()
+      {
+        this.isNarrativeBlockOpened = !this.isNarrativeBlockOpened;
+        this._updateNarrativeChevron();
+        this._updateNarrativeBlock();
+      },
+
+      _updateNarrativeChevron: function()
+      {
+        if(Polymer.dom(this.root).querySelector('#cascadeIcon') == null)
+          return;
+
+        if(this.isNarrativeBlockOpened)
+        {
+          Polymer.dom(this.root).querySelector('#cascadeIcon').setAttribute('icon', 'icons:expand-more');
+          //Polymer.dom(this.root).querySelector('#divBage').removeChild(Polymer.dom(this.root).querySelector('#divBage').firstChild);
+        }
+        else {
+          Polymer.dom(this.root).querySelector('#cascadeIcon').setAttribute('icon', 'icons:chevron-right');
+          // var badge = document.createElement('paper-badge');
+          // badge.setAttribute('for', 'cascadeIcon');
+          // badge.setAttribute('label', this._getNarrativeBlockLength());
+          // Polymer.dom(this.root).querySelector('#divBage').appendChild(badge);
+        }
+      },
+
+      _updateNarrativeBlock: function()
+      {
+        this._updateBadge();
+
+        if(!this.isNarrativeBlockOpened)
+        {
+          this._resetNarrativeZone();
+          return;
+        }
+
+        if(Polymer.dom(this.root).querySelector('#cascadeEntities') == null)
+            return;
+        if(this.entity == null || this.narrativeblock == null)
+          return;
+
+        var div = null;
+        var props = null;
+        var prop = null;
+        var iconDelProp = null;
+        var nbckCascading = null;
+
+        for(var i in this.narrativeblock.elements)
+        {
+          div = document.createElement('div');
+          props = PROPERTIES_POOL.getPropertiesByExtremities(this.narrativeblock.propertyEntity.from, this.narrativeblock.elements[i].id);
+
+          if(props <= 0)
+          {
+            console.error("Unexpected no existence of property. Aborting cascading elements");
+            return null;
+          }
+
+          if( (props[0].constructor).namerElement == null)
+          {
+            prop = document.createElement('p');
+            prop.textContent = "Element does not have any associated displaying function!";
+          }
+          else {
+            prop = new (props[0].constructor).namerElement(props[0]);
+          }
+          // prop.setAttribute('class','floater');
+
+          iconDelProp = document.createElement('paper-icon-button');
+          iconDelProp.setAttribute('icon', 'icons:highlight-off');
+          iconDelProp.setAttribute('idEntity', this.narrativeblock.elements[i].id)
+          // iconDelProp.setAttribute('class','floater');
+          iconDelProp.addEventListener('click', function(e){
+            this._removeItem(e.target.getAttribute('idEntity'));
+          }.bind(this));
+
+          nbckCascading = document.createElement('narrative-block-cascading-element');
+          nbckCascading.setEntity(this.narrativeblock.elements[i]);
+
+          nbckCascading.setAttribute('class', 'subNarrative');
+
+          div.appendChild(iconDelProp);
+          div.appendChild(prop);
+          div.appendChild(nbckCascading);
+
+          Polymer.dom(this.root).querySelector('#cascadeEntities').appendChild(div);
+        }
+      },
+
+      _removeItem: function(itemID)
+      {
+        this.tmpToRemove = itemID;
+        this.$.removeModal.open();
+      },
+
+      _isRemovalConfirmed: function(e)
+      {
+        if(e.detail.confirmed)
+        {
+          this.previousElement = this.narrativeblock.getElementById(this.tmpToRemove);
+          this.previousProp = this.narrativeblock.getPropertyOfElement(this.previousElement);
+          this.narrativeblock.removeElement(this.narrativeblock.getElementById(this.tmpToRemove));
+          this._resetNarrativeZone();
+
+          this.$.toastDelOk.open();
+        }
+      },
+
+      _toastUndoDeletion: function()
+      {
+        if(this.previousProp == null || this.previousElement == null)
+          return;
+
+        this.narrativeblock.addElement(this.previousElement, PROPERTIES_POOL.create(this.previousProp.uri, this.previousProp.label, this.previousProp.from, this.previousProp.to, this.previousProp.additionalConstraints));
+        this._updateNarrativeBlock();
+        this.$.toastDelOk.close();
+      },
+
+    });
+  </script>
+</dom-module>

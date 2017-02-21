@@ -15,11 +15,42 @@ PropertiesPool.prototype = {
   {
     var prop = new Property(uri, label, from, to, additionalConstraints);
 
-    this.pool.push(prop);
+    return this._addingToPool(prop);
+    // this.pool.push(prop);
+    //
+    // this.pool[this.pool.length-1].position = PropertiesPool.POSITION++;
+    //
+    // return this.pool[this.pool.length-1];
+  },
 
-    this.pool[this.pool.length-1].position = PropertiesPool.POSITION++;
+  //IRRELEVANT
+  // createPredefined: function(name, uri, label, from, to, additionalConstraints)
+  // {
+  //   var prop;
+  //
+  //   switch (name) {
+  //     case 'Property':
+  //       return this.create(uri, label, from, to, additionalConstraints);
+  //     case 'ScientificHaecceity':
+  //       return this._addingToPool(new ScientificHaecceity(from, to, additionalConstraints));
+  //     case 'isJustifiedBy':
+  //       return this._addingToPool(new isJustifiedBy(from, to, additionalConstraints));
+  //     default:
+  //       console.error("Warning, the predifined property "+name+" is NOT defined!");
+  //       return this.create(null, null, from, to, additionalConstraints);
+  //   }
+  // },
 
-    return this.pool[this.pool.length-1];
+  _addingToPool(prop)
+  {
+    if(prop == null)
+      return null;
+
+      this.pool.push(prop);
+
+      this.pool[this.pool.length-1].position = PropertiesPool.POSITION++;
+
+      return this.pool[this.pool.length-1];
   },
 
   getByPosition: function(pos)
@@ -44,13 +75,14 @@ PropertiesPool.prototype = {
 
     for(var i = 0; i < this.pool.length; i++)
       if(this.pool[i] === prop)
+      {
         index = i;
-
+        this.pool.splice(index,1);
+        return true;
+      }
+      
     if(index == -1)
       return;
-
-    this.pool.splice(index,1);
-    return true;
   },
 
   relatedProperties: function(extremityID)
@@ -62,6 +94,19 @@ PropertiesPool.prototype = {
       if(this.pool[i].from === extremityID)
         related.push(this.pool[i]);
       else if(this.pool[i].to === extremityID)
+        related.push(this.pool[i]);
+    }
+
+    return related;
+  },
+
+  getPropertiesByExtremities: function(from, to)
+  {
+    var related = [];
+
+    for(var i in this.pool)
+    {
+      if(this.pool[i].from === from && this.pool[i].to === to)
         related.push(this.pool[i]);
     }
 

@@ -1,0 +1,301 @@
+<!-- DELETE ME. NO LONGER USED -->
+
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="narrative-block-displayer-element">
+  <template>
+      <style>
+        :host {
+          display: block;
+        }
+
+        .narrativeBlockItem{
+          border-left: 6px solid #ec407a;
+          margin-left: 10px;
+          margin-bottom: 15px;
+        }
+
+        .narrativeItem
+        {
+          background-color: blue;
+          display: inline-block;
+          margin-left: auto;
+          margin-right: auto;
+        }
+      </style>
+
+
+        <!-- <template id="narrativeBlockExists" is="dom-if" if="{{_narrativeBlockConfigured(nbConfigured)}}" restamp> -->
+
+          <div id="narrativeLoopItem">
+
+          </div>
+
+      <paper-dialog on-iron-overlay-closed="_isRemovalConfirmed" id="removeModal" modal>
+          <h2>Remove the item?</h2>
+          <p>Do you really want to remove this item? This cannot be undone.</p>
+          <p>Please not that the descriptive elements attached to this item WILL NOT BE removed. Thus, binding this item with another element of the application
+             will provide the same information structure.
+          </p>
+          <div class="buttons">
+              <paper-button dialog-dismiss>Decline</paper-button>
+              <paper-button dialog-confirm autofocus>Accept</paper-button>
+          </div>
+      </paper-dialog>
+
+  </template>
+  <script>
+  Polymer({//To be deported in NarrativeBlock.prototype.narrativeblockdisplayer({})
+    is: 'narrative-block-displayer-element',
+
+    properties:
+    {
+      narrativeblock:
+      {
+        type: Object,
+        notify: true,
+        value: function(){return new NarrativeBlock();},
+      },
+
+      entity:
+      {
+        type: Object,
+        notify: true,
+      },
+
+      nbConfigured:
+      {
+        type: Boolean,
+        notify: true,
+        value: false,
+      },
+
+      disableDeletion:
+      {
+        type: Boolean,
+        notify: true,
+        value: false,
+      },
+
+      tmpToRemove:
+      {
+        type: Object,
+        notify: true,
+      },
+
+      // tmpsctfstmt:
+      // {
+      //   type: Object,
+      //   notify: true,
+      //   value: function(){ val = new Statement(); val.is("ScientificStatement"); val.is('Hypothesis'); val.content="Because it is, tho!\n\n'Tis but a scratch!"; return val;}
+      // },
+
+      // prop:
+      // {
+      //   type: Object,
+      //   notify: true,
+      //   value: function(){val = new ScientificHaecceity(); val.is('isJustifiedBy'); return val; },
+      // },
+    },
+
+    attached: function()
+    {
+      console.log(this.narrativeblock);
+      if(this.narrativeblock)//In the case where, while cascading, there is no more narrative block
+      {
+        this.narrativeblock.resetObservers();
+        this.narrativeblock.registerObserverCallbackOnChange(this, this._callbackNarrativeBlockChanged);
+      }
+      this.displayNarrativeBlock();
+
+    },
+
+    _callbackNarrativeBlockChanged: function()
+    {
+      this.displayNarrativeBlock();
+    },
+
+    displayNarrativeBlock: function()
+    {
+
+        if(this.narrativeblock == null || !this._narrativeBlockConfigured())
+          return;
+
+        this._resetDisplayNarrative();
+
+        for(var i in this.narrativeblock.elements)
+        {
+          var item = this.narrativeblock.elements[i];
+          var prop = this._createPropertyElement(item);
+          console.log(prop);
+          if(prop != null)//If there is no exisiing prop between narrativeblock.propertyEntity.from and item.id, then no element has to be drawn
+          {
+            var div = document.createElement('div');
+
+            div.setAttribute('id', "narrativeItem"+item.id);
+            div.setAttribute('class', 'narrativeBlockItem');
+
+            prop.setAttribute('class', 'narrativeItem');
+
+            if(!this.disableDeletion)
+           {
+             var delIcon = document.createElement('paper-icon-button');
+             delIcon.setAttribute('icon', 'icons:highlight-off');
+             delIcon.setAttribute('idEntity', item.id)
+             delIcon.addEventListener('click', function(e){
+               this._removeItem(e.target.getAttribute('idEntity'));
+             }.bind(this));
+             div.appendChild(delIcon);
+           }
+
+            div.appendChild(prop);
+
+            var itemElement = null;
+            console.log(item);
+            if( (item.constructor).namerElement != null)
+            {
+             itemElement = new (item.constructor).namerElement(item);
+           }
+           else {
+             itemElement = document.createElement("p");
+             itemElement.textContent = "Element linked does not have any displaying function associated. (item: "+JSON.stringify(item)+")";
+           }
+
+            itemElement.setAttribute('class', 'narrativeItem');
+            div.appendChild(itemElement);
+
+          this.$$('#narrativeLoopItem').appendChild(div);
+        }
+      }
+    },
+
+    _resetDisplayNarrative:function()
+    {
+      var myNode = this.$$("#narrativeLoopItem");
+
+      if(myNode)
+        while (myNode.firstChild)
+            myNode.removeChild(myNode.firstChild);
+    },
+
+    _removeItem: function(itemID)
+    {
+      this.tmpToRemove = itemID;
+      this.$.removeModal.open();
+    },
+
+    _isRemovalConfirmed: function(e)
+    {
+      if(e.detail.confirmed)
+      {
+        this.narrativeblock.removeElement(this.narrativeblock.getElementById(this.tmpToRemove));
+        this.displayNarrativeBlock();
+      }
+    },
+
+
+  // === CONDITIONAL TEMPLATE BEHAVIOR
+    // _narrativeBlockConfigured: function(nbConfigured) //OLD
+    // {
+    //   if(this.narrativeblock == null || this.narrativeblock.propertyEntity == null)
+    //     this.nbConfigured = false;
+    //   else
+    //     this.nbConfigured = true;
+    //
+    //   return this.nbConfigured;
+    // },
+
+    _narrativeBlockConfigured: function()
+    {
+      if(this.narrativeblock == null || this.narrativeblock.propertyEntity == null)
+        return false;
+
+      return true;
+    },
+
+    _createPropertyElement: function(item)
+    {
+      var props = PROPERTIES_POOL.getPropertiesByExtremities(this.narrativeblock.propertyEntity.from, item.id);
+      console.log(props);
+      // PROPERTIES_POOL.create(null,'isJustifiedBy',7777,7778);
+      // var props = PROPERTIES_POOL.getPropertiesByExtremities(7777,7778);
+      if(props <= 0)
+      { // return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty";
+        return null;
+      }
+
+      var prop = props[0];
+
+      if(prop.constructor == null || (prop.constructor).namerElement == null)
+        // return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty:noNamerConstructor";
+        return null;
+
+      //console.log(PROPERTIES_POOL.getByID(57));
+
+      return new (prop.constructor).namerElement(prop);
+
+      // console.log('appending');
+      // console.log(item);
+      //   console.log(this.$$("#narrativeitem"+item.id));
+      //
+      // //this.$[item.id].appendChild(element);
+      // console.log('appended');
+    },
+
+    // _addProperty: function(item)
+    // {
+    //   //var props = PROPERTIES_POOL.getPropertiesByExtremities(this.narrativeblock.propertyEntity.from, item.id);
+    //   PROPERTIES_POOL.create("delme","delme",7777,7778);
+    //   var props = PROPERTIES_POOL.getPropertiesByExtremities(7777,7778);
+    //   if(props <= 0)
+    //     return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty";
+    //
+    //   var prop = props[0];
+    //
+    //   if(prop.constructor == null)
+    //     return "PROPERTIES_ERROR@narrative-block-displayer-element:_addProperty:noNamerConstructor";
+    //
+    //   var element = new (prop.constructor).namerElement(prop);
+    //
+    //   console.log('appending');
+    //   console.log(item);
+    //     console.log(this.$$("#narrativeitem"+item.id));
+    //
+    //   //this.$[item.id].appendChild(element);
+    //   console.log('appended');
+    // },
+
+    _isStatement: function(item)
+    {
+      console.log(item);
+      if(item == null)
+        return false;
+      if(item.name == "Statement")
+        return true;
+      if(item.inheritanceArray == null)
+        return false;
+
+      for(var i in item.inheritanceArray) //Inspecting the inheritance chain in order to check if the item is a Statement
+        if(item.inheritanceArray[i] == "Statement")
+          return true;
+
+      return false;
+    },
+
+
+    _isUnknown: function(item)
+    {
+      if(item == null)
+        return true;
+
+      if( !this._isStatement(item) ) //&& _isSMTH
+        return true;
+
+      return false;
+    }
+  // === END CONDITIONAL TEMPLATE BEHAVIOR
+
+  });
+  </script>
+
+</dom-module>

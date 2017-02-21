@@ -1,0 +1,260 @@
+<!-- DELETE ME. NO LONGER USED -->
+
+<!-- narrative-block-cascader-display-element allow to encapsulate the behavior of signaling to display the narrative block
+of the element when clicked  -->
+
+<!-- <link rel="import" href="./narrative-block-displayer-element.html"> -->
+
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+<link rel="import" href="../../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../../bower_components/paper-badge/paper-badge.html">
+
+<dom-module id="narrative-block-cascader-display-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+
+    .cascadeNarrative {
+      /*border-left: 6px solid red;*/
+      background-color: lightgrey;
+      margin-left: auto;
+      margin-right: auto;
+      /*margin-left: 15px;*/
+      padding-top: 5px;
+      padding-bottom: 2px;
+    }
+
+    #cascadeZone{
+      display: inline-block;
+      background-color: pink;
+    }
+
+    #editZone{
+      display:inline-block;
+      background-color: purple;
+    }
+
+    #addZone{
+      display: inline-block;
+      background-color: orange;
+    }
+    </style>
+
+    <div class="cascadeNarrative" hidden="{{_isEntityNull(entity)}}">
+      <!-- <h3>Narrative block</h3> -->
+
+      <div id="editZone">
+
+      </div>
+
+      <div id="addZone" hidden="{{_isEntityNull(entity)}}">
+        <narrative-block-adder-element id="adder" narrativeblock="{{narrativeblock}}"></narrative-block-adder-element>
+      </div>
+
+      <template is="dom-if" if="{{hasNarrativeBlock}}" restamp="true">
+        <template is="dom-if" if="{{!isDisplayActivated}}" restamp="true">
+          <div id="cascadeZone">
+            <paper-icon-button id="cascadeBlck" icon="icons:chevron-right" on-click="_notifyCascade"></paper-icon-button>
+            <paper-badge id="badge" for="cascadeBlck" label="{{_getNarrativeBlockLength()}}"></paper-badge>
+          </div>
+        </template>
+        <template is="dom-if" if="{{isDisplayActivated}}" restamp="true">
+          <paper-icon-button icon="icons:expand-more" on-click="_notifyCascade"></paper-icon-button>
+          <narrative-block-displayer-element id="narrativeBlock" entity="{{entity}}" narrativeblock="{{narrativeblock}}"}></narrative-block-displayer-element>
+        </template>
+      </template>
+
+    </template>
+  </div>
+  <script>
+    Polymer({
+      is : "narrative-block-cascader-display-element",
+
+      properties:
+      {
+        entity:
+        {
+          type: Object,
+          notify: true,
+          observer: "_updateNarrativeBlock4Element",
+        },
+        isDisplayActivated:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        hasNarrativeBlock:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        narrativeblock:
+        {
+          type: Object,
+          notify: true,
+        },
+      },
+
+      attached: function()
+      {
+
+        if(Polymer.dom(this.root).querySelector('#adder') != null)
+        {
+          Polymer.dom(this.root).querySelector('#adder').addEventListener('-NewElementNarrative', function(e){
+            console.log("even proc");
+            Polymer.dom(this.root).querySelector('#adder').toggleCreation = false;
+
+            this._updateBadge();
+
+            if(Polymer.dom(this.root).querySelector('#narrativeBlock'))
+              Polymer.dom(this.root).querySelector('#narrativeBlock').displayNarrativeBlock();
+
+            Polymer.dom(this.root).querySelector('#adder').resetState();
+          }.bind(this));
+        }
+      },
+
+      _notifyCascade: function()
+      {
+        this._updateNarrativeBlock4Element();
+        this.isDisplayActivated = !this.isDisplayActivated;
+      },
+
+      _isEntityNull: function(entity)
+      {
+        return (entity == null);
+      },
+
+      _generateEdit: function()
+      {
+        if(Polymer.dom(this.root).querySelector('#editZone') == null)
+        {
+          return;
+        }
+
+        this._resetDivEditing();
+
+        var divGlob = document.createElement('div');
+
+        var divEdit = document.createElement('div');
+        divEdit.setAttribute('id', 'edit'+this.id);
+        divEdit.setAttribute('hidden', 'true');
+
+        var editIcon = document.createElement('paper-icon-button');
+        var divEdit = document.createElement('div');
+        var editElement = null;
+
+        console.log(this.entity);
+        if( (this.entity.constructor).configurerElement != null)
+        {
+         editElement = new (this.entity.constructor).configurerElement(this.entity);
+         divEdit.setAttribute('id', 'edit'+this.entity.id);
+         divEdit.setAttribute('hidden', 'true');
+
+
+         editIcon.setAttribute('icon', 'icons:settings');
+         editIcon.setAttribute('idEdit', this.entity.id);
+         editIcon.addEventListener('click', function(e){
+           this._displayEditButton(e.target.getAttribute('idEdit'));
+         }.bind(this));
+
+         editElement.addEventListener(CONFIGURER_NOTIFY_VALIDATION_SIGNAL_ID, function(e)
+         {
+           this._updateBadge();
+           this._resetDivEditing();
+         }.bind(this));
+
+        }
+        else {
+          editElement = document.createElement("p");
+          editElement.textContent = "Element linked does not have any associated editing function! (itemid:"+this.entity.id+", item:"+this.entity.label+")";
+        }
+
+        divGlob.appendChild(editIcon);
+        divEdit.appendChild(editElement);
+        divGlob.appendChild(divEdit);
+
+        Polymer.dom(this.root).querySelector('#editZone').appendChild(divGlob);
+      },
+
+      _displayEditButton: function(idDiv)
+      {
+        var elmt = Polymer.dom(this.root).querySelector('#edit'+idDiv);
+
+        if(elmt == null)
+          return;
+
+        if( elmt.getAttribute('hidden') )
+        {
+          elmt.removeAttribute('hidden');
+        }
+        else {
+          elmt.setAttribute('hidden', 'true');
+        }
+      },
+
+      _resetDivEditing:function()
+      {
+        var myNode = this.$$("#editZone");
+
+        if(myNode)
+          while (myNode.firstChild)
+              myNode.removeChild(myNode.firstChild);
+      },
+
+
+      //IMPORTANT ! this function WILL CREATE a narrativeblock for the entity if it not already exists
+      _updateNarrativeBlock4Element: function()
+      {
+        if(this.entity == null)
+          return;
+
+          console.log(this.entity);
+        if(this.entity.getNarrativeBlock == null)
+          return;
+
+        this.narrativeblock = this.entity.getNarrativeBlock();
+
+        if(this.narrativeblock != null)
+        {
+          this.hasNarrativeBlock = true;
+          this._updateBadge();
+          this._generateEdit();
+          return;
+        }
+        // else
+        //   this.hasNarrativeBlock = false;
+        this.narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this.entity);
+
+        if(this.narrativeblock != null)
+        {
+            this.hasNarrativeBlock = true;
+            this._updateBadge();
+            this._generateEdit();
+          }
+        else
+         this.hasNarrativeBlock = false;
+      },
+
+      _updateBadge: function()
+      {
+        if(Polymer.dom(this.root).querySelector('#badge'))
+          Polymer.dom(this.root).querySelector('#badge').label = this._getNarrativeBlockLength();
+      },
+
+      _getNarrativeBlockLength: function()
+      {
+        if(this.narrativeblock == null)
+          return -1;
+
+        return this.narrativeblock.getLength();
+      },
+
+    });
+    </script>
+  </dom-module>

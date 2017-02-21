@@ -2,11 +2,18 @@
 <link rel="import" href="APE/ape-element.html">
 <link rel="import" href="RTE/rte.html">
 <link rel="import" href="VOOG/voog.html">
+<link rel="import" href="import/tools-import.html">
+
 <link rel="import" href="wrapper/vis-element.html">
+<link rel="import" href="wrapper/narrative-block-model-element.html">
+<link rel="import" href="wrapper/capten-onto-model-element.html">
+
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
+
 
 
 <dom-module id="main-seed">
@@ -14,6 +21,13 @@
     <style>
       :host {
         display: block;
+      }
+      .toastButton {
+        text-transform: none;
+        color: #eeff41;
+      }
+      #toastNewFocus > a{
+        text-decoration: none;
       }
     </style>
 
@@ -32,6 +46,17 @@
       <div name="voog"><main-voog></main-voog></div>
       <div name="ape"><ape-element id="apeElem" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></ape-element></div>
     </iron-pages>
+
+    <!-- <narrative-block-cascader-display-element id="rootNarrativeBlockDisplayer" entity="{{narrativeentity}}"></narrative-block-cascader-display-element> -->
+    <narrative-block-cascading-element id="rootNarrativeBlockDisplayer"></narrative-block-cascading-element>
+
+
+    <paper-toast id="toastNewFocus" text="New element focused ({{narrativeentity.htmlify}})">
+      <paper-button  on-click="_rollbackNarrativeEntity" class="toastButton">UNDO</paper-button>
+      <!-- <a href="#rootNarrativeBlockDisplayer"> -->
+        <!-- <paper-button  class="toastButton">View More!</paper-button> -->
+      <!-- </a> -->
+    </paper-toast>
 
     <h1>{{data.page}}</h1>
 
@@ -76,6 +101,19 @@
             },
         },
 
+        narrativeentity:
+        {
+          type: Object,
+          notify: true,
+          value: null,
+        },
+
+        previousNarrativeEntity:
+        {
+          type: Object,
+          notify: true,
+        },
+
       },
 
       attached: function()
@@ -86,6 +124,24 @@
           // this.rgtes = [];
           this.push('rgtes', e.detail);
         }.bind(this));
+
+        this.$.apeElem.addEventListener(NARRATIVE_BLOCK_NOTIFY_SIGNAL_ID, function(e)
+        {
+          this.previousNarrativeEntity = this.narrativeentity;
+          this.narrativeentity = e.detail.entity;
+          this.$.toastNewFocus.open();
+          Polymer.dom(this.root).querySelector('#rootNarrativeBlockDisplayer').setEntity(e.detail.entity);
+        }.bind(this));
+      },
+
+      _rollbackNarrativeEntity: function()
+      {
+        if(this.previousNarrativeEntity == null)
+          return;
+
+        this.$.toastNewFocus.close();
+        this.narrativeentity = this.previousNarrativeEntity;
+        Polymer.dom(this.root).querySelector('#rootNarrativeBlockDisplayer').setEntity(this.narrativeentity);
       },
 
 

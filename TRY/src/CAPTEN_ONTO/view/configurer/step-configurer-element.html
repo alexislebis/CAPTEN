@@ -1,0 +1,46 @@
+<link rel="import" href="../theme/configurer/configurer-style.html">
+<dom-module id="step-configurer-element">
+    <template>
+    <style include="configurer-style"></style>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <div id="stepConfigurer">
+      <!-- <h4>Step edition</h4> -->
+      <paper-card heading="Step edition">
+        <div class="card-content">
+
+          <div id="stepName" class="subConfigurerDiv">
+            <entity-name-configurer-element class="subConfigurer" id="nameConfigurer" entity="{{name}}" cascaded></entity-name-configurer-element>
+            <!-- <paper-input label="Name of the step" char-counter maxlength="70" value="{{name}}"></paper-input> -->
+          </div>
+
+          <div id="stepObjective" class="subConfigurerDiv">
+            <!-- <paper-textarea id="stepObjTxt" label="Objective of the step" value="{{objective}}" max-rows="3"></paper-textarea> -->
+            <objective-configurer-element class="subConfigurer" id="objectiveConfigurer" entity="{{objective}}" cascaded></objective-configurer-element>
+          </div>
+
+          <div id="stepContext" class="subConfigurerDiv">
+            <context-configurer-element class="subConfigurer" id="contextConfigurer" entity="{{context}}" cascaded></context-configurer-element>
+            <!-- <paper-textarea id="stepContextTxt" label="Context of the step" value="{{context}}" max-rows="3"></paper-textarea> -->
+          </div>
+
+          <div id="stepAuthor" class="subConfigurerDiv">
+            <author-configurer-element class="subConfigurer" id="authorConfigurer" entity="{{author}}" cascaded></author-configurer-element>
+          </div>
+        </div>
+
+        <div  hidden="{{cascaded}}" class="card-actions">
+            <paper-icon-button icon="icons:done" on-click="_updateStep"></paper-icon-button>
+        </div>
+
+      </paper-card>
+    </div>
+  </template>
+    <script>
+
+    </script>
+</dom-module>

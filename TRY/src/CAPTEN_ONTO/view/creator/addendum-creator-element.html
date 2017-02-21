@@ -1,0 +1,102 @@
+<dom-module id="addendum-creator-element">
+  <template>
+    <style>
+    :host {
+      display: block;
+    }
+    </style>
+
+    <!-- Addendum global attributes for subClasses -->
+      <!-- <namer></namer> -->
+    <div>
+      Choose the addendum type:
+      <paper-dropdown-menu label="Addendum type" name="addendumtype">
+          <paper-menu class="dropdown-content" selected="{{index}}" id="AddendumTypeDropdown">
+              <template is="dom-repeat" items="[[atypes]]" as="item">
+                  <paper-item value$="[[item]]">[[item]]</paper-item>
+              </template>
+          </paper-menu>
+      </paper-dropdown-menu>
+    </div>
+
+    <!-- Specializing regarding the choice-->
+    <div id="specializingAddendum">
+
+    </div>
+
+  </template>
+  <script>
+  Polymer({
+    is : 'addendum-creator-element',
+
+    properties:
+    {
+      addendum:
+      {
+        type: Object,
+        notify: true,
+      },
+      atypes:
+      {
+        type: Array,
+        notify: true,
+        value: function(){return ADDENDUM_AVAILABLE_TYPES;},
+      },
+      index:
+      {
+        type: Object,
+        notify: true,
+        observer: "_displayCorrespondingCreator",
+      },
+      cascaded:
+      {
+        type: Boolean,
+        notify: true,
+      }
+    },
+
+    _displayCorrespondingCreator: function(e)
+    {
+      if(this.index == null)
+        return;
+
+      switch (this.index) {
+        case 0:
+          this.addendum = new Description(); //Faire un tab de constructor
+          break;
+        default:
+          return;
+      }
+
+      // this._resetDisplaySpecializaing();
+
+      var div = document.createElement('div');
+
+      if( this.addendum == null || (this.addendum.constructor).configurerElement == null)
+        return;
+
+      var spz = new (this.addendum.constructor).configurerElement(this.addendum);
+      spz.cascaded = this.cascaded;
+      spz.setAttribute('id', 'spz');
+
+      div.appendChild(spz);
+      this.$.specializingAddendum.appendChild(div);
+    },
+
+    _resetDisplaySpecializaing:function()
+    {
+      var myNode = this.$$("#specializingAddendum");
+
+      if(myNode)
+        while (myNode.firstChild)
+            myNode.removeChild(myNode.firstChild);
+    },
+
+    _update: function()
+    {
+      Polymer.dom(this.root).querySelector('#spz')._update();
+    },
+
+  });
+    </script>
+  </dom-module>
