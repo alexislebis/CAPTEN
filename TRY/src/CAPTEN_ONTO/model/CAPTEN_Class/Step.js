@@ -121,6 +121,11 @@ Step.prototype.constructor = Step;
   // ===
 
   // === PUBLIC
+  Step.prototype.isComplete = function()
+  {
+    return this.isStateComputed;
+  },
+
   Step.prototype.changeOperator = function(op)
   {
       if (op == null)
@@ -135,6 +140,14 @@ Step.prototype.constructor = Step;
       }
 
       this.displayOperatorInputs = true;
+
+      if(this.isStateComputed)
+      {
+        console.error("CHANGER FONCTIONNEMENT D'APPEL VIA CLICK. UTILISER UN SIGNAL DE RESET PRODUIT LORS DU RESET D'UNE ETAPE POUR RENDRE PLUS LOGIQUE LE FONCTIONNEMENT");
+        this.outputs = null;
+        this.isStateComputed = false; //Reset state of computation;
+        this.notifyUncompletion();
+      }
   }
 
   Step.prototype.changeRGTE = function(rgte)
@@ -145,8 +158,16 @@ Step.prototype.constructor = Step;
       this.inputs = rgte;
 
       this.propAsyncBuild.setFirstObject(this.inputs);
+      this._updateUsedConcepts();
 
       this.displayRGTE = true;
+
+      if(this.isStateComputed)
+      {
+        this.outputs = null;
+        this.isStateComputed = false; //Reset state of computation;
+        this.notifyUncompletion();
+      }
   }
 
   Step.prototype.bindRGTENOP = function(params)

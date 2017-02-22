@@ -71,6 +71,17 @@
       </template>
     </div>
 
+    <!-- DIALOG -->
+      <paper-dialog id="resetStep" modal>
+          <h2>Attention please!</h2>
+          <p>The current step has computed output concepts. Changing its components will obviously reset all the steps dependent of this step.<br/>
+            Be advise that a cascading effect can occurs if other steps used concepts belonging to reseted steps.
+          </p>
+          <div class="buttons">
+              <paper-button dialog-dismiss autofocus>Nevermind</paper-button>
+              <paper-button dialog-confirm autofocus on-click="_resetStepAndDependencies">I Know What I'm Doing</paper-button>
+          </div>
+      </paper-dialog>
     <!--  TOASTY -->
       <paper-toast id="toastNOPBadInput" text="Operator cannont be used: it does not have inputs!"></paper-toast>
       <paper-toast id="toastOutputComputed" text="Output computed"></paper-toast>
@@ -190,6 +201,11 @@
                     value: false,
                     notify: true,
                 },
+                waitingElement: //Used when a step is computed. Wait the workzone to compute reset of steps, then the workzone notify this to update the step with the w8ing element.
+                {
+                  type: Object,
+                  notify: true,
+                },
 
             },
 
@@ -276,7 +292,7 @@
 
             },
             // ===
-            changeOperator: function(op)
+            changeOperator: function(op) //Code repercusion in this.continueChanging if modif here plz
             {
                 // if (op == null)
                 //     return;
@@ -291,12 +307,19 @@
                 // }
                 //
                 // this.displayOperatorInputs = true;
+                if(this.step.isComplete())
+                {
+                  this.waitingElement = op;
+                  this.$.resetStep.open();
+                  return;
+                }
+
                 this.step.changeOperator(op);
 
                 this._computeDisplayingOperatorInputs();
             },
 
-            changeRGTE: function(rgte)
+            changeRGTE: function(rgte) //Code repercusion in this.continueChanging if modif here plz
             {
                 // if (rgte == null)
                 //     return;
@@ -314,6 +337,34 @@
             fireOutput: function()
             {
               this.fire("-OutputRecomputed", {step: this.step});
+            },
+
+            _resetStepAndDependencies: function()
+            {
+              this.fire(STEP_RESET_DEPENDENCIES_SIGNAL_ID, {self: this, step: this.step});
+            },
+
+
+            continueChanging: function()//Continue changement operated in changeRGTE or changeOperator. It is call by other process.
+            {
+              if(this.waitingElement == null)
+                return;
+
+
+              if(this.waitingElement instanceof NarratedOperator)
+              {
+                this.step.changeOperator(this.waitingElement);
+                this._computeDisplayingOperatorInputs();
+              }
+              else if( this.waitingElement instanceof RGTE)
+              {
+                this.step.changeRGTE(this.waitingElement);
+                this._computeDisplayingRGTE();
+              }
+
+              this.waitingElement = null;
+
+
             },
 
             // === DISPLAY

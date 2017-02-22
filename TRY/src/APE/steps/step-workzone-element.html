@@ -165,6 +165,11 @@
                   this._hiddeStepEditor();
                 }.bind(this));
 
+                info.addedNodes[i].addEventListener(STEP_RESET_DEPENDENCIES_SIGNAL_ID, function(e)
+                {
+                  this._resetDependencies(e.detail);
+                }.bind(this));
+
               }
             }
           }.bind(this));
@@ -287,6 +292,17 @@
           this.isStepEditionEnabled = true;
         },
 
+        _resetDependencies: function(selfAndStep)
+        {
+          if(selfAndStep == null)
+            return;
+
+          /* Recursive dectection */
+
+          selfAndStep.self.continueChanging();
+        },
+
+      // === TOASTY
         _toastOpenEditorNewStep: function()
         {
           this._openEditorNewStep();

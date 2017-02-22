@@ -51,3 +51,6 @@ var IS_EMPTY = function(entity)
 // === SIGNALS
   // === SIGNALS ID
     var ADDER_NOTIFY_VALIDATION_SIGNAL_ID = "-HjueoIebza7zfghr9u";
+
+    // === STEP
+      var STEP_RESET_DEPENDENCIES_SIGNAL_ID = "-Pj6hyuI4geibPUFZpof6";
