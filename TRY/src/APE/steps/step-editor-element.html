@@ -314,9 +314,15 @@
                   return;
                 }
 
-                this.step.changeOperator(op);
+                this._changeOperator(op);
+            },
 
-                this._computeDisplayingOperatorInputs();
+            _changeOperator: function(op) //Private changeOperator. Called only for avoiding modal control test
+            {
+              this.step.changeOperator(op);
+              this.waitingElement = null;
+
+              this._computeDisplayingOperatorInputs();
             },
 
             changeRGTE: function(rgte) //Code repercusion in this.continueChanging if modif here plz
@@ -341,7 +347,8 @@
 
             _resetStepAndDependencies: function()
             {
-              this.fire(STEP_RESET_DEPENDENCIES_SIGNAL_ID, {self: this, step: this.step});
+              //this.fire(STEP_RESET_DEPENDENCIES_SIGNAL_ID, {self: this, step: this.step});
+              this._changeOperator(this.waitingElement);
             },
 
 

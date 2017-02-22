@@ -22,6 +22,7 @@ function Step() {
     //State of the Step (ouput generation) + notification
     this.observers = [];
     this.observersUnc = []; //Uncomp observer
+    this.observersReset = []; //When compute output is reseted
     this.isStateComputed = false; //If the output has been computed. MUST BE @ true when all the node expected are aligned with the input node
     this.usedComputationInput = []; //State of the computation. Associative array. All the op.beh.inpu node must be aligned with one this.input.node
     this.propAsyncBuild = new PropertyAsyncrhonousBuilder();
@@ -77,6 +78,24 @@ Step.prototype.constructor = Step;
               }
           });
         }
+
+        // === RESETING OUTPUTS
+        Step.prototype.registerObserverCallbackOnOutputsReset = function(objCallback, callback)
+        {
+          this.observersReset.push([objCallback,callback]);
+        }
+
+          // === NOTIFICATION
+          Step.prototype.notifyOutputReset = function(resetedOutput)
+          {
+            this.observersReset.forEach(function(e)
+            {
+              console.log(e);
+                if (typeof e[1] === "function") {
+                  e[1].call(e[0], resetedOutput);//e[0] define the `this` context for e[1]
+                }
+            });
+          }
     // ===
 
   // === CALLBACK BEHAVIORS FROM PROPASYNC
@@ -124,7 +143,15 @@ Step.prototype.constructor = Step;
   Step.prototype.isComplete = function()
   {
     return this.isStateComputed;
-  },
+  }
+
+  Step.prototype.removeInputs = function()
+  {
+    this.inputs = null;
+    this.displayRGTE = false;
+
+    this.verifyOutputsEligibility();
+  }
 
   Step.prototype.changeOperator = function(op)
   {
@@ -141,13 +168,7 @@ Step.prototype.constructor = Step;
 
       this.displayOperatorInputs = true;
 
-      if(this.isStateComputed)
-      {
-        console.error("CHANGER FONCTIONNEMENT D'APPEL VIA CLICK. UTILISER UN SIGNAL DE RESET PRODUIT LORS DU RESET D'UNE ETAPE POUR RENDRE PLUS LOGIQUE LE FONCTIONNEMENT");
-        this.outputs = null;
-        this.isStateComputed = false; //Reset state of computation;
-        this.notifyUncompletion();
-      }
+      this.verifyOutputsEligibility();
   }
 
   Step.prototype.changeRGTE = function(rgte)
@@ -162,12 +183,21 @@ Step.prototype.constructor = Step;
 
       this.displayRGTE = true;
 
-      if(this.isStateComputed)
-      {
-        this.outputs = null;
-        this.isStateComputed = false; //Reset state of computation;
-        this.notifyUncompletion();
-      }
+      this.verifyOutputsEligibility();
+  }
+
+  //A notifyUncompletion is ALWAYS fired! Because its from this func
+  // !!!!!!!!!! THIS FUNCTION HAS TO BE CALLED ONLY AFTER AN ALTERATION OF INPUTS or OPERATOR of THIS !!!!!!!!
+  Step.prototype.verifyOutputsEligibility = function()
+  {
+    if(this.isStateComputed)
+    {
+      var oldOutputs = this.outputs;
+      this.outputs = null;
+      this.isStateComputed = false; //Reset state of computation;
+      this.notifyOutputReset(oldOutputs);
+    }
+    this.notifyUncompletion();
   }
 
   Step.prototype.bindRGTENOP = function(params)

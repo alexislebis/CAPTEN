@@ -262,6 +262,9 @@
         _createNewStep: function()
         {
           this.cstep = new Step();
+
+          this.cstep.registerObserverCallbackOnOutputsReset(this, this._callbackStepReset);
+
           this.rollbackStep = this.cstep;
 
           this.push('steps', this.cstep);
@@ -270,6 +273,19 @@
           // this.isStepEditionEnabled = true;
           this.$.toastNewStep.open();
           this._updateDisplayer();
+        },
+
+        _callbackStepReset: function(oldOutputs)
+        {
+          console.error("Need to be completed when parameters dependencies are implemented");
+
+          for(var i in this.steps)
+          {
+            if(this.steps[i].inputs && this.steps[i].inputs.id == oldOutputs.id)
+            {
+              this.steps[i].removeInputs();
+            }
+          }
         },
 
         _updateDisplayer: function()
