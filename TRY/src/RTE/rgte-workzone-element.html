@@ -71,6 +71,7 @@
                         return new RGTE();
                     },
                     notify: true,
+                    observer: "_test",
                 },
 
                 vocab:
@@ -171,6 +172,11 @@
 
             },
 
+            _test: function()
+            {
+              console.log("In change");
+            },
+
             _generateAddRGTE: function()
             {
                 this.$.OnlyOneRGTEATM.open();
@@ -198,6 +204,13 @@
             {
                 console.log("cH:" + isHidden);
                 return isHidden;
+            },
+
+            notifyRGTEChange: function()
+            {
+              var rgte = this.rgte;
+              this.rgte = null;
+              this.rgte = rgte;
             },
 
         });

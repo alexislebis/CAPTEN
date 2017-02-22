@@ -38,6 +38,14 @@
 
     <paper-toast id="toastNoStepSelected" text="No step selected"></paper-toast>
 
+    <paper-toast id="toastUseNOP" text="Operator used in the current step">
+      <!-- <paper-button on-click="_rollbackNewOP" class="toastButton">UNDO</paper-button> -->
+    </paper-toast>
+
+
+    <paper-toast id="toasOpenStepPane" text="Step workzone is currently closed">
+      <paper-button on-click="_openEditorNewStep" class="toastButton">OPEN</paper-button>
+    </paper-toast>
 
 
   </template>
@@ -98,8 +106,14 @@
             notify: true,
           },
 
+          // === TOASTY
           //For rollback
           rollbackStep:
+          {
+            type: Object,
+            notify: true,
+          },
+          tmpOp:
           {
             type: Object,
             notify: true,
@@ -194,10 +208,14 @@
           if(this.stepEditorReference == null)
           {
             console.error("EDITION MODE IS NOT ENABLED FOR THE STEP. OPERATOR IS DISCARDED.");
+            this.tmpOp = op;
+            this.$.toasOpenStepPane.open();
             return;
           }
 
+          this.$.toastUseNOP.open();//Need to be before this.stepEditorReference, otherwise last toast displayed is "correctly added"
           this.stepEditorReference.changeOperator(op);
+
         },
 
         // === PRIVATE
@@ -267,6 +285,13 @@
             return;
           }
           this.isStepEditionEnabled = true;
+        },
+
+        _toastOpenEditorNewStep: function()
+        {
+          this._openEditorNewStep();
+          this.useOperator(this.tmpOp);
+          this.tmpOp = null;
         },
 
         _rollbackNewStep: function()

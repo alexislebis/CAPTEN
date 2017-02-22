@@ -511,7 +511,7 @@
               nop.implementedByOperation = [];
               nop.implementedByOperation.push(this.noptool1); //TODO array & operations
               nop.author = new Author();
-              nop.author.authorName = this.nopname;
+              nop.author.authorName = this.creatorName; //TODO CREATE NARRATIVE BLOCK
               console.log(nop.author);
               nop.creationDate = new Date();
 
@@ -525,6 +525,7 @@
             _reset: function()
             {
               this.nopname = null;
+              this.creatorName = null;
               this.nopconceptconvoyed1 = null; //TODO array of uri concepts
               // nop.annotation = [];
               // nop.annotation.push(this.nopdescription);
