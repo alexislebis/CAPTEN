@@ -53,6 +53,7 @@
                         return new RGTE();
                     },
                     notify: true,
+                    observer: '_onChange',
                 },
 
                 enableModification:
@@ -114,6 +115,12 @@
 // === OBSERVATION METHODS
             _callbackOnRGTEChanged: function()
             {
+              this.draw();
+            },
+
+            _onChange: function() // Native from polymer
+            {
+              this.replaceRGTE(this.rgte);
               this.draw();
             },
 // ===

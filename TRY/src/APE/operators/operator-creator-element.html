@@ -501,7 +501,7 @@
               // nop.annotation = [];
               // nop.annotation.push(this.nopdescription);
               // nop.annotation.push(this.nopexample1); //TODO array
-              nop.annotation = new Description();
+              nop.annotation = new Description(); console.error("Create a narrative block here!");
               nop.annotation.content = this.nopdescription;
               nop.objective = this.nopobjectif1; //TODO Array
               nop.behaviors = [];
@@ -522,6 +522,22 @@
               return nop;
             },
 
+            _reset: function()
+            {
+              this.nopname = null;
+              this.nopconceptconvoyed1 = null; //TODO array of uri concepts
+              // nop.annotation = [];
+              // nop.annotation.push(this.nopdescription);
+              // nop.annotation.push(this.nopexample1); //TODO array
+              this.nopdescription = null;
+              this.nopobjectif1 = null;
+              this.nopinputrgte = new RGTE();
+              this.nopoutputrgte = new RGTE();
+              this.nopparameter1 = null;
+              this.noptool1 = null; //TODO array & operations;
+              this.props = [];
+            },
+
 
 // === SUBMISSION FORM
             _submitted: function(event)
@@ -540,6 +556,7 @@
               var nop = this._buildNOP();
 
               this.fire('-NewNOP', nop);
+              this._reset();
             },
 
 

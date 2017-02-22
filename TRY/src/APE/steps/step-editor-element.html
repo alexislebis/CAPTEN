@@ -20,7 +20,22 @@
     </div>
 
     <div id="stepState">
+      <h4>Step State</h4>
+      <div id="stepStateError">
+        <div id="sSEHead">
+          The following instructions have to be resolved to complete the step:
+        </div>
+        <div id="sSESubDiv">
+        </div>
+      </div>
+      <div id="stepStateLinking">
+        <div id="sSLHead">
+          Below, the following link between inputs concepts and operator configuration:
+        </div>
+        <div id="sSLSubDiv">
 
+        </div>
+      </div>
     </div>
 
     <template is="dom-if" if="{{isBindingRGTENOP}}">
@@ -51,9 +66,13 @@
     <h4>Output</h4>
     <div id="stepOutputs">
         <template is="dom-if" if="{{displayStepOutputs}}" restamp>
-      <rgte-displayer-element id="opOutput" rgte="{{step.outputs}}" enable-Modification></rgte-displayer-element>
+      <rgte-workzone-element id="opOutput" rgte="{{step.outputs}}" enable-Modification disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-displayer-element>
       </template>
     </div>
+
+    <!--  TOASTY -->
+      <paper-toast id="toastOutputComputed" text="Output computed"></paper-toast>
+
     </template>
     <script>
         Polymer(
@@ -354,10 +373,12 @@
             {
                 // this._computeOutput();
                 // this.displayOperatorOutputs = true;
-                this._resetStepStateDisplay();
+                this._resetDiv('sSESubDiv');
 
                 this._computeDisplayingOutputsStep();
                 this.fireOutput();
+                
+                this.$.toastOutputComputed.open();
             },
 
             _callbackUCIUncompletion: function()
@@ -369,43 +390,114 @@
 
 
             // === PRIVATE METHODS
-            _computeStepStateDisplay: function()
-            {
-              this._resetStepStateDisplay();
-
-              var ul = document.createElement('ul');
-              var li;
-
-              if(this.step.inputs == null)
+              // === STEP STATE
+              _computeStepStateDisplay: function()
               {
-                li = document.createElement('li');
-                li.textContent = "No inputs concepts are selected";
-                ul.appendChild(li);
-              }
-              if(this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
-              {
-                li = document.createElement('li');
-                li.textContent = "No operation is selected";
-                ul.appendChild(li);
-              }
-              if(this.step.propAsyncBuild.lengthArray != 0 && this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength() > 0)
-              {
-                li = document.createElement('li');
-                li.textContent = this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength()+" remaining concepts to bind between operator and inputs concepts";
-                ul.appendChild(li);
-              }
-              //if PARAM
+                this._computeSSESubDiv();
 
-              this.$.stepState.appendChild(ul);
-            },
-            _resetStepStateDisplay: function()
-            {
-              var myNode = this.$$("#stepState");
+                this._computeSSLSubDiv();
+              },
+              _computeSSESubDiv: function()
+              {
+                this._resetDiv('sSESubDiv');
 
-              if(myNode)
-                while (myNode.firstChild)
-                    myNode.removeChild(myNode.firstChild);
-            },
+                var ul = document.createElement('ul');
+                var li;
+
+                if(this.step.inputs == null)
+                {
+                  li = document.createElement('li');
+                  li.textContent = "No inputs concepts are selected";
+                  ul.appendChild(li);
+                }
+                if(this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
+                {
+                  li = document.createElement('li');
+                  li.textContent = "No operation is selected";
+                  ul.appendChild(li);
+                }
+                if(this.step.propAsyncBuild.lengthArray != 0 && this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength() > 0)
+                {
+                  li = document.createElement('li');
+                  li.textContent = this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength()+" remaining concepts to bind between operator and inputs concepts ("+this._getNameOfRemainingConceptsUnboundOperator()+')';
+                  ul.appendChild(li);
+                }
+                //if PARAM
+
+                this.$.sSESubDiv.appendChild(ul);
+              },
+              _computeSSLSubDiv: function()
+              {
+                if(this.step == null)
+                  return;
+
+                this._resetDiv('sSLSubDiv');
+                var ul = document.createElement('ul');
+                var li;
+
+                if(this.step.propAsyncBuild.getArrayToFillCurrentLength == 0)
+                {
+                  ul = document.createElement('p');
+                  ul.textContent = "No association is Currently made";
+                  this.$.sSLSubDiv.appendChild(ul);
+                }
+
+                for(var i in this.step.propAsyncBuild.arrayToFill)
+                {
+                  li = document.createElement('li');
+                  li.textContent = '[@inputs]'+this.step.propAsyncBuild.arrayToFill[i].from.label+" ------> "+this.step.propAsyncBuild.arrayToFill[i].to.label+"[@operator]";
+                  ul.appendChild(li);
+                }
+
+                this.$.sSLSubDiv.appendChild(ul);
+              },
+              _resetDiv: function(divID)
+              {
+                var myNode = this.$$('#'+divID);
+
+                if(myNode)
+                  while (myNode.firstChild)
+                      myNode.removeChild(myNode.firstChild);
+              },
+              _getNameOfRemainingConceptsUnboundOperator: function()
+              {
+                var labels = [];
+                var label;
+                var nodesToCompare;
+
+                if(this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
+                  return labels;
+
+                nodesToCompare = this.step.operator.behaviors.input.getNodes();
+                for(var i in nodesToCompare)
+                {
+                  label =  nodesToCompare[i].label;
+
+                  for(var j in this.step.propAsyncBuild.arrayToFill)
+                  {
+                    if(nodesToCompare[i].id == this.step.propAsyncBuild.arrayToFill[j].to.id)
+                      label = null;
+                  }
+
+                  if(label)
+                    labels.push(label);
+                }
+
+                var str = "";
+                if(labels.length == 1)
+                  return labels[0];
+                //else
+                for(var i = 0; i < labels.length - 1; i++)
+                {
+                  str += labels[i];
+                  if(i < labels.length -2)
+                    str +=', ';
+                }
+                str += ' and '+labels[labels.length-1]
+                return str;
+              },
+            // === END STEP STATE
+
             // === BEHAVIORS METHODS
             _behaviorSelectorWhenGraphsClicked: function(params)
             {

@@ -7,9 +7,12 @@
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <dom-module id="operators-workzone-element">
     <template>
+    <style include="toasty-style"></style>
     <style>
     :host {
         font-family: sans-serif;
@@ -27,9 +30,14 @@
     <operator-bootstrap-element id="bootstrap"></operator-bootstrap-element>
     <operators-lister-element id="lister" operators="{{operators}}" on-addcard="_addOperation"></operators-lister-element>
 
-    <div hidden$="{{_computeHidden(currentoperator)}}" on-tap="_useOperation">
+    <div hidden$="{{_computeHidden(currentoperator)}}" role="listbox">
+        <h4>Selected operation</h4>
         <operator-displayer-element class="displayer"  operator="{{currentoperator}}"></operator-displayer-element>
-        USE THIS OPERATION <iron-icon icon="check-circle"></iron-icon>
+        <!-- <paper-fab icon="play-for-work" >
+          <paper-tooltip>Use this operation</paper-tooltip>
+        </paper-fab> -->
+
+        Use this operation <paper-icon-button on-tap="_useOperation" icon="icons:play-for-work"></paper-icon-button>
 
     </div>
 
@@ -41,6 +49,11 @@
             <paper-button dialog-confirm autofocus>Replace :'(</paper-button>
         </div>
     </paper-dialog>
+
+    <!--  TOASTY -->
+      <paper-toast id="toastNewNOP" text="Operator created">
+        <paper-button on-click="_rollbackNewOP" class="toastButton">UNDO</paper-button>
+      </paper-toast>
 
   </template>
     <script>
@@ -82,7 +95,6 @@
                   observer: '_currentOperatorOnChanged',
                 },
 
-
                 vocab:
                 {
                   type: Object,
@@ -96,6 +108,13 @@
                 {
                     type: Array,
                     notify: true,
+                },
+
+                // === TOASTY
+                previousNOP:
+                {
+                  type: Object,
+                  notify: true,
                 },
             },
 
@@ -126,7 +145,27 @@
               //
               // this.operators = [];
 
+              this.previousNOP = nop;
               this.push('operators', nop);
+
+              this.$.toastNewNOP.open();
+            },
+
+            _rollbackNewOP: function()
+            {
+              if(this.previousNOP == null)
+                return;
+
+              var index;
+              for(var i in this.operators)
+                if(this.operators[i].id == this.previousNOP.id)
+                  index = i;
+
+              if(index == null)
+                return;
+
+              this.splice('operators', index, 1);
+              this.previousNOP = null;
             },
 
             _onOperatorsChanged: function(change)

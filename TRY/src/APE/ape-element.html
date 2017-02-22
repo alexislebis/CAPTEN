@@ -79,7 +79,7 @@
         {
           type: Object,
           notify: true,
-          observer: '_currentOperatorOnChanged',
+          // observer: '_currentOperatorOnChanged',
         },
         //
         // operators:{
@@ -103,6 +103,10 @@
 
       attached: function()
       {
+        this.$.opWorkzone.addEventListener('useThisOperation', function(e){
+          this._currentOperatorOnChanged();
+        }.bind(this));
+
         this._observer=Polymer.dom(this.$.rgteMenuBar).observeNodes(function(info)
         {
           var div = this._findNewRGTEDiv(info.addedNodes);
