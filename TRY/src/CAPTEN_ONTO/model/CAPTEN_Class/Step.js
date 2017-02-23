@@ -107,30 +107,69 @@ Step.prototype.constructor = Step;
   Step.prototype._computeOutput = function()
   {
       // console.log("COMPLETE");
-      var outObs = null;
-      if(this.outputs)
-        outObs = this.outputs.observers; //tmp
+      // var outObs = null;
+      // if(this.outputs)
+      //   outObs = this.outputs.observers; //tmp
+      //
+      // //TODO locate correct pattern regarding context of step
+      // console.log("MATCH REGARDING CONTEXT");
+      //
+      //
+      // this.outputs = this.inputs.merge(this.operator.behaviors.output);
+      // this.outputs.resetObservers();
+      //
+      // for(var i in this.propAsyncBuild.arrayToFill)
+      // {
+      //   var fromID = this.outputs._getIdEquivalenceById("OLD_ID", this.propAsyncBuild.arrayToFill[i].from.id)[1];
+      //
+      //   for(var j in this.operator.behaviors.output.nodes)
+      //   {
+      //     var toID = this.outputs._getIdEquivalenceById("OLD_ID",this.operator.behaviors.output.nodes[j].id)[1];
+      //     this.outputs.addVisProperty(new Property(GENERATES_URI, 'generates', fromID, toID), 'to');
+      //   }
+      // }
 
-      //TODO locate correct pattern regarding context of step
-      console.log("MATCH REGARDING CONTEXT");
+      var outputs = this._generateOutput();
+      this._updateOutputStatus(outputs);
+  }
 
+  Step.prototype._generateOutput = function()
+  {
+    var outputs = this.inputs.merge(this.operator.behaviors.output);
+    outputs.resetObservers();
 
-      this.outputs = this.inputs.merge(this.operator.behaviors.output);
-      this.outputs.resetObservers();
+    for(var i in this.propAsyncBuild.arrayToFill)
+    {
+      var fromID = outputs._getIdEquivalenceById("OLD_ID", this.propAsyncBuild.arrayToFill[i].from.id)[1];
 
-      for(var i in this.propAsyncBuild.arrayToFill)
+      for(var j in this.operator.behaviors.output.nodes)
       {
-        var fromID = this.outputs._getIdEquivalenceById("OLD_ID", this.propAsyncBuild.arrayToFill[i].from.id)[1];
-
-        for(var j in this.operator.behaviors.output.nodes)
-        {
-          var toID = this.outputs._getIdEquivalenceById("OLD_ID",this.operator.behaviors.output.nodes[j].id)[1];
-          this.outputs.addVisProperty(new Property(GENERATES_URI, 'generates', fromID, toID), 'to');
-        }
+        var toID = outputs._getIdEquivalenceById("OLD_ID",this.operator.behaviors.output.nodes[j].id)[1];
+        outputs.addVisProperty(new Property(GENERATES_URI, 'generates', fromID, toID), 'to');
       }
+    }
+
+    return outputs;
+  }
+
+  Step.prototype._updateOutputStatus= function(outputs) //Update the status for a given outputs. Mostly used after this._generateOutput();
+  {
+    if(outputs == null)
+      return;
+
+    if(this.outputs == null || this.outputs.id != outputs.id)
+    {
+      this.outputs = outputs;
 
       this.isStateComputed = true;
-      this.notifyOutputsComputation();
+
+      // Attaching observation on the new output
+      this.outputs.registerObserverCallbackElementAdded(this, this._callbackRGTEReceiveAdd);
+      this.outputs.registerObserverCallbackElementRemoved(this, this._callbackRGTEReceiveRemove);
+      this.outputs.registerObserverCallbackElementUpdated(this, this._callbackRGTEReceiveUpdate);
+
+    }
+    this.notifyOutputsComputation();
   }
 
   Step.prototype._callbackUCIUncompletion = function()
@@ -138,6 +177,83 @@ Step.prototype.constructor = Step;
     this.notifyUncompletion();
   }
   // ===
+
+  // === CALLBACK BEHAVIORS FROM INPUTS & OUTPUTS
+    Step.prototype._callbackRGTEReceiveAdd = function(from, elmt)
+    {
+      if(elmt == null)
+        return;
+
+      if(!this.isStateComputed) // Nothing to do
+        return;
+
+      if(from.id == this.inputs.id)//Inputs has changed, thus recompute must be done !
+      {
+        console.log("building new output");
+        // var newOutput = this.outputs.copy();
+
+        if(elmt instanceof CAPTENClass)
+          this.outputs.addVisNode(elmt, elmt.label);
+        else if(elmt instanceof Property)
+        {
+          var nodeFrom = this._findDerivationCorrespondance(elmt.from, this.outputs);
+          var nodeTo = this._findDerivationCorrespondance(elmt.to, this.outputs);
+
+          if( !nodeFrom instanceof CAPTENClass || !nodeTo instanceof CAPTENClass)
+            return;
+
+          var outputEdge = elmt.copy();
+          outputEdge.from = nodeFrom.id;
+          outputEdge.to = nodeTo.id;
+
+          this.outputs.addVisProperty(outputEdge, elmt.arrows);
+        }
+        this._updateOutputStatus(this.outputs);
+      }
+      else if(from.id == this.outputs.id)//otherwise, outputs has changed, nothing has to be done for this step
+      {
+        /*If the RGTE is produced by this, then modifying it does not influence this. If it is used in other step, then the _callbackRGTEReceiveAdd will
+         * be called and proc into from.id == this.input.id, for recompute
+        */
+      }
+    }
+
+    Step.prototype._callbackRGTEReceiveRemove = function(from, elmt)
+    {
+      if(elmt == null)
+        return;
+
+      if(!this.isStateComputed)
+        return;
+
+      if(elmt instanceof CAPTENClass)
+      {
+        console.error("REMOVE CAPTENClass");
+      }
+      if(elmt instanceof Property)
+      {
+        console.error("REMOVE Property");
+      }
+    }
+
+    Step.prototype._callbackRGTEReceiveUpdate = function(from, elmt)
+    {
+      if(elmt == null)
+        return;
+
+      if(!this.isStateComputed)
+        return;
+
+      if(elmt instanceof CAPTENClass)
+      {
+        console.error("Update CAPTENClass");
+      }
+      if(elmt instanceof Property)
+      {
+        console.error("Update Property");
+      }
+    }
+  // === END CALLBACK BEHAVIORS FROM INPUTS & OUTPUTS
 
   // === PUBLIC
   Step.prototype.isComplete = function()
@@ -180,6 +296,10 @@ Step.prototype.constructor = Step;
           return;
 
       this.inputs = rgte;
+
+      this.inputs.registerObserverCallbackElementAdded(this, this._callbackRGTEReceiveAdd);
+      this.inputs.registerObserverCallbackElementRemoved(this, this._callbackRGTEReceiveRemove);
+      this.inputs.registerObserverCallbackElementUpdated(this, this._callbackRGTEReceiveUpdate);
 
       this.propAsyncBuild.setFirstObject(this.inputs);
       this._updateUsedConcepts();
@@ -529,6 +649,31 @@ Step.prototype.constructor = Step;
 
           return true;
       }
+
+  Step.prototype._findDerivationCorrespondance = function(elmt, rgte)//Browse all the elements of rgte and look @ rgte.elmt.derivedFrom.
+  {
+    var res;
+    var id;
+
+    if(typeof elmt == 'number')
+      id = elmt;
+    else if(elmt.retrieveUniqueIdentifier != null)
+      id = elmt.retrieveUniqueIdentifier();
+    else
+      return null;
+
+    var nodes = rgte.getNodes();
+    for(var i in nodes)
+      if(nodes[i].derivedFrom && nodes[i].derivedFrom.id == id)
+          return nodes[i];
+
+    var edges = rgte.getEdges();
+    for(var i in edges)
+      if(edges[i].derivedFrom && edges[i].derivedFrom.id == id)
+        return edges[i];
+
+    return null;
+  }
 
 // === POLYMER ELEMENTS
   // === NAMER ELEMENT

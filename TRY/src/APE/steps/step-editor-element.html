@@ -86,6 +86,9 @@
     <!--  TOASTY -->
       <paper-toast id="toastNOPBadInput" text="Operator cannont be used: it does not have inputs!"></paper-toast>
       <paper-toast id="toastOutputComputed" text="Output computed"></paper-toast>
+      <paper-toast id="toastSameNOP" text="Operation already in use the step"></paper-toast>
+      <paper-toast id="toastSameRGTE" text="Concepts already in use in the step"></paper-toast>
+
 
       <paper-toast id="toastUseRGTE" text="Graph used in the current step">
         <!-- <paper-button on-click="_rollbackNewOP" class="toastButton">UNDO</paper-button> -->
@@ -316,6 +319,12 @@
                 // }
                 //
                 // this.displayOperatorInputs = true;
+                if(this.step.operator && op.id == this.step.operator.id)//Pas de remplacement, même opérateur
+                {
+                  this.$.toastSameNOP.open();
+                  return;
+                }
+
                 if(this.step.isComplete())
                 {
                   this.waitingElement = op;
@@ -337,6 +346,11 @@
 
             changeRGTE: function(rgte)
             {
+              if(this.step.inputs && this.step.inputs.id == rgte.id)
+              {
+                this.$.toastSameRGTE.open();
+                return;
+              }
               if(this.step.isComplete())
               {
                 this.waitingElement = rgte;

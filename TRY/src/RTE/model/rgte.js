@@ -9,6 +9,12 @@ function RGTE(){
   this.id = CAPTEN.ID++;
 
   this.observers = [];
+
+    // === Specialized observers
+      this.removedElmtObservers= []; //for listening elm removed (ie node or edge)
+      this.addedElmtObservers= [];
+      this.updatedElmtObservers= [];
+
   this.nodes = [];//Need to be CAPTENCLass
   this.edges = [];
   this.edgesCardinality = []; //Array of edge (currently based on vis edge).
@@ -16,6 +22,10 @@ function RGTE(){
   this.context = null;
 
   this.versions = null; //Array of different version with {Author, date, etc}
+
+  // Keep a link with the instance of the same class which was used to produce this
+  // copy function MUST DEFINE this.derivedFrom attribute.
+  this.derivedFrom = null;
 }
 
 RGTE.nodeID = 0;
@@ -53,6 +63,7 @@ RGTE.prototype = {
     // this.nodes.push({"id": RGTE.nodeID++, "label": nodeLabel, "shape": "dot", "size":30});
     this.nodes.push(cls);
     this.notifyChange();
+    this.notifyAdd(cls);
 
     return cls.id;
   },
@@ -83,6 +94,7 @@ RGTE.prototype = {
     // this.edges.push({"id": RGTE.edgeID++, "from":fromID, "to":toID, "label":edgeLabel, "arrows": "to"});
     this.edges.push(prop);
     this.notifyChange();
+    this.notifyAdd(prop);
 
     return prop.id;
   },
@@ -146,6 +158,8 @@ RGTE.prototype = {
 
     for(var i in this.edgesCardinality)
       newRGTE.addEdgesCardinality(this.edgesCardinality[i].id, newRGTE._getIdEquivalenceById("OLD_ID", this.edgesCardinality[i].fromCardinality)[1], newRGTE._getIdEquivalenceById("OLD_ID", this.edgesCardinality[i].toCardinality)[1]);
+
+    newRGTE.derivedFrom = this;
 
     return newRGTE;
   },
@@ -271,6 +285,55 @@ RGTE.prototype = {
           }
       });
     },
+
+    // === SPECIALIZED OBSERVATIONS
+      // === REGISTER
+        registerObserverCallbackElementRemoved: function(objCallback, callback)
+        {
+          this.removedElmtObservers.push([objCallback,callback]);
+        },
+
+        registerObserverCallbackElementAdded: function(objCallback, callback)
+        {
+          this.addedElmtObservers.push([objCallback,callback]);
+        },
+
+        registerObserverCallbackElementUpdated: function(objCallback, callback)
+        {
+          this.updatedElmtObservers.push([objCallback,callback]);
+        },
+      // === NOTIFIER
+        notifyRemove: function(elmtRemoved)
+        {
+          this.removedElmtObservers.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0], this, elmtRemoved);//e[0] define the `this` context for e[1]
+              }
+          }.bind(this));
+        },
+        notifyAdd: function(elmtAdded)
+        {
+          this.addedElmtObservers.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0], this, elmtAdded);//e[0] define the `this` context for e[1]
+              }
+          }.bind(this));
+        },
+        notifyUpdate: function(elmtUpdated)
+        {
+          this.updatedElmtObservers.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0], this, elmtUpdated);//e[0] define the `this` context for e[1]
+              }
+          }.bind(this));
+        },
+    // === END SPECIALIZED OBSERVATION
 
   resetObservers: function()
   {
@@ -582,7 +645,7 @@ _isIdEquivalenceExists: function(location,ID)
         for(var j in affectedProps)
           this._removeEdge(affectedProps[j]);
 
-        this.nodes.splice(i,1);
+        this.notifyRemove(this.nodes.splice(i,1)[0]);//Remove the ieme elmt of this.nodes and notify the remove by taking the 1st elmt returned (and the only one)
         return affectedProps;
       }
     }
@@ -606,6 +669,7 @@ _isIdEquivalenceExists: function(location,ID)
         affectedNodes.push(this.edges[i].to);
 
         this.edges.splice(i,1);
+        this.notifyRemove(this.edges.splice(i,1)[0]);//Remove the ieme elmt of this.edges and notify the remove by taking the 1st elmt returned (and the only one)
         return affectedNodes;
       }
     }
@@ -623,6 +687,7 @@ _isIdEquivalenceExists: function(location,ID)
         console.log(PROPERTIES_POOL.getByID(id));
 
         this.notifyChange();
+        this.notifyUpdate(this.edges[i]);
 
         return;
       }

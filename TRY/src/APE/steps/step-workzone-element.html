@@ -206,7 +206,7 @@
           if(rgte == null)
             return;
 
-          if(this.stepEditorReference == null)
+          if(this.isStepEditionEnabled == false || this.stepEditorReference == null)
           {
             console.error("EDITION MODE IS NOT ENABLED FOR THE STEP. RGTE IS DISCARDED.");
             this.$.toasOpenStepPane.open();
@@ -222,7 +222,7 @@
           if(op == null)
             return;
 
-          if(this.stepEditorReference == null)
+          if(this.isStepEditionEnabled == false || this.stepEditorReference == null)
           {
             console.error("EDITION MODE IS NOT ENABLED FOR THE STEP. OPERATOR IS DISCARDED.");
             this.tmpOp = op;
@@ -401,9 +401,9 @@
         {
           console.log(this.nbOfReset);
           if(this.nbOfReset == 1)
-            return '1 step has been impacted';
+            return '1 step has been resetted';
 
-          return (this.nbOfReset)+' steps has been impacted';
+          return (this.nbOfReset)+' steps has been resetted';
         },
 
       });

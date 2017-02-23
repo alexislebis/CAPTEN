@@ -30,6 +30,10 @@ function CAPTENClass(uri, label, properties)
     //console.log(this.uri);
     if (this.uri != null && this.uri.match(/[_].*/))
         this.isBlank = true;
+
+    // Keep a link with the instance of the same class which was used to produce this
+    // copy function MUST DEFINE this.derivedFrom attribute.
+      this.derivedFrom = null;
 }
 
 CAPTENClass.id = 0;
@@ -260,6 +264,8 @@ CAPTENClass.prototype = {
         // cls.inheritanceArray = this.inheritanceArray;
         // cls.subClassOf = this.subClassOf;
         // cls.subClasses = this.subClasses;
+
+        cls.derivedFrom = this;
 
         return cls;
     },
