@@ -40,7 +40,16 @@ RGTE.CARDI = "edgesCardinality";
 RGTE.prototype = {
 
 // === ADDING METHODS ===
-  addVisNode: function(nodeLabel, label){
+  addVisNode: function(nodeLabel, label)
+  {
+    var cls = this._addVisNode(nodeLabel, label);
+    this.notifyChange();
+    this.notifyAdd(cls);
+
+    return cls.id
+  },
+
+  _addVisNode: function(nodeLabel, label){ //Silence version, return a CAPTENClass
     // var cls = new CAPTENClass(nodeLabel);
     // cls.id = RGTE.nodeID++;
 
@@ -62,10 +71,8 @@ RGTE.prototype = {
     cls.size = 30;
     // this.nodes.push({"id": RGTE.nodeID++, "label": nodeLabel, "shape": "dot", "size":30});
     this.nodes.push(cls);
-    this.notifyChange();
-    this.notifyAdd(cls);
 
-    return cls.id;
+    return cls;
   },
 
   // addVisProperty: function(fromID, toID, edgeLabel, arrows)
@@ -83,6 +90,15 @@ RGTE.prototype = {
 
   addVisProperty: function(proper, arrows)
   {
+    var prop = this._addVisProperty(proper, arrows);
+
+    this.notifyChange();
+    this.notifyAdd(prop);
+
+    return prop.id;
+  },
+  _addVisProperty: function(proper, arrows)//Silence version. Return a Property
+  {
     var prop = proper.copy();
     // prop.id = RGTE.edgeID++;
     prop.idVoc = proper.id;
@@ -93,10 +109,8 @@ RGTE.prototype = {
     // prop.label = edgeLabel;
     // this.edges.push({"id": RGTE.edgeID++, "from":fromID, "to":toID, "label":edgeLabel, "arrows": "to"});
     this.edges.push(prop);
-    this.notifyChange();
-    this.notifyAdd(prop);
 
-    return prop.id;
+    return prop;
   },
 
   addEdgesCardinality: function(eid, fromCardinality, toCardinality)
@@ -626,13 +640,59 @@ _isIdEquivalenceExists: function(location,ID)
     return null;
   },
 
+  updateNode: function(nodeToUpdateID, newNode)
+  {
+    var result = this._updateNode(nodeToUpdateID, newNode);
+
+    if(result)
+      this.notifyUpdate(result);
+  },
+  _updateNode: function(nodeToUpdateID, newNode)
+  {
+    if(nodeToUpdateID == null || typeof nodeToUpdateID != 'number')
+      return null;
+
+    if(newNode == null)
+      return;
+
+    var initialNode = this.getNodeById(nodeToUpdateID);
+    var res = this._removeNode(nodeToUpdateID, true);
+
+    var cls = this._addVisNode(newNode);
+
+    //Trick for update. Since newNode is anonymous and unuseful for trackback,
+    //we set derivedFrom on the nodeToUpdateID, saying that cls come from the updatedNode
+    //Usefull for function such as _findDerivationCorrespondance@Step.js
+    cls.derivedFrom = initialNode;
+
+    for(var i in res)
+    {
+      if(res[i].from === nodeToUpdateID)
+      {
+        // this.rgte.updateEdgeFromTo(res[i], addClass(this.nodeIDSelected), res[i].to);
+        this.updateEdgeFromTo(this._addVisProperty(res[i], 'to').id, cls.id, res[i].to);
+      }
+      else if(res[i].to === nodeToUpdateID)
+      {
+        this.updateEdgeFromTo(this._addVisProperty(res[i], 'to').id, res[i].from, cls.id);
+      }
+      else {
+        throw new Error("Unexpected property to update");
+      }
+
+      this._removeEdge(res[i].id, true);
+    }
+
+    return cls;
+  },
+
   removeNode: function(nodeID)
   {
     var res = this._removeNode(nodeID);
     this.notifyChange();
     return res;
   },
-  _removeNode: function(nodeID)//Without modification of change
+  _removeNode: function(nodeID, isSilent)//Silence remove
   {
     var affectedProps = [];
 
@@ -645,7 +705,10 @@ _isIdEquivalenceExists: function(location,ID)
         for(var j in affectedProps)
           this._removeEdge(affectedProps[j]);
 
-        this.notifyRemove(this.nodes.splice(i,1)[0]);//Remove the ieme elmt of this.nodes and notify the remove by taking the 1st elmt returned (and the only one)
+        var notif = this.nodes.splice(i,1)[0];
+        if(!isSilent || isSilent == null)
+          this.notifyRemove(notif);//Remove the ieme elmt of this.nodes and notify the remove by taking the 1st elmt returned (and the only one)
+
         return affectedProps;
       }
     }
@@ -657,7 +720,7 @@ _isIdEquivalenceExists: function(location,ID)
     this.notifyChange();
     return res;
   },
-  _removeEdge: function(propertyID)//Without notification of change
+  _removeEdge: function(propertyID, isSilent)//Without notification of change
   {
     var affectedNodes = [];
 
@@ -669,7 +732,11 @@ _isIdEquivalenceExists: function(location,ID)
         affectedNodes.push(this.edges[i].to);
 
         this.edges.splice(i,1);
-        this.notifyRemove(this.edges.splice(i,1)[0]);//Remove the ieme elmt of this.edges and notify the remove by taking the 1st elmt returned (and the only one)
+
+        var notif = this.edges.splice(i,1)[0];
+        if(!isSilent || isSilent == null)
+          this.notifyRemove(notif);//Remove the ieme elmt of this.edges and notify the remove by taking the 1st elmt returned (and the only one)
+
         return affectedNodes;
       }
     }
@@ -687,7 +754,7 @@ _isIdEquivalenceExists: function(location,ID)
         console.log(PROPERTIES_POOL.getByID(id));
 
         this.notifyChange();
-        this.notifyUpdate(this.edges[i]);
+        //this.notifyUpdate(this.edges[i]);
 
         return;
       }

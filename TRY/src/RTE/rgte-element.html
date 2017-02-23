@@ -321,29 +321,31 @@
               if(this.nodeIDSelected == -1)
                 return;
 
-              var res = this._deleteCurrentNode();
+              this.rgte.updateNode(this.nodeIDSelected, cls);
 
-              var newcls = this.addClass(cls)
-
-              for(var i in res)
-              {
-                if(res[i].from === this.nodeIDSelected)
-                {
-                  // this.rgte.updateEdgeFromTo(res[i], addClass(this.nodeIDSelected), res[i].to);
-                  this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), newcls, res[i].to);
-                }
-                else if(res[i].to === this.nodeIDSelected)
-                {
-                  this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), res[i].from, newcls);
-                }
-                else {
-                  throw new Error("Unexpected property to update");
-                }
-
-                this.rgte.removeEdge(res[i].id);
-              }
-
-              this.nodeIDSelected = -1;
+              // var res = this._deleteCurrentNode();
+              //
+              // var newcls = this.addClass(cls)
+              //
+              // for(var i in res)
+              // {
+              //   if(res[i].from === this.nodeIDSelected)
+              //   {
+              //     // this.rgte.updateEdgeFromTo(res[i], addClass(this.nodeIDSelected), res[i].to);
+              //     this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), newcls, res[i].to);
+              //   }
+              //   else if(res[i].to === this.nodeIDSelected)
+              //   {
+              //     this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), res[i].from, newcls);
+              //   }
+              //   else {
+              //     throw new Error("Unexpected property to update");
+              //   }
+              //
+              //   this.rgte.removeEdge(res[i].id);
+              // }
+              //
+              // this.nodeIDSelected = -1;
             },
 
             _deleteCurrentNode: function()//@WARNING if all nodes are deleted, it may become impossible to add new ones (since they may be hidden)

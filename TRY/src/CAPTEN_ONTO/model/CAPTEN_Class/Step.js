@@ -202,11 +202,11 @@ Step.prototype.constructor = Step;
           if( !nodeFrom instanceof CAPTENClass || !nodeTo instanceof CAPTENClass)
             return;
 
-          var outputEdge = elmt.copy();
-          outputEdge.from = nodeFrom.id;
-          outputEdge.to = nodeTo.id;
+          // var outputEdge = elmt.copy();
+          // outputEdge.from = nodeFrom.id;
+          // outputEdge.to = nodeTo.id;
 
-          this.outputs.addVisProperty(outputEdge, elmt.arrows);
+          this.outputs.updateEdgeFromTo(this.outputs.addVisProperty(elmt, elmt.arrows), nodeFrom.id, nodeTo.id);
         }
         this._updateOutputStatus(this.outputs);
       }
@@ -228,7 +228,7 @@ Step.prototype.constructor = Step;
 
       if(elmt instanceof CAPTENClass)
       {
-        console.error("REMOVE CAPTENClass");
+        console.error("REMOVE Property");
       }
       if(elmt instanceof Property)
       {
@@ -244,14 +244,27 @@ Step.prototype.constructor = Step;
       if(!this.isStateComputed)
         return;
 
-      if(elmt instanceof CAPTENClass)
-      {
-        console.error("Update CAPTENClass");
-      }
-      if(elmt instanceof Property)
-      {
-        console.error("Update Property");
-      }
+        if(from.id == this.inputs.id)//Inputs has changed, thus recompute must be done !
+        {
+          if(elmt instanceof CAPTENClass)
+          {
+            //CHECK DESYNCHRO WITH OPERATOR
+            console.error('CHECK DESYNCHRO WITH OPERATOR. IF THE UPDATE NODE IS USED, RESET?');
+            var nodeUpdated = this._findDerivationCorrespondance(elmt.derivedFrom, this.outputs);
+
+            this.outputs.updateNode(nodeUpdated.id,elmt);
+          }
+          else if(elmt instanceof Property)
+          {
+
+          }
+        }
+        else if(from.id == this.outputs.id)//otherwise, outputs has changed, nothing has to be done for this step
+        {
+          /*If the RGTE is produced by this, then modifying it does not influence this. If it is used in other step, then the _callbackRGTEReceiveAdd will
+           * be called and proc into from.id == this.input.id, for recompute
+          */
+        }
     }
   // === END CALLBACK BEHAVIORS FROM INPUTS & OUTPUTS
 
