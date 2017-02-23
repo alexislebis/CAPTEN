@@ -38,14 +38,13 @@
 
     <paper-toast id="toastNoStepSelected" text="No step selected"></paper-toast>
 
-    <paper-toast id="toastUseNOP" text="Operator used in the current step">
-      <!-- <paper-button on-click="_rollbackNewOP" class="toastButton">UNDO</paper-button> -->
-    </paper-toast>
-
 
     <paper-toast id="toasOpenStepPane" text="Step workzone is currently closed">
       <paper-button on-click="_openEditorNewStep" class="toastButton">OPEN</paper-button>
     </paper-toast>
+
+    <paper-toast id="toastNumberingResetedStep" text=""></paper-toast>
+
 
 
   </template>
@@ -107,6 +106,18 @@
           },
 
           // === TOASTY
+          //While reset a compute step
+          isFirstReset:
+          {
+            type: Boolean,
+            notify: true,
+          },
+          nbOfReset:
+          {
+            type: Number,
+            notify: true,
+            value: 0,
+          },
           //For rollback
           rollbackStep:
           {
@@ -165,10 +176,10 @@
                   this._hiddeStepEditor();
                 }.bind(this));
 
-                info.addedNodes[i].addEventListener(STEP_RESET_DEPENDENCIES_SIGNAL_ID, function(e)
-                {
-                  this._resetDependencies(e.detail);
-                }.bind(this));
+                // info.addedNodes[i].addEventListener(STEP_RESET_DEPENDENCIES_SIGNAL_ID, function(e)
+                // {
+                //   this._resetDependencies(e.detail);
+                // }.bind(this));
 
               }
             }
@@ -198,6 +209,7 @@
           if(this.stepEditorReference == null)
           {
             console.error("EDITION MODE IS NOT ENABLED FOR THE STEP. RGTE IS DISCARDED.");
+            this.$.toasOpenStepPane.open();
             return;
           }
 
@@ -218,7 +230,6 @@
             return;
           }
 
-          this.$.toastUseNOP.open();//Need to be before this.stepEditorReference, otherwise last toast displayed is "correctly added"
           this.stepEditorReference.changeOperator(op);
 
         },
@@ -275,9 +286,22 @@
           this._updateDisplayer();
         },
 
-        _callbackStepReset: function(oldOutputs)
+        _callbackStepReset: function(oldOutputs) // REFACTOR : Logic code which belongs to NAP/NOP
         {
           console.error("Need to be completed when parameters dependencies are implemented");
+
+          var imFirst = false;
+
+          if(!this.isFirstReset)
+          {
+            this.isFirstReset = true;
+            imFirst = true;
+          }
+
+
+          this._removeRGTE(oldOutputs);
+
+          this.nbOfReset++;
 
           for(var i in this.steps)
           {
@@ -286,6 +310,32 @@
               this.steps[i].removeInputs();
             }
           }
+
+          if(imFirst)
+          {
+            this._openToastNumberReset();
+            this.isFirstReset = false;
+            this.nbOfReset = 0;
+
+            this.$.stepsDisplayer.draw(this.steps);
+          }
+        },
+
+        _removeRGTE: function(rgte) // REFACTOR : Logic code which belongs to NAP/NOP
+        {
+          if(rgte == null)
+            return;
+
+          var index;
+          for(var i in this.rgtes)
+            if(this.rgtes[i].id == rgte.id)
+              index = i;
+
+          if(index == null)
+            return;
+
+          this.splice('rgtes', index, 1);
+          return true;
         },
 
         _updateDisplayer: function()
@@ -308,15 +358,15 @@
           this.isStepEditionEnabled = true;
         },
 
-        _resetDependencies: function(selfAndStep)
-        {
-          if(selfAndStep == null)
-            return;
-
-          /* Recursive dectection */
-
-          selfAndStep.self.continueChanging();
-        },
+        // _resetDependencies: function(selfAndStep)
+        // {
+        //   if(selfAndStep == null)
+        //     return;
+        //
+        //   /* Recursive dectection */
+        //
+        //   selfAndStep.self.continueChanging();
+        // },
 
       // === TOASTY
         _toastOpenEditorNewStep: function()
@@ -341,6 +391,19 @@
           this.cstep = null;
           this.rollbackStep = null;
           this._updateDisplayer();
+        },
+        _openToastNumberReset: function()
+        {
+          this.$.toastNumberingResetedStep.setAttribute('text', this._generateToastNumberingResetedStepText());
+          this.$.toastNumberingResetedStep.open();
+        },
+        _generateToastNumberingResetedStepText: function()
+        {
+          console.log(this.nbOfReset);
+          if(this.nbOfReset == 1)
+            return '1 step has been impacted';
+
+          return (this.nbOfReset)+' steps has been impacted';
         },
 
       });

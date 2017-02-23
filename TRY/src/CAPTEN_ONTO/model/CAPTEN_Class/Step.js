@@ -148,6 +148,9 @@ Step.prototype.constructor = Step;
   Step.prototype.removeInputs = function()
   {
     this.inputs = null;
+
+    this.propAsyncBuild.setFirstObject(null);
+
     this.displayRGTE = false;
 
     this.verifyOutputsEligibility();

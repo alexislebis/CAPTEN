@@ -74,8 +74,9 @@
     <!-- DIALOG -->
       <paper-dialog id="resetStep" modal>
           <h2>Attention please!</h2>
-          <p>The current step has computed output concepts. Changing its components will obviously reset all the steps dependent of this step.<br/>
-            Be advise that a cascading effect can occurs if other steps used concepts belonging to reseted steps.
+          <p>You have already completed the current step. It has computed output concepts, which could be used in other steps. <br/>
+            Changing its components will obviously reset the computed concepts.<br/><br/>
+            Be advise that a cascading reset effect can occurs if other steps used these computed concepts in order to kept the analysis up to date.
           </p>
           <div class="buttons">
               <paper-button dialog-dismiss autofocus>Nevermind</paper-button>
@@ -85,6 +86,14 @@
     <!--  TOASTY -->
       <paper-toast id="toastNOPBadInput" text="Operator cannont be used: it does not have inputs!"></paper-toast>
       <paper-toast id="toastOutputComputed" text="Output computed"></paper-toast>
+
+      <paper-toast id="toastUseRGTE" text="Graph used in the current step">
+        <!-- <paper-button on-click="_rollbackNewOP" class="toastButton">UNDO</paper-button> -->
+      </paper-toast>
+
+      <paper-toast id="toastUseNOP" text="Operator used in the current step">
+        <!-- <paper-button on-click="_rollbackNewOP" class="toastButton">UNDO</paper-button> -->
+      </paper-toast>
 
     </template>
     <script>
@@ -292,7 +301,7 @@
 
             },
             // ===
-            changeOperator: function(op) //Code repercusion in this.continueChanging if modif here plz
+            changeOperator: function(op)
             {
                 // if (op == null)
                 //     return;
@@ -315,6 +324,7 @@
                 }
 
                 this._changeOperator(op);
+                this.$.toastUseNOP.open();//Need to be before this.stepEditorReference, otherwise last toast displayed is "correctly added"
             },
 
             _changeOperator: function(op) //Private changeOperator. Called only for avoiding modal control test
@@ -325,17 +335,22 @@
               this._computeDisplayingOperatorInputs();
             },
 
-            changeRGTE: function(rgte) //Code repercusion in this.continueChanging if modif here plz
+            changeRGTE: function(rgte)
             {
-                // if (rgte == null)
-                //     return;
-                //
-                // this.step.inputs = rgte;
-                // this._computeDisplayingRGTE();
-                //
-                // this.propAsyncBuild.setFirstObject(this.step.inputs);
+              if(this.step.isComplete())
+              {
+                this.waitingElement = rgte;
+                this.$.resetStep.open();
+                return;
+              }
 
+              this._changeRGTE(rgte);
+              this.$.toastUseRGTE.open();
+            },
+            _changeRGTE: function(rgte)
+            {
                 this.step.changeRGTE(rgte);
+                this.waitingElement = null;
 
                 this._computeDisplayingRGTE();
             },
@@ -348,31 +363,36 @@
             _resetStepAndDependencies: function()
             {
               //this.fire(STEP_RESET_DEPENDENCIES_SIGNAL_ID, {self: this, step: this.step});
-              this._changeOperator(this.waitingElement);
-            },
-
-
-            continueChanging: function()//Continue changement operated in changeRGTE or changeOperator. It is call by other process.
-            {
-              if(this.waitingElement == null)
-                return;
-
-
               if(this.waitingElement instanceof NarratedOperator)
-              {
-                this.step.changeOperator(this.waitingElement);
-                this._computeDisplayingOperatorInputs();
-              }
-              else if( this.waitingElement instanceof RGTE)
-              {
-                this.step.changeRGTE(this.waitingElement);
-                this._computeDisplayingRGTE();
-              }
-
-              this.waitingElement = null;
-
-
+                this._changeOperator(this.waitingElement);
+              else if(this.waitingElement instanceof RGTE)
+                this._changeRGTE(this.waitingElement);
+              else
+                console.log("Undefined type");
             },
+
+
+            // continueChanging: function()//Continue changement operated in changeRGTE or changeOperator. It is call by other process.
+            // {
+            //   if(this.waitingElement == null)
+            //     return;
+            //
+            //
+            //   if(this.waitingElement instanceof NarratedOperator)
+            //   {
+            //     this.step.changeOperator(this.waitingElement);
+            //     this._computeDisplayingOperatorInputs();
+            //   }
+            //   else if( this.waitingElement instanceof RGTE)
+            //   {
+            //     this.step.changeRGTE(this.waitingElement);
+            //     this._computeDisplayingRGTE();
+            //   }
+            //
+            //   this.waitingElement = null;
+            //
+            //
+            // },
 
             // === DISPLAY
             _computeDisplayingOperatorInputs: function()
