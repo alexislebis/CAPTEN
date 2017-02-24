@@ -169,7 +169,7 @@
                 }.bind(this));
 
                 info.addedNodes[i].addEventListener("-OutputRecomputed", function(e){
-                  this.push('rgtes', e.detail.step.outputs);
+                  //this.push('rgtes', e.detail.step.outputs);
                 }.bind(this));
 
                 info.addedNodes[i].addEventListener("-ReturnToWorkzone", function(e){
@@ -275,6 +275,7 @@
           this.cstep = new Step();
 
           this.cstep.registerObserverCallbackOnOutputsReset(this, this._callbackStepReset);
+          this.cstep.registerObserverCallbackOnOutputsComputation(this, this._callbackHandleStepComputation);
 
           this.rollbackStep = this.cstep;
 
@@ -319,6 +320,18 @@
 
             this.$.stepsDisplayer.draw(this.steps);
           }
+        },
+
+        _callbackHandleStepComputation: function(stepConcerned)
+        {
+          var alreadyExists = false;
+
+          for(var i in this.rgtes)
+            if(this.rgtes[i].id == stepConcerned.outputs.id)
+              alreadyExists = true;
+
+          if(!alreadyExists)
+            this.push('rgtes', stepConcerned.outputs);
         },
 
         _removeRGTE: function(rgte) // REFACTOR : Logic code which belongs to NAP/NOP

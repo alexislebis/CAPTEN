@@ -285,7 +285,8 @@ RGTE.prototype = {
 // === OBSERVATION
   registerObserverCallbackOnChange: function(objCallback, callback)
   {
-    this.observers.push([objCallback,callback]);
+    if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observers))
+      this.observers.push([objCallback,callback]);
   },
 
     // === NOTIFICATION
@@ -304,17 +305,20 @@ RGTE.prototype = {
       // === REGISTER
         registerObserverCallbackElementRemoved: function(objCallback, callback)
         {
-          this.removedElmtObservers.push([objCallback,callback]);
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.removedElmtObservers))
+            this.removedElmtObservers.push([objCallback,callback]);
         },
 
         registerObserverCallbackElementAdded: function(objCallback, callback)
         {
-          this.addedElmtObservers.push([objCallback,callback]);
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.addedElmtObservers))
+            this.addedElmtObservers.push([objCallback,callback]);
         },
 
         registerObserverCallbackElementUpdated: function(objCallback, callback)
         {
-          this.updatedElmtObservers.push([objCallback,callback]);
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.updatedElmtObservers))
+            this.updatedElmtObservers.push([objCallback,callback]);
         },
       // === NOTIFIER
         notifyRemove: function(elmtRemoved)
@@ -646,6 +650,8 @@ _isIdEquivalenceExists: function(location,ID)
 
     if(result)
       this.notifyUpdate(result);
+
+    return result;
   },
   _updateNode: function(nodeToUpdateID, newNode)
   {
@@ -703,7 +709,7 @@ _isIdEquivalenceExists: function(location,ID)
         affectedProps = PROPERTIES_POOL.relatedProperties(nodeID);
 
         for(var j in affectedProps)
-          this._removeEdge(affectedProps[j]);
+          this._removeEdge(affectedProps[j].id, isSilent);
 
         var notif = this.nodes.splice(i,1)[0];
         if(!isSilent || isSilent == null)
@@ -731,7 +737,7 @@ _isIdEquivalenceExists: function(location,ID)
         affectedNodes.push(this.edges[i].from);
         affectedNodes.push(this.edges[i].to);
 
-        this.edges.splice(i,1);
+        //this.edges.splice(i,1);
 
         var notif = this.edges.splice(i,1)[0];
         if(!isSilent || isSilent == null)

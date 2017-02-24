@@ -20,9 +20,11 @@ function Step() {
     this.author = null; //using FOAF agent
 
     //State of the Step (ouput generation) + notification
-    this.observers = [];
+    this.observersComputed = [];
     this.observersUnc = []; //Uncomp observer
     this.observersReset = []; //When compute output is reseted
+    this.observersInputs = []; //Any modification on inputs are notified
+
     this.isStateComputed = false; //If the output has been computed. MUST BE @ true when all the node expected are aligned with the input node
     this.usedComputationInput = []; //State of the computation. Associative array. All the op.beh.inpu node must be aligned with one this.input.node
     this.propAsyncBuild = new PropertyAsyncrhonousBuilder();
@@ -40,31 +42,33 @@ Step.prototype.constructor = Step;
   // === OBSERVATION
     Step.prototype.resetAllObservers = function()
     {
-      this.observers = [];
+      this.observersComputed = [];
       this.observersUnc = [];
     }
     // === COMPUTATION
     Step.prototype.registerObserverCallbackOnOutputsComputation = function(objCallback, callback)
     {
-      this.observers.push([objCallback,callback]);
+      if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersComputed))
+        this.observersComputed.push([objCallback,callback]);
     }
 
       // === NOTIFICATION
       Step.prototype.notifyOutputsComputation = function()
       {
-        this.observers.forEach(function(e)
+        this.observersComputed.forEach(function(e)
         {
           console.log(e);
             if (typeof e[1] === "function") {
-              e[1].call(e[0]);//e[0] define the `this` context for e[1]
+              e[1].call(e[0], this);//e[0] define the `this` context for e[1]
             }
-        });
+        }.bind(this));
       }
 
       // === UNCOMPLETION
       Step.prototype.registerObserverCallbackOnUncompletion = function(objCallback, callback)
       {
-        this.observersUnc.push([objCallback,callback]);
+        if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersUnc))
+          this.observersUnc.push([objCallback,callback]);
       }
 
         // === NOTIFICATION
@@ -82,7 +86,8 @@ Step.prototype.constructor = Step;
         // === RESETING OUTPUTS
         Step.prototype.registerObserverCallbackOnOutputsReset = function(objCallback, callback)
         {
-          this.observersReset.push([objCallback,callback]);
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersReset))
+            this.observersReset.push([objCallback,callback]);
         }
 
           // === NOTIFICATION
@@ -93,6 +98,25 @@ Step.prototype.constructor = Step;
               console.log(e);
                 if (typeof e[1] === "function") {
                   e[1].call(e[0], resetedOutput);//e[0] define the `this` context for e[1]
+                }
+            });
+          }
+
+        // === CHANGE INPUTS
+          Step.prototype.registerObserverCallbackOnInputsChange = function(objCallback, callback)
+          {
+            if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersInputs))
+              this.observersInputs.push([objCallback, callback]);
+          }
+
+          // === NOTIFICATION
+          Step.prototype.notifyInputsChange = function()
+          {
+            this.observersInputs.forEach(function(e)
+            {
+              console.log(e);
+                if (typeof e[1] === "function") {
+                  e[1].call(e[0]);//e[0] define the `this` context for e[1]
                 }
             });
           }
@@ -140,7 +164,7 @@ Step.prototype.constructor = Step;
 
     for(var i in this.propAsyncBuild.arrayToFill)
     {
-      var fromID = outputs._getIdEquivalenceById("OLD_ID", this.propAsyncBuild.arrayToFill[i].from.id)[1];
+      var fromID = outputs._getIdEquivalenceById("OLD_ID", this.propAsyncBuild.arrayToFill[i].from)[1];
 
       for(var j in this.operator.behaviors.output.nodes)
       {
@@ -208,6 +232,7 @@ Step.prototype.constructor = Step;
 
           this.outputs.updateEdgeFromTo(this.outputs.addVisProperty(elmt, elmt.arrows), nodeFrom.id, nodeTo.id);
         }
+        this.notifyInputsChange();
         this._updateOutputStatus(this.outputs);
       }
       else if(from.id == this.outputs.id)//otherwise, outputs has changed, nothing has to be done for this step
@@ -249,8 +274,12 @@ Step.prototype.constructor = Step;
           if(elmt instanceof CAPTENClass)
           {
             //CHECK DESYNCHRO WITH OPERATOR
-            console.error('CHECK DESYNCHRO WITH OPERATOR. IF THE UPDATE NODE IS USED, RESET?');
+
             var nodeUpdated = this._findDerivationCorrespondance(elmt.derivedFrom, this.outputs);
+            var relatedNOPProps = this._findNOPNodesDependenciesWith(elmt.derivedFrom); //If NOP use the updated node,
+
+            for(var i in relatedNOPProps)
+              relatedNOPProps[i].updateFromTo(elmt.id, relatedNOPProps[i].to);
 
             this.outputs.updateNode(nodeUpdated.id,elmt);
           }
@@ -258,6 +287,9 @@ Step.prototype.constructor = Step;
           {
 
           }
+
+          this.notifyInputsChange();
+          this._updateOutputStatus(this.outputs);
         }
         else if(from.id == this.outputs.id)//otherwise, outputs has changed, nothing has to be done for this step
         {
@@ -649,6 +681,26 @@ Step.prototype.constructor = Step;
       this.usedComputationInput = array;
   }
 
+  Step.prototype._findNOPNodesDependenciesWith = function(node) //test NOP if of its inputs behaviors is linked with node
+  {
+    if(this.operator == null || this.operator.behaviors == null || this.operator.behaviors.input == null)
+      return;
+
+    var res = [];
+    var tmp = [];
+    var browsedNodes = this.operator.behaviors.input.getNodes();
+
+    for(var i in browsedNodes)
+    {
+      tmp = PROPERTIES_POOL.getPropertiesByExtremities(node.id, browsedNodes[i].id);
+
+      for(var j in tmp)
+        res.push(tmp[j]);
+    }
+
+    return res;
+  }
+
   Step.prototype.isArrayFullyCompleted = function(array) //Check only the 1st level
       {
           if (array == null)
@@ -667,7 +719,11 @@ Step.prototype.constructor = Step;
   {
     var res;
     var id;
-
+    if(elmt == null)
+    {
+      console.error("Element is null, could not find dependencies");
+      return;
+    }
     if(typeof elmt == 'number')
       id = elmt;
     else if(elmt.retrieveUniqueIdentifier != null)

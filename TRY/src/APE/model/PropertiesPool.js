@@ -80,7 +80,7 @@ PropertiesPool.prototype = {
         this.pool.splice(index,1);
         return true;
       }
-      
+
     if(index == -1)
       return;
   },

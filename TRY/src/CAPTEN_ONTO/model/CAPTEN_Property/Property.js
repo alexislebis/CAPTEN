@@ -223,6 +223,15 @@ Property.prototype = {
     return ser;
   },
 
+  updateFromTo: function(from, to)
+  {
+    if(from == null || to == null)
+      return;
+
+    this.from = from;
+    this.to = to;
+  },
+
   addFromTo: function(fromCL, toCL)
   {
     if(fromCL == null || toCL == null)

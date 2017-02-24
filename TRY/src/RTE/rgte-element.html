@@ -476,8 +476,8 @@
                   for(var i in arr)
                     prop = arr[i];
 
-                  prop.from = prop.from.retrieveUniqueIdentifier();//Assured that from has retrieveUniqueIdentifier since it comes from the asyncBuilder
-                  prop.to = prop.to.retrieveUniqueIdentifier();
+                  prop.from = prop.from;
+                  prop.to = prop.to;
                   var propriID = this.rgte.addVisProperty(prop, "to");
 
                   this.propAsyncBuild.reset();
