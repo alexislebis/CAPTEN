@@ -225,6 +225,34 @@ PropertyAsyncrhonousBuilder.prototype = {
     this.verifyArrayFilling();
   },
 
+  cleanArrayOf: function(elmtID)
+  {
+    var indexes = [];
+    var iterationObjective = this.arrayToFill.length;
+    var it = 0;
+    var isModifHappened = false;
+
+    while(it < iterationObjective)
+    {
+      it++;
+      for(var i in this.arrayToFill)
+      {
+        if(this.arrayToFill[i].from == elmtID || this.arrayToFill[i].to == elmtID)
+        {
+          this.arrayToFill.splice(i,1);
+          it = 0;
+          iterationObjective -= 1;
+          isModifHappened = true;
+          break;
+        }
+      }
+    }
+
+    if(isModifHappened)
+      this.verifyArrayFilling();
+
+  },
+
   verifyArrayFilling: function()
   {
     if(this.arrayToFill == null || this.arrayToFill.length == 0)

@@ -14,6 +14,7 @@ function RGTE(){
       this.removedElmtObservers= []; //for listening elm removed (ie node or edge)
       this.addedElmtObservers= [];
       this.updatedElmtObservers= [];
+      this.thisDeletedObservers = [];
 
   this.nodes = [];//Need to be CAPTENCLass
   this.edges = [];
@@ -37,13 +38,22 @@ RGTE.NODES = "nodes";
 RGTE.EDGES = "edges";
 RGTE.CARDI = "edgesCardinality";
 
+RGTE.delete = function(rgte)
+{
+  if(! (rgte instanceof RGTE) )
+    return;
+
+  rgte._delete();
+  delete rgte;
+}
+
 RGTE.prototype = {
 
 // === ADDING METHODS ===
   addVisNode: function(nodeLabel, label)
   {
     var cls = this._addVisNode(nodeLabel, label);
-    this.notifyChange();
+    //this.notifyChange();
     this.notifyAdd(cls);
 
     return cls.id
@@ -92,7 +102,7 @@ RGTE.prototype = {
   {
     var prop = this._addVisProperty(proper, arrows);
 
-    this.notifyChange();
+    //this.notifyChange();
     this.notifyAdd(prop);
 
     return prop.id;
@@ -320,6 +330,11 @@ RGTE.prototype = {
           if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.updatedElmtObservers))
             this.updatedElmtObservers.push([objCallback,callback]);
         },
+        registerObserverCallbackGraphDeleted: function(objCallback, callback)
+        {
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.thisDeletedObservers))
+            this.thisDeletedObservers.push([objCallback,callback]);
+        },
       // === NOTIFIER
         notifyRemove: function(elmtRemoved)
         {
@@ -330,6 +345,7 @@ RGTE.prototype = {
                 e[1].call(e[0], this, elmtRemoved);//e[0] define the `this` context for e[1]
               }
           }.bind(this));
+          this.notifyChange();
         },
         notifyAdd: function(elmtAdded)
         {
@@ -340,6 +356,7 @@ RGTE.prototype = {
                 e[1].call(e[0], this, elmtAdded);//e[0] define the `this` context for e[1]
               }
           }.bind(this));
+          this.notifyChange();
         },
         notifyUpdate: function(elmtUpdated)
         {
@@ -350,6 +367,18 @@ RGTE.prototype = {
                 e[1].call(e[0], this, elmtUpdated);//e[0] define the `this` context for e[1]
               }
           }.bind(this));
+          this.notifyChange();
+        },
+        notifyDelete: function()
+        {
+          this.thisDeletedObservers.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0], this.id);//e[0] define the `this` context for e[1]
+              }
+          }.bind(this));
+          this.notifyChange();
         },
     // === END SPECIALIZED OBSERVATION
 
@@ -692,6 +721,11 @@ _isIdEquivalenceExists: function(location,ID)
     return cls;
   },
 
+  _delete: function()
+  {
+    this.notifyDelete();
+  },
+
   updateEdge: function(edgeToUpdateID, newEdge)
   {
     var result = this._updateEdge(edgeToUpdateID, newEdge);
@@ -730,11 +764,15 @@ _isIdEquivalenceExists: function(location,ID)
 
   removeNode: function(nodeID)
   {
-    var res = this._removeNode(nodeID);
-    this.notifyChange();
-    return res;
+    var delNode = this.getNodeById(nodeID);
+
+    var affectedProps = this._removeNode(nodeID);
+
+    this.notifyRemove(delNode);
+
+    return affectedProps;
   },
-  _removeNode: function(nodeID, isSilent)//Silence remove
+  _removeNode: function(nodeID)//Silence remove
   {
     var affectedProps = [];
 
@@ -745,11 +783,11 @@ _isIdEquivalenceExists: function(location,ID)
         affectedProps = PROPERTIES_POOL.relatedProperties(nodeID);
 
         for(var j in affectedProps)
-          this._removeEdge(affectedProps[j].id, isSilent);
+          this._removeEdge(affectedProps[j].id);
 
         var notif = this.nodes.splice(i,1)[0];
-        if(!isSilent || isSilent == null)
-          this.notifyRemove(notif);//Remove the ieme elmt of this.nodes and notify the remove by taking the 1st elmt returned (and the only one)
+        // if(!isSilent || isSilent == null)
+        //   this.notifyRemove(notif);//Remove the ieme elmt of this.nodes and notify the remove by taking the 1st elmt returned (and the only one)
 
         return affectedProps;
       }
@@ -762,7 +800,7 @@ _isIdEquivalenceExists: function(location,ID)
     this.notifyChange();
     return res;
   },
-  _removeEdge: function(propertyID, isSilent)//Without notification of change
+  _removeEdge: function(propertyID)//Without notification of change
   {
     var affectedNodes = [];
 
@@ -776,8 +814,8 @@ _isIdEquivalenceExists: function(location,ID)
         //this.edges.splice(i,1);
 
         var notif = this.edges.splice(i,1)[0];
-        if(!isSilent || isSilent == null)
-          this.notifyRemove(notif);//Remove the ieme elmt of this.edges and notify the remove by taking the 1st elmt returned (and the only one)
+        // if(!isSilent || isSilent == null)
+        //   this.notifyRemove(notif);//Remove the ieme elmt of this.edges and notify the remove by taking the 1st elmt returned (and the only one)
 
         return affectedNodes;
       }

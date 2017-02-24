@@ -191,6 +191,7 @@ Step.prototype.constructor = Step;
       this.outputs.registerObserverCallbackElementAdded(this, this._callbackRGTEReceiveAdd);
       this.outputs.registerObserverCallbackElementRemoved(this, this._callbackRGTEReceiveRemove);
       this.outputs.registerObserverCallbackElementUpdated(this, this._callbackRGTEReceiveUpdate);
+      this.outputs.registerObserverCallbackGraphDeleted(this, this._callbackRGTEDeleted);
 
     }
     this.notifyOutputsComputation();
@@ -251,14 +252,42 @@ Step.prototype.constructor = Step;
       if(!this.isStateComputed)
         return;
 
-      if(elmt instanceof CAPTENClass)
+      if(from.id == this.inputs.id)
       {
-        console.error("REMOVE Property");
+        if(elmt instanceof CAPTENClass)
+        {
+          var relatedNOPProps = this._findNOPNodesDependenciesWith(elmt);
+          var nodeRemoved = this._findDerivationCorrespondance(elmt, this.outputs);
+
+          if(relatedNOPProps == 0)//If the deleted node is not used for compute the output
+          {
+            this.outputs.removeNode(nodeRemoved.id);
+          }
+          else {
+            this.propAsyncBuild.cleanArrayOf(nodeRemoved.id);
+            console.error("PUTAIN DE DELETE DE MERDE! TODO");
+            RGTE.delete(this.outputs);
+          }
+        //   var nodeRemoved = this._findDerivationCorrespondance(elmt, this.outputs);
+        //
+        //   this.outputs.removeNode(nodeRemoved.id);
+        //
+        //   this.propAsyncBuild.cleanArrayOf(nodeRemoved.id);
+        //
+        //   this._computeOutput();
+        // }
+        }
+        else if(elmt instanceof Property)
+        {
+          console.error("REMOVE Property");
+        }
       }
-      if(elmt instanceof Property)
-      {
-        console.error("REMOVE Property");
-      }
+    }
+
+    Step.prototype._callbackRGTEDeleted = function(graphID)
+    {
+      if(graphID == this.inputs.id)
+        this.removeInputs();
     }
 
     Step.prototype._callbackRGTEReceiveUpdate = function(from, elmt)
@@ -281,7 +310,7 @@ Step.prototype.constructor = Step;
             for(var i in relatedNOPProps)
               relatedNOPProps[i].updateFromTo(elmt.id, relatedNOPProps[i].to);
 
-            var n = this.outputs.updateNode(nodeUpdated.id,elmt,);
+            var n = this.outputs.updateNode(nodeUpdated.id,elmt);
             n.derivedFrom = elmt;//Allow to update for the next and avoid id desynchro
           }
           else if(elmt instanceof Property)
@@ -349,6 +378,7 @@ Step.prototype.constructor = Step;
       this.inputs.registerObserverCallbackElementAdded(this, this._callbackRGTEReceiveAdd);
       this.inputs.registerObserverCallbackElementRemoved(this, this._callbackRGTEReceiveRemove);
       this.inputs.registerObserverCallbackElementUpdated(this, this._callbackRGTEReceiveUpdate);
+      this.inputs.registerObserverCallbackGraphDeleted(this, this._callbackRGTEDeleted);
 
       this.propAsyncBuild.setFirstObject(this.inputs);
       this._updateUsedConcepts();
