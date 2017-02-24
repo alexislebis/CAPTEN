@@ -220,7 +220,7 @@ PropertyAsyncrhonousBuilder.prototype = {
     // if(this.arrayToFill[property.to.retrieveUniqueIdentifier()] === undefined)
     //   throw new Error('The array of '+this+" does not include such a key "+property.to.retrieveUniqueIdentifier());
 
-    this.arrayToFill[property.to.retrieveUniqueIdentifier()] = property;
+    this.arrayToFill[property.to] = property;
 
     this.verifyArrayFilling();
   },
@@ -261,7 +261,7 @@ PropertyAsyncrhonousBuilder.prototype = {
     if(this.fromObject != null && this.toObject != null)
     {
       // var tmp = new Property(uri, label, this.fromObject, this.toObject);
-      var tmp = PROPERTIES_POOL.create(uri, label, this.fromObject, this.toObject)
+      var tmp = PROPERTIES_POOL.create(uri, label, this.fromObject.id, this.toObject.id);
       this._resetCurrentProperty();
       return tmp;
     }
