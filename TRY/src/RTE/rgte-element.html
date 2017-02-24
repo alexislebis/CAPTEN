@@ -323,6 +323,8 @@
 
               this.rgte.updateNode(this.nodeIDSelected, cls);
 
+              this.nodeIDSelected = -1;
+
               // var res = this._deleteCurrentNode();
               //
               // var newcls = this.addClass(cls)
@@ -369,19 +371,22 @@
               if(this.edgeIDSelected == -1)
                 return;
 
-              var res = this._deleteCurrentEdge();
-
-              if(res == null || res.length < 2)
-              {
-                throw new Error("Unexpected nodes for redraw property");
-                this.edgeIDSelected = -1;
-
-                return;
-              }
-
-              this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(prop, 'to'), res[0], res[1]);
-
+              this.rgte.updateEdge(this.edgeIDSelected, prop);
+              
               this.edgeIDSelected = -1;
+              // var res = this._deleteCurrentEdge();
+              //
+              // if(res == null || res.length < 2)
+              // {
+              //   throw new Error("Unexpected nodes for redraw property");
+              //   this.edgeIDSelected = -1;
+              //
+              //   return;
+              // }
+              //
+              // this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(prop, 'to'), res[0], res[1]);
+              //
+              // this.edgeIDSelected = -1;
             },
 
             _deleteCurrentEdge: function()

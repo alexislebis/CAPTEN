@@ -281,11 +281,15 @@ Step.prototype.constructor = Step;
             for(var i in relatedNOPProps)
               relatedNOPProps[i].updateFromTo(elmt.id, relatedNOPProps[i].to);
 
-            this.outputs.updateNode(nodeUpdated.id,elmt);
+            var n = this.outputs.updateNode(nodeUpdated.id,elmt,);
+            n.derivedFrom = elmt;//Allow to update for the next and avoid id desynchro
           }
           else if(elmt instanceof Property)
           {
+            var propUpdated = this._findDerivationCorrespondance(elmt.derivedFrom, this.outputs);
 
+            var e = this.outputs.updateEdge(propUpdated.id, elmt);
+            e.derivedFrom = elmt;
           }
 
           this.notifyInputsChange();

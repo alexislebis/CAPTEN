@@ -669,7 +669,7 @@ _isIdEquivalenceExists: function(location,ID)
     //Trick for update. Since newNode is anonymous and unuseful for trackback,
     //we set derivedFrom on the nodeToUpdateID, saying that cls come from the updatedNode
     //Usefull for function such as _findDerivationCorrespondance@Step.js
-    cls.derivedFrom = initialNode;
+      cls.derivedFrom = initialNode;
 
     for(var i in res)
     {
@@ -690,6 +690,42 @@ _isIdEquivalenceExists: function(location,ID)
     }
 
     return cls;
+  },
+
+  updateEdge: function(edgeToUpdateID, newEdge)
+  {
+    var result = this._updateEdge(edgeToUpdateID, newEdge);
+
+    if(result)
+      this.notifyUpdate(result);
+
+    return result;
+  },
+
+  _updateEdge: function(edgeToUpdateID, newEdge)
+  {
+    if(edgeToUpdateID == null || typeof edgeToUpdateID != 'number')
+      return null;
+
+    if(newEdge == null)
+      return;
+
+    var initialEdge = PROPERTIES_POOL.getByID(edgeToUpdateID);
+    var res = this._removeEdge(edgeToUpdateID, true);
+
+    if(res == null || res.length < 2)
+    {
+      throw new Error("Unexpected nodes for redraw property");
+      return;
+    }
+
+    var edge = this._addVisProperty(newEdge, 'to');
+
+      edge.derivedFrom = initialEdge;
+
+    this.updateEdgeFromTo(edge.id, res[0], res[1]);
+
+    return edge;
   },
 
   removeNode: function(nodeID)
@@ -762,7 +798,7 @@ _isIdEquivalenceExists: function(location,ID)
         this.notifyChange();
         //this.notifyUpdate(this.edges[i]);
 
-        return;
+        return id;
       }
     }
   },
