@@ -47,6 +47,16 @@ var IS_EMPTY = function(entity)
   return entity.isEmpty();
 };
 
+// === PROTECTION FOR MULTIPLE INSTANCE OF AN ELEMENT LISTENING THIS
+var PREVENT_REDUDANCY_OBSERVATION = function(elmInstance, observersArray)
+{
+  for(var i in observersArray)
+    if(observersArray[i][0] == elmInstance)
+      return false;
+
+  return true;
+};
+
 
 // === SIGNALS
   // === SIGNALS ID
