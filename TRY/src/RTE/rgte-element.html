@@ -112,24 +112,32 @@
 
 
         <!-- TOASTY -->
-          <paper-toast id="toastClassAdded" text="Class added">
-            <paper-button on-click="_rollbackAddClass" class="toastButton">UNDO</paper-button>
+          <paper-toast id="toastClassAdded" text="Concept added">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
           </paper-toast>
 
-          <paper-toast id="toastClassReplaced" text="Class replaced">
-            <paper-button on-click="_rollbackReplaceClass" class="toastButton">UNDO</paper-button>
+          <paper-toast id="toastClassReplaced" text="Concept replaced">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastClassDeleted" text="Concept deleted">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
           </paper-toast>
 
           <paper-toast id="toastPropertyAdded" text="Property added">
-            <paper-button on-click="_rollbackAddProperty" class="toastButton">UNDO</paper-button>
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
           </paper-toast>
 
           <paper-toast id="toastPropertyReplace" text="Property replaced">
-            <paper-button on-click="_rollbackReplaceProperty" class="toastButton">UNDO</paper-button>
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
           </paper-toast>
 
           <paper-toast id="toastPropertyRelinked" text="Property relinked">
             <paper-button on-click="_rollbackRelinkProperty" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastPropertyDeleted" text="Concept deleted">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
           </paper-toast>
         <!-- END TOASTY -->
 
@@ -322,6 +330,7 @@
                 return;
 
               this.rgte.updateNode(this.nodeIDSelected, cls);
+              this.$.toastClassReplaced.open();
 
               this.nodeIDSelected = -1;
 
@@ -359,6 +368,7 @@
                 return;
 
               var res = this.rgte.removeNode(this.nodeIDSelected);
+              this.$.toastClassDeleted.open();
 
               return res;
             },
@@ -372,7 +382,8 @@
                 return;
 
               this.rgte.updateEdge(this.edgeIDSelected, prop);
-              
+              this.$.toastPropertyReplace.open();
+
               this.edgeIDSelected = -1;
               // var res = this._deleteCurrentEdge();
               //
@@ -398,6 +409,7 @@
                 return;
 
               var res = this.rgte.removeEdge(this.edgeIDSelected);
+              this.$.toastPropertyDeleted.open();
 
               return res;
             },
@@ -636,6 +648,11 @@
 
                 this.rgte.removeEdge(this.previousRGTEEdge.id);
                 this.previousRGTEEdge = null;
+              },
+
+              _rollbackAction: function()
+              {
+                this.rgte.rollback();
               },
             // === END TOASTY
 

@@ -27,12 +27,22 @@ function RGTE(){
   // Keep a link with the instance of the same class which was used to produce this
   // copy function MUST DEFINE this.derivedFrom attribute.
   this.derivedFrom = null;
+
+    // ROLLBACK ATTRIBUTES
+    this.lastAction = null;
+    this.prevAlteredElement = null;//The element altered. In an add, nothing, in an update the initial, like in deletion
+    this.prevSubstituteElement = null; //In add, the new, in update, the replacent, in remove nothing.
 }
 
 RGTE.nodeID = 0;
 RGTE.edgeID = 0;
 RGTE.cardiID = 0;
 RGTE.rgteID = 0;
+
+RGTE.ACTIONS = [];
+  RGTE.ACTIONS.ADD    = "ADD";
+  RGTE.ACTIONS.UPDATE = "UPDATE";
+  RGTE.ACTIONS.REMOVE = "REMOVE";
 
 RGTE.NODES = "nodes";
 RGTE.EDGES = "edges";
@@ -55,6 +65,12 @@ RGTE.prototype = {
   {
     var cls = this._addVisNode(nodeLabel, label);
     //this.notifyChange();
+
+    this.lastAction = RGTE.ACTIONS.ADD;
+    this.prevAlteredElement = null;
+    this.prevSubstituteElement = cls;
+
+
     this.notifyAdd(cls);
 
     return cls.id
@@ -104,6 +120,11 @@ RGTE.prototype = {
     var prop = this._addVisProperty(proper, arrows);
 
     //this.notifyChange();
+
+    this.lastAction = RGTE.ACTIONS.ADD;
+    this.prevAlteredElement = null;
+    this.prevSubstituteElement = prop;
+
     this.notifyAdd(prop);
 
     return prop.id;
@@ -602,6 +623,104 @@ _isIdEquivalenceExists: function(location,ID)
       return cardinalitiesAvailable;
   },
 
+// === ROLLBACK
+rollback: function()
+{
+  switch (this.lastAction) {
+    case RGTE.ACTIONS.ADD:
+      this._rollbackAdd();
+      break;
+    case RGTE.ACTIONS.UPDATE:
+      this._rollbackUpdate();
+      break;
+    case RGTE.ACTIONS.REMOVE:
+      this._rollbackRemove();
+      break;
+    default:
+  }
+
+  this.lastAction = null;
+  this.prevAlteredElement = null;
+  this.prevSubstituteElement = null;
+
+  this.notifyChange();
+},
+
+_rollbackAdd: function()
+{
+  if(this.prevSubstituteElement == null)
+    return;
+
+  if(this.prevSubstituteElement instanceof CAPTENClass)
+    this.removeNode(this.prevSubstituteElement.id);
+  else if(this.prevSubstituteElement instanceof Property)
+    this.removeEdge(this.prevSubstituteElement.id);
+},
+
+_rollbackUpdate: function()
+{
+  if(this.prevAlteredElement == null || this.prevSubstituteElement == null)
+    return;
+
+  if(this.prevAlteredElement instanceof CAPTENClass)
+  {
+    this.updateNode(this.prevSubstituteElement.id, this.prevAlteredElement);
+  }
+  else if(this.prevAlteredElement instanceof Property)
+  {
+    this.updateEdge(this.prevSubstituteElement.id, this.prevAlteredElement);
+  }
+},
+
+_rollbackRemove: function()
+{
+  if(this.prevAlteredElement == null)
+    return;
+
+  if(this.prevAlteredElement instanceof CAPTENClass)
+  {
+    if(this.prevSubstituteElement ==null)
+      return;
+
+    var tmpDerived = this.prevAlteredElement.derivedFrom;
+    var tmpSubstituates = this.prevSubstituteElement;
+    var tmpAltered = this.prevAlteredElement;
+
+    var id = this.addVisNode(this.prevAlteredElement);
+    this.getNodeById(id).derivedFrom = tmpDerived;
+
+    for(var i in tmpSubstituates)//All prop altered previously by the deletion
+    {
+      var tmpEdge = PROPERTIES_POOL.getByID(tmpSubstituates[i].id);
+
+      tmpDerived = tmpEdge.derivedFrom;
+
+      var eID = this.addVisProperty(tmpEdge, tmpEdge.arrows);
+      var newEdge = this.getEdgeById(eID);
+
+      newEdge.derivedFrom = tmpDerived;
+
+      if(newEdge.from == tmpAltered.id)
+      {
+        this.updateEdgeFromTo(eID, id, newEdge.to);
+      }
+      else if(newEdge.to == tmpAltered.id)
+      {
+        this.updateEdgeFromTo(eID, newEdge.from, id);
+      }
+    }
+  }
+  else if(this.prevAlteredElement instanceof Property)
+  {
+    var tmpAltered = this.prevAlteredElement;
+
+    var id = this.addVisProperty(this.prevAlteredElement, this.prevAlteredElement.arrows);
+    this.getEdgeById(id).derivedFrom = tmpAltered.derivedFrom;
+  }
+
+},
+// ===
+
 // === GETTERS ===
   getNodes: function()
   {
@@ -719,6 +838,10 @@ _isIdEquivalenceExists: function(location,ID)
       this._removeEdge(res[i].id, true);
     }
 
+    this.lastAction = RGTE.ACTIONS.UPDATE;
+    this.prevAlteredElement = initialNode;
+    this.prevSubstituteElement = cls;
+
     return cls;
   },
 
@@ -760,6 +883,10 @@ _isIdEquivalenceExists: function(location,ID)
 
     this.updateEdgeFromTo(edge.id, res[0], res[1]);
 
+    this.lastAction = RGTE.ACTIONS.UPDATE;
+    this.prevAlteredElement = initialEdge;
+    this.prevSubstituteElement = edge;
+
     return edge;
   },
 
@@ -768,6 +895,10 @@ _isIdEquivalenceExists: function(location,ID)
     var delNode = this.getNodeById(nodeID);
 
     var affectedProps = this._removeNode(nodeID);
+
+    this.lastAction = RGTE.ACTIONS.REMOVE;
+    this.prevAlteredElement = delNode;
+    this.prevSubstituteElement = affectedProps;
 
     this.notifyRemove(delNode);
 
@@ -800,6 +931,10 @@ _isIdEquivalenceExists: function(location,ID)
     var delEdge = PROPERTIES_POOL.getByID(propertyID);
 
     var affectedNodes = this._removeEdge(propertyID);
+
+    this.lastAction = RGTE.ACTIONS.REMOVE;
+    this.prevAlteredElement = delEdge;
+    this.prevSubstituteElement = null;
 
     this.notifyRemove(delEdge);
 
@@ -836,7 +971,7 @@ _isIdEquivalenceExists: function(location,ID)
         this.edges[i].from = from;
         this.edges[i].to = to;
 
-        console.log(PROPERTIES_POOL.getByID(id));
+        //console.log(PROPERTIES_POOL.getByID(id));
 
         this.notifyChange();
         //this.notifyUpdate(this.edges[i]);
