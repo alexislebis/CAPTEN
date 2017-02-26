@@ -708,6 +708,21 @@ _rollbackRemove: function()
       {
         this.updateEdgeFromTo(eID, newEdge.from, id);
       }
+
+      // for(var i in PROPERTIES_POOL.pool)
+      // {
+      //   if(PROPERTIES_POOL.pool[i].id == newEdge.derivedFrom.id)
+      //   {
+      //     if(PROPERTIES_POOL.pool[i].from == tmpAltered.id)
+      //     {
+      //        PROPERTIES_POOL.pool[i].updateFromTo(id, PROPERTIES_POOL.pool[i].to);
+      //     }
+      //     else if(PROPERTIES_POOL.pool[i].to == tmpAltered.id)
+      //     {
+      //       PROPERTIES_POOL.pool[i].updateFromTo(PROPERTIES_POOL.pool[i].from, id);
+      //     }
+      //   }
+      // }
     }
   }
   else if(this.prevAlteredElement instanceof Property)
