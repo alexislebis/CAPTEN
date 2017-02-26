@@ -692,22 +692,24 @@ _rollbackRemove: function()
     for(var i in tmpSubstituates)//All prop altered previously by the deletion
     {
       var tmpEdge = PROPERTIES_POOL.getByID(tmpSubstituates[i].id);
-
+      var tmpEFrom = tmpEdge.from;
+      var tmpETo = tmpEdge.to;
       tmpDerived = tmpEdge.derivedFrom;
+
+      if(tmpEdge.from == tmpAltered.id)
+        tmpEdge.from = id
+      else if(tmpEdge.to == tmpAltered.id)
+        tmpEdgeto = id;
 
       var eID = this.addVisProperty(tmpEdge, tmpEdge.arrows);
       var newEdge = this.getEdgeById(eID);
 
       newEdge.derivedFrom = tmpDerived;
 
-      if(newEdge.from == tmpAltered.id)
-      {
-        this.updateEdgeFromTo(eID, id, newEdge.to);
-      }
-      else if(newEdge.to == tmpAltered.id)
-      {
-        this.updateEdgeFromTo(eID, newEdge.from, id);
-      }
+      tmpEdge.from = tmpEFrom;
+      tmpEdge.to = tmpETo;
+
+
 
       // for(var i in PROPERTIES_POOL.pool)
       // {
