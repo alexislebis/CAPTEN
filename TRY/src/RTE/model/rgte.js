@@ -38,13 +38,14 @@ RGTE.NODES = "nodes";
 RGTE.EDGES = "edges";
 RGTE.CARDI = "edgesCardinality";
 
-RGTE.delete = function(rgte)
+RGTE.delete = function(object, rgteRef)
 {
-  if(! (rgte instanceof RGTE) )
+  if(object == null || rgteRef == null || object[rgteRef] == null)
     return;
 
-  rgte._delete();
-  delete rgte;
+  object[rgteRef]._delete();
+  delete object[rgteRef];
+  object[rgteRef] = null;
 }
 
 RGTE.prototype = {
@@ -796,9 +797,13 @@ _isIdEquivalenceExists: function(location,ID)
 
   removeEdge: function(propertyID)//With notification of change
   {
-    var res = this._removeEdge(propertyID);
-    this.notifyChange();
-    return res;
+    var delEdge = PROPERTIES_POOL.getByID(propertyID);
+
+    var affectedNodes = this._removeEdge(propertyID);
+
+    this.notifyRemove(delEdge);
+
+    return affectedNodes;
   },
   _removeEdge: function(propertyID)//Without notification of change
   {

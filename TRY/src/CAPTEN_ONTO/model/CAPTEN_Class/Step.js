@@ -178,10 +178,12 @@ Step.prototype.constructor = Step;
 
   Step.prototype._updateOutputStatus= function(outputs) //Update the status for a given outputs. Mostly used after this._generateOutput();
   {
-    if(outputs == null)
-      return;
+    if(this.outputs == null)
+    {
+      this.isStateComputed = false;
+    }
 
-    if(this.outputs == null || this.outputs.id != outputs.id)
+    if(outputs != null && (this.outputs == null || this.outputs.id != outputs.id) )
     {
       this.outputs = outputs;
 
@@ -265,26 +267,18 @@ Step.prototype.constructor = Step;
           }
           else {
             this.propAsyncBuild.cleanArrayOf(nodeRemoved.id);
-            console.error("PUTAIN DE DELETE DE MERDE! TODO");
-            RGTE.delete(this.outputs);
+            this.verifyOutputsEligibility();
           }
-        //   var nodeRemoved = this._findDerivationCorrespondance(elmt, this.outputs);
-        //
-        //   this.outputs.removeNode(nodeRemoved.id);
-        //
-        //   this.propAsyncBuild.cleanArrayOf(nodeRemoved.id);
-        //
-        //   this._computeOutput();
-        // }
         }
         else if(elmt instanceof Property)
         {
-          console.error("REMOVE Property");
+          var edgeRemoved = this._findDerivationCorrespondance(elmt, this.outputs);
+          this.outputs.removeEdge(edgeRemoved.id);
         }
       }
     }
 
-    Step.prototype._callbackRGTEDeleted = function(graphID)
+    Step.prototype._callbackRGTEDeleted = function(graphID)//Handled in the super structure (here NAP). It could be manged by a notification system between rgte & step, but a counter is more hard to maintain
     {
       if(graphID == this.inputs.id)
         this.removeInputs();
@@ -347,6 +341,7 @@ Step.prototype.constructor = Step;
 
     this.displayRGTE = false;
 
+    this.notifyInputsChange();
     this.verifyOutputsEligibility();
   }
 
