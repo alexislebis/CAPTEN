@@ -675,43 +675,45 @@ _rollbackUpdate: function()
 _rollbackRemove: function()
 {
   if(this.prevAlteredElement == null)
-    return;
+       return;
 
-  if(this.prevAlteredElement instanceof CAPTENClass)
-  {
-    if(this.prevSubstituteElement ==null)
-      return;
+     if(this.prevAlteredElement instanceof CAPTENClass)
+     {
+       if(this.prevSubstituteElement ==null)
+         return;
 
-    var tmpDerived = this.prevAlteredElement.derivedFrom;
-    var tmpSubstituates = this.prevSubstituteElement;
-    var tmpAltered = this.prevAlteredElement;
+       var tmpDerived = this.prevAlteredElement.derivedFrom;
+       var tmpSubstituates = this.prevSubstituteElement;
+       var tmpAltered = this.prevAlteredElement;
 
-    var id = this.addVisNode(this.prevAlteredElement);
-    this.getNodeById(id).derivedFrom = tmpDerived;
+       var newNode = this._addVisNode(this.prevAlteredElement);
+       newNode.derivedFrom = tmpDerived;
 
-    for(var i in tmpSubstituates)//All prop altered previously by the deletion
-    {
-      var tmpEdge = PROPERTIES_POOL.getByID(tmpSubstituates[i].id);
-      var tmpEFrom = tmpEdge.from;
-      var tmpETo = tmpEdge.to;
-      tmpDerived = tmpEdge.derivedFrom;
+       for(var i in tmpSubstituates)//All prop altered previously by the deletion
+       {
+         var tmpEdge = PROPERTIES_POOL.getByID(tmpSubstituates[i].id);
 
-      if(tmpEdge.from == tmpAltered.id)
-        tmpEdge.from = id
-      else if(tmpEdge.to == tmpAltered.id)
-        tmpEdgeto = id;
+         tmpDerived = tmpEdge.derivedFrom;
 
-      var eID = this.addVisProperty(tmpEdge, tmpEdge.arrows);
-      var newEdge = this.getEdgeById(eID);
+         var eID = this.addVisProperty(tmpEdge, tmpEdge.arrows);
+         var newEdge = this.getEdgeById(eID);
 
-      newEdge.derivedFrom = tmpDerived;
+         newEdge.derivedFrom = tmpDerived;
 
-      tmpEdge.from = tmpEFrom;
-      tmpEdge.to = tmpETo;
+         if(newEdge.from == tmpAltered.id)
+         {
+           this.updateEdgeFromTo(eID, newNode.id, newEdge.to);
+         }
+         else if(newEdge.to == tmpAltered.id)
+         {
+           this.updateEdgeFromTo(eID, newEdge.from, newNode.id);
+         }
+       }
+     }
 
 
 
-      // for(var i in PROPERTIES_POOL.pool)
+    // for(var i in PROPERTIES_POOL.pool)
       // {
       //   if(PROPERTIES_POOL.pool[i].id == newEdge.derivedFrom.id)
       //   {
@@ -725,8 +727,6 @@ _rollbackRemove: function()
       //     }
       //   }
       // }
-    }
-  }
   else if(this.prevAlteredElement instanceof Property)
   {
     var tmpAltered = this.prevAlteredElement;
