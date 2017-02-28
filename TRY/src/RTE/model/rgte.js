@@ -492,6 +492,16 @@ RGTE.prototype = {
 // ===
 
 
+  setColorNode: function(nodeID, color)
+  {
+    if(nodeID == null)
+      return;
+
+    this.getNodeById(nodeID).color = color;
+
+    this.notifyChange();
+  },
+
   /**
    * For extension and more complex perspective, return an array. However, in the current version (2/Nov/2016)
    * cardinality is always related to only one edge

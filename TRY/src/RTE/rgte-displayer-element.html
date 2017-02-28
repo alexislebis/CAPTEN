@@ -241,11 +241,11 @@
               {
                 if(params.nodes.length != 0)
                 {
-                  this.fire('NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0]});
+                  this.fire('NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0], 'graph': this.rgte});
                 }
                 else if(params.edges.length != 0)
                 {
-                  this.fire('EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label});
+                  this.fire('EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label, 'graph': this.rgte});
                 }
               }
               //if user want to modify the rgte

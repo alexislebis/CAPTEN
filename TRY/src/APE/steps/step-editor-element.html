@@ -1,4 +1,5 @@
 <link rel="import" href="../../RTE/rgte-displayer-element.html">
+<link rel="import" href="../../../bower_components/iron-icons/image-icons.html">
 
 
 <dom-module id="step-editor-element">
@@ -36,6 +37,10 @@
 
         </div>
       </div>
+    </div>
+
+    <div>
+      Identify your knowledge concepts <paper-icon-button icon="image:brush" on-tap="_toggleKnowledgeIdentification"></paper-icon-button>
     </div>
 
     <template is="dom-if" if="{{isBindingRGTENOP}}">
@@ -218,6 +223,12 @@
                   type: Object,
                   notify: true,
                 },
+                isIdentifyingKnowledge:
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
 
             },
 
@@ -283,10 +294,10 @@
                       if (info.addedNodes[i] != null && info.addedNodes[i].localName === 'rgte-workzone-element' && this.displayStepOutputs)
                       {
                           // info.addedNodes[i].draw();
-                          // info.addedNodes[i].addEventListener('NODE_CLICKED', function(p)
-                          // {
-                          //     this._behaviorSelectorWhenGraphsClicked(p.detail);
-                          // }.bind(this));
+                          info.addedNodes[i].addEventListener('NODE_CLICKED', function(p)
+                          {
+                            this._behaviorSelectorWhenGraphsClicked(p.detail);
+                          }.bind(this));
                       }
                     }
                 }.bind(this));
@@ -481,6 +492,11 @@
                 this.isBindingRGTEParams = !this.isBindingRGTEParams;
             },
 
+            _toggleKnowledgeIdentification: function()
+            {
+              this.isIdentifyingKnowledge = !this.isIdentifyingKnowledge;
+            },
+
             _callbackUsedConceptsInputComplete: function()
             {
                 // this._computeOutput();
@@ -613,6 +629,9 @@
             // === BEHAVIORS METHODS
             _behaviorSelectorWhenGraphsClicked: function(params)
             {
+
+              if(this._isInputsGraph(params.graph) || this._isNOPInputsGraph(params.graph))
+              {
                 if (this.isBindingRGTENOP && this.isBindingRGTEParams)
                 {
                     console.log('Curently, binding simultaneously rgte with param & nop is not supported. Disable one of them to procced.');
@@ -623,6 +642,12 @@
                     this.step.bindRGTEParams(params);// this._bindingRGTEParams(params);
                 else
                     this._defaultBehavior(params);
+              }
+              else if(this._isOutputsGraph(params.graph))
+              {
+                if(this.isIdentifyingKnowledge)
+                  this.fire(STEP_KNOWLEDGE_IDENTIFIED_SIGNAL_ID, {'node':this.step.outputs.getNodeById(params.id), 'nodeLabel': params.nodeLabel, 'graph': params.graph});
+              }
             },
             _bindingRGTENOP: function(params)
             {
@@ -730,6 +755,26 @@
                 // this.propAsyncBuild.setArray(this.usedConceptsInput);
 
             },
+
+            _isInputsGraph: function(graph)
+            {
+              if(graph != null && this.step.inputs != null && this.step.inputs.id != null && this.step.inputs.id == graph.id)
+                return true;
+              return false;
+            },
+            _isNOPInputsGraph: function(graph)
+            {
+              if(graph != null && this.step.operator != null && this.step.operator.behaviors != null && this.step.operator.behaviors.input != null && this.step.operator.behaviors.input.id == graph.id)
+                return true;
+              return false;
+            },
+            _isOutputsGraph: function(graph)
+            {
+              if(graph != null && this.step.outputs != null && this.step.outputs.id != null && this.step.outputs.id == graph.id)
+                return true;
+              return false;
+            },
+
             _updateUsedConceptsKeyed: function(key)
             {
                 var array = [];

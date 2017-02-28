@@ -31,7 +31,18 @@
       <steps-displayer-element id="stepsDisplayer" steps="{{steps}}"></steps-displayer-element>
     </div>
 
+    <!-- DIALOG -->
+    <paper-dialog id="removeKnowledge" modal>
+        <h2>Delete the selected knowledge?</h2>
+        <p>The selected concept is already flagged as a knowledge concept expected of the analysis process. Do you really want to remove it?
+        </p>
+        <div class="buttons">
+            <paper-button dialog-dismiss autofocus>No</paper-button>
+            <paper-button dialog-confirm autofocus on-click="_removeCurrentKnowledge">Yes</paper-button>
+        </div>
+    </paper-dialog>
 
+    <!-- TOASTY -->
     <paper-toast id="toastNewStep" text="Step created">
       <paper-button on-click="_rollbackNewStep" class="toastButton">UNDO</paper-button>
     </paper-toast>
@@ -105,6 +116,22 @@
             notify: true,
           },
 
+          knowledges://[] of ExploitableOutput
+          {
+            type: Object,
+            notify: true,
+            value: function(){return [];},
+          },
+          currentKnowledge:
+          {
+            type: Object,
+            notify: true,
+          },
+          currentKnowledgeGraph:
+          {
+            type: Object,
+            notify: true,
+          },
           // === TOASTY
           //While reset a compute step
           isFirstReset:
@@ -174,6 +201,10 @@
 
                 info.addedNodes[i].addEventListener("-ReturnToWorkzone", function(e){
                   this._hiddeStepEditor();
+                }.bind(this));
+
+                info.addedNodes[i].addEventListener(STEP_KNOWLEDGE_IDENTIFIED_SIGNAL_ID, function(e){
+                  this._handleKnowledgeIdentification(e.detail);
                 }.bind(this));
 
                 // info.addedNodes[i].addEventListener(STEP_RESET_DEPENDENCIES_SIGNAL_ID, function(e)
@@ -380,6 +411,40 @@
         //
         //   selfAndStep.self.continueChanging();
         // },
+
+        _handleKnowledgeIdentification: function(params) //TODO Move into superstructre NAP
+        {
+          for(var i in this.knowledges)//Verification of the presence of a knowledge. If the Knowledge already exists, we ask the user if he wants to delete it
+          {
+            if(this.knowledges[i].derivedFrom.id == params.node.id)
+            {
+              this.currentKnowledge = this.knowledges[i];
+              this.currentKnowledgeGraph = params.graph;
+              this.$.removeKnowledge.open();
+              return;
+            }
+          }
+
+          // else, the node flagged as a K is not in the array & must be added.
+          var newK = new ExploitableOutput(params.node);
+          this.knowledges.push(newK);
+          params.graph.setColorNode(params.node.id, KNOWLEDGE_COLOR);
+        },
+        _removeCurrentKnowledge: function()
+        {
+          if(this.currentKnowledge == null)
+            return;
+
+          for(var i in this.knowledges)
+          {
+            if(this.knowledges[i].id == this.currentKnowledge.id)
+            {
+              this.currentKnowledge = null;
+              this.currentKnowledgeGraph.setColorNode(this.knowledges[i].derivedFrom.id, null);
+              return this.knowledges.splice(i,1);
+            }
+          }
+        },
 
       // === TOASTY
         _toastOpenEditorNewStep: function()

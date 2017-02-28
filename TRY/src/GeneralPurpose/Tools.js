@@ -64,3 +64,7 @@ var PREVENT_REDUDANCY_OBSERVATION = function(elmInstance, observersArray)
 
     // === STEP
       var STEP_RESET_DEPENDENCIES_SIGNAL_ID = "-Pj6hyuI4geibPUFZpof6";
+      var STEP_KNOWLEDGE_IDENTIFIED_SIGNAL_ID = "-8JguepzMmgne$v5365dv";
+
+// === COLORS
+  var KNOWLEDGE_COLOR = "#57bb8a";
