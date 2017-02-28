@@ -9,7 +9,7 @@ function CAPTENClass(uri, label, properties)
     this.id = CAPTEN.ID++;
 
     this.uri = uri;
-    this.properties = this.properties; //[Property]
+    this.properties = properties; //[Property]
     if(this.properties == null)
       this.properties = [];
 
