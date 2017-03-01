@@ -94,6 +94,9 @@
 
     _update: function()
     {
+      if(Polymer.dom(this.root).querySelector('#spz') == null)
+        return;
+        
       Polymer.dom(this.root).querySelector('#spz')._update();
     },
 

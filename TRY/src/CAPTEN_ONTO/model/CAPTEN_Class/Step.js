@@ -830,7 +830,13 @@ Step.prototype.constructor = Step;
               type: Object,
               notify: true,
               value: function(){return new Author();},
-            }
+            },
+            cascaded:
+            {
+              type: Boolean,
+              notify: true,
+              value: false,
+            },
         },
 
         factoryImpl: function(item)
