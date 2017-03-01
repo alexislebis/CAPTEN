@@ -254,7 +254,7 @@ CAPTENClass.prototype = {
         var cls = new CAPTENClass(this.uri);
 
         for(var i in this)
-          if(i != 'id')
+          if(i != 'id' && i != 'color')
             cls[i] = this[i];
         //cls.id = this.id;
         // cls.properties = this.properties;

@@ -56,6 +56,14 @@
 
     <paper-toast id="toastNumberingResetedStep" text=""></paper-toast>
 
+    <paper-toast id="toastKAdded" text="Knowledge identified">
+        <paper-button on-click="_rollbackAddKnowledge" class="toastButton">UNDO</paper-button>
+    </paper-toast>
+
+    <paper-toast id="toastKDeleted" text="Knowledge deleted">
+        <paper-button on-click="_rollbackDeleteKnowledge" class="toastButton">UNDO</paper-button>
+    </paper-toast>
+
 
 
   </template>
@@ -156,6 +164,22 @@
             type: Object,
             notify: true,
           },
+          previousKnowledge:
+          {
+            type: Object,
+            notify: true,
+          },
+          previousGraphKnowledge:
+          {
+            type: Object,
+            notify: true,
+          },
+          isToastDisable:
+          {
+            type: Boolean,
+            notify: true,
+            value: false,
+          },
         },
 
         //TODO use prop belongsTo
@@ -205,6 +229,10 @@
 
                 info.addedNodes[i].addEventListener(STEP_KNOWLEDGE_IDENTIFIED_SIGNAL_ID, function(e){
                   this._handleKnowledgeIdentification(e.detail);
+                }.bind(this));
+
+                info.addedNodes[i].addEventListener(NARRATIVE_BLOCK_NODE_IN_STEP_EDITOR_LEFT_CLICKED_SIGNAL_ID, function(e){
+                  this._handleNarrationOfClickedNode(e);
                 }.bind(this));
 
                 // info.addedNodes[i].addEventListener(STEP_RESET_DEPENDENCIES_SIGNAL_ID, function(e)
@@ -283,6 +311,19 @@
           //       return new Property(FOLLOWED_BY_URI, "followed by", this.steps[i].id, this.step[i]);
           //   }
           // },
+
+          _handleNarrationOfClickedNode: function(e)
+          {
+            this._verifAndGenerateKNarrativeBlock(e.detail);
+          },
+
+        _isAnIdentifiedKnowledge: function(id)
+        {
+          for(var i in this.knowledges)
+            if(this.knowledges[i].derivedFrom.id == id)
+              return this.knowledges[i];
+          return null;
+        },
 
         _updateCurrentStep: function(p)
         {
@@ -427,8 +468,14 @@
 
           // else, the node flagged as a K is not in the array & must be added.
           var newK = new ExploitableOutput(params.node);
+          this.previousKnowledge = newK;
+          this.previousGraphKnowledge = params.graph;
+
           this.knowledges.push(newK);
           params.graph.setColorNode(params.node.id, KNOWLEDGE_COLOR);
+
+          if(!this.isToastDisable)
+            this.$.toastKAdded.open();
         },
         _removeCurrentKnowledge: function()
         {
@@ -439,11 +486,27 @@
           {
             if(this.knowledges[i].id == this.currentKnowledge.id)
             {
+              this.previousKnowledge = this.currentKnowledge;
+              this.previousGraphKnowledge = this.currentKnowledgeGraph;
+
               this.currentKnowledge = null;
               this.currentKnowledgeGraph.setColorNode(this.knowledges[i].derivedFrom.id, null);
-              return this.knowledges.splice(i,1);
+              this.currentKnowledgeGraph = null;
+
+              var deletedK = this.knowledges.splice(i,1);
+              if(!this.isToastDisable)
+                this.$.toastKDeleted.open();
+                return deletedK;
             }
           }
+        },
+
+        _verifAndGenerateKNarrativeBlock: function(detail)
+        {
+          var k = this._isAnIdentifiedKnowledge(detail.id);
+
+          if(k)
+            NARRATIVE_BLOCK_NOTIFY_SIGNAL_BUILDER(this, k, detail.event);
         },
 
       // === TOASTY
@@ -482,6 +545,35 @@
             return '1 step has been resetted';
 
           return (this.nbOfReset)+' steps has been resetted';
+        },
+        _rollbackAddKnowledge: function()
+        {
+          if(this.previousKnowledge == null)
+            return;
+
+          this.isToastDisable = true;
+          this.currentKnowledge = this.previousKnowledge;
+          this.currentKnowledgeGraph = this.previousGraphKnowledge;
+          this._removeCurrentKnowledge();
+
+          this.isToastDisable = false;
+          this.previousKnowledge = null;
+          this.previousGraphKnowledge = null;
+        },
+        _rollbackDeleteKnowledge: function()
+        {
+          if(this.previousKnowledge == null)
+            return;
+
+          var params = {'node': this.previousKnowledge.derivedFrom, 'graph': this.previousGraphKnowledge};
+
+          this.isToastDisable = true;
+
+          this._handleKnowledgeIdentification(params);
+
+          this.previousKnowledge = null;
+          this.previousGraphKnowledge = null;
+          this.isToastDisable = false;
         },
 
       });

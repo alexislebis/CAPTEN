@@ -629,7 +629,10 @@
             // === BEHAVIORS METHODS
             _behaviorSelectorWhenGraphsClicked: function(params)
             {
-
+              if(TOOL_EVENT.isCtrlLeftClick(params.event))
+              {
+                this.fire(NARRATIVE_BLOCK_NODE_IN_STEP_EDITOR_LEFT_CLICKED_SIGNAL_ID, {'id': params.id, 'event': params.event});
+              }
               if(this._isInputsGraph(params.graph) || this._isNOPInputsGraph(params.graph))
               {
                 if (this.isBindingRGTENOP && this.isBindingRGTEParams)
