@@ -18,6 +18,7 @@
         --rgte-menu-bar-translate-left: 375px;
         --operators-workzone-element-max-width: 100%;
         --operators-workzone-element-max-height: 85vh;
+        --step-workzone-element-max-width: 100%;
       }
 
       #globalRGTEMenuBar{
@@ -60,6 +61,14 @@
         border-top: 1px solid lightgray;
         border-bottom: 1px solid lightgray;
       }
+
+      #stepDiv
+      {
+        display: block;
+        width: 95%;
+        margin:0 auto;
+        background-color: pink;
+      }
     </style>
 
     <!-- <div id="rgteMenuBar">
@@ -90,7 +99,9 @@
     <ape-model-element></ape-model-element>
 
     <!-- <step-editor-element id="stepEditor"></step-editor-element> -->
-    <step-workzone-element id="stepWorkzone" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-workzone-element>
+    <div id="stepDiv">
+      <step-workzone-element id="stepWorkzone" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-workzone-element>
+    </div>
 
 
     <!-- <h1>

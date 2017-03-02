@@ -5,18 +5,35 @@
   <template>
     <style include="toasty-style"></style>
     <style>
+      :host {
+        --step-editor-element-width: 100%;
+      }
+
+      #divRoot{
+        display: block;
+        position: relative;
+        border-top: 1px solid lightgray;
+        margin-top: 10px;
+        max-width: var(--step-workzone-element-max-width, 750px);
+      }
+      #title{
+        position: relative;
+        display: block;
+        width: 9%;
+        margin:0 auto;
+        border-bottom: 1px solid gray;
+
+      }
     </style>
 
+  <div id="rootDiv">
+    <h2 id="title">Workzone</h2>
     <div id="newStep">
-      <p>
-          Create new a step paper: <paper-icon-button on-click="_createNewStep" icon="icons:add-box"></paper-icon-button>
-      </p>
+          Create new a step: <paper-icon-button on-click="_createNewStep" icon="icons:add-box"></paper-icon-button>
     </div>
 
-    <div id="openEditor">
-      <p>
+    <div id="openEditor" hidden="{{isStepEditionEnabled}}">
           Open step editor for the step current step <paper-icon-button icon="icons:open-in-new" on-click="_openEditorNewStep"></paper-icon-button>
-      </p>
     </div>
 
     <!-- <div hidden="{{!isStepEditionEnabled}}"> -->
@@ -26,10 +43,11 @@
       </template>
     </div>
 
-    <div id="stepsDisplayerDiv">
-      <h3>Steps Displayer</h3>
+    <div id="stepsDisplayerDiv" hidden="{{isStepEditionEnabled}}">
+      <h3>Steps overview</h3>
       <steps-displayer-element id="stepsDisplayer" steps="{{steps}}"></steps-displayer-element>
     </div>
+  </div>
 
     <!-- DIALOG -->
     <paper-dialog id="removeKnowledge" modal>

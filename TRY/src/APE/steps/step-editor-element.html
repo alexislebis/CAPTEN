@@ -5,23 +5,104 @@
 <dom-module id="step-editor-element">
     <template>
     <style>
+    :host{
+      --vis-element-width:100%;
+      --vis-element-height:48vh;
+    }
+
+    #divRoot{
+      margin-top: 25px;
+      border-top: 1px solid lightgray;
+      display: block;
+      position: relative;
+      width: var(--step-editor-element-width, 700px);
+      /*background-color: orange;*/
+    }
+    #rgteDisplayer{
+      display: block;
+      position: relative;
+      width: 32%;
+      min-height: 55vh;
+      /*background-color: blue;*/
+      float:left;
+    }
+
+    #opInputDisplayer{
+      display: block;
+      position: relative;
+      width: 32%;
+      margin-left: 1.5%;
+      min-height: 55vh;
+      /*background-color: green;*/
+      float: left;
+    }
+
+    #stepOutputs{
+      display: block;
+      position: relative;
+      width: 32%;
+      margin-left: 1.5%;
+      min-height: 55vh;
+      /*background-color: yellow;*/
+      float: left;
+    }
+
+    .title{
+      text-align: center;
+    }
+
+    #stepState
+    {
+      clear: both;
+    }
 
     </style>
 
     <div id="returnToWorkzone">
-      <p on-tap="_returnToWorkzone">
-          Return to workzone <iron-icon icon="exit-to-app"></iron-icon>
-      </p>
+          Return to workzone <iron-icon on-tap="_returnToWorkzone" icon="exit-to-app"></iron-icon>
     </div>
 
-    <div id="newStep">
+    <!-- <div id="newStep">
       <p on-tap="_createNewStep">
           Create new a step <iron-icon icon="add-box"></iron-icon>
       </p>
+    </div> -->
+<div id="divRoot">
+    <template is="dom-if" if="{{isBindingRGTENOP}}">
+      <iron-icon icon="lightbulb-outline"></iron-icon> Clicking on a node in the RGTE and the operator input will bind them.
+    </template>
+    <div>
+        <div id="bindRgteToNop">
+            <iron-icon icon="trending-flat" on-tap="_toggleRGTENOPBinding"></iron-icon> Link concepts with the operation
+        </div>
+        <div id="bindRgteToParam">
+            <iron-icon icon="trending-flat" on-tap="_toggleRGTEParamsBinding"></iron-icon> Link concepts with parameters
+        </div>
+    </div>
+    <div id="rgteDisplayer">
+      <h3 class="title">RGTE</h3>
+      <template is="dom-if" if="{{displayRGTE}}" restamp>
+        <rgte-workzone-element id="rgte" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.inputs}}" enable-Modification disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-workzone-element>
+      <!-- <rgte-displayer-element id="rgte" rgte="{{step.inputs}}" enable-Modification></rgte-displayer-element> -->
+      <!-- <rgte-displayer-element id="rgte" rgte="{{si}}"></rgte-displayer-element> -->
+      </template>
+    </div>
+    <div id="opInputDisplayer">
+      <h3 class="title">Operator</h3>
+        <template is="dom-if" if="{{displayOperatorInputs}}" restamp>
+      <!-- <rgte-displayer-element id="opInput" rgte="{{step.operator.behaviors.input}}"></rgte-displayer-element> -->
+          <rgte-workzone-element id="opInput" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.operator.behaviors.input}}"  disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-workzone-element>
+      </template>
+    </div>
+    <div id="stepOutputs">
+      <h3 class="title">Output</h3>
+        <template is="dom-if" if="{{displayStepOutputs}}" restamp>
+      <rgte-workzone-element id="stepOutput" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.outputs}}" enable-Modification disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-displayer-element>
+      </template>
     </div>
 
     <div id="stepState">
-      <h4>Step State</h4>
+      <h3>Step State</h3>
       <div id="stepStateError">
         <div id="sSEHead">
           The following instructions have to be resolved to complete the step:
@@ -43,38 +124,7 @@
       Identify your knowledge concepts <paper-icon-button icon="image:brush" on-tap="_toggleKnowledgeIdentification"></paper-icon-button>
     </div>
 
-    <template is="dom-if" if="{{isBindingRGTENOP}}">
-      <iron-icon icon="lightbulb-outline"></iron-icon> Clicking on a node in the RGTE and the operator input will bind them.
-    </template>
-    <div>
-        <div id="bindRgteToNop">
-            <iron-icon icon="trending-flat" on-tap="_toggleRGTENOPBinding"></iron-icon> Link concepts with the operation
-        </div>
-        <div id="bindRgteToParam">
-            <iron-icon icon="trending-flat" on-tap="_toggleRGTEParamsBinding"></iron-icon> Link concepts with parameters
-        </div>
-    </div>
-    <h4>RGTE</h4>
-    <div id="rgteDisplayer">
-        <template is="dom-if" if="{{displayRGTE}}" restamp>
-      <rgte-workzone-element id="rgte" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.inputs}}" enable-Modification disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-workzone-element>
-      <!-- <rgte-displayer-element id="rgte" rgte="{{step.inputs}}" enable-Modification></rgte-displayer-element> -->
-      <!-- <rgte-displayer-element id="rgte" rgte="{{si}}"></rgte-displayer-element> -->
-    </template>
-    </div>
-    <h4>Operator</h4>
-    <div id="opInputDisplayer">
-        <template is="dom-if" if="{{displayOperatorInputs}}" restamp>
-      <!-- <rgte-displayer-element id="opInput" rgte="{{step.operator.behaviors.input}}"></rgte-displayer-element> -->
-          <rgte-workzone-element id="opInput" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.operator.behaviors.input}}"  disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-workzone-element>
-      </template>
-    </div>
-    <h4>Output</h4>
-    <div id="stepOutputs">
-        <template is="dom-if" if="{{displayStepOutputs}}" restamp>
-      <rgte-workzone-element id="stepOutput" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.outputs}}" enable-Modification disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-displayer-element>
-      </template>
-    </div>
+</div>
 
     <!-- DIALOG -->
       <paper-dialog id="resetStep" modal>
