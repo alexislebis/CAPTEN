@@ -22,14 +22,12 @@
       .container{
         display: block;
         position: relative;
-        max-width: 366.666667px;
-        margin: 5px auto;
-        background-color: blue;
+        max-width: var(--operator-creator-element-max-width, 366.666667px);
+        /*margin: 5px auto;*/
       }
 
       .card{
         display: block;
-        margin: 5px;
         position: relative;
         box-sizing: border-box;
         width: 100%;
@@ -42,7 +40,7 @@
       .fabAdd{
         z-index: 1;
         position: absolute;
-        transform: translate(-115px, -25px);
+        transform: translate(var(--operator-creator-fabAdd-translate-left, 245px), var(--operator-creator-fabAdd-translate-top, -60px));
         /* position: relative; */
         /*transform: translate(-5%, 80%);*/
       }
@@ -50,7 +48,7 @@
       .fabCancel{
         z-index: 1;
         position: absolute;
-        transform: translate(343px, -30px);
+        transform: translate(var(--operator-creator-fabCancel-translate-left, 370px), var(--operator-creator-fabCancel-translate-top, -30px));
       }
     </style>
 <div class="container">

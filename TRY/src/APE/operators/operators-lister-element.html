@@ -7,28 +7,44 @@
     <template>
     <style include="app-grid-style">
     :host {
-      --app-grid-columns: 3;
-      --app-grid-item-height: auto;
+      /*--app-grid-columns: 3;
+      --app-grid-item-height: auto;*/
     }
 
-    .content
+    /*.content
     {
       display: block;
       position: relative;
       max-width: 1100px;
       margin: 5px auto;
       background-color: red;
+    }*/
+    .content{
+      display: block;
+      position: relative;
+      border-top: 1px solid lightgray;
+      margin-top: 10px;
+      max-width: var(--operators-lister-element-max-width, 366.666667px);
+      /*height: var(--operators-lister-element-max-height, 85vh);*/
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    #title{
+      position: relative;
+      display: block;
+      margin-left: 10%;
+      /*background-color: yellow;*/
     }
     </style>
 
     <div class="content">
-        <h2>Operations available</h2>
+        <h3 id="title">Operations available</h3>
         <!-- <ul id="rdfClasses"></ul> -->
         <!-- <iron-list id="ilOperations" items="[[operators]]" as="item" class="flex" selection-enabled> -->
-        <div >
-          <ul class="app-grid">
+        <!-- <div > -->
+          <!-- <ul class="app-grid"> -->
             <template id="templateCards" is="dom-repeat" items="[[operators]]" index-as="index">
-              <li>
+              <!-- <li> -->
                   <div class$="card [[_computeClass(selected)]]">
                       <div class="primary pad" tabindex$="[[tabIndex]]">
                         <operator-displayer-element class="displayer" on-cardselected="_cardSelected" operator="[[item]]" is-selected="[[selected]]" is-use-section-available></operator-displayer-element>
@@ -37,10 +53,10 @@
                           <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
                       </div>
                   </div>
-              </li>
+              <!-- </li> -->
             </template>
-          </ul>
-        </div>
+          <!-- </ul> -->
+        <!-- </div> -->
     </div>
 
     </template>

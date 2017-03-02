@@ -16,6 +16,8 @@
     <style>
     :host {
         font-family: sans-serif;
+        --operator-creator-element-max-width: 100%;
+        --operators-lister-element-max-width: 100%;
     }
 
     .listOpDisplay{
@@ -23,33 +25,73 @@
       max-width: 1110px;
       margin : 5px auto;
     }
+
+    #wokzn{
+      display: block;
+      position: relative;
+      border: 1px solid lightgray;
+      max-width: var(--operators-workzone-element-max-width, 366.666667px);
+      height: var(--operators-workzone-element-max-height, 85vh);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    #title{
+      position: relative;
+      display: block;
+      margin-left: 30%;
+      /*background-color: yellow;*/
+    }
+
+    #selectedTitle{
+      position: relative;
+      display: block;
+      margin-left: 10%;
+    }
+
+    #selectedNOP{
+      border-top: 1px solid lightgray;
+    }
+
+    .fabUseNOP{
+      position: absolute;
+      z-index: 1;
+      /*font-size: 200%;*/
+      /*transform: translate(367px, -250px);*/
+      transform: translate(370px,-16px);
+    }
     </style>
 
-  <div class="listOpDisplay">
-    <!-- <div hidden="{{isNewNopHidden}}"> -->
-      <operator-creator-element id="nopCreator" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operator-creator-element>
-    <!-- </div>
-    <div hidden$="{{!isNewNopHidden}}">
-      <p on-tap="_createNewOperation">
-        Create a new operation concept <iron-icon icon="add-box"></iron-icon>
-      </p>
-      <paper-fab on-tap="_createNewOperation" icon="add"></paper-fab>
+  <div id="wokzn">
+    <h3 id="title"> Operations </h3>
 
-    </div> -->
-    <!-- <operator-bootstrap-element id="bootstrap"></operator-bootstrap-element> -->
-    <operators-lister-element id="lister" operators="{{operators}}" on-addcard="_addOperation"></operators-lister-element>
-  </div>
-    <div hidden$="{{_computeHidden(currentoperator)}}" role="listbox">
-        <h4>Selected operation</h4>
-        <operator-displayer-element class="displayer"  operator="{{currentoperator}}"></operator-displayer-element>
-        <!-- <paper-fab icon="play-for-work" >
-          <paper-tooltip>Use this operation</paper-tooltip>
-        </paper-fab> -->
+    <div class="listOpDisplay">
+      <!-- <div hidden="{{isNewNopHidden}}"> -->
+        <operator-creator-element id="nopCreator" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operator-creator-element>
 
-        Use this operation <paper-icon-button on-tap="_useOperation" icon="icons:play-for-work"></paper-icon-button>
+        <div id="selectedNOP" hidden$="{{_computeHidden(currentoperator)}}" role="listbox">
+            <h3 id="selectedTitle">Selected operation</h3>
+            <paper-fab class="fabUseNOP" on-tap="_useOperation" icon="icons:play-for-work"></paper-fab>
+            <operator-displayer-element class="displayer"  operator="{{currentoperator}}"></operator-displayer-element>
+            <!-- <paper-fab icon="play-for-work" >
+              <paper-tooltip>Use this operation</paper-tooltip>
+            </paper-fab> -->
+            <!-- Use this operation <paper-icon-button on-tap="_useOperation" icon="icons:play-for-work"></paper-icon-button> -->
 
+        </div>
+      <!-- </div>
+      <div hidden$="{{!isNewNopHidden}}">
+        <p on-tap="_createNewOperation">
+          Create a new operation concept <iron-icon icon="add-box"></iron-icon>
+        </p>
+        <paper-fab on-tap="_createNewOperation" icon="add"></paper-fab>
+
+      </div> -->
+      <!-- <operator-bootstrap-element id="bootstrap"></operator-bootstrap-element> -->
+      <operators-lister-element id="lister" operators="{{operators}}" on-addcard="_addOperation"></operators-lister-element>
     </div>
 
+    </div>
     <paper-dialog on-iron-overlay-closed="_isAccepted" id="OnlyOneRGTEATM" modal>
         <h2>Only one RGTE in the bag</h2>
         <p>Currently, you cannot use more than one RGTE simultaneously in the description of an AP. Try to complete your RGTE instead.</p>

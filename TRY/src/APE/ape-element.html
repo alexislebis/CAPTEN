@@ -16,28 +16,42 @@
         --rgte-menu-bar-element-max-width: 100%;
         --rgte-menu-bar-element-max-height: 85vh;
         --rgte-menu-bar-translate-left: 375px;
+        --operators-workzone-element-max-width: 100%;
+        --operators-workzone-element-max-height: 85vh;
       }
 
       #globalRGTEMenuBar{
 
       }
-      #menuBar{
+      #menuBar, #opMenuBar{
         /*display: block;*/
         position: absolute;
+        z-index: 5;
         width: 450px;
         background-color: #eee;
         z-index: 1;
         transition-duration: 1s;
         transform: translate(-424px,0%);
       }
+      #opMenuBar{
+        right: 0px;
+        transform: translate(424px,0%);
+      }
       .hidden{
         display: none;
       }
       .fabForward{
-        z-index: 1;
+        z-index: 5;
         position: absolute;
         transition-duration: 1s;
         transform: translate(0px, 42.5vh);
+      }
+      .nopFABFwrd{
+        z-index: 5;
+        right: 0px;
+        position: absolute;
+        transition-duration: 1s;
+        transform: translate(0px, 42.25vh);
       }
       #spacerRGTEMB{
         width: 26px;
@@ -56,23 +70,28 @@
         </div>
       </template>
     </div> -->
-    <div id="globalRGTEMenuBar">
+    <!-- <div id="globalRGTEMenuBar"> -->
       <div id="menuBar" >
         <rgte-menu-bar-element id="RGTEMenuBar" rgtes="{{rgtes}}"></rgte-menu-bar-element>
       </div>
       <div id="fabFwd" class="fabForward">
         <paper-fab id="paperFabForward" icon="av:fast-forward" on-tap="_toggleRGTEMBVisibility"></paper-fab>
       </div>
-      <div id="spacerRGTEMB">
-      </div>
-    </div>
+      <!-- <div id="spacerRGTEMB">
+      </div> -->
+    <!-- </div> -->
 
+    <div id="opMenuBar">
+      <operators-workzone-element id="opWorkzone" currentoperator="{{currentoperator}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operators-workzone-element>
+    </div>
+    <div id="fabFwdNop" class="nopFABFwrd">
+        <paper-fab id="paperFabForwardNop" icon="av:fast-rewind" on-tap="_toggleNOPMBVisibility"></paper-fab>
+    </div>
     <ape-model-element></ape-model-element>
 
     <!-- <step-editor-element id="stepEditor"></step-editor-element> -->
     <step-workzone-element id="stepWorkzone" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-workzone-element>
 
-    <operators-workzone-element id="opWorkzone" currentoperator="{{currentoperator}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operators-workzone-element>
 
     <!-- <h1>
       APE n°<span style="color:green">[[name]]</span>
@@ -127,6 +146,12 @@
         },
 
         isRGTEMBHidden:
+        {
+          type: Boolean,
+          notify: true,
+          value: true,
+        },
+        isNOPMBHidden:
         {
           type: Boolean,
           notify: true,
@@ -228,6 +253,25 @@
           this.$.menuBar.style.transform = "translate(0%,0%)";
           this.$.fabFwd.style.transform = "translate(424px, 42.5vh)";
           this.$.paperFabForward.setAttribute('icon','av:fast-rewind');
+        }
+      },
+      _toggleNOPMBVisibility: function(e)
+      {
+        this.isNOPMBHidden = !this.isNOPMBHidden;
+
+        if(this.isNOPMBHidden)
+        {
+          // setAttribute('class', 'hidden');
+          this.$.opMenuBar.style.transform = "translate(424px,0%)";
+          this.$.fabFwdNop.style.transform = "translate(0px, 42.25vh)";
+          this.$.paperFabForwardNop.setAttribute('icon','av:fast-rewind');
+        }
+        else
+        {
+          // this.$.menuBar.removeAttribute('class');
+          this.$.opMenuBar.style.transform = "translate(0px,0%)";
+          this.$.fabFwdNop.style.transform = "translate(-424px, 42.25vh)";
+          this.$.paperFabForwardNop.setAttribute('icon','av:fast-forward');
         }
       },
 // ===
