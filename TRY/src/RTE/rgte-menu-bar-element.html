@@ -1,0 +1,95 @@
+<link rel="import" href="./rgte-displayer-element.html">
+
+<dom-module id="rgte-menu-bar-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+        --vis-element-width: 100%;
+        --vis-element-height: 250px;
+        --vis-element-border:none;
+      }
+
+      #title{
+        position: relative;
+        display: block;
+        margin-left: 15%;
+        /*background-color: yellow;*/
+      }
+
+      #rgteMenuBar{
+        display: block;
+        position: relative;
+        border: 1px solid lightgray;
+        max-width: var(--rgte-menu-bar-element-max-width, 366.666667px);
+        height: var(--rgte-menu-bar-element-max-height, 85vh);
+        overflow: auto;
+        /*background-color: green;*/
+      }
+      .card{
+        display: block;
+        position: relative;
+        box-sizing: border-box;
+        margin-bottom: 20px;
+        width: 100%;
+        background-color: #ffffff;
+        border-radius: 2px;
+        font-family: 'Roboto', 'Noto', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .fabAddRGTE{
+        position: absolute;
+        /*transform: translate(367px, -250px);*/
+        transform: translate(var(--rgte-menu-bar-translate-left, 367px), var(--rgte-menu-bar-translate-top, -280px));
+      }
+    </style>
+
+    <div id="rgteMenuBar">
+      <h3 id="title">Conceptual Graphs available</h3>
+      <template id="rgtesMenuBar" is="dom-repeat" items="[[rgtes]]" index-as="index">
+        <div>
+          <paper-card class="card">
+            <div class="card-content">
+              <rgte-displayer-element id$="{{_generateRGTEID(index)}}" rgte="{{item}}"></rgte-displayer-element>
+              <paper-fab class="fabAddRGTE" id$="{{_generateFabID(index)}}" on-tap="_rgteClicked" icon="icons:play-for-work"></paper-fab>
+            </div>
+          </paper-card>
+        </div>
+      </template>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'rgte-menu-bar-element',
+
+      properties:
+      {
+        rgtes:{
+          type: Array,
+          notify: true,
+          value: function(){return [];},
+        },
+      },
+
+      _rgteClicked: function(e)
+      {
+        var rgteIndex = parseInt(Polymer.dom(e).localTarget.id.split('fab')[1]);
+        // console.log("VALIDATION FOR SWAPPING RGTE REQUIRED!");
+        // // this.$.stepEditor.changeRGTE(this.rgtes[rgteIndex]);
+        // this.$.stepWorkzone.useRGTE(this.rgtes[rgteIndex]);
+        this.fire(RGTE_MENU_BAR_RGTE_CLICKED_SIGNAL_ID, {'rgte': this.rgtes[rgteIndex]});
+      },
+
+      _generateRGTEID: function(index)
+      {
+        return "rgte"+index;
+      },
+      _generateFabID: function(index)
+      {
+        return "fab"+index;
+      },
+    });
+  </script>
+</dom-module>

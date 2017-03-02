@@ -12,119 +12,181 @@
     <style>
       :host {
         font-family: sans-serif;
+        --vis-element-width: 100%;
       }
 
       .propSelected{
         background-color: red;
       }
+
+      .container{
+        display: block;
+        position: relative;
+        max-width: 366.666667px;
+        margin: 5px auto;
+        background-color: blue;
+      }
+
+      .card{
+        display: block;
+        margin: 5px;
+        position: relative;
+        box-sizing: border-box;
+        width: 100%;
+        background-color: #ffffff;
+        border-radius: 2px;
+        font-family: 'Roboto', 'Noto', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .fabAdd{
+        z-index: 1;
+        position: absolute;
+        transform: translate(-115px, -25px);
+        /* position: relative; */
+        /*transform: translate(-5%, 80%);*/
+      }
+
+      .fabCancel{
+        z-index: 1;
+        position: absolute;
+        transform: translate(343px, -30px);
+      }
     </style>
-
-  <span on-tap="_close">Close <iron-icon icon="clear" prefix></iron-icon></span>
-
-  <form is="iron-form" method="get" action="/" id="newNopForm" on-iron-form-submit="_submitForm">
-    <paper-input id="creatorName" name="n" label="Creator's name" value="{{creatorName}}" required></paper-input>
-
-    <paper-input id="nameNOP" label="NOP's name" value="{{nopname}}" char-counter required maxlength="100"></paper-input>
-    <paper-textarea label="Description of the narrated operator" value="{{nopdescription}}"></paper-textarea>
-    <paper-textarea label="Example" value="{{nopexample1}}"></paper-textarea>
-
-    <paper-input id="objectif1NOP" label="NOP's objective (#1)" value="{{nopobjectif1}}" char-counter maxlength="100"></paper-input>
-
-    <div id="conceptsConveyed">
-      <paper-input id="conceptConvoyed1" label="Concept conveyed by the NOP (#1)" value="{{nopconceptconvoyed1}}"></paper-input>
-
+<div class="container">
+    <div class="fabAdd" hidden="{{isNewNopHidden}}">
+      <paper-fab on-tap="_toggleNopHide" icon="add"></paper-fab>
+    </div>
+    <div class="fabCancel" hidden="{{!isNewNopHidden}}">
+      <paper-fab on-tap="_toggleNopHide" icon="clear"></paper-fab>
+      <!-- <span on-tap="_toggleNopHide">Close <iron-icon icon="clear" prefix></iron-icon></span> -->
     </div>
 
-    <div>
-      <paper-input id="tag1" label="Tag" value="{{noptag1}}" char-counter maxlength="15"></paper-input>
-      <!-- TODO : Faire les multi-paper-inputs -->
-    </div>
+  <div hidden='{{!isNewNopHidden}}'>
+      <paper-card class="card">
+        <h3>Operator Creator</h3>
+        <form is="iron-form" method="get" action="/" id="newNopForm" on-iron-form-submit="_submitForm">
+        <div class="card-content">
 
-    <div>
-    <!-- <paper-textarea label="Example of utilization "></paper-textarea> -->
-    <!-- TODO multi text area  -->
-    </div>
+          <h4>Operator attributes <paper-icon-button id="pibCollapse1" on-tap="_toggleCollapse1" icon="icons:expand-more"></paper-icon-button></h4>
 
-    <div id="relationNOP">
-      <!-- Dérivé de, etc. -->
-      <!-- TODO : Relations sur les particularités, contraintes, etc... Utiliser Haeeceity sans doute vers elmts -->
-    </div>
+          <iron-collapse id="collapse">
 
-    <div id="patterns">
-      <div>
-        <template is="dom-if" if="{{isBindingIO}}">
-          <iron-icon icon="lightbulb-outline"></iron-icon> Clicking on a node in the operator input and output will bind them.
-        </template>
-        <div id="bindIToO">
-          <iron-icon icon="trending-flat" on-tap="_toggleIOBinding"></iron-icon> Link concepts with the operation
-        </div>
-        <div id="bindPToO">
-          <iron-icon icon="trending-flat" on-tap="_toggleRGTEParamsBinding"></iron-icon> Link concepts with parameters
-        </div>
-      </div>
-      <div id="inputP">
-        <div hidden$="{{isInputPatternDisplayed}}" on-tap="_toggleInputPatternDisplayed">
-          Open input pattern <iron-icon icon="add-box"></iron-icon>
-        </div>
-        <div hidden$="{{!isInputPatternDisplayed}}">
-          <span on-tap="_toggleInputPatternDisplayed"> Close input pattern  <iron-icon icon="clear"></iron-icon></span>
-          <rgte-workzone-element id="inputPattern" disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopinputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
-        </div>
-      </div>
-      <div id="outputP">
-        <div hidden$="{{isOutputPatternDisplayed}}" on-tap="_toggleOutputPatternDisplayed">
-          Open output pattern <iron-icon icon="add-box"></iron-icon>
-        </div>
-        <div hidden$="{{!isOutputPatternDisplayed}}">
-          <span on-tap="_toggleOutputPatternDisplayed"> Close output pattern  <iron-icon icon="clear"></iron-icon></span>
-          <rgte-workzone-element id="outputPattern" disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopoutputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
-        </div>
-      </div>
-      <div id="parametersP">
-        <div hidden$="{{isParameterPatternDisplayed}}" on-tap="_toggleParameterPatternDisplayed">
-          Open parameters pattern <iron-icon icon="add-box"></iron-icon>
-        </div>
-        <div hidden$="{{!isParameterPatternDisplayed}}">
-          <span on-tap="_toggleParameterPatternDisplayed"> Close parameters pattern  <iron-icon icon="clear"></iron-icon></span>
+            <paper-input id="creatorName" name="n" label="Creator's name" value="{{creatorName}}" required></paper-input>
 
-          <div id="divp1">
-            P1 :
-            <paper-input id="p1" label="Parameter concept (e.g. Type of correlation measure)" value="{{nopparameter1}}"></paper-input>
+            <paper-input id="nameNOP" label="NOP's name" value="{{nopname}}" char-counter required maxlength="100"></paper-input>
+            <paper-textarea label="Description of the narrated operator" value="{{nopdescription}}"></paper-textarea>
+            <paper-textarea label="Example" value="{{nopexample1}}"></paper-textarea>
+
+            <paper-input id="objectif1NOP" label="NOP's objective (#1)" value="{{nopobjectif1}}" char-counter maxlength="100"></paper-input>
+
+            <div id="conceptsConveyed">
+              <paper-input id="conceptConvoyed1" label="Concept conveyed by the NOP (#1)" value="{{nopconceptconvoyed1}}"></paper-input>
+
+            </div>
+
+            <div>
+              <paper-input id="tag1" label="Tag" value="{{noptag1}}" char-counter maxlength="15"></paper-input>
+              <!-- TODO : Faire les multi-paper-inputs -->
+            </div>
+
+            <div>
+            <!-- <paper-textarea label="Example of utilization "></paper-textarea> -->
+            <!-- TODO multi text area  -->
+            </div>
+
+            <div id="relationNOP">
+              <!-- Dérivé de, etc. -->
+              <!-- TODO : Relations sur les particularités, contraintes, etc... Utiliser Haeeceity sans doute vers elmts -->
+            </div>
+          </iron-collapse>
+
+          <h4>Operator graphs <paper-icon-button id="pibCollapse2" on-tap="_toggleCollapse2" icon="icons:expand-more"></paper-icon-button></h4>
+          <iron-collapse id="collapse2">
+
+            <div id="patterns">
+              <div>
+                <template is="dom-if" if="{{isBindingIO}}">
+                  <iron-icon icon="lightbulb-outline"></iron-icon> Clicking on a node in the operator input and output will bind them.
+                </template>
+                <div id="bindIToO">
+                  <iron-icon icon="trending-flat" on-tap="_toggleIOBinding"></iron-icon> Link concepts with the operation
+                </div>
+                <div id="bindPToO">
+                  <iron-icon icon="trending-flat" on-tap="_toggleRGTEParamsBinding"></iron-icon> Link concepts with parameters
+                </div>
+              </div>
+              <div id="inputP">
+                <div hidden$="{{isInputPatternDisplayed}}" on-tap="_toggleInputPatternDisplayed">
+                  Open input pattern <iron-icon icon="add-box"></iron-icon>
+                </div>
+                <div hidden$="{{!isInputPatternDisplayed}}">
+                  <span on-tap="_toggleInputPatternDisplayed"> Close input pattern  <iron-icon icon="clear"></iron-icon></span>
+                  <rgte-workzone-element id="inputPattern" disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopinputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+                </div>
+              </div>
+              <div id="outputP">
+                <div hidden$="{{isOutputPatternDisplayed}}" on-tap="_toggleOutputPatternDisplayed">
+                  Open output pattern <iron-icon icon="add-box"></iron-icon>
+                </div>
+                <div hidden$="{{!isOutputPatternDisplayed}}">
+                  <span on-tap="_toggleOutputPatternDisplayed"> Close output pattern  <iron-icon icon="clear"></iron-icon></span>
+                  <rgte-workzone-element id="outputPattern" disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopoutputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+                </div>
+              </div>
+              <div id="parametersP">
+                <div hidden$="{{isParameterPatternDisplayed}}" on-tap="_toggleParameterPatternDisplayed">
+                  Open parameters pattern <iron-icon icon="add-box"></iron-icon>
+                </div>
+                <div hidden$="{{!isParameterPatternDisplayed}}">
+                  <span on-tap="_toggleParameterPatternDisplayed"> Close parameters pattern  <iron-icon icon="clear"></iron-icon></span>
+
+                  <div id="divp1">
+                    P1 :
+                    <paper-input id="p1" label="Parameter concept (e.g. Type of correlation measure)" value="{{nopparameter1}}"></paper-input>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </iron-collapse>
+
+        <h4>Operator's relation with analysis tools <paper-icon-button id="pibCollapse3" on-tap="_toggleCollapse3" icon="icons:expand-more"></paper-icon-button></h4>
+        <iron-collapse id="collapse3">
+
+          <div id="toolsImplementation">
+            <paper-input id="creatorName" label="Tool handling the NOP (version). Example : KTBS (v0.2.5)" value="{{noptool1}}"></paper-input>
+            <!-- TODO : gestion plus pousser des outils. Par exemple lors d'un choix d'outils, sous menu pour indiquer op et configuration , version, etc..-->
           </div>
+        </iron-collapse>
+
+          <paper-dialog on-iron-overlay-closed="_replaceOrAddIO" id="propertyIOModal" modal>
+              <h2>Replace or add ?</h2>
+              <p>Will this new property replace an existing one or be simply added ?</p>
+              <div class="buttons">
+                  <paper-button dialog-dismiss>Replace</paper-button>
+                  <paper-button dialog-confirm autofocus>Add</paper-button>
+              </div>
+          </paper-dialog>
+
+          <paper-dialog on-iron-overlay-closed="_selectPropIO" id="propertySelectIOModal" modal>
+              <h2>Select a property to replace</h2>
+              <template id="propsSelector" is="dom-repeat" items="[[props]]" index-as="index">
+                <div on-tap="_propSelect" id="prop[[idProp]]" class$="[[_computePropertySelection(index, indexSelectedProp)]]">
+                  {{item.uri}} : From {{item.from.uri}} to {{item.to.uri}}
+                </div>
+              </template>
+              <div class="buttons">
+                  <paper-button dialog-confirm autofocus>Ok</paper-button>
+              </div>
+          </paper-dialog>
         </div>
-      </div>
-    </div>
-
-
-    <div id="toolsImplementation">
-      <paper-input id="creatorName" label="Tool handling the NOP (version). Example : KTBS (v0.2.5)" value="{{noptool1}}"></paper-input>
-      <!-- TODO : gestion plus pousser des outils. Par exemple lors d'un choix d'outils, sous menu pour indiquer op et configuration , version, etc..-->
-    </div>
-
-    <paper-dialog on-iron-overlay-closed="_replaceOrAddIO" id="propertyIOModal" modal>
-        <h2>Replace or add ?</h2>
-        <p>Will this new property replace an existing one or be simply added ?</p>
-        <div class="buttons">
-            <paper-button dialog-dismiss>Replace</paper-button>
-            <paper-button dialog-confirm autofocus>Add</paper-button>
+        <div class="card-actions">
+          <paper-button raised on-click="_submitted">Create !</paper-button>
         </div>
-    </paper-dialog>
-
-    <paper-dialog on-iron-overlay-closed="_selectPropIO" id="propertySelectIOModal" modal>
-        <h2>Select a property to replace</h2>
-        <template id="propsSelector" is="dom-repeat" items="[[props]]" index-as="index">
-          <div on-tap="_propSelect" id="prop[[idProp]]" class$="[[_computePropertySelection(index, indexSelectedProp)]]">
-            {{item.uri}} : From {{item.from.uri}} to {{item.to.uri}}
-          </div>
-        </template>
-        <div class="buttons">
-            <paper-button dialog-confirm autofocus>Ok</paper-button>
-        </div>
-    </paper-dialog>
-
-    <paper-button raised on-click="_submitted">Create !</paper-button>
-  </form>
-
+      </form>
+    </paper-card>
+  </div>
+</div>
   </template>
     <script>
         Polymer(
@@ -325,6 +387,17 @@
                     type: Array,
                     notify: true,
                 },
+                isNewNopHidden:
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
+                // iconsForCollapser:
+                // {
+                //   type: Object,
+                //   value: function(return ["icons:expand-more","icons:expand-less"])
+                // },
             },
 
           // === NATIVE METHODS
@@ -539,11 +612,41 @@
               this.props = [];
             },
 
+            _toggleNopHide: function()
+            {
+              this.isNewNopHidden = !this.isNewNopHidden;
+            },
+
+            _toggleCollapse1: function()
+            {
+              this.$.collapse.toggle();
+              if(this.$.collapse.opened)
+                this.$.pibCollapse1.setAttribute('icon', 'icons:expand-less');
+              else
+                this.$.pibCollapse1.setAttribute('icon', 'icons:expand-more');
+            },
+            _toggleCollapse2: function()
+            {
+              this.$.collapse2.toggle();
+              if(this.$.collapse2.opened)
+                this.$.pibCollapse2.setAttribute('icon', 'icons:expand-less');
+              else
+                this.$.pibCollapse2.setAttribute('icon', 'icons:expand-more');
+            },
+            _toggleCollapse3: function()
+            {
+              this.$.collapse3.toggle();
+              if(this.$.collapse3.opened)
+                this.$.pibCollapse3.setAttribute('icon', 'icons:expand-less');
+              else
+                this.$.pibCollapse3.setAttribute('icon', 'icons:expand-more');
+            },
+
 
 // === SUBMISSION FORM
             _submitted: function(event)
             {
-                Polymer.dom(event).localTarget.parentElement.submit();
+                Polymer.dom(event).localTarget.parentElement.parentElement.submit();
             },
 
             _submitForm: function(event)

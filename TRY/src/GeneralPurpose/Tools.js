@@ -69,5 +69,8 @@ var PREVENT_REDUDANCY_OBSERVATION = function(elmInstance, observersArray)
     // === NARRATIVE BLOCK
       var NARRATIVE_BLOCK_NODE_IN_STEP_EDITOR_LEFT_CLICKED_SIGNAL_ID = "-pLkiJnBfduehU5745";
 
+    //RGTE
+      var RGTE_MENU_BAR_RGTE_CLICKED_SIGNAL_ID = "-ItenJebg4z4g554123.vbr";
+
 // === COLORS
   var KNOWLEDGE_COLOR = "#57bb8a";

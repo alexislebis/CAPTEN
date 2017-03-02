@@ -17,19 +17,28 @@
     :host {
         font-family: sans-serif;
     }
+
+    .listOpDisplay{
+      display: block;
+      max-width: 1110px;
+      margin : 5px auto;
+    }
     </style>
 
-    <div hidden="{{isNewNopHidden}}">
+  <div class="listOpDisplay">
+    <!-- <div hidden="{{isNewNopHidden}}"> -->
       <operator-creator-element id="nopCreator" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operator-creator-element>
-    </div>
+    <!-- </div>
     <div hidden$="{{!isNewNopHidden}}">
       <p on-tap="_createNewOperation">
         Create a new operation concept <iron-icon icon="add-box"></iron-icon>
       </p>
-    </div>
-    <operator-bootstrap-element id="bootstrap"></operator-bootstrap-element>
-    <operators-lister-element id="lister" operators="{{operators}}" on-addcard="_addOperation"></operators-lister-element>
+      <paper-fab on-tap="_createNewOperation" icon="add"></paper-fab>
 
+    </div> -->
+    <!-- <operator-bootstrap-element id="bootstrap"></operator-bootstrap-element> -->
+    <operators-lister-element id="lister" operators="{{operators}}" on-addcard="_addOperation"></operators-lister-element>
+  </div>
     <div hidden$="{{_computeHidden(currentoperator)}}" role="listbox">
         <h4>Selected operation</h4>
         <operator-displayer-element class="displayer"  operator="{{currentoperator}}"></operator-displayer-element>
@@ -124,7 +133,7 @@
 
             attached: function()
             {
-                this.set('operators', this.$.bootstrap.getOperators());
+                // this.set('operators', this.$.bootstrap.getOperators());
 
                 this.$.nopCreator.addEventListener('-CloseNOPCreator', function(e)
                 {

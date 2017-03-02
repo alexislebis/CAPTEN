@@ -14,10 +14,21 @@ Display expected input pattern, some example, description, review, etc... -->
     :host {
       display: block;
     }
+
+    .card{
+      display: block;
+      margin: 5px;
+      position: relative;
+      box-sizing: border-box;
+      background-color: #ffffff;
+      border-radius: 2px;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
   </style>
 
  <!--FIXME focus issue -->
-  <paper-card heading="{{operator.usualName}}" on-tap="_manageSelection">
+  <paper-card heading="{{operator.usualName}}" class="card" on-tap="_manageSelection">
     <div class="card-content">
       <div class="operator-header">{{operator.usualName}} operation
       </div>
