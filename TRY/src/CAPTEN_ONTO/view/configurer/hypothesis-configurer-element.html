@@ -1,5 +1,8 @@
+<link rel="import" href="../theme/configurer/configurer-style.html">
+
 <dom-module id="hypothesis-configurer-element">
   <template>
+    <style include="configurer-style"></style>
     <style>
     :host {
       display: block;
@@ -7,7 +10,8 @@
     </style>
 
     <!-- STATEMENT CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
-    <paper-card heading="Hypothesis edition">
+  <div id="divRoot">
+    <paper-card class="card" heading="Hypothesis edition">
       <div class="card-content">
 
         <statement-configurer-element id="inheritedStmt" entity="{{entity}}"><statement-configurer-element>
@@ -17,6 +21,7 @@
         <paper-icon-button icon="icons:done" on-click="_update"></paper-icon-button>
       </div>
     </paper-card>
+  </div>
   </template>
   <script>
 

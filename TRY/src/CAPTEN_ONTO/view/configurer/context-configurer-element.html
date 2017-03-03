@@ -1,13 +1,17 @@
+<link rel="import" href="../theme/configurer/configurer-style.html">
+
 <dom-module id="context-configurer-element">
   <template>
+    <style include="configurer-style"></style>
     <style>
     :host {
       display: block;
     }
     </style>
 
+<div id="divRoot">
     <!-- CAPTEN CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
-    <paper-card heading="Context edition">
+    <paper-card class="card" heading="Context edition">
       <div class="card-content">
 
         <div id="currentAddendum">
@@ -37,7 +41,7 @@
     </div>
 
   </paper-card>
-
+</div>
 
   </template>
   <script>

@@ -2,26 +2,140 @@
 
 <dom-module id="narrative-block-cascading-element">
   <template>
+    <style include="toasty-style"></style>
     <style>
     :host {
       display: block;
+      --configurer-element-min-width: 40vw;
+      --narrative-block-adder-min-width: 40vw;
+      --narrative-block-adder-fab-position: absolute;
+      --narrative-block-adder-fab-translate-left: 45px;
+      --narrative-block-adder-fab-translate-top: -44px
     }
 
-    .toastButton {
-      text-transform: none;
-      color: #eeff41;
+    #managingButtons{
+      display: block;
+      position: relative;
+      max-width: var(--narrative-block-cascading-max-width, 100px);
+
     }
 
-    .outer{
+    #entityBlock{
+      /*width: fit-content;*/
+      /*background-color: green;*/
+    }
+
+    #editZone, #addZone{
+      display: block;
+      position: relative;
+      width: fit-content;
+      float: left;
+    }
+
+    #editEntity{
+      display: block;
+      position: absolute;
+      z-index:1;
+      min-width: 40vw;
+      width: 40vw;
+      /*left: -150vw;
+      transition-duration: 1s;
+      transform: translate(150vw,0%);*/
+    }
+
+    #entityNamer
+    {
+      clear:both;
+      font-size: 125%;
+      /*padding-left: 10px;*/
+      float: left;
+    }
+
+    .propNamer
+    {
+      margin-top: 45px;
+      font-size: 125%;
+      width: fit-content;
+      float: left;
+      margin-right: 6px;
+      /*background-color: green;*/
+    }
+
+    .subNarrative{
+      margin-top: 45px;
+      display: block;
+      position: relative;
+      float: left;
+      /*background-color: blue;*/
+    }
+
+    #fabEditing
+    {
+      position: absolute;
+      left:0;
+      transform: translate(0px, -45px);
+      margin-bottom: 3px;
+    }
+
+    .delAndProp
+    {
+      display: block;
+      float: left;
+      position: relative;
+      /*background-color: orange;*/
+      width: fit-content;
+    }
+
+    .fabDeleting{
+      display: block;
+      position: absolute;;
+      width: fit-content;
+      /*right: 5px;*/
+    }
+
+    .entitySubBlock{
+      /*background-color: yellow;*/
+      margin-bottom: 5px;
+      height: fit-content;
+    }
+
+    .killFloatingBehavior{
+      clear: both;
+    }
+
+
+    #mainTitle{
+      position: relative;
+      width: fit-content;
+      border-bottom: 1px solid lightgray;
+      margin:0 auto 25px auto;
+    }
+
+    #cascadeZone
+    {
+      clear: both;
+      display: block;
+      position:  relative;
+      margin-left: 5%;
+    }
+
+    #cascadeButton
+    {
+      display: block;
+      position: relative;
+      float: left;
+    }
+
+    /*.outer{*/
        /*display:inline-block;*/
-       margin-left: 20px;
+       /*margin-left: 20px;
     }
 
     .align{
       position: relative;
       border: 1px solid;
       width: fit-content;
-    }
+    }*/
 
     /*.subNarrative{
       margin-left: 10px;
@@ -29,11 +143,16 @@
 
     </style>
 
+  <div id="rootDiv">
+    <h2 id="mainTitle" hidden="{{cascaded}}">Related information</h2>
+
     <div id="narrativeBlock" class="outer" hidden="true">
       <div id="entityBlock" class="align">
         <div id="managingButtons" class="align">
           <div id="editZone">
-            <paper-icon-button icon="icons:settings" on-click="_toggleEditingZone"></paper-icon-button>
+            <!-- <paper-icon-button class="pIB"icon="icons:settings" on-click="_toggleEditingZone"></paper-icon-button> -->
+            <paper-fab id="fabEditing" mini icon="icons:settings" on-click="_toggleEditingZone"></paper-fab>
+
             <div id="editEntity">
 
             </div>
@@ -45,21 +164,23 @@
         <div id="entityNamer" class="align">
 
         </div>
-      </div>
-
-      <div id="cascadeZone" class="">
         <div id="cascadeButton" class="">
           <paper-icon-button id="cascadeIcon" icon="icons:chevron-right" on-click="_toggleCascadeZone"></paper-icon-button>
           <div id="divBage">
             <paper-badge id="badge" for="cascadeIcon" label="{{_getNarrativeBlockLength()}}"></paper-badge>
           </div>
         </div>
+      </div>
+
+      <div id="cascadeZone" class="">
+
         <div id="cascadeEntities" class="">
 
         </div>
       </div>
 
     </div>
+  </div>
 
 
     <paper-toast id="toastEditOk" text="Element ({{entity.htmlify}}) updated">
@@ -131,10 +252,17 @@
           type: Object,
           notify: true,
         },
+        cascaded:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
       },
 
       attached: function()
       {
+        this._styleDivRoot();
         this.$.adder.addEventListener(ADDER_NOTIFY_VALIDATION_SIGNAL_ID, function(e){
           this.$.toastAddOk.open();
         }.bind(this));
@@ -419,6 +547,11 @@
         for(var i in this.narrativeblock.elements)
         {
           div = document.createElement('div');
+          div.setAttribute('class','entitySubBlock');
+
+          var divPropDel = document.createElement('div');
+          divPropDel.setAttribute('class','delAndProp');
+
           props = PROPERTIES_POOL.getPropertiesByExtremities(this.narrativeblock.propertyEntity.from, this.narrativeblock.elements[i].id);
 
           if(props <= 0)
@@ -435,12 +568,13 @@
           else {
             prop = new (props[0].constructor).namerElement(props[0]);
           }
-          // prop.setAttribute('class','floater');
+          prop.setAttribute('class','propNamer');
 
-          iconDelProp = document.createElement('paper-icon-button');
+          iconDelProp = document.createElement('paper-fab');
           iconDelProp.setAttribute('icon', 'icons:highlight-off');
+          iconDelProp.setAttribute('mini','true');
           iconDelProp.setAttribute('idEntity', this.narrativeblock.elements[i].id)
-          // iconDelProp.setAttribute('class','floater');
+          iconDelProp.setAttribute('class','fabDeleting');
           iconDelProp.addEventListener('click', function(e){
             this._removeItem(e.target.getAttribute('idEntity'));
           }.bind(this));
@@ -449,12 +583,36 @@
           nbckCascading.setEntity(this.narrativeblock.elements[i]);
 
           nbckCascading.setAttribute('class', 'subNarrative');
+          nbckCascading.isCascaded();
 
-          div.appendChild(iconDelProp);
-          div.appendChild(prop);
+          var killFloatingBehavior = document.createElement('div');
+          killFloatingBehavior.setAttribute('class', 'killFloatingBehavior');
+
+          divPropDel.appendChild(iconDelProp);
+          divPropDel.appendChild(prop);
+
+          // div.appendChild(iconDelProp);
+          // div.appendChild(prop);
+          div.appendChild(divPropDel);
           div.appendChild(nbckCascading);
+          div.appendChild(killFloatingBehavior);
 
           Polymer.dom(this.root).querySelector('#cascadeEntities').appendChild(div);
+        }
+      },
+
+      isCascaded: function()
+      {
+        this.cascaded = true;
+      },
+
+      _styleDivRoot: function()
+      {
+        if(!this.cascaded){
+          this.$.rootDiv.style.borderStyle = "solid";
+          this.$.rootDiv.style.borderWidth = "1px";
+          this.$.rootDiv.style.borderColor = "lightgray";
+          this.$.rootDiv.style.minHeight = "250px";
         }
       },
 

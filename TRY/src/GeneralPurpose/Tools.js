@@ -47,7 +47,30 @@ var IS_EMPTY = function(entity)
   return entity.isEmpty();
 };
 
+// === PROTECTION FOR MULTIPLE INSTANCE OF AN ELEMENT LISTENING THIS
+var PREVENT_REDUDANCY_OBSERVATION = function(elmInstance, observersArray)
+{
+  for(var i in observersArray)
+    if(observersArray[i][0] == elmInstance)
+      return false;
+
+  return true;
+};
+
 
 // === SIGNALS
   // === SIGNALS ID
     var ADDER_NOTIFY_VALIDATION_SIGNAL_ID = "-HjueoIebza7zfghr9u";
+
+    // === STEP
+      var STEP_RESET_DEPENDENCIES_SIGNAL_ID = "-Pj6hyuI4geibPUFZpof6";
+      var STEP_KNOWLEDGE_IDENTIFIED_SIGNAL_ID = "-8JguepzMmgne$v5365dv";
+
+    // === NARRATIVE BLOCK
+      var NARRATIVE_BLOCK_NODE_IN_STEP_EDITOR_LEFT_CLICKED_SIGNAL_ID = "-pLkiJnBfduehU5745";
+
+    //RGTE
+      var RGTE_MENU_BAR_RGTE_CLICKED_SIGNAL_ID = "-ItenJebg4z4g554123.vbr";
+
+// === COLORS
+  var KNOWLEDGE_COLOR = "#57bb8a";

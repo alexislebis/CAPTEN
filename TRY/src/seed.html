@@ -1,4 +1,3 @@
-<link rel="import" href="my-app/my-app.html">
 <link rel="import" href="APE/ape-element.html">
 <link rel="import" href="RTE/rte.html">
 <link rel="import" href="VOOG/voog.html">
@@ -14,23 +13,26 @@
 <link rel="import" href="../bower_components/app-route/app-location.html">
 <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
 
+<!-- THEMES -->
+  <link rel="import" href="GeneralPurpose/view/theme/toasty-style.html">
+
 
 
 <dom-module id="main-seed">
   <template>
+    <style include="toasty-style"></style>
     <style>
       :host {
         display: block;
       }
-      .toastButton {
-        text-transform: none;
-        color: #eeff41;
-      }
-      #toastNewFocus > a{
-        text-decoration: none;
+
+      #rootDiv{
+        display: block;
+        position: relative;
       }
     </style>
 
+<div id="rootDiv">
     <app-location use-hash-as-path route="{{route}}"></app-location>
     <app-route route="{{route}}" pattern="/tabs" tail="{{tabsRoute}}" active="{{tabsActive}}"></app-route>
     <app-route route="{{tabsRoute}}" pattern="/:tabName" data="{{data}}"></app-route>
@@ -48,18 +50,20 @@
     </iron-pages>
 
     <!-- <narrative-block-cascader-display-element id="rootNarrativeBlockDisplayer" entity="{{narrativeentity}}"></narrative-block-cascader-display-element> -->
-    <narrative-block-cascading-element id="rootNarrativeBlockDisplayer"></narrative-block-cascading-element>
-
+    <div hidden="{{_isNarrativeEntityIsEmpty(narrativeentity)}}">
+      <narrative-block-cascading-element id="rootNarrativeBlockDisplayer"></narrative-block-cascading-element>
+    </div>
 
     <paper-toast id="toastNewFocus" text="New element focused ({{narrativeentity.htmlify}})">
       <paper-button  on-click="_rollbackNarrativeEntity" class="toastButton">UNDO</paper-button>
-      <!-- <a href="#rootNarrativeBlockDisplayer"> -->
-        <!-- <paper-button  class="toastButton">View More!</paper-button> -->
-      <!-- </a> -->
+    </paper-toast>
+
+    <paper-toast id="toastAddBag" text='Graph copied to the "APE" section'>
+      <paper-button on-click="_rollbackBagAdd" class="toastButton">UNDO</paper-button>
     </paper-toast>
 
     <h1>{{data.page}}</h1>
-
+</div>
   </template>
   <script>
     Polymer({
@@ -108,11 +112,17 @@
           value: null,
         },
 
-        previousNarrativeEntity:
-        {
-          type: Object,
-          notify: true,
-        },
+        // === TOASTY
+          previousNarrativeEntity:
+          {
+            type: Object,
+            notify: true,
+          },
+          previousRGTE:
+          {
+            type: Object,
+            notify: true,
+          },
 
       },
 
@@ -120,9 +130,14 @@
       {
         this.$.rteElem.addEventListener("-RGTEAddedToTheBag", function(e)
         {
-          console.log("WARNING: Currently, only one RGTE can be used simultaneously.");//TODO
+          // console.log("WARNING: Currently, only one RGTE can be used simultaneously.");//TODO
           // this.rgtes = [];
-          this.push('rgtes', e.detail);
+          this.previousRGTE = e.detail.copy();//Copy for new edition
+
+          this.push('rgtes', this.previousRGTE);
+
+          this.$.toastAddBag.open();
+
         }.bind(this));
 
         this.$.apeElem.addEventListener(NARRATIVE_BLOCK_NOTIFY_SIGNAL_ID, function(e)
@@ -134,6 +149,14 @@
         }.bind(this));
       },
 
+      _isNarrativeEntityIsEmpty: function(nEntity)
+      {
+        if(nEntity == null)
+          return true;
+        else
+          return false;
+      },
+
       _rollbackNarrativeEntity: function()
       {
         if(this.previousNarrativeEntity == null)
@@ -142,6 +165,22 @@
         this.$.toastNewFocus.close();
         this.narrativeentity = this.previousNarrativeEntity;
         Polymer.dom(this.root).querySelector('#rootNarrativeBlockDisplayer').setEntity(this.narrativeentity);
+      },
+
+      _rollbackBagAdd: function()
+      {
+        if(this.previousRGTE == null)
+          return;
+
+        var index;
+        for(var i in this.rgtes)
+          if(this.rgtes[i].id == this.previousRGTE.id)
+            index = i;
+
+        if(index == null)
+          return;
+
+        this.splice('rgtes', index, 1);
       },
 
 

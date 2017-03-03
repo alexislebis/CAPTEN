@@ -86,6 +86,14 @@ Description.prototype.updateHTML = function(){
             val: function(){if(this.entity != null)this.val = this.entity.content;},
             observer: "_updateEntityHTML",
           },
+
+          cascaded:
+          {
+            type: Boolean,
+            notify: true,
+            value: false,
+          },
+          
         },
 
         factoryImpl: function(item)

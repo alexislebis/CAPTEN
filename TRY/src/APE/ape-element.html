@@ -4,6 +4,8 @@
 <link rel="import" href="./steps/step-workzone-element.html">
 
 <link rel="import" href="./operators/operators-workzone-element.html">
+<link rel='import' href="../RTE/rgte-menu-bar-element.html">
+<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
 
 
 <dom-module id="ape-element">
@@ -11,28 +13,108 @@
     <style>
       :host {
         display: block;
+        --rgte-menu-bar-element-max-width: 100%;
+        --rgte-menu-bar-element-max-height: 85vh;
+        --rgte-menu-bar-translate-left: 390px;
+        --operators-workzone-element-max-width: 100%;
+        --operators-workzone-element-max-height: 85vh;
+        --step-workzone-element-max-width: 100%;
+      }
+
+      #rootDiv{
+        display: block;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      #globalRGTEMenuBar{
+
+      }
+      #menuBar, #opMenuBar{
+        /*display: block;*/
+        position: absolute;
+        z-index: 5;
+        width: 450px;
+        background-color: #eee;
+        z-index: 1;
+        transition-duration: 1s;
+        transform: translate(-424px,0%);
+      }
+      #opMenuBar{
+        right: 0px;
+        transform: translate(424px,0%);
+      }
+      .hidden{
+        display: none;
+      }
+      .fabForward{
+        z-index: 5;
+        position: absolute;
+        transition-duration: 1s;
+        transform: translate(0px, 42.5vh);
+      }
+      .nopFABFwrd{
+        z-index: 5;
+        right: 0px;
+        position: absolute;
+        transition-duration: 1s;
+        transform: translate(0px, 42.25vh);
+      }
+      #spacerRGTEMB{
+        width: 26px;
+        height: 85vh;
+        border-right: 1px solid lightgray;
+        border-top: 1px solid lightgray;
+        border-bottom: 1px solid lightgray;
+      }
+
+      #stepDiv
+      {
+        display: block;
+        width: 95%;
+        margin:0 auto;
+        min-height: 86vh;
+        /*background-color: pink;*/
       }
     </style>
 
-    <div id="rgteMenuBar">
+<div id="rootDiv">
+    <!-- <div id="rgteMenuBar">
       <h3>RGTE Menu bar</h3>
       <template id="rgtesMenuBar" is="dom-repeat" items="[[rgtes]]" index-as="index">
         <div>
           <rgte-displayer-element id$="{{_generateRGTEID(index)}}" rgte="{{item}}" on-tap="_rgteClicked"></rgte-displayer-element>
         </div>
       </template>
-    </div>
+    </div> -->
+    <!-- <div id="globalRGTEMenuBar"> -->
+      <div id="menuBar" >
+        <rgte-menu-bar-element id="RGTEMenuBar" rgtes="{{rgtes}}"></rgte-menu-bar-element>
+      </div>
+      <div id="fabFwd" class="fabForward">
+        <paper-fab id="paperFabForward" icon="av:fast-forward" on-tap="_toggleRGTEMBVisibility"></paper-fab>
+      </div>
+      <!-- <div id="spacerRGTEMB">
+      </div> -->
+    <!-- </div> -->
 
+    <div id="opMenuBar">
+      <operators-workzone-element id="opWorkzone" currentoperator="{{currentoperator}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operators-workzone-element>
+    </div>
+    <div id="fabFwdNop" class="nopFABFwrd">
+        <paper-fab id="paperFabForwardNop" icon="av:fast-rewind" on-tap="_toggleNOPMBVisibility"></paper-fab>
+    </div>
     <ape-model-element></ape-model-element>
 
     <!-- <step-editor-element id="stepEditor"></step-editor-element> -->
-    <step-workzone-element id="stepWorkzone" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-workzone-element>
+    <div id="stepDiv">
+      <step-workzone-element id="stepWorkzone" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-workzone-element>
+    </div>
+</div>
 
-    <operators-workzone-element id="opWorkzone" currentoperator="{{currentoperator}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operators-workzone-element>
-
-    <h1>
+    <!-- <h1>
       APE n°<span style="color:green">[[name]]</span>
-    </h1>
+    </h1> -->
   </template>
   <script>
     Polymer({
@@ -79,7 +161,20 @@
         {
           type: Object,
           notify: true,
-          observer: '_currentOperatorOnChanged',
+          // observer: '_currentOperatorOnChanged',
+        },
+
+        isRGTEMBHidden:
+        {
+          type: Boolean,
+          notify: true,
+          value: true,
+        },
+        isNOPMBHidden:
+        {
+          type: Boolean,
+          notify: true,
+          value: true,
         },
         //
         // operators:{
@@ -103,6 +198,14 @@
 
       attached: function()
       {
+        this.$.opWorkzone.addEventListener('useThisOperation', function(e){
+          this._currentOperatorOnChanged();
+        }.bind(this));
+
+        this.$.RGTEMenuBar.addEventListener(RGTE_MENU_BAR_RGTE_CLICKED_SIGNAL_ID, function(e){
+          this._rgteClicked(e.detail.rgte);
+        }.bind(this));
+
         this._observer=Polymer.dom(this.$.rgteMenuBar).observeNodes(function(info)
         {
           var div = this._findNewRGTEDiv(info.addedNodes);
@@ -136,10 +239,11 @@
 
       _rgteClicked: function(e)
       {
-        var rgteIndex = parseInt(Polymer.dom(e).localTarget.id.split('rgte')[1]);
-        console.log("VALIDATION FOR SWAPPING RGTE REQUIRED!");
-        // this.$.stepEditor.changeRGTE(this.rgtes[rgteIndex]);
-        this.$.stepWorkzone.useRGTE(this.rgtes[rgteIndex]);
+        // var rgteIndex = parseInt(Polymer.dom(e).localTarget.id.split('rgte')[1]);
+        // console.log("VALIDATION FOR SWAPPING RGTE REQUIRED!");
+        // // this.$.stepEditor.changeRGTE(this.rgtes[rgteIndex]);
+        // this.$.stepWorkzone.useRGTE(this.rgtes[rgteIndex]);
+        this.$.stepWorkzone.useRGTE(e);
       },
 
       _currentOperatorOnChanged: function()
@@ -149,6 +253,45 @@
 
         // this.$.stepEditor.changeOperator(this.currentoperator);
         this.$.stepWorkzone.useOperator(this.currentoperator);
+      },
+
+      _toggleRGTEMBVisibility: function(e)
+      {
+        this.isRGTEMBHidden = !this.isRGTEMBHidden;
+
+        if(this.isRGTEMBHidden)
+        {
+          // setAttribute('class', 'hidden');
+          this.$.menuBar.style.transform = "translate(-424px,0%)";
+          this.$.fabFwd.style.transform = "translate(0px, 42.5vh)";
+          this.$.paperFabForward.setAttribute('icon','av:fast-forward');
+        }
+        else
+        {
+          // this.$.menuBar.removeAttribute('class');
+          this.$.menuBar.style.transform = "translate(0%,0%)";
+          this.$.fabFwd.style.transform = "translate(424px, 42.5vh)";
+          this.$.paperFabForward.setAttribute('icon','av:fast-rewind');
+        }
+      },
+      _toggleNOPMBVisibility: function(e)
+      {
+        this.isNOPMBHidden = !this.isNOPMBHidden;
+
+        if(this.isNOPMBHidden)
+        {
+          // setAttribute('class', 'hidden');
+          this.$.opMenuBar.style.transform = "translate(424px,0%)";
+          this.$.fabFwdNop.style.transform = "translate(0px, 42.25vh)";
+          this.$.paperFabForwardNop.setAttribute('icon','av:fast-rewind');
+        }
+        else
+        {
+          // this.$.menuBar.removeAttribute('class');
+          this.$.opMenuBar.style.transform = "translate(0px,0%)";
+          this.$.fabFwdNop.style.transform = "translate(-424px, 42.25vh)";
+          this.$.paperFabForwardNop.setAttribute('icon','av:fast-forward');
+        }
       },
 // ===
 

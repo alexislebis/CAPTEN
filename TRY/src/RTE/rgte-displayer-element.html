@@ -53,6 +53,7 @@
                         return new RGTE();
                     },
                     notify: true,
+                    observer: '_onChange',
                 },
 
                 enableModification:
@@ -116,6 +117,13 @@
             {
               this.draw();
             },
+
+            _onChange: function() // Native from polymer
+            {
+              console.log(this.rgte);
+              this.replaceRGTE(this.rgte);
+              this.draw();
+            },
 // ===
 
             draw: function()
@@ -124,6 +132,8 @@
 
                 if (rgteView.getNetwork() == null)
                     return;
+                if(this.rgte == null)
+                  return;
 
                 //UPDATING NETWORK WITH NEW NODES.
                 //Update the node will not change ID of already existing (and identical) elements
@@ -231,11 +241,11 @@
               {
                 if(params.nodes.length != 0)
                 {
-                  this.fire('NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0]});
+                  this.fire('NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0], 'graph': this.rgte, 'event': params.event});
                 }
                 else if(params.edges.length != 0)
                 {
-                  this.fire('EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label});
+                  this.fire('EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label, 'graph': this.rgte, 'even': params.event});
                 }
               }
               //if user want to modify the rgte

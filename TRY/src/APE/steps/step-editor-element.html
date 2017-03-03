@@ -1,24 +1,129 @@
 <link rel="import" href="../../RTE/rgte-displayer-element.html">
+<link rel="import" href="../../../bower_components/iron-icons/image-icons.html">
 
 
 <dom-module id="step-editor-element">
     <template>
     <style>
+    :host{
+      --vis-element-width:100%;
+      --vis-element-height:48vh;
+    }
+
+    #divRoot{
+      margin-top: 25px;
+      border-top: 1px solid lightgray;
+      display: block;
+      position: relative;
+      width: var(--step-editor-element-width, 700px);
+      /*background-color: orange;*/
+    }
+    #rgteDisplayer{
+      display: block;
+      position: relative;
+      width: 32%;
+      min-height: 55vh;
+      /*background-color: blue;*/
+      float:left;
+    }
+
+    #opInputDisplayer{
+      display: block;
+      position: relative;
+      width: 32%;
+      margin-left: 1.5%;
+      min-height: 55vh;
+      /*background-color: green;*/
+      float: left;
+    }
+
+    #stepOutputs{
+      display: block;
+      position: relative;
+      width: 32%;
+      margin-left: 1.5%;
+      min-height: 55vh;
+      /*background-color: yellow;*/
+      float: left;
+    }
+
+    .title{
+      width: fit-content;
+      margin:0 auto;
+      border-bottom: 1px solid lightgray;
+    }
+
+    #stepState
+    {
+      clear: both;
+      width: 100%;
+    }
+
+    #stepStateError{
+      display: block;
+      position: relative;
+      width: 33%;
+      float: left;
+      /*background-color: red;*/
+    }
+
+    #stepStateLinking{
+      display: block;
+      position: relative;
+      width: 33%;
+      float: left;
+      /*background-color: blue;*/
+    }
+
+    #identifK{
+      display: block;
+      position: relative;
+      width: 33%;
+      min-height: 70px;
+      /*background-color: green;*/
+      float: left;
+    }
+
+    #kFab
+    {
+      position: relative;
+      /*width: 100%;*/
+      margin:0 auto;
+      background-color: #616161;
+      transform: translate(0px,10px);*/
+    }
+
+    #validateFab
+    {
+      position: relative;
+      margin:0 auto;
+      background-color: #0f9d58;
+      transform: translate(0px,10px);*/
+    }
+
+    #killFloatingBehavior{
+      clear: both;
+    }
+
+    #stateTitle
+    {
+      width: fit-content;
+      border-bottom: 1px solid lightgray;
+      margin-left: 20px;
+    }
 
     </style>
 
     <div id="returnToWorkzone">
-      <p on-tap="_returnToWorkzone">
-          Return to workzone <iron-icon icon="exit-to-app"></iron-icon>
-      </p>
+          <paper-icon-button on-tap="_returnToWorkzone" icon="icons:open-in-new"></paper-icon-button>Return to workzone
     </div>
 
-    <div id="newStep">
+    <!-- <div id="newStep">
       <p on-tap="_createNewStep">
           Create new a step <iron-icon icon="add-box"></iron-icon>
       </p>
-    </div>
-
+    </div> -->
+<div id="divRoot">
     <template is="dom-if" if="{{isBindingRGTENOP}}">
       <iron-icon icon="lightbulb-outline"></iron-icon> Clicking on a node in the RGTE and the operator input will bind them.
     </template>
@@ -30,26 +135,83 @@
             <iron-icon icon="trending-flat" on-tap="_toggleRGTEParamsBinding"></iron-icon> Link concepts with parameters
         </div>
     </div>
-    <h4>RGTE</h4>
     <div id="rgteDisplayer">
-        <template is="dom-if" if="{{displayRGTE}}" restamp>
-      <rgte-workzone-element id="rgte" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.inputs}}" enable-Modification disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-workzone-element>
+      <h3 class="title">Input concepts</h3>
+      <template is="dom-if" if="{{displayRGTE}}" restamp>
+        <rgte-workzone-element id="rgte" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.inputs}}" enable-Modification disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-workzone-element>
       <!-- <rgte-displayer-element id="rgte" rgte="{{step.inputs}}" enable-Modification></rgte-displayer-element> -->
       <!-- <rgte-displayer-element id="rgte" rgte="{{si}}"></rgte-displayer-element> -->
-    </template>
+      </template>
     </div>
-    <h4>Operator</h4>
     <div id="opInputDisplayer">
+      <h3 class="title">Operator</h3>
         <template is="dom-if" if="{{displayOperatorInputs}}" restamp>
-      <rgte-displayer-element id="opInput" rgte="{{step.operator.behaviors.input}}"></rgte-displayer-element>
+      <!-- <rgte-displayer-element id="opInput" rgte="{{step.operator.behaviors.input}}"></rgte-displayer-element> -->
+          <rgte-workzone-element id="opInput" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.operator.behaviors.input}}"  disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-workzone-element>
       </template>
     </div>
-    <h4>Output</h4>
     <div id="stepOutputs">
+      <h3 class="title">Output</h3>
         <template is="dom-if" if="{{displayStepOutputs}}" restamp>
-      <rgte-displayer-element id="opOutput" rgte="{{step.outputs}}" enable-Modification></rgte-displayer-element>
+      <rgte-workzone-element id="stepOutput" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.outputs}}" enable-Modification disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-displayer-element>
       </template>
     </div>
+
+    <div id="stepState">
+      <h3 id="stateTitle">Step State</h3>
+      <div id="stepStateError">
+        <div id="sSEHead">
+          <h4 class="title">Error to solve before completing the step</h4>
+        </div>
+        <div id="sSESubDiv">
+        </div>
+      </div>
+      <div id="stepStateLinking">
+        <div id="sSLHead">
+          <h4 class="title">Inputs concepts to Operator linkage</h4>
+        </div>
+        <div id="sSLSubDiv">
+
+        </div>
+      </div>
+      <div id="identifK">
+        <h4 class="title">Identify knowledge concepts</h4>
+        <paper-fab id="kFab" icon="image:brush" on-tap="_toggleKnowledgeIdentification">
+      </div>
+    </div>
+
+    <div id="killFloatingBehavior">
+    </div>
+
+</div>
+
+    <!-- DIALOG -->
+      <paper-dialog id="resetStep" modal>
+          <h2>Attention please!</h2>
+          <p>You have already completed the current step. It has computed output concepts, which could be used in other steps. <br/>
+            Changing its components will obviously reset the computed concepts.<br/><br/>
+            Be advise that a cascading reset effect can occurs if other steps used these computed concepts in order to kept the analysis up to date.
+          </p>
+          <div class="buttons">
+              <paper-button dialog-dismiss autofocus>Nevermind</paper-button>
+              <paper-button dialog-confirm autofocus on-click="_resetStepAndDependencies">I Know What I'm Doing</paper-button>
+          </div>
+      </paper-dialog>
+    <!--  TOASTY -->
+      <paper-toast id="toastNOPBadInput" text="Operator cannont be used: it does not have inputs!"></paper-toast>
+      <paper-toast id="toastOutputComputed" text="Output computed"></paper-toast>
+      <paper-toast id="toastSameNOP" text="Operation already in use the step"></paper-toast>
+      <paper-toast id="toastSameRGTE" text="Concepts already in use in the step"></paper-toast>
+
+
+      <paper-toast id="toastUseRGTE" text="Graph used in the current step">
+        <!-- <paper-button on-click="_rollbackNewOP" class="toastButton">UNDO</paper-button> -->
+      </paper-toast>
+
+      <paper-toast id="toastUseNOP" text="Operator used in the current step">
+        <!-- <paper-button on-click="_rollbackNewOP" class="toastButton">UNDO</paper-button> -->
+      </paper-toast>
+
     </template>
     <script>
         Polymer(
@@ -165,6 +327,17 @@
                     value: false,
                     notify: true,
                 },
+                waitingElement: //Used when a step is computed. Wait the workzone to compute reset of steps, then the workzone notify this to update the step with the w8ing element.
+                {
+                  type: Object,
+                  notify: true,
+                },
+                isIdentifyingKnowledge:
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
 
             },
 
@@ -181,10 +354,9 @@
                 // this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackUsedConceptsInputComplete);
                 // this.propAsyncBuild.registerObserverCallbackOnUncompletion(this, this._callbackUCIUncompletion);
 
-                this.step.resetAllObservers();
                 this.step.registerObserverCallbackOnOutputsComputation(this, this._callbackUsedConceptsInputComplete);
                 this.step.registerObserverCallbackOnUncompletion(this, this._callbackUCIUncompletion);
-
+                this.step.registerObserverCallbackOnInputsChange(this, this._computeDisplayingRGTE);
                 //For redrawing the displayer when operator input is displayed for the first time
                 this._observer = Polymer.dom(this.$.opInputDisplayer).observeNodes(function(info)
                 {
@@ -198,9 +370,9 @@
                     // }
                     for(var i in info.addedNodes)
                     {
-                      if (info.addedNodes[i] != null && info.addedNodes[i].localName === 'rgte-displayer-element' && this.displayRGTE)
+                      if (info.addedNodes[i] != null && info.addedNodes[i].localName === 'rgte-workzone-element' && this.displayOperatorInputs)
                       {
-                          info.addedNodes[i].draw();
+                          // info.addedNodes[i].draw();
                           info.addedNodes[i].addEventListener('NODE_CLICKED', function(p)
                           {
                               this._behaviorSelectorWhenGraphsClicked(p.detail);
@@ -228,13 +400,13 @@
                   {
                     for(var i in info.addedNodes)
                     {
-                      if (info.addedNodes[i] != null && info.addedNodes[i].localName === 'rgte-displayer-element' && this.displayRGTE)
+                      if (info.addedNodes[i] != null && info.addedNodes[i].localName === 'rgte-workzone-element' && this.displayStepOutputs)
                       {
-                          info.addedNodes[i].draw();
-                          // info.addedNodes[i].addEventListener('NODE_CLICKED', function(p)
-                          // {
-                          //     this._behaviorSelectorWhenGraphsClicked(p.detail);
-                          // }.bind(this));
+                          // info.addedNodes[i].draw();
+                          info.addedNodes[i].addEventListener('NODE_CLICKED', function(p)
+                          {
+                            this._behaviorSelectorWhenGraphsClicked(p.detail);
+                          }.bind(this));
                       }
                     }
                 }.bind(this));
@@ -266,22 +438,53 @@
                 // }
                 //
                 // this.displayOperatorInputs = true;
+                if(this.step.operator && op.id == this.step.operator.id)//Pas de remplacement, même opérateur
+                {
+                  this.$.toastSameNOP.open();
+                  return;
+                }
 
-                this.step.changeOperator(op);
-                this._computeDisplayingOperatorInputs();
+                if(this.step.isComplete())
+                {
+                  this.waitingElement = op;
+                  this.$.resetStep.open();
+                  return;
+                }
+
+                this._changeOperator(op);
+                this.$.toastUseNOP.open();//Need to be before this.stepEditorReference, otherwise last toast displayed is "correctly added"
+            },
+
+            _changeOperator: function(op) //Private changeOperator. Called only for avoiding modal control test
+            {
+              this.step.changeOperator(op);
+              this.waitingElement = null;
+
+              this._computeDisplayingOperatorInputs();
             },
 
             changeRGTE: function(rgte)
             {
-                // if (rgte == null)
-                //     return;
-                //
-                // this.step.inputs = rgte;
-                // this._computeDisplayingRGTE();
-                //
-                // this.propAsyncBuild.setFirstObject(this.step.inputs);
+              if(this.step.inputs && this.step.inputs.id == rgte.id)
+              {
+                this.$.toastSameRGTE.open();
+                return;
+              }
+              if(this.step.isComplete())
+              {
+                this.waitingElement = rgte;
+                this.$.resetStep.open();
+                return;
+              }
 
+              this._changeRGTE(rgte);
+              this.$.toastUseRGTE.open();
+            },
+            _changeRGTE: function(rgte)
+            {
                 this.step.changeRGTE(rgte);
+                this.waitingElement = null;
+
                 this._computeDisplayingRGTE();
             },
 
@@ -290,13 +493,59 @@
               this.fire("-OutputRecomputed", {step: this.step});
             },
 
+            _resetStepAndDependencies: function()
+            {
+              //this.fire(STEP_RESET_DEPENDENCIES_SIGNAL_ID, {self: this, step: this.step});
+              if(this.waitingElement instanceof NarratedOperator)
+                this._changeOperator(this.waitingElement);
+              else if(this.waitingElement instanceof RGTE)
+                this._changeRGTE(this.waitingElement);
+              else
+                console.log("Undefined type");
+            },
+
+
+            // continueChanging: function()//Continue changement operated in changeRGTE or changeOperator. It is call by other process.
+            // {
+            //   if(this.waitingElement == null)
+            //     return;
+            //
+            //
+            //   if(this.waitingElement instanceof NarratedOperator)
+            //   {
+            //     this.step.changeOperator(this.waitingElement);
+            //     this._computeDisplayingOperatorInputs();
+            //   }
+            //   else if( this.waitingElement instanceof RGTE)
+            //   {
+            //     this.step.changeRGTE(this.waitingElement);
+            //     this._computeDisplayingRGTE();
+            //   }
+            //
+            //   this.waitingElement = null;
+            //
+            //
+            // },
+
             // === DISPLAY
             _computeDisplayingOperatorInputs: function()
             {
                 if (this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
+                {
                     this.displayOperatorInputs = false;
+
+                    if(this.step == null && this.step.operator == null && this.step.operator.behaviors == null && this.step.operator.behaviors.input == null)
+                      this.$.toastNOPBadInput.open();
+                }
                 else
+                {
                     this.displayOperatorInputs = true;
+                    if(Polymer.dom(this.root).querySelector('#opInput'))
+                      Polymer.dom(this.root).querySelector('#opInput').rgte = this.step.operator.behaviors.input;
+                    else {
+                      console.log("No Operator Inputs");
+                    }
+                }
             },
 
             _computeDisplayingRGTE: function()
@@ -304,7 +553,11 @@
                 if (this.step.inputs == null)
                     this.displayRGTE = false;
                 else
+                {
                     this.displayRGTE = true;
+                    if(Polymer.dom(this.root).querySelector('#rgte'))
+                      Polymer.dom(this.root).querySelector('#rgte').rgte = this.step.inputs;
+                }
             },
 
             _computeDisplayingOutputsStep: function()
@@ -315,6 +568,8 @@
                 this.displayStepOutputs = false;
               else {
                 this.displayStepOutputs = true;
+                if(Polymer.dom(this.root).querySelector('#stepOutput'))
+                  Polymer.dom(this.root).querySelector('#stepOutput').rgte = this.step.outputs;
               }
             },
 
@@ -331,6 +586,8 @@
 
             _onDisplayersChanged: function()
             {
+              this._computeStepStateDisplay();
+
                 if (this.displayOperatorInputs && this.displayRGTE)
                     this._automaticallyCompute();
             },
@@ -344,24 +601,165 @@
                 this.isBindingRGTEParams = !this.isBindingRGTEParams;
             },
 
+            _toggleKnowledgeIdentification: function()
+            {
+              this.isIdentifyingKnowledge = !this.isIdentifyingKnowledge;
+
+              if(this.isIdentifyingKnowledge)
+                this.$.kFab.style.backgroundColor= "#4285f4"
+              else
+                this.$.kFab.style.backgroundColor = "#616161";
+            },
+
             _callbackUsedConceptsInputComplete: function()
             {
                 // this._computeOutput();
                 // this.displayOperatorOutputs = true;
+                this._resetDiv('sSESubDiv');
+
                 this._computeDisplayingOutputsStep();
                 this.fireOutput();
+
+                this.$.toastOutputComputed.open();
             },
 
             _callbackUCIUncompletion: function()
             {
               // this.displayOperatorOutputs = false;
               this.displayStepOutputs = false;
+              this._computeStepStateDisplay();
             },
 
+
             // === PRIVATE METHODS
+              // === STEP STATE
+              _computeStepStateDisplay: function()
+              {
+                this._computeSSESubDiv();
+
+                this._computeSSLSubDiv();
+              },
+              _computeSSESubDiv: function()
+              {
+                this._resetDiv('sSESubDiv');
+
+                var isError = false;
+                var ul = document.createElement('ul');
+                var li;
+
+                if(this.step.inputs == null)
+                {
+                  isError = true;
+                  li = document.createElement('li');
+                  li.textContent = "No inputs concepts are selected";
+                  ul.appendChild(li);
+                }
+                if(this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
+                {
+                  isError = true;
+                  li = document.createElement('li');
+                  li.textContent = "No operation is selected";
+                  ul.appendChild(li);
+                }
+                if(this.step.propAsyncBuild.lengthArray != 0 && this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength() > 0)
+                {
+                  isError = true;
+                  li = document.createElement('li');
+                  li.textContent = this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength()+" remaining concepts to bind between operator and inputs concepts ("+this._getNameOfRemainingConceptsUnboundOperator()+')';
+                  ul.appendChild(li);
+                }
+                //if PARAM
+
+                if(!isError)
+                {
+                  ul = document.createElement('paper-fab');
+                  ul.setAttribute('icon', 'icons:done-all');
+                  ul.setAttribute('id', 'validateFab');
+                }
+
+                this.$.sSESubDiv.appendChild(ul);
+              },
+              _computeSSLSubDiv: function()
+              {
+                if(this.step == null)
+                  return;
+
+                this._resetDiv('sSLSubDiv');
+                var ul = document.createElement('ul');
+                var li;
+
+                if(this.step.propAsyncBuild.getArrayToFillCurrentLength == 0)
+                {
+                  ul = document.createElement('p');
+                  ul.textContent = "No association is Currently made";
+                  this.$.sSLSubDiv.appendChild(ul);
+                }
+
+                for(var i in this.step.propAsyncBuild.arrayToFill)
+                {
+                  li = document.createElement('li');
+                  li.textContent = '[@inputs]'+this.step.propAsyncBuild.arrayToFill[i].from.label+" ------> "+this.step.propAsyncBuild.arrayToFill[i].to.label+"[@operator]";
+                  ul.appendChild(li);
+                }
+
+                this.$.sSLSubDiv.appendChild(ul);
+              },
+              _resetDiv: function(divID)
+              {
+                var myNode = this.$$('#'+divID);
+
+                if(myNode)
+                  while (myNode.firstChild)
+                      myNode.removeChild(myNode.firstChild);
+              },
+              _getNameOfRemainingConceptsUnboundOperator: function()
+              {
+                var labels = [];
+                var label;
+                var nodesToCompare;
+
+                if(this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
+                  return labels;
+
+                nodesToCompare = this.step.operator.behaviors.input.getNodes();
+                for(var i in nodesToCompare)
+                {
+                  label =  nodesToCompare[i].label;
+
+                  for(var j in this.step.propAsyncBuild.arrayToFill)
+                  {
+                    if(nodesToCompare[i].id == this.step.propAsyncBuild.arrayToFill[j].to.id)
+                      label = null;
+                  }
+
+                  if(label)
+                    labels.push(label);
+                }
+
+                var str = "";
+                if(labels.length == 1)
+                  return labels[0];
+                //else
+                for(var i = 0; i < labels.length - 1; i++)
+                {
+                  str += labels[i];
+                  if(i < labels.length -2)
+                    str +=', ';
+                }
+                str += ' and '+labels[labels.length-1]
+                return str;
+              },
+            // === END STEP STATE
+
             // === BEHAVIORS METHODS
             _behaviorSelectorWhenGraphsClicked: function(params)
             {
+              if(TOOL_EVENT.isCtrlLeftClick(params.event))
+              {
+                this.fire(NARRATIVE_BLOCK_NODE_IN_STEP_EDITOR_LEFT_CLICKED_SIGNAL_ID, {'id': params.id, 'event': params.event});
+              }
+              if(this._isInputsGraph(params.graph) || this._isNOPInputsGraph(params.graph))
+              {
                 if (this.isBindingRGTENOP && this.isBindingRGTEParams)
                 {
                     console.log('Curently, binding simultaneously rgte with param & nop is not supported. Disable one of them to procced.');
@@ -372,6 +770,12 @@
                     this.step.bindRGTEParams(params);// this._bindingRGTEParams(params);
                 else
                     this._defaultBehavior(params);
+              }
+              else if(this._isOutputsGraph(params.graph))
+              {
+                if(this.isIdentifyingKnowledge)
+                  this.fire(STEP_KNOWLEDGE_IDENTIFIED_SIGNAL_ID, {'node':this.step.outputs.getNodeById(params.id), 'nodeLabel': params.nodeLabel, 'graph': params.graph});
+              }
             },
             _bindingRGTENOP: function(params)
             {
@@ -422,8 +826,8 @@
                   }
                 }
 
-                this.$.opOutput.replaceRGTE(this.step.outputs);
-                this.$.opOutput.draw();
+                this.$.stepOutput.replaceRGTE(this.step.outputs);
+                this.$.stepOutput.draw();
 
                 this.fireOutput();
             },
@@ -479,6 +883,26 @@
                 // this.propAsyncBuild.setArray(this.usedConceptsInput);
 
             },
+
+            _isInputsGraph: function(graph)
+            {
+              if(graph != null && this.step.inputs != null && this.step.inputs.id != null && this.step.inputs.id == graph.id)
+                return true;
+              return false;
+            },
+            _isNOPInputsGraph: function(graph)
+            {
+              if(graph != null && this.step.operator != null && this.step.operator.behaviors != null && this.step.operator.behaviors.input != null && this.step.operator.behaviors.input.id == graph.id)
+                return true;
+              return false;
+            },
+            _isOutputsGraph: function(graph)
+            {
+              if(graph != null && this.step.outputs != null && this.step.outputs.id != null && this.step.outputs.id == graph.id)
+                return true;
+              return false;
+            },
+
             _updateUsedConceptsKeyed: function(key)
             {
                 var array = [];

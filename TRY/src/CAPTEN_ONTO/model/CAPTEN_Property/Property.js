@@ -32,6 +32,10 @@ function Property(uri, label, From, to, additionalConstraints){
     this.subClasses = []; //Here are the classes which inherit this
     this.subClassOf = []; //Here, the classes inherited from this
 
+    // Keep a link with the instance of the same class which was used to produce this
+    // copy function MUST DEFINE this.derivedFrom attribute.
+      this.derivedFrom = null;
+
   //   this.subClasses = [
   //             {subClasses:{}, uri: 'NAU', name: 'hasPreviousStep'},
   //             {subClasses:{}, uri: 'NAU', name: 'hasPreviousVersion'},
@@ -121,6 +125,8 @@ Property.prototype = {
     cls.description = this.description;
 
     cls.description = this.inheritanceArray;
+
+    cls.derivedFrom = this;
 
     return cls;
   },
@@ -215,6 +221,15 @@ Property.prototype = {
     }
 
     return ser;
+  },
+
+  updateFromTo: function(from, to)
+  {
+    if(from == null || to == null)
+      return;
+
+    this.from = from;
+    this.to = to;
   },
 
   addFromTo: function(fromCL, toCL)

@@ -5,6 +5,7 @@
     <style>
     :host {
       display: block;
+      --vis-element-width: 100%;
     }
     </style>
 
@@ -74,7 +75,10 @@
         },
         _stepToNode: function(step, numero)//Dry
         {
-          return {'id': step.id, 'label': numero+'#Step'}
+          console.log(step);
+          if(step.name == null)
+            return {'id': step.id, 'label': numero+'#Step'};
+          return {'id': step.id, 'label': step.name.name};
         },
         _edgesDependencies: function()
         {

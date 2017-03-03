@@ -20,8 +20,11 @@ function Step() {
     this.author = null; //using FOAF agent
 
     //State of the Step (ouput generation) + notification
-    this.observers = [];
+    this.observersComputed = [];
     this.observersUnc = []; //Uncomp observer
+    this.observersReset = []; //When compute output is reseted
+    this.observersInputs = []; //Any modification on inputs are notified
+
     this.isStateComputed = false; //If the output has been computed. MUST BE @ true when all the node expected are aligned with the input node
     this.usedComputationInput = []; //State of the computation. Associative array. All the op.beh.inpu node must be aligned with one this.input.node
     this.propAsyncBuild = new PropertyAsyncrhonousBuilder();
@@ -39,31 +42,33 @@ Step.prototype.constructor = Step;
   // === OBSERVATION
     Step.prototype.resetAllObservers = function()
     {
-      this.observers = [];
+      this.observersComputed = [];
       this.observersUnc = [];
     }
     // === COMPUTATION
     Step.prototype.registerObserverCallbackOnOutputsComputation = function(objCallback, callback)
     {
-      this.observers.push([objCallback,callback]);
+      if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersComputed))
+        this.observersComputed.push([objCallback,callback]);
     }
 
       // === NOTIFICATION
       Step.prototype.notifyOutputsComputation = function()
       {
-        this.observers.forEach(function(e)
+        this.observersComputed.forEach(function(e)
         {
           console.log(e);
             if (typeof e[1] === "function") {
-              e[1].call(e[0]);//e[0] define the `this` context for e[1]
+              e[1].call(e[0], this);//e[0] define the `this` context for e[1]
             }
-        });
+        }.bind(this));
       }
 
       // === UNCOMPLETION
       Step.prototype.registerObserverCallbackOnUncompletion = function(objCallback, callback)
       {
-        this.observersUnc.push([objCallback,callback]);
+        if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersUnc))
+          this.observersUnc.push([objCallback,callback]);
       }
 
         // === NOTIFICATION
@@ -77,6 +82,44 @@ Step.prototype.constructor = Step;
               }
           });
         }
+
+        // === RESETING OUTPUTS
+        Step.prototype.registerObserverCallbackOnOutputsReset = function(objCallback, callback)
+        {
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersReset))
+            this.observersReset.push([objCallback,callback]);
+        }
+
+          // === NOTIFICATION
+          Step.prototype.notifyOutputReset = function(resetedOutput)
+          {
+            this.observersReset.forEach(function(e)
+            {
+              console.log(e);
+                if (typeof e[1] === "function") {
+                  e[1].call(e[0], resetedOutput);//e[0] define the `this` context for e[1]
+                }
+            });
+          }
+
+        // === CHANGE INPUTS
+          Step.prototype.registerObserverCallbackOnInputsChange = function(objCallback, callback)
+          {
+            if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersInputs))
+              this.observersInputs.push([objCallback, callback]);
+          }
+
+          // === NOTIFICATION
+          Step.prototype.notifyInputsChange = function()
+          {
+            this.observersInputs.forEach(function(e)
+            {
+              console.log(e);
+                if (typeof e[1] === "function") {
+                  e[1].call(e[0]);//e[0] define the `this` context for e[1]
+                }
+            });
+          }
     // ===
 
   // === CALLBACK BEHAVIORS FROM PROPASYNC
@@ -88,30 +131,72 @@ Step.prototype.constructor = Step;
   Step.prototype._computeOutput = function()
   {
       // console.log("COMPLETE");
-      var outObs = null;
-      if(this.outputs)
-        outObs = this.outputs.observers; //tmp
+      // var outObs = null;
+      // if(this.outputs)
+      //   outObs = this.outputs.observers; //tmp
+      //
+      // //TODO locate correct pattern regarding context of step
+      // console.log("MATCH REGARDING CONTEXT");
+      //
+      //
+      // this.outputs = this.inputs.merge(this.operator.behaviors.output);
+      // this.outputs.resetObservers();
+      //
+      // for(var i in this.propAsyncBuild.arrayToFill)
+      // {
+      //   var fromID = this.outputs._getIdEquivalenceById("OLD_ID", this.propAsyncBuild.arrayToFill[i].from.id)[1];
+      //
+      //   for(var j in this.operator.behaviors.output.nodes)
+      //   {
+      //     var toID = this.outputs._getIdEquivalenceById("OLD_ID",this.operator.behaviors.output.nodes[j].id)[1];
+      //     this.outputs.addVisProperty(new Property(GENERATES_URI, 'generates', fromID, toID), 'to');
+      //   }
+      // }
 
-      //TODO locate correct pattern regarding context of step
-      console.log("MATCH REGARDING CONTEXT");
+      var outputs = this._generateOutput();
+      this._updateOutputStatus(outputs);
+  }
 
+  Step.prototype._generateOutput = function()
+  {
+    var outputs = this.inputs.merge(this.operator.behaviors.output);
+    outputs.resetObservers();
 
-      this.outputs = this.inputs.merge(this.operator.behaviors.output);
-      this.outputs.resetObservers();
+    for(var i in this.propAsyncBuild.arrayToFill)
+    {
+      var fromID = outputs._getIdEquivalenceById("OLD_ID", this.propAsyncBuild.arrayToFill[i].from)[1];
 
-      for(var i in this.propAsyncBuild.arrayToFill)
+      for(var j in this.operator.behaviors.output.nodes)
       {
-        var fromID = this.outputs._getIdEquivalenceById("OLD_ID", this.propAsyncBuild.arrayToFill[i].from.id)[1];
-
-        for(var j in this.operator.behaviors.output.nodes)
-        {
-          var toID = this.outputs._getIdEquivalenceById("OLD_ID",this.operator.behaviors.output.nodes[j].id)[1];
-          this.outputs.addVisProperty(new Property(GENERATES_URI, 'generates', fromID, toID), 'to');
-        }
+        var toID = outputs._getIdEquivalenceById("OLD_ID",this.operator.behaviors.output.nodes[j].id)[1];
+        outputs.addVisProperty(new Property(GENERATES_URI, 'generates', fromID, toID), 'to');
       }
+    }
+
+    return outputs;
+  }
+
+  Step.prototype._updateOutputStatus= function(outputs) //Update the status for a given outputs. Mostly used after this._generateOutput();
+  {
+    if(this.outputs == null)
+    {
+      this.isStateComputed = false;
+    }
+
+    if(outputs != null && (this.outputs == null || this.outputs.id != outputs.id) )
+    {
+      this.outputs = outputs;
 
       this.isStateComputed = true;
-      this.notifyOutputsComputation();
+
+      // Attaching observation on the new output
+      this.outputs.registerObserverCallbackElementAdded(this, this._callbackRGTEReceiveAdd);
+      this.outputs.registerObserverCallbackElementRemoved(this, this._callbackRGTEReceiveRemove);
+      this.outputs.registerObserverCallbackElementUpdated(this, this._callbackRGTEReceiveUpdate);
+      this.outputs.registerObserverCallbackGraphDeleted(this, this._callbackRGTEDeleted);
+
+    }
+    this.notifyOutputsComputation();
   }
 
   Step.prototype._callbackUCIUncompletion = function()
@@ -120,7 +205,146 @@ Step.prototype.constructor = Step;
   }
   // ===
 
+  // === CALLBACK BEHAVIORS FROM INPUTS & OUTPUTS
+    Step.prototype._callbackRGTEReceiveAdd = function(from, elmt)
+    {
+      if(elmt == null)
+        return;
+
+      if(!this.isStateComputed) // Nothing to do
+        return;
+
+      if(from.id == this.inputs.id)//Inputs has changed, thus recompute must be done !
+      {
+        console.log("building new output");
+        // var newOutput = this.outputs.copy();
+
+        if(elmt instanceof CAPTENClass)
+          this.outputs.addVisNode(elmt, elmt.label);
+        else if(elmt instanceof Property)
+        {
+          var nodeFrom = this._findDerivationCorrespondance(elmt.from, this.outputs);
+          var nodeTo = this._findDerivationCorrespondance(elmt.to, this.outputs);
+
+          if( !nodeFrom instanceof CAPTENClass || !nodeTo instanceof CAPTENClass)
+            return;
+
+          // var outputEdge = elmt.copy();
+          // outputEdge.from = nodeFrom.id;
+          // outputEdge.to = nodeTo.id;
+
+          this.outputs.updateEdgeFromTo(this.outputs.addVisProperty(elmt, elmt.arrows), nodeFrom.id, nodeTo.id);
+        }
+        this.notifyInputsChange();
+        this._updateOutputStatus(this.outputs);
+      }
+      else if(from.id == this.outputs.id)//otherwise, outputs has changed, nothing has to be done for this step
+      {
+        /*If the RGTE is produced by this, then modifying it does not influence this. If it is used in other step, then the _callbackRGTEReceiveAdd will
+         * be called and proc into from.id == this.input.id, for recompute
+        */
+      }
+    }
+
+    Step.prototype._callbackRGTEReceiveRemove = function(from, elmt)
+    {
+      if(elmt == null)
+        return;
+
+      if(!this.isStateComputed)
+        return;
+
+      if(from.id == this.inputs.id)
+      {
+        if(elmt instanceof CAPTENClass)
+        {
+          var relatedNOPProps = this._findNOPNodesDependenciesWith(elmt);
+          var nodeRemoved = this._findDerivationCorrespondance(elmt, this.outputs);
+
+          if(relatedNOPProps == 0)//If the deleted node is not used for compute the output
+          {
+            this.outputs.removeNode(nodeRemoved.id);
+          }
+          else {
+            this.propAsyncBuild.cleanArrayOf(nodeRemoved.id);
+            this.verifyOutputsEligibility();
+          }
+        }
+        else if(elmt instanceof Property)
+        {
+          var edgeRemoved = this._findDerivationCorrespondance(elmt, this.outputs);
+          this.outputs.removeEdge(edgeRemoved.id);
+        }
+      }
+    }
+
+    Step.prototype._callbackRGTEDeleted = function(graphID)//Handled in the super structure (here NAP). It could be manged by a notification system between rgte & step, but a counter is more hard to maintain
+    {
+      if(graphID == this.inputs.id)
+        this.removeInputs();
+    }
+
+    Step.prototype._callbackRGTEReceiveUpdate = function(from, elmt)
+    {
+      if(elmt == null)
+        return;
+
+      if(!this.isStateComputed)
+        return;
+
+        if(from.id == this.inputs.id)//Inputs has changed, thus recompute must be done !
+        {
+          if(elmt instanceof CAPTENClass)
+          {
+            //CHECK DESYNCHRO WITH OPERATOR
+
+            var nodeUpdated = this._findDerivationCorrespondance(elmt.derivedFrom, this.outputs);
+            var relatedNOPProps = this._findNOPNodesDependenciesWith(elmt.derivedFrom); //If NOP use the updated node,
+
+            for(var i in relatedNOPProps)
+              relatedNOPProps[i].updateFromTo(elmt.id, relatedNOPProps[i].to);
+
+            var n = this.outputs.updateNode(nodeUpdated.id,elmt);
+            n.derivedFrom = elmt;//Allow to update for the next and avoid id desynchro
+          }
+          else if(elmt instanceof Property)
+          {
+            var propUpdated = this._findDerivationCorrespondance(elmt.derivedFrom, this.outputs);
+
+            var e = this.outputs.updateEdge(propUpdated.id, elmt);
+            e.derivedFrom = elmt;
+          }
+
+          this.notifyInputsChange();
+          this._updateOutputStatus(this.outputs);
+        }
+        else if(from.id == this.outputs.id)//otherwise, outputs has changed, nothing has to be done for this step
+        {
+          /*If the RGTE is produced by this, then modifying it does not influence this. If it is used in other step, then the _callbackRGTEReceiveAdd will
+           * be called and proc into from.id == this.input.id, for recompute
+          */
+        }
+    }
+  // === END CALLBACK BEHAVIORS FROM INPUTS & OUTPUTS
+
   // === PUBLIC
+  Step.prototype.isComplete = function()
+  {
+    return this.isStateComputed;
+  }
+
+  Step.prototype.removeInputs = function()
+  {
+    this.inputs = null;
+
+    this.propAsyncBuild.setFirstObject(null);
+
+    this.displayRGTE = false;
+
+    this.notifyInputsChange();
+    this.verifyOutputsEligibility();
+  }
+
   Step.prototype.changeOperator = function(op)
   {
       if (op == null)
@@ -135,6 +359,8 @@ Step.prototype.constructor = Step;
       }
 
       this.displayOperatorInputs = true;
+
+      this.verifyOutputsEligibility();
   }
 
   Step.prototype.changeRGTE = function(rgte)
@@ -144,9 +370,31 @@ Step.prototype.constructor = Step;
 
       this.inputs = rgte;
 
+      this.inputs.registerObserverCallbackElementAdded(this, this._callbackRGTEReceiveAdd);
+      this.inputs.registerObserverCallbackElementRemoved(this, this._callbackRGTEReceiveRemove);
+      this.inputs.registerObserverCallbackElementUpdated(this, this._callbackRGTEReceiveUpdate);
+      this.inputs.registerObserverCallbackGraphDeleted(this, this._callbackRGTEDeleted);
+
       this.propAsyncBuild.setFirstObject(this.inputs);
+      this._updateUsedConcepts();
 
       this.displayRGTE = true;
+
+      this.verifyOutputsEligibility();
+  }
+
+  //A notifyUncompletion is ALWAYS fired! Because its from this func
+  // !!!!!!!!!! THIS FUNCTION HAS TO BE CALLED ONLY AFTER AN ALTERATION OF INPUTS or OPERATOR of THIS !!!!!!!!
+  Step.prototype.verifyOutputsEligibility = function()
+  {
+    if(this.isStateComputed)
+    {
+      var oldOutputs = this.outputs;
+      this.outputs = null;
+      this.isStateComputed = false; //Reset state of computation;
+      this.notifyOutputReset(oldOutputs);
+    }
+    this.notifyUncompletion();
   }
 
   Step.prototype.bindRGTENOP = function(params)
@@ -462,6 +710,26 @@ Step.prototype.constructor = Step;
       this.usedComputationInput = array;
   }
 
+  Step.prototype._findNOPNodesDependenciesWith = function(node) //test NOP if of its inputs behaviors is linked with node
+  {
+    if(this.operator == null || this.operator.behaviors == null || this.operator.behaviors.input == null)
+      return;
+
+    var res = [];
+    var tmp = [];
+    var browsedNodes = this.operator.behaviors.input.getNodes();
+
+    for(var i in browsedNodes)
+    {
+      tmp = PROPERTIES_POOL.getPropertiesByExtremities(node.id, browsedNodes[i].id);
+
+      for(var j in tmp)
+        res.push(tmp[j]);
+    }
+
+    return res;
+  }
+
   Step.prototype.isArrayFullyCompleted = function(array) //Check only the 1st level
       {
           if (array == null)
@@ -475,6 +743,35 @@ Step.prototype.constructor = Step;
 
           return true;
       }
+
+  Step.prototype._findDerivationCorrespondance = function(elmt, rgte)//Browse all the elements of rgte and look @ rgte.elmt.derivedFrom.
+  {
+    var res;
+    var id;
+    if(elmt == null)
+    {
+      console.error("Element is null, could not find dependencies");
+      return;
+    }
+    if(typeof elmt == 'number')
+      id = elmt;
+    else if(elmt.retrieveUniqueIdentifier != null)
+      id = elmt.retrieveUniqueIdentifier();
+    else
+      return null;
+
+    var nodes = rgte.getNodes();
+    for(var i in nodes)
+      if(nodes[i].derivedFrom && nodes[i].derivedFrom.id == id)
+          return nodes[i];
+
+    var edges = rgte.getEdges();
+    for(var i in edges)
+      if(edges[i].derivedFrom && edges[i].derivedFrom.id == id)
+        return edges[i];
+
+    return null;
+  }
 
 // === POLYMER ELEMENTS
   // === NAMER ELEMENT
@@ -533,7 +830,13 @@ Step.prototype.constructor = Step;
               type: Object,
               notify: true,
               value: function(){return new Author();},
-            }
+            },
+            cascaded:
+            {
+              type: Boolean,
+              notify: true,
+              value: false,
+            },
         },
 
         factoryImpl: function(item)

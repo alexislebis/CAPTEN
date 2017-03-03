@@ -9,6 +9,13 @@ function RGTE(){
   this.id = CAPTEN.ID++;
 
   this.observers = [];
+
+    // === Specialized observers
+      this.removedElmtObservers= []; //for listening elm removed (ie node or edge)
+      this.addedElmtObservers= [];
+      this.updatedElmtObservers= [];
+      this.thisDeletedObservers = [];
+
   this.nodes = [];//Need to be CAPTENCLass
   this.edges = [];
   this.edgesCardinality = []; //Array of edge (currently based on vis edge).
@@ -16,6 +23,15 @@ function RGTE(){
   this.context = null;
 
   this.versions = null; //Array of different version with {Author, date, etc}
+
+  // Keep a link with the instance of the same class which was used to produce this
+  // copy function MUST DEFINE this.derivedFrom attribute.
+  this.derivedFrom = null;
+
+    // ROLLBACK ATTRIBUTES
+    this.lastAction = null;
+    this.prevAlteredElement = null;//The element altered. In an add, nothing, in an update the initial, like in deletion
+    this.prevSubstituteElement = null; //In add, the new, in update, the replacent, in remove nothing.
 }
 
 RGTE.nodeID = 0;
@@ -23,14 +39,44 @@ RGTE.edgeID = 0;
 RGTE.cardiID = 0;
 RGTE.rgteID = 0;
 
+RGTE.ACTIONS = [];
+  RGTE.ACTIONS.ADD    = "ADD";
+  RGTE.ACTIONS.UPDATE = "UPDATE";
+  RGTE.ACTIONS.REMOVE = "REMOVE";
+
 RGTE.NODES = "nodes";
 RGTE.EDGES = "edges";
 RGTE.CARDI = "edgesCardinality";
 
+RGTE.delete = function(object, rgteRef)
+{
+  if(object == null || rgteRef == null || object[rgteRef] == null)
+    return;
+
+  object[rgteRef]._delete();
+  delete object[rgteRef];
+  object[rgteRef] = null;
+}
+
 RGTE.prototype = {
 
 // === ADDING METHODS ===
-  addVisNode: function(nodeLabel, label){
+  addVisNode: function(nodeLabel, label)
+  {
+    var cls = this._addVisNode(nodeLabel, label);
+    //this.notifyChange();
+
+    this.lastAction = RGTE.ACTIONS.ADD;
+    this.prevAlteredElement = null;
+    this.prevSubstituteElement = cls;
+
+
+    this.notifyAdd(cls);
+
+    return cls.id
+  },
+
+  _addVisNode: function(nodeLabel, label){ //Silence version, return a CAPTENClass
     // var cls = new CAPTENClass(nodeLabel);
     // cls.id = RGTE.nodeID++;
 
@@ -52,9 +98,8 @@ RGTE.prototype = {
     cls.size = 30;
     // this.nodes.push({"id": RGTE.nodeID++, "label": nodeLabel, "shape": "dot", "size":30});
     this.nodes.push(cls);
-    this.notifyChange();
 
-    return cls.id;
+    return cls;
   },
 
   // addVisProperty: function(fromID, toID, edgeLabel, arrows)
@@ -72,6 +117,20 @@ RGTE.prototype = {
 
   addVisProperty: function(proper, arrows)
   {
+    var prop = this._addVisProperty(proper, arrows);
+
+    //this.notifyChange();
+
+    this.lastAction = RGTE.ACTIONS.ADD;
+    this.prevAlteredElement = null;
+    this.prevSubstituteElement = prop;
+
+    this.notifyAdd(prop);
+
+    return prop.id;
+  },
+  _addVisProperty: function(proper, arrows)//Silence version. Return a Property
+  {
     var prop = proper.copy();
     // prop.id = RGTE.edgeID++;
     prop.idVoc = proper.id;
@@ -82,9 +141,8 @@ RGTE.prototype = {
     // prop.label = edgeLabel;
     // this.edges.push({"id": RGTE.edgeID++, "from":fromID, "to":toID, "label":edgeLabel, "arrows": "to"});
     this.edges.push(prop);
-    this.notifyChange();
 
-    return prop.id;
+    return prop;
   },
 
   addEdgesCardinality: function(eid, fromCardinality, toCardinality)
@@ -146,6 +204,8 @@ RGTE.prototype = {
 
     for(var i in this.edgesCardinality)
       newRGTE.addEdgesCardinality(this.edgesCardinality[i].id, newRGTE._getIdEquivalenceById("OLD_ID", this.edgesCardinality[i].fromCardinality)[1], newRGTE._getIdEquivalenceById("OLD_ID", this.edgesCardinality[i].toCardinality)[1]);
+
+    newRGTE.derivedFrom = this;
 
     return newRGTE;
   },
@@ -257,7 +317,8 @@ RGTE.prototype = {
 // === OBSERVATION
   registerObserverCallbackOnChange: function(objCallback, callback)
   {
-    this.observers.push([objCallback,callback]);
+    if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observers))
+      this.observers.push([objCallback,callback]);
   },
 
     // === NOTIFICATION
@@ -271,6 +332,77 @@ RGTE.prototype = {
           }
       });
     },
+
+    // === SPECIALIZED OBSERVATIONS
+      // === REGISTER
+        registerObserverCallbackElementRemoved: function(objCallback, callback)
+        {
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.removedElmtObservers))
+            this.removedElmtObservers.push([objCallback,callback]);
+        },
+
+        registerObserverCallbackElementAdded: function(objCallback, callback)
+        {
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.addedElmtObservers))
+            this.addedElmtObservers.push([objCallback,callback]);
+        },
+
+        registerObserverCallbackElementUpdated: function(objCallback, callback)
+        {
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.updatedElmtObservers))
+            this.updatedElmtObservers.push([objCallback,callback]);
+        },
+        registerObserverCallbackGraphDeleted: function(objCallback, callback)
+        {
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.thisDeletedObservers))
+            this.thisDeletedObservers.push([objCallback,callback]);
+        },
+      // === NOTIFIER
+        notifyRemove: function(elmtRemoved)
+        {
+          this.removedElmtObservers.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0], this, elmtRemoved);//e[0] define the `this` context for e[1]
+              }
+          }.bind(this));
+          this.notifyChange();
+        },
+        notifyAdd: function(elmtAdded)
+        {
+          this.addedElmtObservers.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0], this, elmtAdded);//e[0] define the `this` context for e[1]
+              }
+          }.bind(this));
+          this.notifyChange();
+        },
+        notifyUpdate: function(elmtUpdated)
+        {
+          this.updatedElmtObservers.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0], this, elmtUpdated);//e[0] define the `this` context for e[1]
+              }
+          }.bind(this));
+          this.notifyChange();
+        },
+        notifyDelete: function()
+        {
+          this.thisDeletedObservers.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0], this.id);//e[0] define the `this` context for e[1]
+              }
+          }.bind(this));
+          this.notifyChange();
+        },
+    // === END SPECIALIZED OBSERVATION
 
   resetObservers: function()
   {
@@ -359,6 +491,16 @@ RGTE.prototype = {
   },
 // ===
 
+
+  setColorNode: function(nodeID, color)
+  {
+    if(nodeID == null)
+      return;
+
+    this.getNodeById(nodeID).color = color;
+
+    this.notifyChange();
+  },
 
   /**
    * For extension and more complex perspective, return an array. However, in the current version (2/Nov/2016)
@@ -491,6 +633,121 @@ _isIdEquivalenceExists: function(location,ID)
       return cardinalitiesAvailable;
   },
 
+// === ROLLBACK
+rollback: function()
+{
+  switch (this.lastAction) {
+    case RGTE.ACTIONS.ADD:
+      this._rollbackAdd();
+      break;
+    case RGTE.ACTIONS.UPDATE:
+      this._rollbackUpdate();
+      break;
+    case RGTE.ACTIONS.REMOVE:
+      this._rollbackRemove();
+      break;
+    default:
+  }
+
+  this.lastAction = null;
+  this.prevAlteredElement = null;
+  this.prevSubstituteElement = null;
+
+  this.notifyChange();
+},
+
+_rollbackAdd: function()
+{
+  if(this.prevSubstituteElement == null)
+    return;
+
+  if(this.prevSubstituteElement instanceof CAPTENClass)
+    this.removeNode(this.prevSubstituteElement.id);
+  else if(this.prevSubstituteElement instanceof Property)
+    this.removeEdge(this.prevSubstituteElement.id);
+},
+
+_rollbackUpdate: function()
+{
+  if(this.prevAlteredElement == null || this.prevSubstituteElement == null)
+    return;
+
+  if(this.prevAlteredElement instanceof CAPTENClass)
+  {
+    this.updateNode(this.prevSubstituteElement.id, this.prevAlteredElement);
+  }
+  else if(this.prevAlteredElement instanceof Property)
+  {
+    this.updateEdge(this.prevSubstituteElement.id, this.prevAlteredElement);
+  }
+},
+
+_rollbackRemove: function()
+{
+  if(this.prevAlteredElement == null)
+       return;
+
+     if(this.prevAlteredElement instanceof CAPTENClass)
+     {
+       if(this.prevSubstituteElement ==null)
+         return;
+
+       var tmpDerived = this.prevAlteredElement.derivedFrom;
+       var tmpSubstituates = this.prevSubstituteElement;
+       var tmpAltered = this.prevAlteredElement;
+
+       var newNode = this._addVisNode(this.prevAlteredElement);
+       newNode.derivedFrom = tmpDerived;
+
+       for(var i in tmpSubstituates)//All prop altered previously by the deletion
+       {
+         var tmpEdge = PROPERTIES_POOL.getByID(tmpSubstituates[i].id);
+
+         tmpDerived = tmpEdge.derivedFrom;
+
+         var eID = this.addVisProperty(tmpEdge, tmpEdge.arrows);
+         var newEdge = this.getEdgeById(eID);
+
+         newEdge.derivedFrom = tmpDerived;
+
+         if(newEdge.from == tmpAltered.id)
+         {
+           this.updateEdgeFromTo(eID, newNode.id, newEdge.to);
+         }
+         else if(newEdge.to == tmpAltered.id)
+         {
+           this.updateEdgeFromTo(eID, newEdge.from, newNode.id);
+         }
+       }
+     }
+
+
+
+    // for(var i in PROPERTIES_POOL.pool)
+      // {
+      //   if(PROPERTIES_POOL.pool[i].id == newEdge.derivedFrom.id)
+      //   {
+      //     if(PROPERTIES_POOL.pool[i].from == tmpAltered.id)
+      //     {
+      //        PROPERTIES_POOL.pool[i].updateFromTo(id, PROPERTIES_POOL.pool[i].to);
+      //     }
+      //     else if(PROPERTIES_POOL.pool[i].to == tmpAltered.id)
+      //     {
+      //       PROPERTIES_POOL.pool[i].updateFromTo(PROPERTIES_POOL.pool[i].from, id);
+      //     }
+      //   }
+      // }
+  else if(this.prevAlteredElement instanceof Property)
+  {
+    var tmpAltered = this.prevAlteredElement;
+
+    var id = this.addVisProperty(this.prevAlteredElement, this.prevAlteredElement.arrows);
+    this.getEdgeById(id).derivedFrom = tmpAltered.derivedFrom;
+  }
+
+},
+// ===
+
 // === GETTERS ===
   getNodes: function()
   {
@@ -563,13 +820,118 @@ _isIdEquivalenceExists: function(location,ID)
     return null;
   },
 
+  updateNode: function(nodeToUpdateID, newNode)
+  {
+    var result = this._updateNode(nodeToUpdateID, newNode);
+
+    if(result)
+      this.notifyUpdate(result);
+
+    return result;
+  },
+  _updateNode: function(nodeToUpdateID, newNode)
+  {
+    if(nodeToUpdateID == null || typeof nodeToUpdateID != 'number')
+      return null;
+
+    if(newNode == null)
+      return;
+
+    var initialNode = this.getNodeById(nodeToUpdateID);
+    var res = this._removeNode(nodeToUpdateID, true);
+
+    var cls = this._addVisNode(newNode);
+
+    //Trick for update. Since newNode is anonymous and unuseful for trackback,
+    //we set derivedFrom on the nodeToUpdateID, saying that cls come from the updatedNode
+    //Usefull for function such as _findDerivationCorrespondance@Step.js
+      cls.derivedFrom = initialNode;
+
+    for(var i in res)
+    {
+      if(res[i].from === nodeToUpdateID)
+      {
+        // this.rgte.updateEdgeFromTo(res[i], addClass(this.nodeIDSelected), res[i].to);
+        this.updateEdgeFromTo(this._addVisProperty(res[i], 'to').id, cls.id, res[i].to);
+      }
+      else if(res[i].to === nodeToUpdateID)
+      {
+        this.updateEdgeFromTo(this._addVisProperty(res[i], 'to').id, res[i].from, cls.id);
+      }
+      else {
+        throw new Error("Unexpected property to update");
+      }
+
+      this._removeEdge(res[i].id, true);
+    }
+
+    this.lastAction = RGTE.ACTIONS.UPDATE;
+    this.prevAlteredElement = initialNode;
+    this.prevSubstituteElement = cls;
+
+    return cls;
+  },
+
+  _delete: function()
+  {
+    this.notifyDelete();
+  },
+
+  updateEdge: function(edgeToUpdateID, newEdge)
+  {
+    var result = this._updateEdge(edgeToUpdateID, newEdge);
+
+    if(result)
+      this.notifyUpdate(result);
+
+    return result;
+  },
+
+  _updateEdge: function(edgeToUpdateID, newEdge)
+  {
+    if(edgeToUpdateID == null || typeof edgeToUpdateID != 'number')
+      return null;
+
+    if(newEdge == null)
+      return;
+
+    var initialEdge = PROPERTIES_POOL.getByID(edgeToUpdateID);
+    var res = this._removeEdge(edgeToUpdateID, true);
+
+    if(res == null || res.length < 2)
+    {
+      throw new Error("Unexpected nodes for redraw property");
+      return;
+    }
+
+    var edge = this._addVisProperty(newEdge, 'to');
+
+      edge.derivedFrom = initialEdge;
+
+    this.updateEdgeFromTo(edge.id, res[0], res[1]);
+
+    this.lastAction = RGTE.ACTIONS.UPDATE;
+    this.prevAlteredElement = initialEdge;
+    this.prevSubstituteElement = edge;
+
+    return edge;
+  },
+
   removeNode: function(nodeID)
   {
-    var res = this._removeNode(nodeID);
-    this.notifyChange();
-    return res;
+    var delNode = this.getNodeById(nodeID);
+
+    var affectedProps = this._removeNode(nodeID);
+
+    this.lastAction = RGTE.ACTIONS.REMOVE;
+    this.prevAlteredElement = delNode;
+    this.prevSubstituteElement = affectedProps;
+
+    this.notifyRemove(delNode);
+
+    return affectedProps;
   },
-  _removeNode: function(nodeID)//Without modification of change
+  _removeNode: function(nodeID)//Silence remove
   {
     var affectedProps = [];
 
@@ -580,9 +942,12 @@ _isIdEquivalenceExists: function(location,ID)
         affectedProps = PROPERTIES_POOL.relatedProperties(nodeID);
 
         for(var j in affectedProps)
-          this._removeEdge(affectedProps[j]);
+          this._removeEdge(affectedProps[j].id);
 
-        delete this.nodes[i];
+        var notif = this.nodes.splice(i,1)[0];
+        // if(!isSilent || isSilent == null)
+        //   this.notifyRemove(notif);//Remove the ieme elmt of this.nodes and notify the remove by taking the 1st elmt returned (and the only one)
+
         return affectedProps;
       }
     }
@@ -590,9 +955,17 @@ _isIdEquivalenceExists: function(location,ID)
 
   removeEdge: function(propertyID)//With notification of change
   {
-    var res = this._removeEdge(propertyID);
-    this.notifyChange();
-    return res;
+    var delEdge = PROPERTIES_POOL.getByID(propertyID);
+
+    var affectedNodes = this._removeEdge(propertyID);
+
+    this.lastAction = RGTE.ACTIONS.REMOVE;
+    this.prevAlteredElement = delEdge;
+    this.prevSubstituteElement = null;
+
+    this.notifyRemove(delEdge);
+
+    return affectedNodes;
   },
   _removeEdge: function(propertyID)//Without notification of change
   {
@@ -605,7 +978,12 @@ _isIdEquivalenceExists: function(location,ID)
         affectedNodes.push(this.edges[i].from);
         affectedNodes.push(this.edges[i].to);
 
-        delete this.edges[i];
+        //this.edges.splice(i,1);
+
+        var notif = this.edges.splice(i,1)[0];
+        // if(!isSilent || isSilent == null)
+        //   this.notifyRemove(notif);//Remove the ieme elmt of this.edges and notify the remove by taking the 1st elmt returned (and the only one)
+
         return affectedNodes;
       }
     }
@@ -620,11 +998,12 @@ _isIdEquivalenceExists: function(location,ID)
         this.edges[i].from = from;
         this.edges[i].to = to;
 
-        console.log(PROPERTIES_POOL.getByID(id));
+        //console.log(PROPERTIES_POOL.getByID(id));
 
         this.notifyChange();
+        //this.notifyUpdate(this.edges[i]);
 
-        return;
+        return id;
       }
     }
   },

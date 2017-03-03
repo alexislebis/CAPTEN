@@ -9,7 +9,7 @@ function CAPTENClass(uri, label, properties)
     this.id = CAPTEN.ID++;
 
     this.uri = uri;
-    this.properties = this.properties; //[Property]
+    this.properties = properties; //[Property]
     if(this.properties == null)
       this.properties = [];
 
@@ -30,6 +30,10 @@ function CAPTENClass(uri, label, properties)
     //console.log(this.uri);
     if (this.uri != null && this.uri.match(/[_].*/))
         this.isBlank = true;
+
+    // Keep a link with the instance of the same class which was used to produce this
+    // copy function MUST DEFINE this.derivedFrom attribute.
+      this.derivedFrom = null;
 }
 
 CAPTENClass.id = 0;
@@ -250,7 +254,7 @@ CAPTENClass.prototype = {
         var cls = new CAPTENClass(this.uri);
 
         for(var i in this)
-          if(i != 'id')
+          if(i != 'id' && i != 'color')
             cls[i] = this[i];
         //cls.id = this.id;
         // cls.properties = this.properties;
@@ -260,6 +264,8 @@ CAPTENClass.prototype = {
         // cls.inheritanceArray = this.inheritanceArray;
         // cls.subClassOf = this.subClassOf;
         // cls.subClasses = this.subClasses;
+
+        cls.derivedFrom = this;
 
         return cls;
     },

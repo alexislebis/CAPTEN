@@ -1,5 +1,8 @@
+<link rel="import" href="../theme/configurer/configurer-style.html">
+
 <dom-module id="entity-name-configurer-element">
   <template>
+    <style include="configurer-style"></style>
     <style>
     :host {
       display: block;
@@ -7,8 +10,8 @@
     </style>
 
     <!-- ROOT CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
-
-    <paper-card heading="Name">
+<div id="divRoot">
+    <paper-card class="card" heading="Name">
       <div class="card-content">
         <paper-input id="name" label="Name" value="{{name}}" char-counter maxlength="70"></paper-input>
       </div>
@@ -17,6 +20,7 @@
       </div>
 
     </paper-card>
+</div>
   </template>
   <script>
 

@@ -8,6 +8,7 @@
 
 <dom-module id="rgte-element">
     <template>
+      <style include="toasty-style"></style>
         <style>
              :host {
                 display: block;
@@ -108,6 +109,38 @@
         <div hidden$="{{ disableCardinality }}">
           <rgte-cardinality-form-element id="rgteCard" rgte="{{rgte}}" edgeid="{{edgeIDSelected}}"></rgte-cardinality-form-element>
         </div>
+
+
+        <!-- TOASTY -->
+          <paper-toast id="toastClassAdded" text="Concept added">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastClassReplaced" text="Concept replaced">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastClassDeleted" text="Concept deleted">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastPropertyAdded" text="Property added">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastPropertyReplace" text="Property replaced">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastPropertyRelinked" text="Property relinked">
+            <paper-button on-click="_rollbackRelinkProperty" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastPropertyDeleted" text="Concept deleted">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+        <!-- END TOASTY -->
+
 
     </template>
     <script>
@@ -210,6 +243,18 @@
                   value: false,
                   notify: true,
                 },
+
+                // === TOASTY
+                  previousRGTENode:
+                  {
+                    type: Object,
+                    notify: true,
+                  },
+                  previousRGTEEdge:
+                  {
+                    type: Object,
+                    notify: true,
+                  },
             },
 
             attached: function()
@@ -268,7 +313,12 @@
 
             addClass: function(cls) //From rte-lister-element redirected by rgte-workzone-element
             {
-              return this.rgte.addVisNode(cls);
+              var nodeID = this.rgte.addVisNode(cls);
+
+              this.previousRGTENode = this.rgte.getNodeById(nodeID);
+              this.$.toastClassAdded.open();
+
+              return nodeID;
             },
 
             _updateCurrentNode: function(cls)//@CHECK PROPERTIES_POOL Related
@@ -279,29 +329,34 @@
               if(this.nodeIDSelected == -1)
                 return;
 
-              var res = this._deleteCurrentNode();
-
-              var newcls = this.addClass(cls)
-
-              for(var i in res)
-              {
-                if(res[i].from === this.nodeIDSelected)
-                {
-                  // this.rgte.updateEdgeFromTo(res[i], addClass(this.nodeIDSelected), res[i].to);
-                  this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), newcls, res[i].to);
-                }
-                else if(res[i].to === this.nodeIDSelected)
-                {
-                  this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), res[i].from, newcls);
-                }
-                else {
-                  throw new Error("Unexpected property to update");
-                }
-
-                this.rgte.removeEdge(res[i].id);
-              }
+              this.rgte.updateNode(this.nodeIDSelected, cls);
+              this.$.toastClassReplaced.open();
 
               this.nodeIDSelected = -1;
+
+              // var res = this._deleteCurrentNode();
+              //
+              // var newcls = this.addClass(cls)
+              //
+              // for(var i in res)
+              // {
+              //   if(res[i].from === this.nodeIDSelected)
+              //   {
+              //     // this.rgte.updateEdgeFromTo(res[i], addClass(this.nodeIDSelected), res[i].to);
+              //     this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), newcls, res[i].to);
+              //   }
+              //   else if(res[i].to === this.nodeIDSelected)
+              //   {
+              //     this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(res[i], 'to'), res[i].from, newcls);
+              //   }
+              //   else {
+              //     throw new Error("Unexpected property to update");
+              //   }
+              //
+              //   this.rgte.removeEdge(res[i].id);
+              // }
+              //
+              // this.nodeIDSelected = -1;
             },
 
             _deleteCurrentNode: function()//@WARNING if all nodes are deleted, it may become impossible to add new ones (since they may be hidden)
@@ -313,6 +368,7 @@
                 return;
 
               var res = this.rgte.removeNode(this.nodeIDSelected);
+              this.$.toastClassDeleted.open();
 
               return res;
             },
@@ -325,19 +381,23 @@
               if(this.edgeIDSelected == -1)
                 return;
 
-              var res = this._deleteCurrentEdge();
-
-              if(res == null || res.length < 2)
-              {
-                throw new Error("Unexpected nodes for redraw property");
-                this.edgeIDSelected = -1;
-
-                return;
-              }
-
-              this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(prop, 'to'), res[0], res[1]);
+              this.rgte.updateEdge(this.edgeIDSelected, prop);
+              this.$.toastPropertyReplace.open();
 
               this.edgeIDSelected = -1;
+              // var res = this._deleteCurrentEdge();
+              //
+              // if(res == null || res.length < 2)
+              // {
+              //   throw new Error("Unexpected nodes for redraw property");
+              //   this.edgeIDSelected = -1;
+              //
+              //   return;
+              // }
+              //
+              // this.rgte.updateEdgeFromTo(this.rgte.addVisProperty(prop, 'to'), res[0], res[1]);
+              //
+              // this.edgeIDSelected = -1;
             },
 
             _deleteCurrentEdge: function()
@@ -349,6 +409,7 @@
                 return;
 
               var res = this.rgte.removeEdge(this.edgeIDSelected);
+              this.$.toastPropertyDeleted.open();
 
               return res;
             },
@@ -432,13 +493,16 @@
                   for(var i in arr)
                     prop = arr[i];
 
-                  prop.from = prop.from.retrieveUniqueIdentifier();//Assured that from has retrieveUniqueIdentifier since it comes from the asyncBuilder
-                  prop.to = prop.to.retrieveUniqueIdentifier();
-                  this.rgte.addVisProperty(prop, "to");
+                  prop.from = prop.from;
+                  prop.to = prop.to;
+                  var propriID = this.rgte.addVisProperty(prop, "to");
 
                   this.propAsyncBuild.reset();
 
                   this.isWaitingPropertyBinding = false;
+
+                  this.previousRGTEEdge = this.rgte.getEdgeById(propriID);
+                  this.$.toastPropertyAdded.open();
                 },
 
             //Define the behavior of the RGTE on click
@@ -566,6 +630,31 @@
             {
               this.fire('MANAGE_LISTER_VISIBILITY', {isListerDisable:lister, isListerAddingDisable: adding, isClassesListerDisable: classes, isPropertiesListerDisable: properties});
             },
+
+            // === TOASTY BEHAVIORS
+              _rollbackAddClass: function()
+              {
+                if(this.previousRGTENode == null)
+                  return;
+
+                this.rgte.removeNode(this.previousRGTENode.id);
+                this.previousRGTENode = null;
+              },
+
+              _rollbackAddProperty: function()
+              {
+                if(this.previousRGTEEdge == null)
+                  return;
+
+                this.rgte.removeEdge(this.previousRGTEEdge.id);
+                this.previousRGTEEdge = null;
+              },
+
+              _rollbackAction: function()
+              {
+                this.rgte.rollback();
+              },
+            // === END TOASTY
 
             //=== BUTTONS
               _create: function()

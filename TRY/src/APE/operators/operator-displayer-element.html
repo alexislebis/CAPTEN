@@ -14,10 +14,22 @@ Display expected input pattern, some example, description, review, etc... -->
     :host {
       display: block;
     }
+
+    .card{
+      display: block;
+      position: relative;
+      box-sizing: border-box;
+      /*margin-bottom: 5px;*/
+      width: 100%;
+      background-color: #ffffff;
+      border-radius: 2px;
+      font-family: 'Roboto', 'Noto', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
   </style>
 
  <!--FIXME focus issue -->
-  <paper-card heading="{{operator.usualName}}" on-tap="_manageSelection">
+  <paper-card heading="{{operator.usualName}}" class="card" on-tap="_manageSelection">
     <div class="card-content">
       <div class="operator-header">{{operator.usualName}} operation
       </div>
@@ -30,22 +42,24 @@ Display expected input pattern, some example, description, review, etc... -->
       <p><iron-icon icon="event" class="icon">event</iron-icon> {{operator.creationDate}}</p>
 
     </div>
-    <div class="card-actions">
+
       <template is="dom-if" if="{{isUseSectionAvailable}}" restamp="true">
+          <div class="card-actions">
         <p>
           SELECT IT
           <paper-icon-button icon$="[[_computeSelection(isSelected)]]" class="icon" on-tap="_useCard"></paper-icon-button>
         </p>
+        </div>
       </template>
 
-      <div class="horizontal justified">
+      <!-- <div class="horizontal justified">
 
         <paper-button on-click="_togglePatternCllp">PATTERN</paper-button>
         <paper-button on-click="_toggleExamplesCllp">EXAMPLES</paper-button>
         <paper-button on-click="_toggleUsedCllp">USED IN</paper-button>
-      </div>
+      </div> -->
 
-      <iron-collapse id="showPattern" style="width:100%;">
+      <!-- <iron-collapse id="showPattern" style="width:100%;">
         <p>VIS PATTERN HERE</p>
       </iron-collapse>
 
@@ -55,9 +69,9 @@ Display expected input pattern, some example, description, review, etc... -->
 
       <iron-collapse id="showUsedIn" style="width:100%;">
         <p>IAP USING THIS IOP HERE</p>
-      </iron-collapse>
+      </iron-collapse> -->
 
-    </div>
+
   </paper-card>
 
 </template>

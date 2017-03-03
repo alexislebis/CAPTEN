@@ -3,20 +3,40 @@
 
 <dom-module id="step-workzone-element">
   <template>
+    <style include="toasty-style"></style>
     <style>
+      :host {
+        --step-editor-element-width: 100%;
+      }
 
+      #divRoot{
+        display: block;
+        position: relative;
+        border-top: 1px solid lightgray;
+        margin-top: 10px;
+        max-width: var(--step-workzone-element-max-width, 750px);
+      }
+      #title{
+        position: relative;
+        display: block;
+        width: fit-content;
+        margin:0 auto;
+        border-bottom: 1px solid gray;
+
+      }
+      #stepsDisplayerDiv{
+        width: 100%;
+      }
     </style>
 
+  <div id="rootDiv">
+    <h2 id="title">Workzone</h2>
     <div id="newStep">
-      <p on-tap="_createNewStep">
-          Create new a step <iron-icon icon="add-box"></iron-icon>
-      </p>
+          <paper-icon-button on-click="_createNewStep" icon="icons:add-box"></paper-icon-button>Create new a step
     </div>
 
-    <div id="openEditor">
-      <p on-tap="_openEditorNewStep">
-          Open step editor for the step current step <iron-icon icon="open-in-new"></iron-icon>
-      </p>
+    <div id="openEditor" hidden="{{isStepEditionEnabled}}">
+          <paper-icon-button icon="icons:exit-to-app" on-click="_openEditorNewStep"></paper-icon-button>Edit the current step 
     </div>
 
     <!-- <div hidden="{{!isStepEditionEnabled}}"> -->
@@ -26,10 +46,46 @@
       </template>
     </div>
 
-    <div id="stepsDisplayerDiv">
-      <h3>Steps Displayer</h3>
+    <div id="stepsDisplayerDiv" hidden="{{isStepEditionEnabled}}">
+      <h3>Steps overview</h3>
       <steps-displayer-element id="stepsDisplayer" steps="{{steps}}"></steps-displayer-element>
     </div>
+  </div>
+
+    <!-- DIALOG -->
+    <paper-dialog id="removeKnowledge" modal>
+        <h2>Delete the selected knowledge?</h2>
+        <p>The selected concept is already flagged as a knowledge concept expected of the analysis process. Do you really want to remove it?
+        </p>
+        <div class="buttons">
+            <paper-button dialog-dismiss autofocus>No</paper-button>
+            <paper-button dialog-confirm autofocus on-click="_removeCurrentKnowledge">Yes</paper-button>
+        </div>
+    </paper-dialog>
+
+    <!-- TOASTY -->
+    <paper-toast id="toastNewStep" text="Step created">
+      <paper-button on-click="_rollbackNewStep" class="toastButton">UNDO</paper-button>
+    </paper-toast>
+
+    <paper-toast id="toastNoStepSelected" text="No step selected"></paper-toast>
+
+
+    <paper-toast id="toasOpenStepPane" text="Step workzone is currently closed">
+      <paper-button on-click="_openEditorNewStep" class="toastButton">OPEN</paper-button>
+    </paper-toast>
+
+    <paper-toast id="toastNumberingResetedStep" text=""></paper-toast>
+
+    <paper-toast id="toastKAdded" text="Knowledge identified">
+        <paper-button on-click="_rollbackAddKnowledge" class="toastButton">UNDO</paper-button>
+    </paper-toast>
+
+    <paper-toast id="toastKDeleted" text="Knowledge deleted">
+        <paper-button on-click="_rollbackDeleteKnowledge" class="toastButton">UNDO</paper-button>
+    </paper-toast>
+
+
 
   </template>
   <script>
@@ -72,7 +128,7 @@
           cstep:
           {
             type: Object,
-            value: function(){return new Step();},
+            // value: function(){return new Step();},
             notify: true,
           },
           isStepEditionEnabled:
@@ -87,6 +143,63 @@
             type: Object,
             value: null,
             notify: true,
+          },
+
+          knowledges://[] of ExploitableOutput
+          {
+            type: Object,
+            notify: true,
+            value: function(){return [];},
+          },
+          currentKnowledge:
+          {
+            type: Object,
+            notify: true,
+          },
+          currentKnowledgeGraph:
+          {
+            type: Object,
+            notify: true,
+          },
+          // === TOASTY
+          //While reset a compute step
+          isFirstReset:
+          {
+            type: Boolean,
+            notify: true,
+          },
+          nbOfReset:
+          {
+            type: Number,
+            notify: true,
+            value: 0,
+          },
+          //For rollback
+          rollbackStep:
+          {
+            type: Object,
+            notify: true,
+          },
+          tmpOp:
+          {
+            type: Object,
+            notify: true,
+          },
+          previousKnowledge:
+          {
+            type: Object,
+            notify: true,
+          },
+          previousGraphKnowledge:
+          {
+            type: Object,
+            notify: true,
+          },
+          isToastDisable:
+          {
+            type: Boolean,
+            notify: true,
+            value: false,
           },
         },
 
@@ -128,12 +241,25 @@
                 }.bind(this));
 
                 info.addedNodes[i].addEventListener("-OutputRecomputed", function(e){
-                  this.push('rgtes', e.detail.step.outputs);
+                  //this.push('rgtes', e.detail.step.outputs);
                 }.bind(this));
 
                 info.addedNodes[i].addEventListener("-ReturnToWorkzone", function(e){
                   this._hiddeStepEditor();
                 }.bind(this));
+
+                info.addedNodes[i].addEventListener(STEP_KNOWLEDGE_IDENTIFIED_SIGNAL_ID, function(e){
+                  this._handleKnowledgeIdentification(e.detail);
+                }.bind(this));
+
+                info.addedNodes[i].addEventListener(NARRATIVE_BLOCK_NODE_IN_STEP_EDITOR_LEFT_CLICKED_SIGNAL_ID, function(e){
+                  this._handleNarrationOfClickedNode(e);
+                }.bind(this));
+
+                // info.addedNodes[i].addEventListener(STEP_RESET_DEPENDENCIES_SIGNAL_ID, function(e)
+                // {
+                //   this._resetDependencies(e.detail);
+                // }.bind(this));
 
               }
             }
@@ -160,9 +286,10 @@
           if(rgte == null)
             return;
 
-          if(this.stepEditorReference == null)
+          if(this.isStepEditionEnabled == false || this.stepEditorReference == null)
           {
             console.error("EDITION MODE IS NOT ENABLED FOR THE STEP. RGTE IS DISCARDED.");
+            this.$.toasOpenStepPane.open();
             return;
           }
 
@@ -175,13 +302,16 @@
           if(op == null)
             return;
 
-          if(this.stepEditorReference == null)
+          if(this.isStepEditionEnabled == false || this.stepEditorReference == null)
           {
             console.error("EDITION MODE IS NOT ENABLED FOR THE STEP. OPERATOR IS DISCARDED.");
+            this.tmpOp = op;
+            this.$.toasOpenStepPane.open();
             return;
           }
 
           this.stepEditorReference.changeOperator(op);
+
         },
 
         // === PRIVATE
@@ -202,6 +332,19 @@
           //       return new Property(FOLLOWED_BY_URI, "followed by", this.steps[i].id, this.step[i]);
           //   }
           // },
+
+          _handleNarrationOfClickedNode: function(e)
+          {
+            this._verifAndGenerateKNarrativeBlock(e.detail);
+          },
+
+        _isAnIdentifiedKnowledge: function(id)
+        {
+          for(var i in this.knowledges)
+            if(this.knowledges[i].derivedFrom.id == id)
+              return this.knowledges[i];
+          return null;
+        },
 
         _updateCurrentStep: function(p)
         {
@@ -224,12 +367,81 @@
         {
           this.cstep = new Step();
 
+          this.cstep.registerObserverCallbackOnOutputsReset(this, this._callbackStepReset);
+          this.cstep.registerObserverCallbackOnOutputsComputation(this, this._callbackHandleStepComputation);
+
+          this.rollbackStep = this.cstep;
+
           this.push('steps', this.cstep);
 
           this.isStepEditionEnabled = false;
           // this.isStepEditionEnabled = true;
-
+          this.$.toastNewStep.open();
           this._updateDisplayer();
+        },
+
+        _callbackStepReset: function(oldOutputs) // REFACTOR : Logic code which belongs to NAP/NOP
+        {
+          console.error("Need to be completed when parameters dependencies are implemented");
+
+          var imFirst = false;
+
+          if(!this.isFirstReset)
+          {
+            this.isFirstReset = true;
+            imFirst = true;
+          }
+
+
+          this._removeRGTE(oldOutputs);
+
+          this.nbOfReset++;
+
+          for(var i in this.steps)
+          {
+            if(this.steps[i].inputs && this.steps[i].inputs.id == oldOutputs.id)
+            {
+              this.steps[i].removeInputs();
+            }
+          }
+
+          if(imFirst)
+          {
+            this._openToastNumberReset();
+            this.isFirstReset = false;
+            this.nbOfReset = 0;
+
+            this.$.stepsDisplayer.draw(this.steps);
+          }
+        },
+
+        _callbackHandleStepComputation: function(stepConcerned)
+        {
+          var alreadyExists = false;
+
+          for(var i in this.rgtes)
+            if(this.rgtes[i].id == stepConcerned.outputs.id)
+              alreadyExists = true;
+
+          if(!alreadyExists)
+            this.push('rgtes', stepConcerned.outputs);
+        },
+
+        _removeRGTE: function(rgte) // REFACTOR : Logic code which belongs to NAP/NOP
+        {
+          if(rgte == null)
+            return;
+
+          var index;
+          for(var i in this.rgtes)
+            if(this.rgtes[i].id == rgte.id)
+              index = i;
+
+          if(index == null)
+            return;
+
+          this.splice('rgtes', index, 1);
+          return true;
         },
 
         _updateDisplayer: function()
@@ -244,7 +456,145 @@
 
         _openEditorNewStep: function()
         {
+          if(this.cstep == null)
+          {
+            this.$.toastNoStepSelected.open();
+            return;
+          }
           this.isStepEditionEnabled = true;
+        },
+
+        // _resetDependencies: function(selfAndStep)
+        // {
+        //   if(selfAndStep == null)
+        //     return;
+        //
+        //   /* Recursive dectection */
+        //
+        //   selfAndStep.self.continueChanging();
+        // },
+
+        _handleKnowledgeIdentification: function(params) //TODO Move into superstructre NAP
+        {
+          for(var i in this.knowledges)//Verification of the presence of a knowledge. If the Knowledge already exists, we ask the user if he wants to delete it
+          {
+            if(this.knowledges[i].derivedFrom.id == params.node.id)
+            {
+              this.currentKnowledge = this.knowledges[i];
+              this.currentKnowledgeGraph = params.graph;
+              this.$.removeKnowledge.open();
+              return;
+            }
+          }
+
+          // else, the node flagged as a K is not in the array & must be added.
+          var newK = new ExploitableOutput(params.node);
+          this.previousKnowledge = newK;
+          this.previousGraphKnowledge = params.graph;
+
+          this.knowledges.push(newK);
+          params.graph.setColorNode(params.node.id, KNOWLEDGE_COLOR);
+
+          if(!this.isToastDisable)
+            this.$.toastKAdded.open();
+        },
+        _removeCurrentKnowledge: function()
+        {
+          if(this.currentKnowledge == null)
+            return;
+
+          for(var i in this.knowledges)
+          {
+            if(this.knowledges[i].id == this.currentKnowledge.id)
+            {
+              this.previousKnowledge = this.currentKnowledge;
+              this.previousGraphKnowledge = this.currentKnowledgeGraph;
+
+              this.currentKnowledge = null;
+              this.currentKnowledgeGraph.setColorNode(this.knowledges[i].derivedFrom.id, null);
+              this.currentKnowledgeGraph = null;
+
+              var deletedK = this.knowledges.splice(i,1);
+              if(!this.isToastDisable)
+                this.$.toastKDeleted.open();
+                return deletedK;
+            }
+          }
+        },
+
+        _verifAndGenerateKNarrativeBlock: function(detail)
+        {
+          var k = this._isAnIdentifiedKnowledge(detail.id);
+
+          if(k)
+            NARRATIVE_BLOCK_NOTIFY_SIGNAL_BUILDER(this, k, detail.event);
+        },
+
+      // === TOASTY
+        _toastOpenEditorNewStep: function()
+        {
+          this._openEditorNewStep();
+          this.useOperator(this.tmpOp);
+          this.tmpOp = null;
+        },
+
+        _rollbackNewStep: function()
+        {
+          if(this.rollbackStep == null)
+            return;
+
+          var index;
+          for(var i in this.steps)
+            if(this.steps[i].id == this.rollbackStep)
+              index = i;
+
+          this.splice('steps', index, 1);
+
+          this.cstep = null;
+          this.rollbackStep = null;
+          this._updateDisplayer();
+        },
+        _openToastNumberReset: function()
+        {
+          this.$.toastNumberingResetedStep.setAttribute('text', this._generateToastNumberingResetedStepText());
+          this.$.toastNumberingResetedStep.open();
+        },
+        _generateToastNumberingResetedStepText: function()
+        {
+          console.log(this.nbOfReset);
+          if(this.nbOfReset == 1)
+            return '1 step has been resetted';
+
+          return (this.nbOfReset)+' steps has been resetted';
+        },
+        _rollbackAddKnowledge: function()
+        {
+          if(this.previousKnowledge == null)
+            return;
+
+          this.isToastDisable = true;
+          this.currentKnowledge = this.previousKnowledge;
+          this.currentKnowledgeGraph = this.previousGraphKnowledge;
+          this._removeCurrentKnowledge();
+
+          this.isToastDisable = false;
+          this.previousKnowledge = null;
+          this.previousGraphKnowledge = null;
+        },
+        _rollbackDeleteKnowledge: function()
+        {
+          if(this.previousKnowledge == null)
+            return;
+
+          var params = {'node': this.previousKnowledge.derivedFrom, 'graph': this.previousGraphKnowledge};
+
+          this.isToastDisable = true;
+
+          this._handleKnowledgeIdentification(params);
+
+          this.previousKnowledge = null;
+          this.previousGraphKnowledge = null;
+          this.isToastDisable = false;
         },
 
       });

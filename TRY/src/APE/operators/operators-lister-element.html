@@ -1,31 +1,62 @@
 <link rel="import" href="./operator-displayer-element.html">
 <link rel="import" href="../../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/app-layout/app-grid/app-grid-style.html">
 
 <dom-module id="operators-lister-element">
     <template>
-    <style>
+    <style include="app-grid-style">
     :host {
-        font-family: sans-serif;
+      /*--app-grid-columns: 3;
+      --app-grid-item-height: auto;*/
+    }
+
+    /*.content
+    {
+      display: block;
+      position: relative;
+      max-width: 1100px;
+      margin: 5px auto;
+      background-color: red;
+    }*/
+    .content{
+      display: block;
+      position: relative;
+      border-top: 1px solid lightgray;
+      margin-top: 10px;
+      max-width: var(--operators-lister-element-max-width, 366.666667px);
+      /*height: var(--operators-lister-element-max-height, 85vh);*/
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    #title{
+      position: relative;
+      display: block;
+      margin-left: 10%;
+      /*background-color: yellow;*/
     }
     </style>
 
-    <div>
-        <h2>Operations available</h2>
+    <div class="content">
+        <h3 id="title">Operations available</h3>
         <!-- <ul id="rdfClasses"></ul> -->
         <!-- <iron-list id="ilOperations" items="[[operators]]" as="item" class="flex" selection-enabled> -->
-        <template id="templateCards" is="dom-repeat" items="[[operators]]" index-as="index">
-          <div>
-              <div class$="card [[_computeClass(selected)]]">
-                  <div class="primary pad" tabindex$="[[tabIndex]]">
-                    <operator-displayer-element class="displayer" on-cardselected="_cardSelected" operator="[[item]]" is-selected="[[selected]]" is-use-section-available></operator-displayer-element>
+        <!-- <div > -->
+          <!-- <ul class="app-grid"> -->
+            <template id="templateCards" is="dom-repeat" items="[[operators]]" index-as="index">
+              <!-- <li> -->
+                  <div class$="card [[_computeClass(selected)]]">
+                      <div class="primary pad" tabindex$="[[tabIndex]]">
+                        <operator-displayer-element class="displayer" on-cardselected="_cardSelected" operator="[[item]]" is-selected="[[selected]]" is-use-section-available></operator-displayer-element>
+                      </div>
+                      <div class="selectedItem">
+                          <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+                      </div>
                   </div>
-                  <div class="selectedItem">
-                      <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
-                  </div>
-              </div>
-          </div>
-        </template>
+              <!-- </li> -->
+            </template>
+          <!-- </ul> -->
+        <!-- </div> -->
     </div>
 
     </template>

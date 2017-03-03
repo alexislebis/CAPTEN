@@ -7,32 +7,92 @@
 <link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../../bower_components/paper-fab/paper-fab.html">
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
 <dom-module id="operators-workzone-element">
     <template>
+    <style include="toasty-style"></style>
     <style>
     :host {
         font-family: sans-serif;
+        --operator-creator-element-max-width: 100%;
+        --operators-lister-element-max-width: 100%;
+    }
+
+    .listOpDisplay{
+      display: block;
+      max-width: 1110px;
+      margin : 5px auto;
+    }
+
+    #wokzn{
+      display: block;
+      position: relative;
+      border: 1px solid lightgray;
+      max-width: var(--operators-workzone-element-max-width, 366.666667px);
+      height: var(--operators-workzone-element-max-height, 85vh);
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    #title{
+      position: relative;
+      display: block;
+      margin-left: 30%;
+      /*background-color: yellow;*/
+    }
+
+    #selectedTitle{
+      position: relative;
+      display: block;
+      margin-left: 10%;
+    }
+
+    #selectedNOP{
+      border-top: 1px solid lightgray;
+    }
+
+    .fabUseNOP{
+      position: absolute;
+      z-index: 1;
+      /*font-size: 200%;*/
+      /*transform: translate(367px, -250px);*/
+      transform: translate(395px,-16px);
+      background-color: #4285f4;
     }
     </style>
 
-    <div hidden="{{isNewNopHidden}}">
-      <operator-creator-element id="nopCreator" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operator-creator-element>
-    </div>
-    <div hidden$="{{!isNewNopHidden}}">
-      <p on-tap="_createNewOperation">
-        Create a new operation concept <iron-icon icon="add-box"></iron-icon>
-      </p>
-    </div>
-    <operator-bootstrap-element id="bootstrap"></operator-bootstrap-element>
-    <operators-lister-element id="lister" operators="{{operators}}" on-addcard="_addOperation"></operators-lister-element>
+  <div id="wokzn">
+    <h3 id="title"> Operations </h3>
 
-    <div hidden$="{{_computeHidden(currentoperator)}}" on-tap="_useOperation">
-        <operator-displayer-element class="displayer"  operator="{{currentoperator}}"></operator-displayer-element>
-        USE THIS OPERATION <iron-icon icon="check-circle"></iron-icon>
+    <div class="listOpDisplay">
+      <!-- <div hidden="{{isNewNopHidden}}"> -->
+        <operator-creator-element id="nopCreator" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operator-creator-element>
 
+        <div id="selectedNOP" hidden$="{{_computeHidden(currentoperator)}}" role="listbox">
+            <h3 id="selectedTitle">Selected operation</h3>
+            <paper-fab mini class="fabUseNOP" on-tap="_useOperation" icon="icons:play-for-work"></paper-fab>
+            <operator-displayer-element class="displayer"  operator="{{currentoperator}}"></operator-displayer-element>
+            <!-- <paper-fab icon="play-for-work" >
+              <paper-tooltip>Use this operation</paper-tooltip>
+            </paper-fab> -->
+            <!-- Use this operation <paper-icon-button on-tap="_useOperation" icon="icons:play-for-work"></paper-icon-button> -->
+
+        </div>
+      <!-- </div>
+      <div hidden$="{{!isNewNopHidden}}">
+        <p on-tap="_createNewOperation">
+          Create a new operation concept <iron-icon icon="add-box"></iron-icon>
+        </p>
+        <paper-fab on-tap="_createNewOperation" icon="add"></paper-fab>
+
+      </div> -->
+      <!-- <operator-bootstrap-element id="bootstrap"></operator-bootstrap-element> -->
+      <operators-lister-element id="lister" operators="{{operators}}" on-addcard="_addOperation"></operators-lister-element>
     </div>
 
+    </div>
     <paper-dialog on-iron-overlay-closed="_isAccepted" id="OnlyOneRGTEATM" modal>
         <h2>Only one RGTE in the bag</h2>
         <p>Currently, you cannot use more than one RGTE simultaneously in the description of an AP. Try to complete your RGTE instead.</p>
@@ -41,6 +101,11 @@
             <paper-button dialog-confirm autofocus>Replace :'(</paper-button>
         </div>
     </paper-dialog>
+
+    <!--  TOASTY -->
+      <paper-toast id="toastNewNOP" text="Operator created">
+        <paper-button on-click="_rollbackNewOP" class="toastButton">UNDO</paper-button>
+      </paper-toast>
 
   </template>
     <script>
@@ -82,7 +147,6 @@
                   observer: '_currentOperatorOnChanged',
                 },
 
-
                 vocab:
                 {
                   type: Object,
@@ -97,6 +161,13 @@
                     type: Array,
                     notify: true,
                 },
+
+                // === TOASTY
+                previousNOP:
+                {
+                  type: Object,
+                  notify: true,
+                },
             },
 
             observers: [
@@ -105,7 +176,7 @@
 
             attached: function()
             {
-                this.set('operators', this.$.bootstrap.getOperators());
+                // this.set('operators', this.$.bootstrap.getOperators());
 
                 this.$.nopCreator.addEventListener('-CloseNOPCreator', function(e)
                 {
@@ -126,7 +197,27 @@
               //
               // this.operators = [];
 
+              this.previousNOP = nop;
               this.push('operators', nop);
+
+              this.$.toastNewNOP.open();
+            },
+
+            _rollbackNewOP: function()
+            {
+              if(this.previousNOP == null)
+                return;
+
+              var index;
+              for(var i in this.operators)
+                if(this.operators[i].id == this.previousNOP.id)
+                  index = i;
+
+              if(index == null)
+                return;
+
+              this.splice('operators', index, 1);
+              this.previousNOP = null;
             },
 
             _onOperatorsChanged: function(change)
