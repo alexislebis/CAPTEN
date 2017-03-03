@@ -54,6 +54,52 @@
     #stepState
     {
       clear: both;
+      width: 100%;
+    }
+
+    #stepStateError{
+      display: block;
+      position: relative;
+      width: 33%;
+      float: left;
+      /*background-color: red;*/
+    }
+
+    #stepStateLinking{
+      display: block;
+      position: relative;
+      width: 33%;
+      float: left;
+      /*background-color: blue;*/
+    }
+
+    #identifK{
+      display: block;
+      position: relative;
+      width: 33%;
+      /*background-color: green;*/
+      float: left;
+    }
+
+    #kFab
+    {
+      position: relative;
+      /*width: 100%;*/
+      margin:0 auto;
+      background-color: #616161;
+      transform: translate(0px,-5px);
+    }
+
+    #validateFab
+    {
+      position: relative;
+      margin:0 auto;
+      background-color: #0f9d58;
+      transform: translate(0px,-2px);
+    }
+
+    #killFloatingBehavior{
+      clear: both;
     }
 
     </style>
@@ -80,7 +126,7 @@
         </div>
     </div>
     <div id="rgteDisplayer">
-      <h3 class="title">RGTE</h3>
+      <h3 class="title">Input concepts</h3>
       <template is="dom-if" if="{{displayRGTE}}" restamp>
         <rgte-workzone-element id="rgte" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" rgte="{{step.inputs}}" enable-Modification disable-Lister disable-Adding disable-Save-Menu disable-Bag-Menu disable-Load-Menu disable-Adding disable-Cardinality></rgte-workzone-element>
       <!-- <rgte-displayer-element id="rgte" rgte="{{step.inputs}}" enable-Modification></rgte-displayer-element> -->
@@ -105,23 +151,26 @@
       <h3>Step State</h3>
       <div id="stepStateError">
         <div id="sSEHead">
-          The following instructions have to be resolved to complete the step:
+          <h4 class="title">Error to solve before completing the step</h4>
         </div>
         <div id="sSESubDiv">
         </div>
       </div>
       <div id="stepStateLinking">
         <div id="sSLHead">
-          Below, the following link between inputs concepts and operator configuration:
+          <h4 class="title">Link between inputs concepts and operator</h4>
         </div>
         <div id="sSLSubDiv">
 
         </div>
       </div>
+      <div id="identifK">
+        <h4 class="title">Identify knowledge concepts</h4>
+        <paper-fab id="kFab" icon="image:brush" on-tap="_toggleKnowledgeIdentification">
+      </div>
     </div>
 
-    <div>
-      Identify your knowledge concepts <paper-icon-button icon="image:brush" on-tap="_toggleKnowledgeIdentification"></paper-icon-button>
+    <div id="killFloatingBehavior">
     </div>
 
 </div>
@@ -545,6 +594,11 @@
             _toggleKnowledgeIdentification: function()
             {
               this.isIdentifyingKnowledge = !this.isIdentifyingKnowledge;
+
+              if(this.isIdentifyingKnowledge)
+                this.$.kFab.style.backgroundColor= "#ff4081"
+              else
+                this.$.kFab.style.backgroundColor = "#616161";
             },
 
             _callbackUsedConceptsInputComplete: function()
@@ -579,28 +633,39 @@
               {
                 this._resetDiv('sSESubDiv');
 
+                var isError = false;
                 var ul = document.createElement('ul');
                 var li;
 
                 if(this.step.inputs == null)
                 {
+                  isError = true;
                   li = document.createElement('li');
                   li.textContent = "No inputs concepts are selected";
                   ul.appendChild(li);
                 }
                 if(this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
                 {
+                  isError = true;
                   li = document.createElement('li');
                   li.textContent = "No operation is selected";
                   ul.appendChild(li);
                 }
                 if(this.step.propAsyncBuild.lengthArray != 0 && this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength() > 0)
                 {
+                  isError = true;
                   li = document.createElement('li');
                   li.textContent = this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength()+" remaining concepts to bind between operator and inputs concepts ("+this._getNameOfRemainingConceptsUnboundOperator()+')';
                   ul.appendChild(li);
                 }
                 //if PARAM
+
+                if(!isError)
+                {
+                  ul = document.createElement('paper-fab');
+                  ul.setAttribute('icon', 'icons:done-all');
+                  ul.setAttribute('id', 'validateFab');
+                }
 
                 this.$.sSESubDiv.appendChild(ul);
               },
