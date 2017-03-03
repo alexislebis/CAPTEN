@@ -1,13 +1,15 @@
+<link rel="import" href="../theme/configurer/configurer-style.html">
 <dom-module id="author-configurer-element">
   <template>
-    <style>
+    <style include="configurer-style">
     :host {
       display: block;
     }
     </style>
 
     <!-- ROOT CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
-    <paper-card heading="Author information">
+<div id="divRoot">
+    <paper-card class="card" heading="Author information">
       <div class="card-content">
         <div class="inlineBlock">
           <paper-input id="authName" label="Author Name" value="{{authName}}" char-counter maxlength="70"></paper-input>
@@ -17,7 +19,7 @@
       <paper-icon-button icon="icons:done" on-click="_updateAuthor"></paper-icon-button>
     </div>
   </paper-card>
-
+</div>
   </template>
   <script>
 

@@ -24,16 +24,19 @@
         border-bottom: 1px solid gray;
 
       }
+      #stepsDisplayerDiv{
+        width: 100%;
+      }
     </style>
 
   <div id="rootDiv">
     <h2 id="title">Workzone</h2>
     <div id="newStep">
-          Create new a step: <paper-icon-button on-click="_createNewStep" icon="icons:add-box"></paper-icon-button>
+          <paper-icon-button on-click="_createNewStep" icon="icons:add-box"></paper-icon-button>Create new a step
     </div>
 
     <div id="openEditor" hidden="{{isStepEditionEnabled}}">
-          Open step editor for the step current step <paper-icon-button icon="icons:open-in-new" on-click="_openEditorNewStep"></paper-icon-button>
+          <paper-icon-button icon="icons:exit-to-app" on-click="_openEditorNewStep"></paper-icon-button>Edit the current step 
     </div>
 
     <!-- <div hidden="{{!isStepEditionEnabled}}"> -->

@@ -11,55 +11,85 @@
         :host {
           display: block;
         }
+
+        #title{
+          display: block;
+          position: relative;
+          width: fit-content;
+          margin: 0 auto;
+          border-bottom: 1px solid lightgray;
+        }
+
+        #rootDiv{
+          display: block;
+          position: relative;
+          min-width: var(--narrative-block-adder-min-width, 100%);
+        }
+
+        #faboulus{
+          display: block;
+          position: var(--narrative-block-adder-fab-position, relative);
+          transform: translate(var(--narrative-block-adder-fab-translate-left, 0px), var(--narrative-block-adder-fab-translate-top, 0px));
+          margin-bottom: 3px;
+        }
       </style>
 
-      <paper-icon-button icon="{{_displayIcons(toggleCreation)}}" on-click="_toggleCreation"></paper-icon-button>
+      <paper-fab id="faboulus" mini icon="{{_displayIcons(toggleCreation)}}" on-click="_toggleCreation"></paper-fab>
 
+<div id="rootDiv">
       <template is="dom-if" if="{{toggleCreation}}" restamp="true">
         <form is="iron-form" method="get" action="/" id="NarrBlockForm" on-iron-form-submit="submitForm">
-          <div>
-            <div>
-              <h4>Select the relation</h4>
+          <paper-card>
+            <div class="card-content">
 
-              <paper-dropdown-menu label="Relation" name="relation" required>
-                  <paper-menu class="dropdown-content" selected="{{prop}}" id="RelationDropdown">
-                      <template is="dom-repeat" items="[[relItems]]" as="item">
-                          <paper-item value$="[[item]]">[[item.label]]</paper-item>
-                      </template>
-                  </paper-menu>
-              </paper-dropdown-menu>
+                <div>
+                  <div>
+                    <h3 id="title">Create an addendum</h3>
+
+                    <paper-dropdown-menu label="Relation" name="relation" required>
+                        <paper-menu class="dropdown-content" selected="{{prop}}" id="RelationDropdown">
+                            <template is="dom-repeat" items="[[relItems]]" as="item">
+                                <paper-item value$="[[item]]">[[item.label]]</paper-item>
+                            </template>
+                        </paper-menu>
+                    </paper-dropdown-menu>
 
 
-            </div>
-            <div>
-              <h4>Select the kind of element</h4>
+                  </div>
+                  <div>
+                    <h4>Select the kind of element</h4>
 
-              <paper-button id="newElmt" raised on-click='_newElementChoosed'><iron-icon icon="icons:add"></iron-icon>New Element</paper-button>
-              <paper-button id="existElmt" raised on-click='_existingElementChoosed'><iron-icon icon="icons:search"></iron-icon>Research Element</paper-button>
+                    <paper-button id="newElmt" raised on-click='_newElementChoosed'><iron-icon icon="icons:add"></iron-icon>New Element</paper-button>
+                    <paper-button id="existElmt" disabled raised on-click='_existingElementChoosed'><iron-icon icon="icons:search"></iron-icon>Research Element</paper-button>
 
-              <template is="dom-if" if="{{isNewChoosed}}" restamp="true">
-                <paper-dropdown-menu label="Entity" name="entity" required>
-                    <paper-menu class="dropdown-content" selected="{{elem}}" id="EntityDropdown">
-                        <template is="dom-repeat" items="[[entItems]]" as="item">
-                            <paper-item value$="[[item]]">[[item.label]]</paper-item>
-                        </template>
-                    </paper-menu>
-                </paper-dropdown-menu>
-                <div id="configuringSelectedEntity">
+                    <template is="dom-if" if="{{isNewChoosed}}" restamp="true">
+                      <paper-dropdown-menu label="Entity" name="entity" required>
+                          <paper-menu class="dropdown-content" selected="{{elem}}" id="EntityDropdown">
+                              <template is="dom-repeat" items="[[entItems]]" as="item">
+                                  <paper-item value$="[[item]]">[[item.label]]</paper-item>
+                              </template>
+                          </paper-menu>
+                      </paper-dropdown-menu>
+                      <div id="configuringSelectedEntity">
 
+                      </div>
+                    </template>
+
+                    <template is="dom-if" if="{{isExistingChoosed}}" restamp="true">
+
+                    </template>
+
+                  </div>
                 </div>
-              </template>
-
-              <template is="dom-if" if="{{isExistingChoosed}}" restamp="true">
-
-              </template>
-
+        </div>
+            <div class="card-actions">
+              <paper-button raised on-click="submit">Submit</paper-button>
+              <paper-button raised on-click="reset">Reset</paper-button>
             </div>
-          </div>
-          <paper-button raised on-click="submit">Submit</paper-button>
-          <paper-button raised on-click="reset">Reset</paper-button>
+          </paper-card>
         </form>
       </template>
+  </div>
 
       <paper-dialog id="formError" modal>
         <h2>Information</h2>

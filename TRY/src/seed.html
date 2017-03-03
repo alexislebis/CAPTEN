@@ -26,9 +26,13 @@
         display: block;
       }
 
-
+      #rootDiv{
+        display: block;
+        position: relative;
+      }
     </style>
 
+<div id="rootDiv">
     <app-location use-hash-as-path route="{{route}}"></app-location>
     <app-route route="{{route}}" pattern="/tabs" tail="{{tabsRoute}}" active="{{tabsActive}}"></app-route>
     <app-route route="{{tabsRoute}}" pattern="/:tabName" data="{{data}}"></app-route>
@@ -46,8 +50,9 @@
     </iron-pages>
 
     <!-- <narrative-block-cascader-display-element id="rootNarrativeBlockDisplayer" entity="{{narrativeentity}}"></narrative-block-cascader-display-element> -->
-    <narrative-block-cascading-element id="rootNarrativeBlockDisplayer"></narrative-block-cascading-element>
-
+    <div hidden="{{_isNarrativeEntityIsEmpty(narrativeentity)}}">
+      <narrative-block-cascading-element id="rootNarrativeBlockDisplayer"></narrative-block-cascading-element>
+    </div>
 
     <paper-toast id="toastNewFocus" text="New element focused ({{narrativeentity.htmlify}})">
       <paper-button  on-click="_rollbackNarrativeEntity" class="toastButton">UNDO</paper-button>
@@ -58,7 +63,7 @@
     </paper-toast>
 
     <h1>{{data.page}}</h1>
-
+</div>
   </template>
   <script>
     Polymer({
@@ -142,6 +147,14 @@
           this.$.toastNewFocus.open();
           Polymer.dom(this.root).querySelector('#rootNarrativeBlockDisplayer').setEntity(e.detail.entity);
         }.bind(this));
+      },
+
+      _isNarrativeEntityIsEmpty: function(nEntity)
+      {
+        if(nEntity == null)
+          return true;
+        else
+          return false;
       },
 
       _rollbackNarrativeEntity: function()

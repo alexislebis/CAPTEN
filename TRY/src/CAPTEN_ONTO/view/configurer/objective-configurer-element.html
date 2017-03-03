@@ -1,14 +1,18 @@
+<link rel="import" href="../theme/configurer/configurer-style.html">
+
 <dom-module id="objective-configurer-element">
   <template>
+    <style include="configurer-style"></style>
     <style>
     :host {
       display: block;
     }
     </style>
 
+  <div id="divRoot">
     <div id="objectiveConfigurer">
       <!-- <h4>Objective edition</h4> -->
-      <paper-card heading="Objective edition">
+      <paper-card class="card" heading="Objective edition">
         <div class="card-content">
 
           <div id="currentAddendum">
@@ -36,7 +40,8 @@
       </div>
     </paper-card>
     </div>
-
+  </div>
+  
   </template>
   <script>
 

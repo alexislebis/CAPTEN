@@ -58,7 +58,8 @@
       z-index: 1;
       /*font-size: 200%;*/
       /*transform: translate(367px, -250px);*/
-      transform: translate(370px,-16px);
+      transform: translate(395px,-16px);
+      background-color: #4285f4;
     }
     </style>
 
@@ -71,7 +72,7 @@
 
         <div id="selectedNOP" hidden$="{{_computeHidden(currentoperator)}}" role="listbox">
             <h3 id="selectedTitle">Selected operation</h3>
-            <paper-fab class="fabUseNOP" on-tap="_useOperation" icon="icons:play-for-work"></paper-fab>
+            <paper-fab mini class="fabUseNOP" on-tap="_useOperation" icon="icons:play-for-work"></paper-fab>
             <operator-displayer-element class="displayer"  operator="{{currentoperator}}"></operator-displayer-element>
             <!-- <paper-fab icon="play-for-work" >
               <paper-tooltip>Use this operation</paper-tooltip>

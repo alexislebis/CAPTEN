@@ -42,6 +42,7 @@
         position: absolute;
         /*transform: translate(367px, -250px);*/
         transform: translate(var(--rgte-menu-bar-translate-left, 367px), var(--rgte-menu-bar-translate-top, -280px));
+        background-color: #4285f4
       }
     </style>
 
@@ -52,7 +53,7 @@
           <paper-card class="card">
             <div class="card-content">
               <rgte-displayer-element id$="{{_generateRGTEID(index)}}" rgte="{{item}}"></rgte-displayer-element>
-              <paper-fab class="fabAddRGTE" id$="{{_generateFabID(index)}}" on-tap="_rgteClicked" icon="icons:play-for-work"></paper-fab>
+              <paper-fab mini class="fabAddRGTE" id$="{{_generateFabID(index)}}" on-tap="_rgteClicked" icon="icons:play-for-work"></paper-fab>
             </div>
           </paper-card>
         </div>

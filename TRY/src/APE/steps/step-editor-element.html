@@ -115,7 +115,7 @@
     </style>
 
     <div id="returnToWorkzone">
-          Return to workzone <iron-icon on-tap="_returnToWorkzone" icon="exit-to-app"></iron-icon>
+          <paper-icon-button on-tap="_returnToWorkzone" icon="icons:open-in-new"></paper-icon-button>Return to workzone
     </div>
 
     <!-- <div id="newStep">
@@ -168,7 +168,7 @@
       </div>
       <div id="stepStateLinking">
         <div id="sSLHead">
-          <h4 class="title">Link between inputs concepts and operator</h4>
+          <h4 class="title">Inputs concepts to Operator linkage</h4>
         </div>
         <div id="sSLSubDiv">
 
@@ -606,7 +606,7 @@
               this.isIdentifyingKnowledge = !this.isIdentifyingKnowledge;
 
               if(this.isIdentifyingKnowledge)
-                this.$.kFab.style.backgroundColor= "#ff4081"
+                this.$.kFab.style.backgroundColor= "#4285f4"
               else
                 this.$.kFab.style.backgroundColor = "#616161";
             },

@@ -1,5 +1,8 @@
+<link rel="import" href="../theme/configurer/configurer-style.html">
+
 <dom-module id="description-configurer-element">
   <template>
+    <style include="configurer-style"></style>
     <style>
     :host {
       display: block;
@@ -7,7 +10,8 @@
     </style>
 
     <!-- ROOT CONFIGURER ELEMENT - BACKTRACK INHERITANCE -->
-    <paper-card heading="Descriptive addendum edition">
+  <div id="divRoot">
+    <paper-card class="card" heading="Descriptive addendum edition">
       <div class="card-content">
 
       Description: <paper-textarea id="descrTxt" label="Description" value="{{val}}" max-rows="3"></paper-textarea>
@@ -16,6 +20,8 @@
       <paper-icon-button icon="icons:done" on-click="_update"></paper-icon-button>
     </div>
   </paper-card>
+
+</div>
   </template>
   <script>
 
