@@ -21,12 +21,6 @@
         --step-workzone-element-max-width: 100%;
       }
 
-      #rootDiv{
-        display: block;
-        position: relative;
-        overflow-x: hidden;
-      }
-
       #globalRGTEMenuBar{
 
       }
@@ -73,12 +67,10 @@
         display: block;
         width: 95%;
         margin:0 auto;
-        min-height: 86vh;
-        /*background-color: pink;*/
+        background-color: pink;
       }
     </style>
 
-<div id="rootDiv">
     <!-- <div id="rgteMenuBar">
       <h3>RGTE Menu bar</h3>
       <template id="rgtesMenuBar" is="dom-repeat" items="[[rgtes]]" index-as="index">
@@ -110,7 +102,7 @@
     <div id="stepDiv">
       <step-workzone-element id="stepWorkzone" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-workzone-element>
     </div>
-</div>
+
 
     <!-- <h1>
       APE n°<span style="color:green">[[name]]</span>
