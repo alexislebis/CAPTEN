@@ -60,8 +60,3 @@ Please make sure that **[python](https://www.python.org/)**, **[git](https://git
   ```  
 
 5. Finally, open your web-browser at `http://localhost:3000/` (assuming that 3000 was the port used during the python command line).
-
-## Thanks
-[//]: # (I would like to thanks any contributors of the project. I would like to thanks especially **[Vanda Luengo](http://www.lip6.fr/actualite/personnes-fiche.php?ident=P1041)** and **[Nathalie Guin](http://liris.cnrs.fr/nathalie.guin/)** for their precious advices and helps.)
-
-[//]: # (I am also truly thankful to **[Marie Lefevre](http://liris.cnrs.fr/marie.lefevre/index.html)** for her *unconditional* investments, helps and guidances *hrt*. Thank you. )
