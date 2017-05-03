@@ -1,13 +1,13 @@
 function Addendum()
 {
-  CAPTENClass.call(this);
+  NarrativeElement.call(this);
   this.uri = "NAU";
 
   this.content = null;
   this.htmlify = 'an addendum';
 }
 
-Addendum.prototype = new CAPTENClass();
+Addendum.prototype = new NarrativeElement();
 Addendum.prototype.constructor = Addendum;
 
 var ADDENDUM_AVAILABLE_TYPES = [
@@ -93,7 +93,7 @@ Description.prototype.updateHTML = function(){
             notify: true,
             value: false,
           },
-          
+
         },
 
         factoryImpl: function(item)

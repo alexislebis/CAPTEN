@@ -4,11 +4,11 @@
 
  function EntityName()
 {
-  CAPTENClass.call(this);
+  NarrativeElement.call(this);
   this.name = null;
 }
 
-EntityName.prototype = new CAPTENClass();
+EntityName.prototype = new NarrativeElement();
 EntityName.prototype.constructor = EntityName;
 
 EntityName.prototype.setName = function(name)

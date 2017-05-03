@@ -1,7 +1,7 @@
 
 function Statement()
   {
-    CAPTENClass.call(this);
+    NarrativeElement.call(this);
 
     this.inheritanceArray.push("CAPTENClass");
 
@@ -24,7 +24,7 @@ function Statement()
     // ];
 }
 
-Statement.prototype = new CAPTENClass();//Object.create(CAPTENClass.prototype);
+Statement.prototype = new NarrativeElement();//Object.create(CAPTENClass.prototype);
 
 Statement.prototype.addAddendum = function(content)
 {
