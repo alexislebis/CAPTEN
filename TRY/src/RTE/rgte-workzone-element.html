@@ -4,15 +4,77 @@
 <link rel="import" href="../RTE/rgte-saver-xml-element.html">
 <link rel="import" href="../RTE/rgte-file-reader-element.html">
 
+<link rel="import" href="../../../bower_components/paper-fab-transitions/paper-fab-morph.html">
 <link rel="import" href="../../../bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/vaadin-split-layout/vaadin-split-layout.html">
+
 
 <dom-module id="rgte-workzone-element">
-    <template>
-        <style>
+  <template>
+      <style is="custom-style">
             :host {
                 display: block;
+                --rgte-common-width: 80%;
+                --vis-element-background-color: white;
             }
-        </style>
+
+      #divRoot{
+        width: var(--rgte-workzone-element-width, 100%);
+      }
+
+      #rgte{
+        margin: 0 auto;
+        width: var(--rgte-common-width);
+        /*background-color: yellow;*/
+      }
+
+
+      #show-toolbar{
+        display: block;
+        position: relative;
+        width: 100%;
+        --paper-icon-button: {color: white};
+
+        --paper-morph-background: var(--default-primary-color);
+
+        --paper-morph-dropdown: {width: 100%;}
+
+        --paper-morph-content: {
+          background-color: var(--default-primary-color);
+          /*left: 0;
+          bottom: 0;*/
+          top:0;
+          height: 56px;
+          padding-top: 8px;
+          overflow: visible;
+          @apply(--layout-horizontal);
+          @apply(--layout-around-justified);
+        }
+      }
+
+      #show-toolbar paper-fab {
+        --paper-fab-background: var(--default-primary-color);
+      }
+
+  </style>
+
+  <vaadin-split-layout>
+  <vaadin-split-layout>
+<div id="divRoot">
+
+  <paper-fab-morph id="show-toolbar" vertical-align="bottom" horizontal-align="right" >
+    <paper-fab icon="more-horiz" class="dropdown-trigger"></paper-fab>
+    <div class="dropdown-content">
+      <span hidden$="{{!enableModification}}"><paper-icon-button icon="add" ></paper-icon-button></span>
+      <span hidden$="{{disableLister}}"><paper-icon-button icon="create"></paper-icon-button></span>
+      <paper-icon-button icon="icons:speaker-notes"></paper-icon-button>
+      <paper-icon-button icon="search"></paper-icon-button>
+    </div>
+  </paper-fab-morph>
+
+  <rgte-element id="rgte" rgte="{{rgte}}" disable-Cardinality="{{disableCardinality}}" enable-Modification="{{enableModification}}"></rgte-element>
+
 
         <div hidden$="{{disableLoadMenu}}">
           <rgte-file-reader-element id="rgteReader" rgte="{{rgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-file-reader-element>
@@ -21,9 +83,6 @@
         <div hidden$="{{disableLister}}">
           <rte-lister-element id="rteList" vocab="{{vocab}}" rgte="{{rgte}}" customcls="{{customcls}}" customprops="{{customprops}}" disable-Adding="{{disableAdding}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rte-lister-element>
         </div>
-
-        <rgte-element id="rgte" rgte="{{rgte}}" disable-Cardinality="{{disableCardinality}}" enable-Modification="{{enableModification}}"></rgte-element>
-
 
         <div  hidden$="{{isHidden}}">
           <rgte-saver-xml-element id="xmlSaver" rgte="{{rgte}}" vocab="{{vocab}}"></rgte-saver-xml-element>
@@ -48,172 +107,177 @@
               </div>
           </paper-dialog>
         </div>
+</div> <!-- divRoot -->
 
+<div>2</div></vaadin-split-layout>
+<vaadin-split-layout><div>3</div></vaadin-split-layout>
+</vaadin-split-layout>
       </template>
-    <script>
-        Polymer(
+  <script>
+    Polymer(
+    {
+      is: 'rgte-workzone-element',
+
+      properties:
+      {
+        isHidden:
         {
-            is: 'rgte-workzone-element',
+          type: Boolean,
+          value: true,
+          notify: true,
+        },
+        rgte:
+        {
+          type: Object,
+          value: function()
+          {
+            return new RGTE();
+          },
+          notify: true,
+          observer: "_test",
+        },
 
-            properties:
-            {
-                isHidden:
-                {
-                    type: Boolean,
-                    value: true,
-                    notify: true,
-                },
-                rgte:
-                {
-                    type: Object,
-                    value: function()
-                    {
-                        return new RGTE();
-                    },
-                    notify: true,
-                    observer: "_test",
-                },
+        vocab:
+        {
+          type: Object,
+        },
+        customcls: //used for file-reader
+        {
+          type: Array,
+          notify: true,
+        },
+        customprops:
+        {
+          type: Array,
+          notify: true,
+        },
 
-                vocab:
-                {
-                    type: Object,
-                },
-                customcls: //used for file-reader
-                {
-                    type: Array,
-                    notify: true,
-                },
-                customprops:
-                {
-                    type: Array,
-                    notify: true,
-                },
+        // === FEATURES BEHAVIORS
+        disableSaveMenu:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        disableBagMenu:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        disableLoadMenu:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        disableLister:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        disableAdding: //Used in the RGTE LISTER for prevent addition of new element
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        disableCardinality:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        enableModification:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        disableClassesLister:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        disablePropertiesLister:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
 
-                // === FEATURES BEHAVIORS
-                disableSaveMenu:
-                {
-                  type: Boolean,
-                  notify: true,
-                  value: false,
-                },
-                disableBagMenu:
-                {
-                  type: Boolean,
-                  notify: true,
-                  value: false,
-                },
-                disableLoadMenu:
-                {
-                  type: Boolean,
-                  notify: true,
-                  value: false,
-                },
-                disableLister:
-                {
-                  type: Boolean,
-                  notify: true,
-                  value: false,
-                },
-                disableAdding://Used in the RGTE LISTER for prevent addition of new element
-                {
-                  type: Boolean,
-                  notify: true,
-                  value: false,
-                },
-                disableCardinality:
-                {
-                  type: Boolean,
-                  value: false,
-                  notify: true,
-                },
-                enableModification:
-                {
-                  type: Boolean,
-                  value: false,
-                  notify: true,
-                },
-                disableClassesLister:
-                {
-                  type: Boolean,
-                  value: false,
-                  notify: true,
-                },
-                disablePropertiesLister:
-                {
-                  type: Boolean,
-                  value: false,
-                  notify: true,
-                },
+      },
 
-            },
+      behaviors: [
+        Polymer.IronFormElementBehavior
+      ],
 
-            behaviors: [
-              Polymer.IronFormElementBehavior
-            ],
+      attached: function()
+      {
+        this.$.rteList.addEventListener('-ClassAddedToRGTE', function(e)
+        {
+          this.$.rgte.classDispatcherBehavior(e.detail.val);
+        }.bind(this));
 
-            attached: function()
-            {
-                this.$.rteList.addEventListener('-ClassAddedToRGTE', function(e)
-                {
-                    this.$.rgte.classDispatcherBehavior(e.detail.val);
-                }.bind(this));
+        this.$.rteList.addEventListener('-PropAddedToRGTE', function(e)
+        {
+          this.$.rgte.propertyDispatcherBehavior(e.detail.val);
+        }.bind(this));
 
-                this.$.rteList.addEventListener('-PropAddedToRGTE', function(e)
-                {
-                    this.$.rgte.propertyDispatcherBehavior(e.detail.val);
-                }.bind(this));
+        this.$.rgte.addEventListener('MANAGE_LISTER_VISIBILITY', function(p)
+        {
+          this.disableLister = p.detail.isListerDisable;
+          this.disableAdding = p.detail.isListerAddingDisable;
+          this.disableClassesLister = p.detail.isClassesListerDisable;
+          this.disablePropertiesLister = p.detail.isPropertiesListerDisable;
+        }.bind(this));
 
-                this.$.rgte.addEventListener('MANAGE_LISTER_VISIBILITY', function(p){
-                  this.disableLister = p.detail.isListerDisable;
-                  this.disableAdding = p.detail.isListerAddingDisable;
-                  this.disableClassesLister  = p.detail.isClassesListerDisable;
-                  this.disablePropertiesLister = p.detail.isPropertiesListerDisable;
-                }.bind(this));
+      },
 
-            },
+      _test: function()
+      {
+        console.log("In change");
+      },
 
-            _test: function()
-            {
-              console.log("In change");
-            },
+      _generateAddRGTE: function()
+      {
+        this.$.OnlyOneRGTEATM.open();
 
-            _generateAddRGTE: function()
-            {
-                this.$.OnlyOneRGTEATM.open();
+        // console.log("DELETE BELOW");
+        // this.rgte.parseJSON('lol','1');
+      },
 
-                // console.log("DELETE BELOW");
-                // this.rgte.parseJSON('lol','1');
-            },
+      _saveRGTEToXML: function()
+      {
+        this.isHidden = false;
+        // this.$.xmlSaver.save(this.network);
+      },
 
-            _saveRGTEToXML: function()
-            {
-                this.isHidden = false;
-                // this.$.xmlSaver.save(this.network);
-            },
+      _isAccepted: function(e)
+      {
+        if (!e.detail.confirmed)
+          return;
 
-            _isAccepted: function(e)
-            {
-                if (!e.detail.confirmed)
-                    return;
+        //var RGTE = {network: this.$.rgte.getNetwork(), cardinality: this.$.rgte.getEdgesCardinality()};
+        this.fire("-RGTEAddedToTheBag", this.rgte);
+      },
 
-                //var RGTE = {network: this.$.rgte.getNetwork(), cardinality: this.$.rgte.getEdgesCardinality()};
-                this.fire("-RGTEAddedToTheBag", this.rgte);
-            },
+      _computeHidden: function(isHidden)
+      {
+        console.log("cH:" + isHidden);
+        return isHidden;
+      },
 
-            _computeHidden: function(isHidden)
-            {
-                console.log("cH:" + isHidden);
-                return isHidden;
-            },
+      notifyRGTEChange: function()
+      {
+        var rgte = this.rgte;
+        this.rgte = null;
+        this.rgte = rgte;
+      },
 
-            notifyRGTEChange: function()
-            {
-              var rgte = this.rgte;
-              this.rgte = null;
-              this.rgte = rgte;
-            },
-
-        });
-    </script>
+    });
+  </script>
 
 </dom-module>

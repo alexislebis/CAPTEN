@@ -13,8 +13,10 @@
              :host {
                 display: block;
             }
+
         </style>
 
+<div id="divRoot">
         <!-- <vis-element id="rgte" network="{{network}}" , nodes="{{nodes}}" edges="{{edges}}"></vis-element> -->
         <div  hidden$="{{ !isWaitingPropertyBinding }}">
         <paper-card>
@@ -141,7 +143,7 @@
           </paper-toast>
         <!-- END TOASTY -->
 
-
+</div> <!-- divRoot -->
     </template>
     <script>
     (

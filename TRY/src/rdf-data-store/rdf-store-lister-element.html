@@ -57,7 +57,21 @@
                 <!-- <ul id="rdfClasses"></ul> -->
                 <iron-collapse id="classRDFCollapse">
 
-                <iron-list id="ilRDFC" items="[[rdfclasses]]" as="item" class="flex" selection-enabled>
+                  <template is="dom-repeat" items="{{rdfclasses}}" filter="{{computeFilter(filter)}}" index-as="index">
+                    <div>
+                        <div class$="[[_computeClass(selected)]]" on-tap="_rdfcTapped">
+                            <div class="primary pad" tabindex$="[[tabIndex]]">[[item.uri]]</div>
+                            <div class="selectedItem">
+                                <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+                            </div>
+
+                        </div>
+                        <iron-icon class="makeRelation" icon="swap-vert" on-tap="_makeRelTapped"></iron-icon>
+                        <div class="border"></div>
+                    </div>
+                  </template>
+
+                <!-- <iron-list id="ilRDFC" items="[[rdfclasses]]" as="item" class="flex" selection-enabled>
                     <template>
                         <div>
                             <div class$="[[_computeClass(selected)]]" on-tap="_rdfcTapped">
@@ -71,7 +85,7 @@
                             <div class="border"></div>
                         </div>
                     </template>
-                </iron-list>
+                </iron-list> -->
 
                 </iron-collapse>
               </div>
@@ -143,6 +157,11 @@
                 {
                   type: Boolean,
                   value: false,
+                  notify: true,
+                },
+                filter:
+                {
+                  type: String,
                   notify: true,
                 },
                 // },
@@ -263,21 +282,34 @@
 
             getClassListing: function()
             {
-                return Polymer.dom(this.root).querySelector('#ilRDFC');
+                // return Polymer.dom(this.root).querySelector('#ilRDFC');
             },
 
             getPropsListing: function()
             {
-                return Polymer.dom(this.root).querySelector('#ilRDFP');
+                // return Polymer.dom(this.root).querySelector('#ilRDFP');
             },
 
             clearClsSelection: function()
             {
-                this.$.ilRDFC.clearSelection();
+                // this.$.ilRDFC.clearSelection();
             },
             clearPropSelection: function()
             {
-                this.$.ilRDFP.clearSelection();
+                // this.$.ilRDFP.clearSelection();
+            },
+
+
+
+            computeFilter: function(query)
+            {
+              if(!query || query == null)
+                return null;
+              else {
+                return function(item){
+                  return (item.uri.includes(query) || item.label.includes(query));
+                };
+              }
             },
         });
     </script>

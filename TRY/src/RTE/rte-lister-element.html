@@ -4,12 +4,25 @@
 <link rel="import" href="./rte-formulaire-element.html">
 <link rel="import" href="./rgte-custom-class-relation-element.html">
 
+<link rel="import" href="../../bower_components/paper-searchbox/paper-searchbox.html">
+
+
 
 <dom-module id="rte-lister-element">
     <template>
         <style>
             :host {
                 font-family: sans-serif;
+            }
+
+            #divRoot{
+              background-color: yellow;
+
+            }
+
+            #searchZone paper-searchbox{
+              --paper-searchbox-background: var(--paper-searchbox-dark-background);
+              --paper-searchbox-color: black;
             }
 
             .content {
@@ -87,7 +100,16 @@
             }
         </style>
 
+<div id="divRoot">
+
+        <!--@TODO formulaire à faire en popup -->
         <rte-formulaire-element id="rteform" classes="{{mergedCls}}" props="{{mergedProps}}"></rte-formulaire-element>
+
+    <div>
+        <div id="searchZone">
+          <paper-searchbox raise-forced="true" placeholder="Search some terms" value="{{query}}"></paper-searchbox>
+        </div>
+
 
         <div hidden="{{hideClassRelationForm}}">
           <rgte-custom-class-relation-element id="customRel" vocab="{{vocab}}" customcls="{{customcls}}" customproprs="{{customprops}}" rgte="{{rgte}}" selectedcls="{{selectedcls}}"></rgte-custom-class-relation-element>
@@ -112,10 +134,25 @@
           </div>
         </div>
 
+      <div id="custom">
         <div hidden$="{{disableClassesLister}}">
             <h2>Custom Classes</h2>
             <!-- <ul id="rdfClasses"></ul> -->
-            <iron-list id="ilCUSTCLS" items="{{customcls}}" as="item" class="flex" selection-enabled>
+            <template is="dom-repeat" items="{{customcls}}" filter="{{computeFilter(query)}}" index-as="index">
+              <div>
+                  <div class$="[[_computeClass(selected)]]" on-tap="_custcTapped">
+                      <div class="primary pad" tabindex$="[[tabIndex]]">[[item.uri]]</div>
+                      <div class="selectedItem">
+                          <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+                      </div>
+                  </div>
+                  <iron-icon class="makeRelation" icon="swap-vert" on-tap="_makeRel"></iron-icon>
+                  <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomCLS"></iron-icon>
+                  <div class="border"></div>
+              </div>
+            </template>
+
+            <!-- <iron-list id="ilCUSTCLS" items="{{customclsToDisplay}}" as="item" class="flex" selection-enabled>
                 <template>
                     <div>
                         <div class$="[[_computeClass(selected)]]" on-tap="_custcTapped">
@@ -129,12 +166,27 @@
                         <div class="border"></div>
                     </div>
                 </template>
-            </iron-list>
+            </iron-list> -->
         </div>
 
         <div hidden$="{{disablePropertiesLister}}">
             <h2>Custom Properties</h2>
-            <iron-list id="ilCUSTPROPS" items="[[customprops]]" as="item" class="flex" selection-enabled>
+
+            <template is="dom-repeat" items="{{customprops}}" filter="{{computeFilter(query)}}" index-as="index">
+              <div>
+                  <div class$="[[_computeClass(selected)]]" on-tap="_custpTapped">
+                      <div class="primary pad" tabindex$="[[tabIndex]]">[[item.uri]]</div>
+                      <div class="selectedItem">
+                          <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+                      </div>
+                  </div>
+                  <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomProp"></iron-icon>
+                  <div class="border"></div>
+
+                </div>
+            </template>
+
+            <!-- <iron-list id="ilCUSTPROPS" items="[[custompropsToDisplay]]" as="item" class="flex" selection-enabled>
                 <template>
                     <div>
                         <div class$="[[_computeClass(selected)]]" on-tap="_custpTapped">
@@ -148,10 +200,16 @@
 
                       </div>
                 </template>
-            </iron-list>
+            </iron-list> -->
         </div>
+      </div>
 
-        <rdf-store-lister-element id="lister" vocab="{{vocab}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rdf-store-lister-element>
+      <div id="default">
+        <rdf-store-lister-element id="lister" filter="{{query}}" vocab="{{vocab}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rdf-store-lister-element>
+      </div>
+    </div>
+
+</div> <!-- divRoot -->
 
     </template>
     <script>
@@ -191,6 +249,36 @@
                 //     },
                 //     notify: true,
                 // },
+
+                //===POLY-FILTER
+                query:
+                {
+                  type: String,
+                  notify: true,
+                  observer: '_onQueryChanged',
+                },
+
+                customclsToDisplay:
+                {
+                  type: Array,
+                  notify: true,
+                  value: function()
+                  {
+                      return [];
+                  },
+                },
+
+                custompropsToDisplay:
+                {
+                  type: Array,
+                  notify: true,
+                  value: function()
+                  {
+                      return [];
+                  },
+                },
+                //=== END OF POLY FILTER
+
                 customcls:
                 {
                     type: Array,
@@ -208,6 +296,7 @@
                     {
                         return [];
                     },
+                    // observer: "_onCustomPropsChanged",
                 },
                 selectedcls://Class selected
                 {
@@ -338,6 +427,10 @@
                     return;
 
                 this.push('customprops', PROPERTIES_POOL.create(cProp, cProp));
+                // this.customprops.push(PROPERTIES_POOL.create(cProp, cProp));
+                // var tmp4Notif = this.customprops;
+                // // this.customprops = null;
+                // this.customprops = tmp4Notif;
             },
 
             iconForItem: function(isSelected)
@@ -385,19 +478,27 @@
 
                 // this._mergingCls();
 
-                Polymer.dom(this.root).querySelector('#ilCUSTCLS').notifyResize();
+                console.log(this.customcls);
+                this.customclsToDisplay = this.customcls;
+                this.query = null;
+
+                // Polymer.dom(this.root).querySelector('#ilCUSTCLS').notifyResize();
             },
             _onCustomPropsChanged: function(change)
             {
-                if (Object.keys(this.customprops).length === 0 && this.customprops.constructor === Object)
+                if (this.customprops == null)
                     return;
 
-                if (!change)
-                    return;
+                // if (!change)
+                //     return;
 
                 // this._mergingProps();
 
-                Polymer.dom(this.root).querySelector('#ilCUSTPROPS').notifyResize();
+                console.log(this.customprops);
+                this.custompropsToDisplay = this.customprops;
+                this.query = null;
+
+                // Polymer.dom(this.root).querySelector('#ilCUSTPROPS').notifyResize();
             },
             _removeCustomCLS: function(e)
             {
@@ -439,17 +540,15 @@
 
             _manageSelectedClass: function(e)
             {
-              this.$.ilCUSTCLS.clearSelection();
-
-              // if(!e.detail.element.model.selected)
-                this.selectedcls = e.detail;
+              // this.$.ilCUSTCLS.clearSelection();
+              //
+               this.selectedcls = e.detail;
 
             },
             _manageSelectedProp: function(e)
             {
-              this.$.ilCUSTPROPS.clearSelection();
-
-              // if(!e.detail.element.model.selected)
+              // this.$.ilCUSTPROPS.clearSelection();
+              //
               this.selectedprop = e.detail;
             },
 
@@ -460,6 +559,26 @@
 
               this.hideClassRelationForm = false;
               this.$.customRel.update();
+            },
+
+
+            //===V2
+            _onQueryChanged: function(e)
+            {
+                if(this.query != null && this.query.length == 0)
+                  this.query = null;
+            },
+
+            //Simple string verification
+            computeFilter: function(query)
+            {
+              if(!query || query == null)
+                return null;
+              else {
+                return function(item){
+                  return (item.uri.includes(query) || item.label.includes(query));
+                };
+              }
             },
         });
     </script>
