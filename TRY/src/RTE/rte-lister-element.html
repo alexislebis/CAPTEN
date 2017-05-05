@@ -5,6 +5,7 @@
 <link rel="import" href="./rgte-custom-class-relation-element.html">
 
 <link rel="import" href="../../bower_components/paper-searchbox/paper-searchbox.html">
+<link rel="import" href="../../bower_components/paper-ripple/paper-ripple.html">
 
 
 
@@ -16,13 +17,25 @@
             }
 
             #divRoot{
-              background-color: yellow;
+              width: var(--rgte-workzone-element-width, 100%);
+              background-color: MistyRose;
 
             }
 
             #searchZone paper-searchbox{
               --paper-searchbox-background: var(--paper-searchbox-dark-background);
               --paper-searchbox-color: black;
+            }
+
+            #rtelister{
+              background-color: MediumSpringGreen;
+              width: var(--rgte-common-width, 80%);
+              margin: 0 auto;
+            }
+
+            #custom{
+              @apply(--layout-horizontal);
+              @apply(--layout-justified);
             }
 
             .content {
@@ -37,10 +50,24 @@
             }
 
             .item {
-                @apply(--layout-horizontal);
+              @apply(--layout-horizontal);
+              cursor: pointer;
+              min-height: 38px;
+              height: 38px;
+              max-height: 38px;
+              padding-left: 2px;
+              border-bottom: 1px solid #DDD;
+              overflow: hidden;
+              /*@apply(--layout-justified);*/
+                /*@apply(--layout-horizontal);
+                position: relative;
+                max-width: 100%;
+                max-height: 48px;
                 cursor: pointer;
-                padding: 16px 22px;
+                padding-left: 2px;
                 border-bottom: 1px solid #DDD;
+                overflow-y: hidden;
+                overflow-x: auto;*/
             }
 
             .item:focus,
@@ -66,14 +93,14 @@
               color: var(--paper-green-500);
             }
 
-            .removeElmt {
+            /*.removeElmt {
                 color: var(--paper-red-600);
                 width: 26px;
                 height: 26px;
-            }
+            }*/
 
             .removeElmt:hover {
-                background-color: var(--paper-red-600);
+                /*background-color: var(--paper-red-600);*/
                 color: white;
             }
 
@@ -92,20 +119,90 @@
             }
 
             .hidden{
-              display: none;s
+              display: none;
+            }
+
+            .elementBlock{
+              display: block;
+              position: relative;
+              width: 100%;
+              max-height: 25vh;
+              overflow-x: auto;
+            }
+
+            h4{
+
+              text-align: center;
+            }
+
+            .subBlock{
+              width: 50%;
+              max-width: 50%;
+              /*border-top: 1px solid gray;*/
+            }
+
+            .evenRow{
+              background-color: #eee;
+            }
+            .oddRow{
+              background-color: #ddd;
+            }
+
+            .subBlock{
+              border-bottom: solid 1px gray;
+            }
+            .leftSubBlock{
+              border-right: solid 1px gray;
             }
 
             iron-list {
                 @apply(--layout-flex);
             }
+
+            .useButton{
+              padding-top: 2px;
+            }
+
+            .useButton paper-icon-button{
+
+              border-radius: 50%;
+              opacity: 1;
+
+              --paper-icon-button: {
+                width: 35px;
+                height: 35px;
+              }
+
+              --paper-icon-button-hover: {
+                border-radius: 50%;
+                background: var(--paper-blue-600);
+              }
+            }
+
+            .hideUseButton{
+              display: none;
+              transition: opacity 1s ease-out;
+              opacity: 0;
+            }
+
+            .primary{
+              /*@apply(--layout-horizontal);*/
+              position: relative;
+              max-width: 100%;
+
+              padding-top: 2%;
+
+              overflow-y: hidden;
+              overflow-x: auto;
+            }
         </style>
 
 <div id="divRoot">
-
+        <!-- @IMPORTANT Gérer les make_relations dans le composant dédiée aux vocabulaires -->
         <!--@TODO formulaire à faire en popup -->
         <rte-formulaire-element id="rteform" classes="{{mergedCls}}" props="{{mergedProps}}"></rte-formulaire-element>
 
-    <div>
+    <div id="rtelister">
         <div id="searchZone">
           <paper-searchbox raise-forced="true" placeholder="Search some terms" value="{{query}}"></paper-searchbox>
         </div>
@@ -115,7 +212,7 @@
           <rgte-custom-class-relation-element id="customRel" vocab="{{vocab}}" customcls="{{customcls}}" customproprs="{{customprops}}" rgte="{{rgte}}" selectedcls="{{selectedcls}}"></rgte-custom-class-relation-element>
         </div>
 
-        <div hidden$="{{disableClassesLister}}">
+        <!-- <div hidden$="{{disableClassesLister}}">
           <div class$="[[_isCLSSelected(selectedcls)]]">
             <p>Selected class (node): [[selectedcls.uri]]
               <span hidden$="{{disableAdding}}">
@@ -123,8 +220,8 @@
               </span>
             </p>
           </div>
-        </div>
-        <div hidden$="{{disablePropertiesLister}}">
+        </div> -->
+        <!-- <div hidden$="{{disablePropertiesLister}}">
           <div class$="[[_isPROPSelected(selectedprop)]]">
             <p>Selected property (edge): [[selectedprop.uri]]
               <span hidden$="{{disableAdding}}">
@@ -132,26 +229,31 @@
               </span>
             </p>
           </div>
-        </div>
+        </div> -->
 
       <div id="custom">
-        <div hidden$="{{disableClassesLister}}">
-            <h2>Custom Classes</h2>
+        <div class="subBlock leftSubBlock" hidden$="{{disableClassesLister}}">
+            <h4>Custom Classes</h4>
+
+            <div class="elementBlock">
             <!-- <ul id="rdfClasses"></ul> -->
             <template is="dom-repeat" items="{{customcls}}" filter="{{computeFilter(query)}}" index-as="index">
-              <div>
-                  <div class$="[[_computeClass(selected)]]" on-tap="_custcTapped">
-                      <div class="primary pad" tabindex$="[[tabIndex]]">[[item.uri]]</div>
-                      <div class="selectedItem">
-                          <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
-                      </div>
-                  </div>
-                  <iron-icon class="makeRelation" icon="swap-vert" on-tap="_makeRel"></iron-icon>
-                  <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomCLS"></iron-icon>
-                  <div class="border"></div>
-              </div>
-            </template>
+              <!-- <div> -->
+                  <div class$="[[_computeClass(index)]]" on-tap="_custcTapped">
+                      <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >[[item.uri]] <paper-ripple></paper-ripple> </div>
+                      <span class="useButton hideUseButton selectedItem">
+                          <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
+                          <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
+                          <paper-icon-button class="removeElmt" icon="icons:system-update-alt" on-tap="_addClassToRGTE"></paper-icon-button>
+                      </span>
 
+                  </div>
+
+                  <!-- <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomCLS"></iron-icon>
+                  <div class="border"></div>
+              </div> -->
+            </template>
+          </div>
             <!-- <iron-list id="ilCUSTCLS" items="{{customclsToDisplay}}" as="item" class="flex" selection-enabled>
                 <template>
                     <div>
@@ -169,23 +271,25 @@
             </iron-list> -->
         </div>
 
-        <div hidden$="{{disablePropertiesLister}}">
-            <h2>Custom Properties</h2>
+        <div class="subBlock" hidden$="{{disablePropertiesLister}}">
+            <h4>Custom Properties</h4>
 
+            <div class="elementBlock" >
             <template is="dom-repeat" items="{{customprops}}" filter="{{computeFilter(query)}}" index-as="index">
-              <div>
-                  <div class$="[[_computeClass(selected)]]" on-tap="_custpTapped">
-                      <div class="primary pad" tabindex$="[[tabIndex]]">[[item.uri]]</div>
-                      <div class="selectedItem">
-                          <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
-                      </div>
+              <!-- <div> -->
+                  <div class$="[[_computeClass(index)]]" on-tap="_custpTapped">
+                      <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]] <paper-ripple></paper-ripple></div>
+                      <span class="useButton hideUseButton selectedItem">
+                          <!-- <paper-iron-button icon$="[[iconForItem(selected)]]" class="star"></iron-icon> -->
+                          <paper-icon-button class="removeElmt" icon="icons:system-update-alt" on-tap="_addPropToRGTE"></paper-icon-button>
+                      </span>
                   </div>
-                  <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomProp"></iron-icon>
-                  <div class="border"></div>
 
-                </div>
+                  <!-- <div class="border"></div>
+
+                </div> -->
             </template>
-
+          </div>
             <!-- <iron-list id="ilCUSTPROPS" items="[[custompropsToDisplay]]" as="item" class="flex" selection-enabled>
                 <template>
                     <div>
@@ -346,6 +450,11 @@
                   value: false,
                   notify: true,
                 },
+
+                lastSelectedSpan:
+                {
+                  type: Object,
+                }
             },
 
             observers: [
@@ -387,6 +496,10 @@
 
                 this.$.lister.addEventListener('-MakeRelTapped', function(e){
                   this._makeRel();
+                }.bind(this));
+
+                this.$.lister.addEventListener(RDF_STORE_LISTER_ELEMENT_SELECTED_ID, function(e){
+                  this._hideLastSelectedSpan();
                 }.bind(this));
             },
 
@@ -438,14 +551,16 @@
                 return isSelected ? 'check-circle' : 'radio-button-unchecked';
             },
 
-            _computeClass: function(isSelected)
+            _computeClass: function(index)
             {
-                return isSelected ? 'item selected' : 'item';
+                return (index % 2 == 0) ? 'item evenRow' : 'item oddRow';
+
+                // return isSelected ? 'item selected '+style : 'item'+style;
             },
 
             _custcTapped: function(e)
             {
-                this.$.lister.clearClsSelection();
+                // this.$.lister.clearClsSelection();
 
                 if(!e.model.selected)
                   this.selectedcls = e.model.item;
@@ -456,7 +571,7 @@
             },
             _custpTapped: function(e)
             {
-                this.$.lister.clearPropSelection();
+                // this.$.lister.clearPropSelection();
 
                 if(!e.model.selected){
                   this.selectedprop = e.model.item;
@@ -478,8 +593,8 @@
 
                 // this._mergingCls();
 
-                console.log(this.customcls);
-                this.customclsToDisplay = this.customcls;
+                // console.log(this.customcls);
+                // this.customclsToDisplay = this.customcls;
                 this.query = null;
 
                 // Polymer.dom(this.root).querySelector('#ilCUSTCLS').notifyResize();
@@ -494,8 +609,8 @@
 
                 // this._mergingProps();
 
-                console.log(this.customprops);
-                this.custompropsToDisplay = this.customprops;
+                // console.log(this.customprops);
+                // this.custompropsToDisplay = this.customprops;
                 this.query = null;
 
                 // Polymer.dom(this.root).querySelector('#ilCUSTPROPS').notifyResize();
@@ -543,13 +658,14 @@
               // this.$.ilCUSTCLS.clearSelection();
               //
                this.selectedcls = e.detail;
-
+               this._addClassToRGTE();
             },
             _manageSelectedProp: function(e)
             {
               // this.$.ilCUSTPROPS.clearSelection();
               //
               this.selectedprop = e.detail;
+              this._addPropToRGTE();
             },
 
             _makeRel: function(e)
@@ -572,6 +688,9 @@
             //Simple string verification
             computeFilter: function(query)
             {
+              this._hideLastSelectedSpan();
+              this.lastSelectedSpan = null;
+
               if(!query || query == null)
                 return null;
               else {
@@ -580,6 +699,27 @@
                 };
               }
             },
+
+            _selectItem: function(event)
+            {
+
+              if(this.$.lister != null){
+                console.log(this.$.lister);
+                this.$.lister._hideLastSelectedSpan();
+              }
+
+              this._hideLastSelectedSpan();
+
+              this.lastSelectedSpan = event.target.nextSibling.nextSibling;
+
+              if(this.lastSelectedSpan != null)
+                this.lastSelectedSpan.className = "useButton selectedItem";
+            },
+              _hideLastSelectedSpan: function()
+              {
+                if(this.lastSelectedSpan != null)
+                  this.lastSelectedSpan.className += " hideUseButton";
+              },
         });
     </script>
 </dom-module>

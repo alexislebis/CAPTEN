@@ -90,6 +90,17 @@ CONTROLLED_VOCABULARY.prototype = {
         return this._cloneArrayMap(this.properties);
     },
 
+    getPropertiesArrayed: function() //return the properties, set in a standard array
+    {
+      var clonedArray = [];
+
+      for(var i in this.properties){
+        clonedArray.push(this.properties[i]);
+      }
+
+      return clonedArray;
+    },
+
     /**
      * Return the URI of all properties stocked after the parsing in an Array of String
      */

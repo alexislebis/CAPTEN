@@ -4,7 +4,7 @@
 <link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
 
 <dom-module id="rdf-store-lister-element">
-    <template>
+  <template>
         <style>
             :host {
                 font-family: sans-serif;
@@ -15,6 +15,14 @@
                 height: 100%;
             }
 
+            #rdflister{
+              width: var(--rdf-store-lister-width, 100%);
+              /*max-width: var(--rdf-store-lister-width, 100%);*/
+              background-color: PapayaWhip;
+              @apply(--layout-horizontal);
+              @apply(--layout-justified);
+            }
+
             .pad {
                 @apply(--layout-flex);
                 @apply(--layout-vertical);
@@ -22,10 +30,18 @@
             }
 
             .item {
-                @apply(--layout-horizontal);
+              @apply(--layout-horizontal);
+              cursor: pointer;
+              min-height: 38px;
+              /*height: 38px;*/
+              max-height: 45px;
+              padding-left: 2px;
+              border-bottom: 1px solid #DDD;
+              overflow: hidden;
+                /*@apply(--layout-horizontal);
                 cursor: pointer;
                 padding: 16px 22px;
-                border-bottom: 1px solid #DDD;
+                border-bottom: 1px solid #DDD;*/
             }
 
             .item:focus,
@@ -50,28 +66,115 @@
             iron-list {
                 @apply(--layout-flex);
             }
+
+            .elementBlock{
+              display: block;
+              position: relative;
+              width: 100%;
+              max-height: 25vh;
+              overflow-x: auto;
+            }
+
+            h4{
+
+              text-align: center;
+            }
+
+            .subBlock{
+              width: 50%;
+              max-width: 50%;
+              /*border-top: 1px solid gray;*/
+            }
+
+            .evenRow{
+              background-color: #eee;
+            }
+            .oddRow{
+              background-color: #ddd;
+            }
+
+            .subBlock{
+              border-bottom: solid 1px gray;
+            }
+            .leftSubBlock{
+              border-right: solid 1px gray;
+            }
+
+            iron-list {
+                @apply(--layout-flex);
+            }
+
+            .useButton{
+              padding-top: 2px;
+              margin-left: 1px;
+            }
+
+            .useButton paper-icon-button{
+
+              border-radius: 50%;
+              opacity: 1;
+
+              --paper-icon-button: {
+                width: 35px;
+                height: 35px;
+              }
+
+              --paper-icon-button-hover: {
+                border-radius: 50%;
+                background: var(--paper-blue-600);
+              }
+            }
+
+            .removeElmt:hover {
+                /*background-color: var(--paper-red-600);*/
+                color: white;
+            }
+
+            .hideUseButton{
+              display: none;
+              transition: opacity 1s ease-out;
+              opacity: 0;
+            }
+
+            .primary{
+              /*@apply(--layout-horizontal);*/
+              position: relative;
+              max-width: 100%;
+
+              padding-top: 2%;
+
+              overflow-y: hidden;
+              overflow-x: auto;
+            }
         </style>
+        <!-- @IMPORTANT Gérer les make_relations dans le composant dédiée aux vocabulaires -->
         <div id="rdflister">
-            <div hidden$="{{disableClassesLister}}">
-                <h2 on-tap="_toggleRDFClasses">Available Classes</h2>
+            <div class="subBlock leftSubBlock" hidden$="{{disableClassesLister}}">
+                <h4 on-tap="_toggleRDFClasses">Available Classes</h4>
                 <!-- <ul id="rdfClasses"></ul> -->
-                <iron-collapse id="classRDFCollapse">
-
+                <!-- <iron-collapse id="classRDFCollapse"> -->
+                  <div class="elementBlock">
                   <template is="dom-repeat" items="{{rdfclasses}}" filter="{{computeFilter(filter)}}" index-as="index">
-                    <div>
-                        <div class$="[[_computeClass(selected)]]" on-tap="_rdfcTapped">
-                            <div class="primary pad" tabindex$="[[tabIndex]]">[[item.uri]]</div>
-                            <div class="selectedItem">
+                    <!-- <div> -->
+                        <div class$="[[_computeClass(index)]]">
+                            <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]]<paper-ripple></paper-ripple></div>
+
+                            <span class="useButton hideUseButton selectedItem">
+                              <paper-icon-button class="removeElmt" icon="icons:system-update-alt" on-click="_rdfcTapped"></paper-icon-button>
+                            </span>
+                            <!-- <div class="selectedItem">
                                 <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
-                            </div>
-
+                            </div> -->
+                            <!-- <span class="useButton hideUseButton selectedItem"> -->
+                            <!-- </span> -->
                         </div>
-                        <iron-icon class="makeRelation" icon="swap-vert" on-tap="_makeRelTapped"></iron-icon>
-                        <div class="border"></div>
-                    </div>
+                          <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <iron-icon class="makeRelation" icon="swap-vert" on-tap="_makeRelTapped"></iron-icon>
+                        <div class="border"></div> -->
+                    <!-- </div> -->
                   </template>
+                </div>
 
-                <!-- <iron-list id="ilRDFC" items="[[rdfclasses]]" as="item" class="flex" selection-enabled>
+  <!-- <iron-list id="ilRDFC" items="[[rdfclasses]]" as="item" class="flex" selection-enabled>
                     <template>
                         <div>
                             <div class$="[[_computeClass(selected)]]" on-tap="_rdfcTapped">
@@ -87,230 +190,275 @@
                     </template>
                 </iron-list> -->
 
-                </iron-collapse>
+          <!-- </iron-collapse> -->
+          </div>
+
+          <div class="subBlock leftSubBlock" hidden$="{{disablePropertiesLister}}">
+            <h4 on-tap="_toggleRDFProps">Availablle Properties</h4>
+
+            <!-- <iron-collapse id="propRDFCollapse"> -->
+              <div class="elementBlock">
+                <template is="dom-repeat" items="{{rdfprops}}" filter="{{computeFilter(filter)}}" index-as="index">
+                  <!-- <div> -->
+                      <div class$="[[_computeClass(index)]]">
+                          <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]]<paper-ripple></paper-ripple></div>                          <span class="useButton hideUseButton selectedItem">
+                            <paper-icon-button class="removeElmt" icon="icons:system-update-alt" on-click="_rdfpTapped"></paper-icon-button>
+                          </span>
+                        </div>
+                    </template>
+                  </div>
+                <!-- </iron-collapse> -->
               </div>
+              <!-- <iron-list id="ilRDFP" items="{{_toArray(rdfprops)}}" as="item" class="flex" selection-enabled>
+                <template>
+                                    <div>
+                                        <div class$="[[_computeClass(selected)]]" on-tap="_rdfpTapped">
+                                            <div class="primary pad" tabindex$="[[tabIndex]]">[[item.value.uri]]</div>
+                                            <div class="selectedItem">
+                                                <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
+                                            </div>
+                                        </div>
+                                        <div class="border"></div>
+                                      </div>
+                                </template>
 
-    <div hidden$="{{disablePropertiesLister}}">
-        <h2 on-tap="_toggleRDFProps">Availablle Properties</h2>
-
-        <iron-collapse id="propRDFCollapse">
-
-
-        <iron-list id="ilRDFP" items="{{_toArray(rdfprops)}}" as="item" class="flex" selection-enabled>
-            <template>
-                            <div>
-                                <div class$="[[_computeClass(selected)]]" on-tap="_rdfpTapped">
-                                    <div class="primary pad" tabindex$="[[tabIndex]]">[[item.value.uri]]</div>
-                                    <div class="selectedItem">
-                                        <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
-                                    </div>
-                                </div>
-                                <div class="border"></div>
-
-                        </template>
-              </div>
               </iron-list>
-          </iron-collapse>
-    </div>
-    </div>
-    </template>
-    <script>
-        Polymer(
+            </iron-collapse>
+          </div> -->
+        </div>
+  </template>
+  <script>
+    Polymer(
+    {
+      is: 'rdf-store-lister-element',
+
+      properties:
+      {
+        rdfclasses:
         {
-            is: 'rdf-store-lister-element',
+          type: Array,
+          notify: true,
+          value: function()
+          {
+            return [];
+          },
+        },
 
-            properties:
-            {
-                rdfclasses:
-                {
-                    type: Array,
-                    notify: true,
-                    value: function()
-                    {
-                        return [];
-                    },
-                },
+        rdfprops:
+        {
+          type: Array,
+          notify: true,
+          value: function()
+          {
+            return [];
+          },
+        },
 
-                rdfprops:
-                {
-                    type: Array,
-                    notify: true,
-                    value: function()
-                    {
-                        return [];
-                    },
-                },
+        vocab:
+        {
+          type: Object,
+          // value: function(){return new CONTROLLED_VOCABULARY();},
+        },
 
-                vocab:
-                {
-                    type: Object,
-                    // value: function(){return new CONTROLLED_VOCABULARY();},
-                },
+        disableClassesLister:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        disablePropertiesLister:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        filter:
+        {
+          type: String,
+          notify: true,
+        },
 
-                disableClassesLister:
-                {
-                  type: Boolean,
-                  value: false,
-                  notify: true,
-                },
-                disablePropertiesLister:
-                {
-                  type: Boolean,
-                  value: false,
-                  notify: true,
-                },
-                filter:
-                {
-                  type: String,
-                  notify: true,
-                },
-                // },
-            },
-            //
-            // observers: [
-            //     "_onRdfclassesChanged(rdfclasses.splices)",
-            //     "_onRdfpropertiesChanged(rdfprops.splices)",
-            // ],
+        lastSelectedSpan:
+        {
+          type: Object,
+        }
+        // },
+      },
+      //
+      // observers: [
+      //     "_onRdfclassesChanged(rdfclasses.splices)",
+      //     "_onRdfpropertiesChanged(rdfprops.splices)",
+      // ],
 
-            attached: function()
-            {
-                this.vocab.registerObserverCallbackOnChange(this, this._onVocabularyChange);
-            },
+      attached: function()
+      {
+        this.vocab.registerObserverCallbackOnChange(this, this._onVocabularyChange);
+      },
 
-            // === PRIVATE METHODS ===
-            _onVocabularyChange: function()
-            {
-                console.log(this.vocab.classes);
-                this._onRdfclassesChanged(null);
-                this._onRdfpropertiesChanged(null);
-            },
+      // === PRIVATE METHODS ===
+      _onVocabularyChange: function()
+      {
+        console.log(this.vocab.classes);
+        this._onRdfclassesChanged(null);
+        this._onRdfpropertiesChanged(null);
+      },
 
-            _toggleRDFClasses: function()
-            {
-              this.$.classRDFCollapse.toggle();
-            },
+      _toggleRDFClasses: function()
+      {
+        this.$.classRDFCollapse.toggle();
+      },
 
-            _toggleRDFProps: function()
-            {
-              this.$.propRDFCollapse.toggle();
-            },
+      _toggleRDFProps: function()
+      {
+        this.$.propRDFCollapse.toggle();
+      },
 
-            _iterateOnClasses: function(vocab)
-            {
-                console.log("yo");
-                return vocab.getClasses();
-            },
+      _iterateOnClasses: function(vocab)
+      {
+        console.log("yo");
+        return vocab.getClasses();
+      },
 
-            _onRdfclassesChanged: function(change)
-            {
-                console.log("rdfclssChanged");
+      _onRdfclassesChanged: function(change)
+      {
+        console.log("rdfclssChanged");
 
-                //this.set('rdfclasses', this.vocab.getClasses());
-                this.rdfclasses = [];
-                this.rdfclasses = this.vocab.getClasses();
+        //this.set('rdfclasses', this.vocab.getClasses());
+        this.rdfclasses = [];
+        this.rdfclasses = this.vocab.getClasses();
 
-                console.log(this.vocab.getClasses());
+        console.log(this.vocab.getClasses());
 
-                Polymer.dom(this.root).querySelector('#ilRDFC').notifyResize();
-                //document.querySelector('iron-list').notifyResize();
-            },
+        // Polymer.dom(this.root).querySelector('#ilRDFC').notifyResize();
+        //document.querySelector('iron-list').notifyResize();
+      },
 
-            _onRdfpropertiesChanged: function(change)
-            {
-                this.rdfprops = [];
-                // this.set('rdfprops', this.vocab.getProperties());
-                console.log(this.vocab.getProperties());
-                this.rdfprops = this.vocab.getProperties();
-                console.log(this.rdfprops);
+      _onRdfpropertiesChanged: function(change)
+      {
+        this.rdfprops = [];
+        // this.set('rdfprops', this.vocab.getProperties());
+        console.log(this.vocab.getProperties());
+        this.rdfprops = this.vocab.getPropertiesArrayed();
+        console.log(this.rdfprops);
 
-                Polymer.dom(this.root).querySelector('#ilRDFP').notifyResize();
-            },
+        // Polymer.dom(this.root).querySelector('#ilRDFP').notifyResize();
+      },
 
-            _computeClass: function(isSelected)
-            {
-                return isSelected ? 'item selected' : 'item';
-            },
+      _computeClass: function(index)
+      {
+          return (index % 2 == 0) ? 'item evenRow' : 'item oddRow';
+      },
+      // _computeClass: function(isSelected)
+      // {
+      //   return isSelected ? 'item selected' : 'item';
+      // },
 
-            _rdfcTapped: function(e)
-            {
-                console.log(e.model.item);
+      _rdfcTapped: function(e)
+      {
+        console.log(e.model.item);
 
-                if (!e.model.selected) //If the item is selected
-                    this.fire("ClassSelected", e.model.item);
-                else
-                {
-                    this.fire("ClassDeselected",
-                    {});
-                }
-            },
-            _rdfpTapped: function(e)
-            {
-                console.log(e.model.item);
+        if (!e.model.selected) //If the item is selected
+          this.fire("ClassSelected", e.model.item);
+        else
+        {
+          this.fire("ClassDeselected",
+          {});
+        }
+      },
+      _rdfpTapped: function(e)
+      {
+        console.log(e.model.item);
 
-                if (!e.model.selected) //If the item is selected
-                    this.fire("PropSelected", e.model.item.value);//Here we used .value because rgte has a map of properties and it is parsed with this._toArray(obj), producing a name & a value !
-                else
-                {
-                    this.fire("PropDeselected",
-                    {});
-                }
-            },
+        if (!e.model.selected) //If the item is selected
+          this.fire("PropSelected", e.model.item); //Here we used .value because rgte has a map of properties and it is parsed with this._toArray(obj), producing a name & a value !
+        else
+        {
+          this.fire("PropDeselected",
+          {});
+        }
+      },
 
-            _makeRelTapped: function(e)
-            {
-              this.fire("-MakeRelTapped");
-            },
+      _makeRelTapped: function(e)
+      {
+        this.fire("-MakeRelTapped");
+      },
 
-            _toArray: function(obj)
-            {
-                return Object.keys(obj).map(function(key)
-                {
-                    return {
-                        name: key,
-                        value: obj[key]
-                    };
-                });
-            },
-
-            // ===
-
-            iconForItem: function(isSelected)
-            {
-                return isSelected ? 'check-circle' : 'radio-button-unchecked';
-            },
-
-
-            getClassListing: function()
-            {
-                // return Polymer.dom(this.root).querySelector('#ilRDFC');
-            },
-
-            getPropsListing: function()
-            {
-                // return Polymer.dom(this.root).querySelector('#ilRDFP');
-            },
-
-            clearClsSelection: function()
-            {
-                // this.$.ilRDFC.clearSelection();
-            },
-            clearPropSelection: function()
-            {
-                // this.$.ilRDFP.clearSelection();
-            },
-
-
-
-            computeFilter: function(query)
-            {
-              if(!query || query == null)
-                return null;
-              else {
-                return function(item){
-                  return (item.uri.includes(query) || item.label.includes(query));
-                };
-              }
-            },
+      _toArray: function(obj)
+      {
+        console.log(obj);
+        return Object.keys(obj).map(function(key)
+        {
+          return {
+            name: key,
+            value: obj[key]
+          };
         });
-    </script>
+      },
+
+      // ===
+
+      iconForItem: function(isSelected)
+      {
+        return isSelected ? 'check-circle' : 'radio-button-unchecked';
+      },
+
+
+      getClassListing: function()
+      {
+        // return Polymer.dom(this.root).querySelector('#ilRDFC');
+      },
+
+      getPropsListing: function()
+      {
+        // return Polymer.dom(this.root).querySelector('#ilRDFP');
+      },
+
+      clearClsSelection: function()
+      {
+        // this.$.ilRDFC.clearSelection();
+      },
+      clearPropSelection: function()
+      {
+        // this.$.ilRDFP.clearSelection();
+      },
+
+
+
+      computeFilter: function(query)
+      {
+        this._hideLastSelectedSpan();
+        this.lastSelectedSpan = null;
+
+        if (!query || query == null)
+          return null;
+        else
+        {
+          return function(item)
+          {
+            return (item.uri.includes(query) || item.label.includes(query));
+          };
+        }
+      },
+
+      _selectItem: function(event)
+      {
+
+        //FIRE EVENT ITEM SELECTED
+        this.fire(RDF_STORE_LISTER_ELEMENT_SELECTED_ID);
+
+
+        this._hideLastSelectedSpan();
+
+        this.lastSelectedSpan = event.target.nextSibling.nextSibling;
+
+        if(this.lastSelectedSpan != null)
+          this.lastSelectedSpan.className = "useButton selectedItem";
+      },
+        _hideLastSelectedSpan: function()
+        {
+          if(this.lastSelectedSpan != null)
+            this.lastSelectedSpan.className += " hideUseButton";
+        },
+    });
+  </script>
 </dom-module>
