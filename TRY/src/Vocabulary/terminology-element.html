@@ -1,0 +1,29 @@
+
+<dom-module id="terminology-element">
+  <template>
+    <style>
+      :host {
+          display: block;
+      }
+    </style>
+
+    <h1>terminology-element</h1>
+
+    <h4>cf. p.34/45 from file:///home/alexis/Downloads/CAPTEN_V2_mockup_at_balsamiq%20(1).pdf</h4>
+
+  </template>
+  <script>
+    Polymer(
+    {
+      is: "terminology-element",
+      properties:
+      {
+        item:
+        {
+          type: Object,
+          notify: true,
+        }
+      }
+    });
+  </script>
+</dom-module>

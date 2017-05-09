@@ -1,6 +1,8 @@
 <link rel="import" href="APE/ape-element.html">
 <link rel="import" href="RTE/rte.html">
 <link rel="import" href="VOOG/voog.html">
+<link rel="import" href="./Vocabulary/vocabulary-lister-element.html">
+<link rel="import" href="./Vocabulary/terminology-element.html">
 <link rel="import" href="import/tools-import.html">
 
 <link rel="import" href="wrapper/vis-element.html">
@@ -11,6 +13,7 @@
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../bower_components/app-route/app-route.html">
 <link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/neon-animation/neon-animation.html">
 <link rel="import" href="../../../bower_components/paper-toast/paper-toast.html">
 
 <!-- THEMES -->
@@ -34,20 +37,35 @@
 
 <div id="rootDiv">
     <app-location use-hash-as-path route="{{route}}"></app-location>
-    <app-route route="{{route}}" pattern="/tabs" tail="{{tabsRoute}}" active="{{tabsActive}}"></app-route>
-    <app-route route="{{tabsRoute}}" pattern="/:tabName" data="{{data}}"></app-route>
+    <!-- <app-route route="{{route}}" pattern="/tabs" tail="{{tabsRoute}}" active="{{tabsActive}}"></app-route>
+      <app-route route="{{tabsRoute}}" pattern="/:tabName" data="{{data}}"></app-route>
+    <app-route route="{{route}}" pattern="/vocabulary" active="{{vocabularyActive}}"></app-route> -->
 
-    <paper-tabs selected='{{data.tabName}}'  fit-container attr-for-selected="name">
+    <app-route route="{{route}}" pattern="/:topLevel" active="{{active}}" data="{{routeData}}" tail="{{tailTopLevel}}"></app-route>
+    
+      <!-- <app-route route="{{tailTopLevel}}" prefix="/tabs" pattern="/:tabName" active="{{activeTabs}}" data="{{dataTabs}}"></app-route> -->
+        <!-- <app-route route="{{tail}}" pattern="/:tabName" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route> -->
+
+
+
+
+    <paper-tabs selected='{{routeData.topLevel}}'  fit-container attr-for-selected="name">
             <paper-tab name="rte">RTE</paper-tab>
             <paper-tab name="voog">VOOG</paper-tab>
             <paper-tab name="ape">APE</paper-tab>
     </paper-tabs>
 
-    <iron-pages selected='{{data.tabName}}' attr-for-selected="name">
-      <div name="rte" ><main-rte id="rteElem" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></main-rte></div>
-      <div name="voog"><main-voog></main-voog></div>
-      <div name="ape"><ape-element id="apeElem" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></ape-element></div>
-    </iron-pages>
+    <neon-animated-pages selected='{{routeData.topLevel}}'
+                     attr-for-selected='name'
+                     entry-animation='scale-up-animation'
+                     exit-animation='slide-right-animation'>
+      <neon-animatable name='rte'><div name="rte" ><main-rte id="rteElem" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></main-rte></div></neon-animatable>
+      <neon-animatable name='voog'><div name="voog"><main-voog></main-voog></div></neon-animatable>
+      <neon-animatable name='ape'><div name="ape"><ape-element id="apeElem" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></ape-element></div></neon-animatable>
+      <neon-animatable name='vocabulary'><vocabulary-lister-element route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></vocabulary-lister-element></neon-animatable>
+      <neon-animatable name='vocabulary/new'><terminology-element></terminology-element></neon-animatable>
+    </neon-animated-pages>
+
 
     <!-- <narrative-block-cascader-display-element id="rootNarrativeBlockDisplayer" entity="{{narrativeentity}}"></narrative-block-cascader-display-element> -->
     <div hidden="{{_isNarrativeEntityIsEmpty(narrativeentity)}}">
@@ -124,6 +142,12 @@
             notify: true,
           },
 
+      },
+
+      _routeChanged: function(changeRecord) {
+        if (changeRecord.path === 'path') {
+          console.log('Path changed!');
+        }
       },
 
       attached: function()

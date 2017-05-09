@@ -64,7 +64,7 @@
             </div>
         </paper-dialog> -->
 
-        <paper-dialog on-iron-overlay-closed="_isRemovingNodeAccepted" id="removeNodeModal" modal>
+        <paper-dialog on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="_isRemovingNodeAccepted" id="removeNodeModal" modal>
           <h2>Confirm node deletion</h2>
           <p>Do you wish to definitely remove the selected node in the graph?</p>
           <div class="buttons">
@@ -73,7 +73,7 @@
           </div>
         </paper-dialog>
 
-        <paper-dialog on-iron-overlay-closed="_isRemovingEdgeAccepted" id="removeEdgeModal" modal>
+        <paper-dialog on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="_isRemovingEdgeAccepted" id="removeEdgeModal" modal>
           <h2>Confirm edge deletion</h2>
           <p>Do you wish to definitely remove the selected edge in the graph?</p>
           <div class="buttons">
@@ -82,7 +82,7 @@
           </div>
         </paper-dialog>
 
-        <paper-dialog on-iron-overlay-closed="_isAddPropertyConfirmed" id="propertyModal" modal>
+        <paper-dialog on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="_isAddPropertyConfirmed" id="propertyModal" modal>
             <h2>Bind the property</h2>
             <p>Please choose the two nodes that will be linked with the selected property. First is the domain, the second the range.</p>
             <div class="buttons">
@@ -91,7 +91,7 @@
             </div>
         </paper-dialog>
 
-        <paper-dialog id="propertyIsWaiting" modal>
+        <paper-dialog on-iron-overlay-opened="patchOverlay" id="propertyIsWaiting" modal>
             <h2>Property is waiting</h2>
             <p>A property is currently waiting to be bound. Please select the remaining nodes.</p>
             <div class="buttons">
@@ -99,7 +99,7 @@
             </div>
         </paper-dialog>
 
-        <paper-dialog id="NotEnoughNodes" modal>
+        <paper-dialog on-iron-overlay-opened="patchOverlay" id="NotEnoughNodes" modal>
             <h2>More nodes are needed</h2>
             <p>You don't have enough nodes in your RGTE in order to applying this property. First, add more nodes.</p>
             <div class="buttons">
@@ -257,6 +257,14 @@
                     type: Object,
                     notify: true,
                   },
+            },
+
+
+            //@HACK
+            patchOverlay: function (e) {
+              if (e.target.withBackdrop) {
+                e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
+              }
             },
 
             attached: function()

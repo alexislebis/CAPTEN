@@ -1,15 +1,16 @@
 <link rel="import" href="../rdf-data-store/rdf-store-lister-element.html">
 <link rel="import" href="../../bower_components/iron-list/iron-list.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
-<link rel="import" href="./rte-formulaire-element.html">
-<link rel="import" href="./rgte-custom-class-relation-element.html">
+<link rel="import" href="../RTE/rte-formulaire-element.html">
+<link rel="import" href="../RTE/rgte-custom-class-relation-element.html">
 
 <link rel="import" href="../../bower_components/paper-searchbox/paper-searchbox.html">
 <link rel="import" href="../../bower_components/paper-ripple/paper-ripple.html">
 
+<link rel="import" href="./terminology-element.html">
 
 
-<dom-module id="rte-lister-element">
+<dom-module id="vocabulary-lister-element">
     <template>
         <style>
             :host {
@@ -17,9 +18,14 @@
             }
 
             #divRoot{
-              width: var(--rgte-workzone-element-width, 100%);
+              width: 60%;
+              margin: 0 auto;
               background-color: MistyRose;
 
+            }
+
+            #searchZone{
+              margin-bottom: 5vh;
             }
 
             #searchZone paper-searchbox{
@@ -29,7 +35,7 @@
 
             #rtelister{
               background-color: MediumSpringGreen;
-              width: var(--rgte-common-width, 80%);
+              width: 100%;
               margin: 0 auto;
             }
 
@@ -138,7 +144,8 @@
             .subBlock{
               width: 50%;
               max-width: 50%;
-              /*border-top: 1px solid gray;*/
+              border-bottom: solid 1px gray;
+              border-top: solid 1px gray;
             }
 
             .evenRow{
@@ -148,9 +155,6 @@
               background-color: #ddd;
             }
 
-            .subBlock{
-              border-bottom: solid 1px gray;
-            }
             .leftSubBlock{
               border-right: solid 1px gray;
             }
@@ -200,6 +204,7 @@
               width: 100%;
               height: 50px;
               text-align: center;
+              margin-bottom: 7vh;
             }
 
             paper-toolbar{
@@ -223,6 +228,12 @@
               transition: opacity 1s ease-out;
             }
 
+            .isActive{
+              position: relative;
+              opacity: 1;
+              height: auto;
+            }
+
             #openFormElement{
               position: absolute;
               right: -23px;
@@ -233,13 +244,41 @@
               padding: 0px 5px;
             }
 
+            #paperFabs{
+              position: absolute;
+              left: 16%;
+            }
+
+            #paperFabs paper-fab{
+              margin-top: 25px;
+            }
+
+            paper-fab{
+              z-index: 2;
+            }
+
+            #vocabDisplayer{
+              margin-bottom: 5vh;
+            }
+
         </style>
 
-<app-location use-hash-as-path route="{{route}}"></app-location>
+<!-- <app-location use-hash-as-path route="{{route}}"></app-location> -->
+
+  <app-route route="{{route}}" pattern="/:idItemOrAction" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
+
+
+  <!-- <neon-animated-pages selected='{{data.idItemOrAction}}'
+                   attr-for-selected='name'
+                   entry-animation='scale-up-animation'
+                   exit-animation='slide-right-animation'>
+    <neon-animatable name='new'><terminology-element></terminology-element></neon-animatable>
+    <neon-animatable name='{{data.idItemOrAction}}'><terminology-element></terminology-element></neon-animatable>
+  </neon-animated-pages> -->
 
 <div id="divRoot">
-        <!-- @IMPORTANT Gérer les make_relations dans le composant dédiée aux vocabulaires -->
-        <!--@TODO formulaire à faire en popup -->
+        <paper-fab icon="image:navigate-before" on-click="_goBack"></paper-fab>
+
 
         <paper-dialog on-iron-overlay-opened="patchOverlay" id="newElementPopUp">
           <h2>Add a new concept to the vocabulary</h2>
@@ -248,6 +287,12 @@
           <!-- <paper-dialog-scrollable> -->
             <rte-formulaire-element id="rteform" classes="{{mergedCls}}" props="{{mergedProps}}"></rte-formulaire-element>
           <!-- </paper-dialog-scrollable> -->
+        </paper-dialog>
+
+        <paper-dialog id="importVocab" on-iron-overlay-opened="patchOverlay">
+          <h2>Import a predifined vocabulary</h2>
+
+          <rdf-store-reader-element vocab="{{vocab}}"></rdf-store-reader-element>
         </paper-dialog>
 
 
@@ -277,8 +322,15 @@
         </div> -->
 
 
-        <paper-fab id="fabMenu" on-click="_activateMenuVoc" icon="more-horiz"></paper-fab>
-        <div id="menuTB" class="isHiddenWAnim">
+        <div id="paperFabs">
+          <paper-fab icon="icons:file-upload" on-click="_openImportVocab"></paper-fab>
+          <paper-fab on-click="_openFormAdd" icon="add"></paper-fab>
+          <!-- Display Voc graph -->
+          <paper-fab id="visibilityOn" icon="icons:visibility" on-click="_makeVisible"></paper-fab>
+          <paper-fab id="visibilityOff" class="isHiddenWAnim" icon="icons:visibility-off" on-click="_makeUnvisible"></paper-fab>
+        </div>
+
+        <!-- <div id="menuTB" class="isHiddenWAnim">
           <paper-toolbar>
               <paper-icon-button icon="menu" on-click="_deactivateMenuVoc"></paper-icon-button>
 
@@ -286,7 +338,7 @@
               <paper-icon-button icon="icons:launch" on-click="_openVocabularyPage"></paper-icon-button>
 
           </paper-toolbar>
-        </div>
+        </div> -->
 
       <header>
         <h2>Vocabulary</h2>
@@ -294,6 +346,10 @@
 
       <div id="searchZone">
         <paper-searchbox raise-forced="true" placeholder="Search some terms" value="{{query}}"></paper-searchbox>
+      </div>
+
+      <div id="vocabDisplayer">
+        <rdf-store-displayer-element id="displayer" class="isHiddenWAnim" vocab="{{vocab}}"></rdf-store-displayer-element>
       </div>
 
       <div id="custom">
@@ -309,31 +365,11 @@
                       <span class="useButton hideUseButton selectedItem">
                           <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
                           <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
-                          <paper-icon-button class="removeElmt" icon="icons:system-update-alt" on-tap="_addClassToRGTE"></paper-icon-button>
+                          <paper-icon-button class="removeElmt" icon="icons:launch" on-click="_openTerminology"></paper-icon-button>
                       </span>
-
                   </div>
-
-                  <!-- <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomCLS"></iron-icon>
-                  <div class="border"></div>
-              </div> -->
             </template>
           </div>
-            <!-- <iron-list id="ilCUSTCLS" items="{{customclsToDisplay}}" as="item" class="flex" selection-enabled>
-                <template>
-                    <div>
-                        <div class$="[[_computeClass(selected)]]" on-tap="_custcTapped">
-                            <div class="primary pad" tabindex$="[[tabIndex]]">[[item.uri]]</div>
-                            <div class="selectedItem">
-                                <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
-                            </div>
-                        </div>
-                        <iron-icon class="makeRelation" icon="swap-vert" on-tap="_makeRel"></iron-icon>
-                        <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomCLS"></iron-icon>
-                        <div class="border"></div>
-                    </div>
-                </template>
-            </iron-list> -->
         </div>
 
         <div class="subBlock" hidden$="{{disablePropertiesLister}}">
@@ -346,35 +382,16 @@
                       <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]] <paper-ripple></paper-ripple></div>
                       <span class="useButton hideUseButton selectedItem">
                           <!-- <paper-iron-button icon$="[[iconForItem(selected)]]" class="star"></iron-icon> -->
-                          <paper-icon-button class="removeElmt" icon="icons:system-update-alt" on-tap="_addPropToRGTE"></paper-icon-button>
+                          <paper-icon-button class="removeElmt" icon="icons:launch" on-tap="_addPropToRGTE"></paper-icon-button>
                       </span>
                   </div>
-
-                  <!-- <div class="border"></div>
-
-                </div> -->
             </template>
           </div>
-            <!-- <iron-list id="ilCUSTPROPS" items="[[custompropsToDisplay]]" as="item" class="flex" selection-enabled>
-                <template>
-                    <div>
-                        <div class$="[[_computeClass(selected)]]" on-tap="_custpTapped">
-                            <div class="primary pad" tabindex$="[[tabIndex]]">[[item.uri]]</div>
-                            <div class="selectedItem">
-                                <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
-                            </div>
-                        </div>
-                        <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomProp"></iron-icon>
-                        <div class="border"></div>
-
-                      </div>
-                </template>
-            </iron-list> -->
         </div>
       </div>
 
       <div id="default">
-        <rdf-store-lister-element id="lister" icon="icons:system-update-alt" filter="{{query}}" vocab="{{vocab}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rdf-store-lister-element>
+        <rdf-store-lister-element id="lister" icon="icons:launch" filter="{{query}}" vocab="{{vocab}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rdf-store-lister-element>
       </div>
     </div>
 
@@ -384,7 +401,7 @@
     <script>
         Polymer(
         {
-            is: 'rte-lister-element',
+            is: 'vocabulary-lister-element',
 
             properties:
             {
@@ -418,6 +435,11 @@
                 //     },
                 //     notify: true,
                 // },
+
+                route:{
+                  type: Object,
+                  notify: true,
+                },
 
                 //===POLY-FILTER
                 query:
@@ -819,14 +841,81 @@
             _openVocabularyPage: function(e)
             {
               this.set('route.path', '/vocabulary');
-              window.scrollTo(0,0);
             },
 
             _openVocabularyNewItemPage: function(e)
             {
               this.set('route.path', '/vocabulary/new');
+            },
+
+            _openImportVocab: function(e)
+            {
+              this.$.importVocab.open();
+            },
+
+            _alterVocabWCustoms: function()
+            {
+              console.error("Effet de bords!!!!!!!!!!!!!!!!!!!!!!!!!!");
+              console.error("NE PAS UTILISER TANT QUE VOCAB NE PEUT PAS ÊTRE COPIE");
+              if(this.vocab == null)
+                return;
+
+              this.vocabaltered = this.vocab;
+
+              for(var i in this.customcls)
+              {
+                this.vocabaltered.nonBlankNodes.push(this.customcls[i]);
+              }
+
+              for(var i in this.customprops)
+              {
+                this.vocabaltered.properties[this.customprops[i].uri] = this.customprops[i];
+              }
+
+            },
+
+            _makeVisible: function(e)
+            {
+              this.$.visibilityOff.classList.remove('isHiddenWAnim');
+              this.$.visibilityOff.classList.add('isActive');
+
+              this.$.visibilityOn.classList.add('isHiddenWAnim');
+              this.$.visibilityOn.classList.remove('isActive');
+
+              if(this.vocab.rdfStore == null) //test here prevent to display the graph zone
+                {console.log("Store is null. Not displaying");return;}
+              this.$.displayer.classList.remove('isHiddenWAnim');
+              this.$.displayer.classList.add('isActiveWAnim');
+
+              // this._alterVocabWCustoms();
+
+              this.$.displayer.generateGraph();
+            },
+
+            _makeUnvisible: function(e)
+            {
+              this.$.visibilityOn.classList.remove('isHiddenWAnim');
+              this.$.visibilityOn.classList.add('isActive');
+
+              this.$.visibilityOff.classList.add('isHiddenWAnim');
+              this.$.visibilityOff.classList.remove('isActive');
+
+              this.$.displayer.classList.add('isHiddenWAnim');
+              this.$.displayer.classList.remove('isActiveWAnim');
+
+            },
+
+            _goBack: function()
+            {
+              window.history.back();
               window.scrollTo(0,0);
-            }
+            },
+
+            _openTerminology: function(evt)
+            {
+              // this.set('route.path', '/vocabulary/'+evt.model.item.id);
+              this.set('route.path', '/vocabulary/new');
+            },
         });
     </script>
 </dom-module>

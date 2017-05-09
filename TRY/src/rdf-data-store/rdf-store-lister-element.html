@@ -160,7 +160,7 @@
                             <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]]<paper-ripple></paper-ripple></div>
 
                             <span class="useButton hideUseButton selectedItem">
-                              <paper-icon-button class="removeElmt" icon="icons:system-update-alt" on-click="_rdfcTapped"></paper-icon-button>
+                              <paper-icon-button class="removeElmt" icon="{{icon}}" on-click="_rdfcTapped"></paper-icon-button>
                             </span>
                             <!-- <div class="selectedItem">
                                 <iron-icon icon$="[[iconForItem(selected)]]" class="star"></iron-icon>
@@ -202,7 +202,7 @@
                   <!-- <div> -->
                       <div class$="[[_computeClass(index)]]">
                           <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]]<paper-ripple></paper-ripple></div>                          <span class="useButton hideUseButton selectedItem">
-                            <paper-icon-button class="removeElmt" icon="icons:system-update-alt" on-click="_rdfpTapped"></paper-icon-button>
+                            <paper-icon-button class="removeElmt" icon="{{icon}}" on-click="_rdfpTapped"></paper-icon-button>
                           </span>
                         </div>
                     </template>
@@ -234,6 +234,11 @@
 
       properties:
       {
+        icon:
+        {
+          type: String,
+          notify: true,
+        },
         rdfclasses:
         {
           type: Array,
@@ -429,13 +434,12 @@
         this._hideLastSelectedSpan();
         this.lastSelectedSpan = null;
 
-        if (!query || query == null)
+        if(!query || query == null)
           return null;
-        else
-        {
-          return function(item)
-          {
-            return (item.uri.includes(query) || item.label.includes(query));
+        else {
+          query = query.toLowerCase();
+          return function(item){
+            return (item.uri.toLowerCase().includes(query) || item.label.toLowerCase().includes(query));
           };
         }
       },
