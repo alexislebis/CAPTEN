@@ -150,7 +150,7 @@
         <!-- @IMPORTANT Gérer les make_relations dans le composant dédiée aux vocabulaires -->
         <div id="rdflister">
             <div class="subBlock leftSubBlock" hidden$="{{disableClassesLister}}">
-                <h4 on-tap="_toggleRDFClasses">Available Classes</h4>
+                <h4>Available Classes</h4>
                 <!-- <ul id="rdfClasses"></ul> -->
                 <!-- <iron-collapse id="classRDFCollapse"> -->
                   <div class="elementBlock">
@@ -194,7 +194,7 @@
           </div>
 
           <div class="subBlock leftSubBlock" hidden$="{{disablePropertiesLister}}">
-            <h4 on-tap="_toggleRDFProps">Availablle Properties</h4>
+            <h4>Availablle Properties</h4>
 
             <!-- <iron-collapse id="propRDFCollapse"> -->
               <div class="elementBlock">
@@ -306,16 +306,6 @@
         console.log(this.vocab.classes);
         this._onRdfclassesChanged(null);
         this._onRdfpropertiesChanged(null);
-      },
-
-      _toggleRDFClasses: function()
-      {
-        this.$.classRDFCollapse.toggle();
-      },
-
-      _toggleRDFProps: function()
-      {
-        this.$.propRDFCollapse.toggle();
       },
 
       _iterateOnClasses: function(vocab)
