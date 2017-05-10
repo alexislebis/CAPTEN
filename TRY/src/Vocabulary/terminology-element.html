@@ -1,3 +1,4 @@
+<link rel="import" href="./subsumption-element.html">
 
 <dom-module id="terminology-element">
   <template>
@@ -5,14 +6,160 @@
       :host {
           display: block;
       }
+
+      #divRoot{
+        width: 60%;
+        margin: 0 auto;
+        background-color: MistyRose;
+
+      }
+
+      #searchZone paper-searchbox{
+        --paper-searchbox-background: var(--paper-searchbox-dark-background);
+        --paper-searchbox-color: black;
+      }
+
+      .pad {
+          @apply(--layout-flex);
+          @apply(--layout-vertical);
+          padding: 0 16px;
+      }
+
+      .elementBlock{
+        display: block;
+        position: relative;
+        width: 100%;
+        max-height: 13vh;
+        overflow-x: auto;
+      }
+
+      .item {
+        @apply(--layout-horizontal);
+        cursor: pointer;
+        min-height: 38px;
+        /*height: 38px;*/
+        max-height: 45px;
+        padding-left: 2px;
+        border-bottom: 1px solid #DDD;
+        overflow: hidden;
+      }
+
+      .primary{
+        /*@apply(--layout-horizontal);*/
+        position: relative;
+        max-width: 100%;
+
+        padding-top: 1%;
+
+        overflow-y: hidden;
+        overflow-x: auto;
+      }
+
+      .evenRow{
+        background-color: #eee;
+      }
+      .oddRow{
+        background-color: #ddd;
+      }
+
+      iron-list {
+          @apply(--layout-flex);
+      }
+
+      .useButton{
+        padding-top: 2px;
+        margin-left: 1px;
+      }
+
+      .useButton paper-icon-button{
+
+        border-radius: 50%;
+        opacity: 1;
+
+        --paper-icon-button: {
+          width: 35px;
+          height: 35px;
+        }
+
+        --paper-icon-button-hover: {
+          border-radius: 50%;
+          background: var(--paper-blue-600);
+        }
+      }
+
+      .hideUseButton{
+        display: none;
+        transition: opacity 1s ease-out;
+        opacity: 0;
+      }
+
+
     </style>
 
     <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
 
+<div id="divRoot">
+    <h2>Terminology</h2>
+    createNewTermFromHere + DiscardCurrent?
 
-    <h2>terminology-element</h2>
+    <paper-input label="Terminology name" char-counter value="{{itemElmt.label}}"></paper-input>
 
-    value {{data.itemValue}}
+
+    Type {{itemType}}
+    URI {{itemElmt.uri}}
+
+    <div id="searchZone">
+      <paper-searchbox raise-forced="true" placeholder="Search for subsumption" value="{{query}}"></paper-searchbox>
+    </div>
+
+
+    <div hidden="{{_computeHiddenAssumption(itemElmt)}}">
+      <subsumption-element id="customRel" vocab="{{vocab}}" customcls="{{customcls}}" customproprs="{{customprops}}" rgte="{{rgte}}" selectedcls="{{itemElmt}}"></subsumption-element>
+    </div>
+
+    <div class="subBlock leftSubBlock">
+        <h4>Subsumed by the following terms</h4>
+        <div class="elementBlock">
+        <!-- <ul id="rdfClasses"></ul> -->
+        <template is="dom-repeat" items="{{itemElmt.subClassOf}}" filter="{{computeFilter(query)}}" index-as="index">
+          <!-- <div> -->
+              <div class$="[[_computeClass(index)]]">
+                  <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >{{item.label}} <paper-ripple></paper-ripple> </div>
+                  <span class="useButton hideUseButton selectedItem">
+                      <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
+                      <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
+                      <paper-icon-button class="removeElmt" icon="icons:launch" on-click="_openTerminology"></paper-icon-button>
+                  </span>
+              </div>
+        </template>
+      </div>
+    </div>
+
+  <div class="subBlock">
+      <h4>Subsumed terms</h4>
+      <div class="elementBlock">
+      <!-- <ul id="rdfClasses"></ul> -->
+      <template is="dom-repeat" items="{{itemElmt.subClasses}}" filter="{{computeFilter(query)}}" index-as="index">
+        <!-- <div> -->
+            <div class$="[[_computeClass(index)]]">
+                <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >{{item.label}} <paper-ripple></paper-ripple> </div>
+                <span class="useButton hideUseButton selectedItem">
+                    <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
+                    <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
+                    <paper-icon-button class="removeElmt" icon="icons:launch" on-click="_openTerminology"></paper-icon-button>
+                </span>
+            </div>
+      </template>
+    </div>
+  </div>
+
+  Frequent Association
+  @todo
+
+  Narrative Elements
+
+  Used in (Operation pool required + Narrative pool : narrativeblock using term must be displayed here)
+</div>
 
   </template>
   <script>
@@ -21,26 +168,201 @@
       is: "terminology-element",
       properties:
       {
-        item:
+        itemElmt:
         {
           type: Object,
           notify: true,
         },
+
+        query: String,//For quick search
+
+        itemType: String,
 
         route:
         {
           type: Object,
           notify: true,
         },
+
+        vocab:
+        {
+          type: Object,
+          value: function(){return new CONTROLLED_VOCABULARY();},
+        },
+        rgte:
+        {
+          type: Object,
+          value: function(){ return new RGTE();},
+        },
+        customcls:
+        {
+            type: Array,
+            notify: true,
+            value: function()
+            {
+                return [];
+            },
+        },
+        customprops:
+        {
+            type: Array,
+            notify: true,
+            value: function()
+            {
+                return [];
+            },
+            // observer: "_onCustomPropsChanged",
+        },
+        rgtes:{
+          type: Array,
+          notify: true,
+          value: function(){return [];},
+        },
+
+        //Displaying
+        lastSelectedSpan: Object, //for the lists
+
       },
 
       observers: [
         "_onDataRouteChanged(data.*)",
       ],
 
+    // === ROUTING
       _onDataRouteChanged: function(e)
       {
-        console.log('coucou');
+
+        if(e.value.itemValue == null || e.value.itemValue.toLowerCase() == 'new' || e.value.itemValue.search(/\D+/) != -1)
+        {
+          console.log("generate new config. Forward on /new thus remove /new matching");
+          return;
+        }
+
+        this.lastSelectedSpan = null; //Display synchro
+
+        var resItem = this._findElementWithCorrespondingID(e.value.itemValue);
+
+        if(resItem == null)
+          return; //Return to default config
+
+        this.itemElmt = resItem.value;
+        this.itemType = resItem.type;
+      },
+
+      _openTerminology: function(evt)
+      {
+        this._selectItem();//For reset the last element. @TODO create a reset function for the component
+        this.set('route.path', ''+evt.model.item.id);
+      },
+
+    // === COMPONENT FUNCTIONS
+      _findElementWithCorrespondingID: function(id)
+      {
+        var res = this._findIdInVocab(id);
+        if(res != null)
+          return res;
+
+        res = this._findIdInCustomCls(id);
+        if(res != null)
+          return res;
+
+        res = this._findIdInCustomProp(id);
+        if(res != null)
+          return res;
+
+        res = this._findIdInRgte(id);
+        if(res != null)
+          return res;
+
+        res = this._findIdInRgtes(id);
+        if(res != null)
+          return res;
+
+        return null;
+      },
+        _findIdInVocab: function(id)
+        {
+          if(this.vocab == null)
+            return null;
+
+          for(var i in this.vocab.classes)
+            if(this.vocab.classes[i].id == id)
+              return {'type': 'Class', 'value': this.vocab.classes[i]};
+
+          for(var i in this.vocab.properties)
+            if(this.vocab.properties[i].id == id)
+              return {'type': 'Property', 'value': this.vocab.properties[i]};
+
+          return null;
+        },
+        _findIdInCustomCls: function(id)
+        {
+          if(this.customcls == null)
+            return null;
+
+          for(var i in this.customcls)
+            if(this.customcls[i].id == id)
+              return {'type': 'Class', 'value': this.customcls[i]};
+        },
+        _findIdInCustomProp: function(id)
+        {
+          if(this.customprops == null)
+            return null;
+
+          for(var i in this.customprops)
+            if(this.customprops[i].id == id)
+              return {'type': 'Property', 'value': this.customprops[i]};
+        },
+        _findIdInRgte: function()
+        {
+          console.error("Unimplemented function");
+        },
+        _findIdInRgtes: function()
+        {
+          console.error("Unimplemented function");
+        },
+
+    // === SEARCH
+      computeFilter: function(query)
+      {
+        this._hideLastSelectedSpan();
+        this.lastSelectedSpan = null;
+
+        if(!query || query == null)
+          return null;
+        else {
+          query = query.toLowerCase();
+          return function(item){
+            return (item.uri.toLowerCase().includes(query) || item.label.toLowerCase().includes(query));
+          };
+        }
+      },
+    // === DISPLAYING
+      _computeClass: function(index)
+      {
+          return (index % 2 == 0) ? 'item evenRow' : 'item oddRow';
+      },
+      _selectItem: function(event)
+      {
+        this._hideLastSelectedSpan();
+
+        if(event == null)
+          return;
+
+        this.lastSelectedSpan = event.target.nextSibling.nextSibling;
+
+        if(this.lastSelectedSpan != null)
+          this.lastSelectedSpan.className = "useButton selectedItem";
+      },
+        _hideLastSelectedSpan: function()
+        {
+          if(this.lastSelectedSpan != null)
+            this.lastSelectedSpan.className += " hideUseButton";
+        },
+
+      _computeHiddenAssumption: function(item)
+      {
+        return item instanceof CAPTENClass ? false : true;
       },
     });
   </script>

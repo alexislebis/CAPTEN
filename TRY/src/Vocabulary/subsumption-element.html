@@ -1,11 +1,8 @@
-<!-- @DEPRECATED -->
-<!-- Use subsumption-element.html instead  -->
-
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 
 
-<dom-module id="rgte-custom-class-relation-element">
+<dom-module id="subsumption-element">
 
     <template>
     <style>
@@ -15,27 +12,24 @@
     </style>
 
     <form is="iron-form" method="get" action="/" id="Form" on-iron-form-submit="_submitForm" on-iron-form-element-register="_elementRegister">
-      <template is="dom-repeat" items="{{nbOfForms}}" as="item">
-        <div id="drops{{item}}">
-          {{selectedcls.uri}}
-          <paper-dropdown-menu label="Inheritance Relation with" name="inherit" >
-            <paper-menu class="dropdown-content" id="inheritDrop{{item}}">
-              <template is="dom-repeat" items="[[inheritanceTypeArray]]" as="type">
-                <paper-item value$="[[type]]">[[type]]</paper-item>
-              </template>
-            </paper-menu>
-          </paper-dropdown-menu>
-          <paper-dropdown-menu label="a Concept" name="type">
-            <paper-menu class="dropdown-content" id="menu{{item}}">
-              <template is="dom-repeat" items="[[classes]]" as="cls">
-                <paper-item value$="[[cls.id]]">[[cls.label]]</paper-item>
-              </template>
-            </paper-menu>
-          </paper-dropdown-menu>
-        </div>
-      </template>
-
-      <iron-icon icon="add-circle" on-tap="_addNewMenu" class="addToRTE"></iron-icon>
+          <div>
+            <paper-dropdown-menu label="Inheritance Relation with" name="inherit" >
+              <paper-menu class="dropdown-content" id="inheritDrop{{item}}" selected="{{subsumptionType}}">
+                <template is="dom-repeat" items="[[inheritanceTypeArray]]" as="type">
+                  <paper-item value$="[[type]]">[[type]]</paper-item>
+                </template>
+              </paper-menu>
+            </paper-dropdown-menu>
+          </div>
+          <div>
+            <paper-dropdown-menu label="a Concept" name="type">
+              <paper-menu class="dropdown-content" id="menu{{item}}">
+                <template is="dom-repeat" items="[[classes]]" filter="{{_avoidDuplicata(selectedcls, subsumptionType)}}" as="cls">
+                  <paper-item value$="[[cls.id]]">[[cls.label]]</paper-item>
+                </template>
+              </paper-menu>
+            </paper-dropdown-menu>
+          </div>
       <paper-button raised on-click="_submit">Save relations!</paper-button>
     </form>
 
@@ -46,10 +40,12 @@
     <script>
         Polymer(
         {
-            is: "rgte-custom-class-relation-element",
+            is: "subsumption-element",
 
             properties:
             {
+                subsumptionType : Number,
+
                 nbOfForms:
                 {
                     type: Array,
@@ -385,7 +381,29 @@
                 {
                     this._addSuperClass(this.nbOfForms[i]);
                 }
-            }
+            },
+
+            _avoidDuplicata: function(elmt, type)
+            {
+              if(elmt == null)
+                return null;
+              else {
+                return function(item)
+                {
+                  for(var i in elmt.subClassOf)
+                  {
+                      if(item.uri == elmt.subClassOf[i].uri)
+                        return false;//Element already had this element. Do not display it
+                  }
+                  for(var i in elmt.subClasses)
+                  {
+                    if(item.uri == elmt.subClasses[i].uri)
+                      return false;//IDEM
+                  }
+                    return true;
+                };
+              }
+            },
         });
     </script>
 </dom-module>
