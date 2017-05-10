@@ -7,9 +7,12 @@
       }
     </style>
 
-    <h1>terminology-element</h1>
+    <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
 
-    <h4>cf. p.34/45 from file:///home/alexis/Downloads/CAPTEN_V2_mockup_at_balsamiq%20(1).pdf</h4>
+
+    <h2>terminology-element</h2>
+
+    value {{data.itemValue}}
 
   </template>
   <script>
@@ -22,8 +25,23 @@
         {
           type: Object,
           notify: true,
-        }
-      }
+        },
+
+        route:
+        {
+          type: Object,
+          notify: true,
+        },
+      },
+
+      observers: [
+        "_onDataRouteChanged(data.*)",
+      ],
+
+      _onDataRouteChanged: function(e)
+      {
+        console.log('coucou');
+      },
     });
   </script>
 </dom-module>

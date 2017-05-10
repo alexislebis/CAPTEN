@@ -263,9 +263,9 @@
 
         </style>
 
-<!-- <app-location use-hash-as-path route="{{route}}"></app-location> -->
+<app-location use-hash-as-path route="{{route}}"></app-location>
 
-  <app-route route="{{route}}" pattern="/:idItemOrAction" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
+  <!-- <app-route route="{{route}}" pattern="/:idItemOrAction" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route> -->
 
 
   <!-- <neon-animated-pages selected='{{data.idItemOrAction}}'
@@ -597,16 +597,6 @@
               }
             },
 
-            _addClassToRGTE: function(e)
-            {
-              this.fire("-ClassAddedToRGTE", {val:this.selectedcls});
-            },
-
-            _addPropToRGTE: function(e)
-            {
-              this.fire("-PropAddedToRGTE", {val:this.selectedprop});
-            },
-
             _parseNewElement: function(e)
             {
                 if (e.detail.type === "CLASS") //Si il s'agit d'une classe
@@ -752,14 +742,14 @@
               // this.$.ilCUSTCLS.clearSelection();
               //
                this.selectedcls = e.detail;
-               this._addClassToRGTE();
+               this._openTerminologyWId(this.selectedcls.id);
             },
             _manageSelectedProp: function(e)
             {
               // this.$.ilCUSTPROPS.clearSelection();
               //
               this.selectedprop = e.detail;
-              this._addPropToRGTE();
+              this._openTerminologyWId(this.selectedprop.id);
             },
 
             _makeRel: function(e)
@@ -913,8 +903,12 @@
 
             _openTerminology: function(evt)
             {
-              // this.set('route.path', '/vocabulary/'+evt.model.item.id);
-              this.set('route.path', '/vocabulary/new');
+              this.set('route.path', '/terminology/'+evt.model.item.id);
+            },
+
+            _openTerminologyWId: function(id)
+            {
+              this.set('route.path', '/terminology/'+id);
             },
         });
     </script>

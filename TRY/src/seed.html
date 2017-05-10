@@ -42,7 +42,7 @@
     <app-route route="{{route}}" pattern="/vocabulary" active="{{vocabularyActive}}"></app-route> -->
 
     <app-route route="{{route}}" pattern="/:topLevel" active="{{active}}" data="{{routeData}}" tail="{{tailTopLevel}}"></app-route>
-    
+
       <!-- <app-route route="{{tailTopLevel}}" prefix="/tabs" pattern="/:tabName" active="{{activeTabs}}" data="{{dataTabs}}"></app-route> -->
         <!-- <app-route route="{{tail}}" pattern="/:tabName" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route> -->
 
@@ -62,8 +62,8 @@
       <neon-animatable name='rte'><div name="rte" ><main-rte id="rteElem" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></main-rte></div></neon-animatable>
       <neon-animatable name='voog'><div name="voog"><main-voog></main-voog></div></neon-animatable>
       <neon-animatable name='ape'><div name="ape"><ape-element id="apeElem" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></ape-element></div></neon-animatable>
-      <neon-animatable name='vocabulary'><vocabulary-lister-element route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></vocabulary-lister-element></neon-animatable>
-      <neon-animatable name='vocabulary/new'><terminology-element></terminology-element></neon-animatable>
+      <neon-animatable name='vocabulary'><vocabulary-lister-element vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></vocabulary-lister-element></neon-animatable>
+      <neon-animatable name='terminology'><terminology-element route="{{tailTopLevel}}" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></terminology-element></neon-animatable>
     </neon-animated-pages>
 
 
