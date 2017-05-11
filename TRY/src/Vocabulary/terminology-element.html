@@ -139,16 +139,43 @@
     <h2>Terminology</h2>
 
     <div id="paperFabs">
-      <paper-fab icon="av:fiber-new"></paper-fab>
+      <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab>
       <!-- Display Voc graph -->
-      <paper-fab id="subsumptionRel" icon="icons:settings-input-component" active="{{openSubsumptionForm}}" toggles disabled="{{_computeHiddenAssumption(itemElmt)}}"></paper-fab>
+      <paper-fab id="subsumptionRel" icon="icons:settings-input-component" active="{{openSubsumptionForm}}" toggles disabled="{{_isAuthorized(itemElmt, isNew)}}"></paper-fab>
       <paper-fab id="discard" class="isHiddenWAnim" icon="icons:delete" disabled></paper-fab>
     </div>
   </header>
 
+    <div hidden="{{!isNew}}">
+      <p>Create a new term</p>
+    </div>
 
-    <paper-input id="elmtName" label="Name of the term" char-counter value="{{itemElmt.label}}"></paper-input>
+    <paper-input id="elmtName" label="Name of the term" value="{{itemElmt.label}}"></paper-input>
 
+  <div hidden="{{!isNew}}">
+    <form is="iron-form" method="get" action="/" id="Form" on-iron-form-submit="_submitForm">
+          <div>
+            <paper-dropdown-menu id="ddType" label="Type of the term" name="inherit" required >
+              <paper-menu class="dropdown-content" id="inheritDrop" selected="{{typeIndex}}">
+                <template is="dom-repeat" items="[[typeArray]]" as="type">
+                  <paper-item value$="[[type]]">[[type]]</paper-item>
+                </template>
+              </paper-menu>
+            </paper-dropdown-menu>
+          </div>
+          <div>
+            <paper-input id="uriElmt" label="URI of the term" char-counter value="{{uriElmt}}" required>
+              <div suffix>
+                <paper-icon-button icon="icons:content-copy" on-click="_autoFillURI"></paper-icon-button>
+              </div>
+            </paper-input>
+          </div>
+        <paper-fab icon="icons:check" on-click="_submit"></paper-fab>
+    </form>
+
+  </div>
+
+  <div hidden="{{isNew}}">
     <div id="infoElmts">
       <div>
         <span class="infoElmt"><iron-icon class="infoIcon" icon="icons:info"></iron-icon> Type: <span style="font-style: italic;">{{itemType}}</span></span>
@@ -203,6 +230,8 @@
       </template>
     </div>
   </div>
+
+</div>
 
   Frequent Association
   @todo
@@ -272,18 +301,48 @@
         },
 
         //Displaying
+        isNew: {
+          type: Boolean,
+          value: true,
+          notify: true,
+          observer: "valueCheck",
+        },
+        typeArray:
+        {
+            type: Array,
+            notify: true,
+            value: function()
+            {
+                return ["Class", "Property"];
+            },
+        },
+
         lastSelectedSpan: Object, //for the lists
 
         subClassOfArray : Array,
         subClassesArray : Array,
+        typeIndex: Number,
+
+        uriElmt:{
+          type: String,
+          value: "",
+          notify: true,
+        },
+
 
       },
 
       observers: [
-        "_onDataRouteChanged(data.*)",
+        "_onDataRouteChanged(route)",
+        "_onTypeIndexChange(typeIndex)",
+        "_onNewUriElmt(uriElmt)",
         // "_onLabelChange(itemElmt.label)",
       ],
 
+      valueCheck: function(e)
+      {
+        console.log(this.isNew);;
+      },
       attached: function()
       {
         this.$.customRel.addEventListener(SUBSUMPTION_CREATED_SIGNAL_ID, function(e){
@@ -295,31 +354,113 @@
       },
 
     // === ROUTING
-      _onDataRouteChanged: function(e)
+      _onDataRouteChanged: function(r)
       {
+        this._resetComponent();
 
-        if(e.value.itemValue == null || e.value.itemValue.toLowerCase() == 'new' || e.value.itemValue.search(/\D+/) != -1)
+        if(this.data.itemValue == null || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
         {
-          console.log("generate new config. Forward on /new thus remove /new matching");
+          this._generateDefaultConfig();
           return;
         }
 
-        this.lastSelectedSpan = null; //Display synchro
+        // this.lastSelectedSpan = null; //Display synchro
 
-        var resItem = this._findElementWithCorrespondingID(e.value.itemValue);
+        var resItem = this._findElementWithCorrespondingID(this.data.itemValue);
 
         if(resItem == null)
-          return; //Return to default config
+        {
+          this._generateDefaultConfig();
+          return;
+        }
 
         this.itemElmt = resItem.value;
         this.itemType = resItem.type;
+        this.isNew = false;
+      },
+
+      _generateDefaultConfig: function()
+      {
+        this.isNew = true;
+        this.typeIndex = -1;
+        this.typeIndex = 0;
+        // this.itemType = "Class";
+        // this.itemType = new CAPTENClass();
       },
 
       _openTerminology: function(evt)
       {
-        this._selectItem();//For reset the last element. @TODO create a reset function for the component
+        this._openTerminologyWId(evt.model.item.id);
+      },
 
-        this.set('route.path', ''+evt.model.item.id);
+      _openTerminologyWId: function(id)
+      {
+        this._resetComponent();
+        this.set('route.path', ''+id);
+      },
+
+      _openVocabularyNewItemPage: function(e)
+      {
+        this._resetComponent();
+        this.set('route.path', '/new');
+        window.scrollTo(0,0);
+      },
+
+      _resetComponent: function()
+      {
+        this.itemElmt = null;
+        this.uriElmt = "";
+        this.$.elmtName.value = null;
+        this._selectItem();
+        this._generateDefaultConfig();
+      },
+
+    // === NEW TERM BEHAVIOR
+      _submit: function(event)
+      {
+          Polymer.dom(event).localTarget.parentElement.submit();
+      },
+      _submitForm: function()
+      {
+        if(this.typeIndex == 0)
+          this.push("customcls", this.itemElmt);
+        else if(this.typeIndex == 1)
+          this.push("customprops", this.itemElmt);
+
+        this._openTerminologyWId(this.itemElmt.id);
+      },
+
+      _onTypeIndexChange: function(index)
+      {
+        console.log("Changing type :"+ index);
+
+        if(index == 0)
+        {
+          if(!(this.itemElmt instanceof CAPTENClass))
+          {
+            this.itemElmt = new CAPTENClass();
+          }
+        }
+        else if(index == 1)
+        {
+          if(!(this.itemElmt instanceof Property))
+          {
+            this.itemElmt = new Property();
+          }
+        }
+      },
+
+      _autoFillURI: function()
+      {
+        this.itemElmt.uri = this.itemElmt.label;
+        this.uriElmt = this.itemElmt.uri;
+      },
+      _onNewUriElmt: function(uri)
+      {
+        if(this.itemElmt == null)
+          return;
+
+        this.itemElmt.uri = this.uriElmt;
       },
 
     // === COMPONENT FUNCTIONS
@@ -462,6 +603,11 @@
           console.log(tab[i]);
         }
         return tab;
+      },
+      _isAuthorized: function(i, n)
+      {
+        var res = ( (i instanceof CAPTENClass) && !n);
+        return !res;
       },
     });
   </script>
