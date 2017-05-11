@@ -14,3 +14,6 @@
 
     // === RDF
       var RDF_STORE_LISTER_ELEMENT_SELECTED_ID = "-68756e4f6KEFnegzlezegL";
+
+    // === SUBSUMPTION
+      var SUBSUMPTION_CREATED_SIGNAL_ID = "-6e35ge78gr79hre6h67rqehq";

@@ -157,7 +157,7 @@
                   <template is="dom-repeat" items="{{rdfclasses}}" filter="{{computeFilter(filter)}}" index-as="index">
                     <!-- <div> -->
                         <div class$="[[_computeClass(index)]]">
-                            <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]]<paper-ripple></paper-ripple></div>
+                            <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.label]]<paper-ripple></paper-ripple></div>
 
                             <span class="useButton hideUseButton selectedItem">
                               <paper-icon-button class="removeElmt" icon="{{icon}}" on-click="_rdfcTapped"></paper-icon-button>
@@ -201,7 +201,7 @@
                 <template is="dom-repeat" items="{{rdfprops}}" filter="{{computeFilter(filter)}}" index-as="index">
                   <!-- <div> -->
                       <div class$="[[_computeClass(index)]]">
-                          <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]]<paper-ripple></paper-ripple></div>                          <span class="useButton hideUseButton selectedItem">
+                          <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.label]]<paper-ripple></paper-ripple></div>                          <span class="useButton hideUseButton selectedItem">
                             <paper-icon-button class="removeElmt" icon="{{icon}}" on-click="_rdfpTapped"></paper-icon-button>
                           </span>
                         </div>

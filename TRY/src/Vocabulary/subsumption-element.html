@@ -1,3 +1,6 @@
+<!-- REQUIRE -->
+<!-- selectedcls object must implements becomesSubClassOf function -->
+
 <link rel="import" href="../../bower_components/iron-form/iron-form.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 
@@ -9,12 +12,21 @@
       :host {
         display: block;
       }
+
+      #ddmenurelation{
+        width: 15%;
+      }
+
+      #ddmenuconcept{
+        display: block;
+        width: 85%;
+      }
     </style>
 
     <form is="iron-form" method="get" action="/" id="Form" on-iron-form-submit="_submitForm" on-iron-form-element-register="_elementRegister">
           <div>
-            <paper-dropdown-menu label="Inheritance Relation with" name="inherit" >
-              <paper-menu class="dropdown-content" id="inheritDrop{{item}}" selected="{{subsumptionType}}">
+            <paper-dropdown-menu id="ddmenurelation" label="Relation" name="inherit" required >
+              <paper-menu class="dropdown-content" id="inheritDrop" selected="{{subsumptionType}}">
                 <template is="dom-repeat" items="[[inheritanceTypeArray]]" as="type">
                   <paper-item value$="[[type]]">[[type]]</paper-item>
                 </template>
@@ -22,8 +34,8 @@
             </paper-dropdown-menu>
           </div>
           <div>
-            <paper-dropdown-menu label="a Concept" name="type">
-              <paper-menu class="dropdown-content" id="menu{{item}}">
+            <paper-dropdown-menu label="a Concept" id="ddmenuconcept" name="type" required>
+              <paper-menu class="dropdown-content" id="menu" selected="{{indexOfSelectedClass}}" selected-item="{{dropdownConcept}}">
                 <template is="dom-repeat" items="[[classes]]" filter="{{_avoidDuplicata(selectedcls, subsumptionType)}}" as="cls">
                   <paper-item value$="[[cls.id]]">[[cls.label]]</paper-item>
                 </template>
@@ -45,6 +57,8 @@
             properties:
             {
                 subsumptionType : Number,
+                indexOfSelectedClass : Number,
+                dropdownConcept : Object,
 
                 nbOfForms:
                 {
@@ -375,12 +389,43 @@
 
             _submitForm: function()
             {
-                this.selectedcls.resetSubClassRelations();
+                // this.selectedcls.resetSubClassRelations();
+                //
+                // for (var i = 0; i < this.nbOfForms.length; i++)
+                // {
+                //     this._addSuperClass(this.nbOfForms[i]);
+                // }
+                this._buildRelation();
+            },
 
-                for (var i = 0; i < this.nbOfForms.length; i++)
-                {
-                    this._addSuperClass(this.nbOfForms[i]);
-                }
+            _buildRelation: function()
+            {
+              if(this.selectedcls == null || this.dropdownConcept == null)
+                return;
+
+              var concernedCls = this.classes.filter(this._avoidDuplicata(this.selectedcls, this.subsumptionType))[this.indexOfSelectedClass];
+
+              if(concernedCls == null)
+                return;
+
+              if(this.subsumptionType == 0) //IS A
+              {
+                this.selectedcls.becomesSubClassOf(concernedCls);
+
+              }
+              else if(this.subsumptionType == 1) //CAN BE
+              {
+                concernedCls.becomesSubClassOf(this.selectedcls);
+              }
+              else {
+                console.error("Unrecognized subsumption type");
+                return;
+              }
+
+              this.fire(SUBSUMPTION_CREATED_SIGNAL_ID);
+
+              this.indexOfSelectedClass = -1;
+
             },
 
             _avoidDuplicata: function(elmt, type)
@@ -390,15 +435,37 @@
               else {
                 return function(item)
                 {
-                  for(var i in elmt.subClassOf)
+                  if(item.uri == elmt.uri)
+                    return false;
+
+                  var heightSearchArray = [];
+                  for(var i in elmt.subClassOf) // Copied affectation, not referenced.
                   {
-                      if(item.uri == elmt.subClassOf[i].uri)
-                        return false;//Element already had this element. Do not display it
+                    heightSearchArray.push(elmt.subClassOf[i]);
                   }
+
+                  for(var i = 0; i < heightSearchArray.length; i++)
+                  {
+                    if(item.uri == heightSearchArray[i].uri)
+                      return false;//Element already had this element. Do not display it
+
+                    for(var j in heightSearchArray[i].subClassOf)
+                      heightSearchArray.push(heightSearchArray[i].subClassOf[j]);
+                  }
+
+                  var depthSearchArray = [];
                   for(var i in elmt.subClasses)
                   {
-                    if(item.uri == elmt.subClasses[i].uri)
+                    depthSearchArray.push(elmt.subClasses[i]);
+                  }
+
+                  for(var i = 0; i < depthSearchArray.length; i++)
+                  {
+                    if(item.uri == depthSearchArray[i].uri)
                       return false;//IDEM
+
+                    for(var j in depthSearchArray[i].subClasses) //Handling depth search propagation: pushing the other subclasses in the array to check
+                      depthSearchArray.push(depthSearchArray[i].subClasses[j]);
                   }
                     return true;
                 };

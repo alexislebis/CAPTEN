@@ -245,8 +245,10 @@
             }
 
             #paperFabs{
-              position: absolute;
-              left: 16%;
+              position: relative;
+              top: -60px;
+              left: -65px;
+              margin-bottom: -150px;
             }
 
             #paperFabs paper-fab{
@@ -277,7 +279,7 @@
   </neon-animated-pages> -->
 
 <div id="divRoot">
-        <paper-fab icon="image:navigate-before" on-click="_goBack"></paper-fab>
+        <paper-fab icon="icons:reply" on-click="_goBack"></paper-fab>
 
 
         <paper-dialog on-iron-overlay-opened="patchOverlay" id="newElementPopUp">
@@ -322,13 +324,7 @@
         </div> -->
 
 
-        <div id="paperFabs">
-          <paper-fab icon="icons:file-upload" on-click="_openImportVocab"></paper-fab>
-          <paper-fab on-click="_openFormAdd" icon="add"></paper-fab>
-          <!-- Display Voc graph -->
-          <paper-fab id="visibilityOn" icon="icons:visibility" on-click="_makeVisible"></paper-fab>
-          <paper-fab id="visibilityOff" class="isHiddenWAnim" icon="icons:visibility-off" on-click="_makeUnvisible"></paper-fab>
-        </div>
+
 
         <!-- <div id="menuTB" class="isHiddenWAnim">
           <paper-toolbar>
@@ -342,6 +338,13 @@
 
       <header>
         <h2>Vocabulary</h2>
+        <div id="paperFabs">
+          <paper-fab icon="icons:file-upload" on-click="_openImportVocab"></paper-fab>
+          <paper-fab on-click="_openFormAdd" icon="add"></paper-fab>
+          <!-- Display Voc graph -->
+          <paper-fab id="visibilityOn" icon="icons:visibility" on-click="_makeVisible"></paper-fab>
+          <paper-fab id="visibilityOff" class="isHiddenWAnim" icon="icons:visibility-off" on-click="_makeUnvisible"></paper-fab>
+        </div>
       </header>
 
       <div id="searchZone">
@@ -835,7 +838,7 @@
 
             _openVocabularyNewItemPage: function(e)
             {
-              this.set('route.path', '/vocabulary/new');
+              this.set('route.path', '/terminology/new');
             },
 
             _openImportVocab: function(e)

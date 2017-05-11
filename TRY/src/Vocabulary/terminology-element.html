@@ -93,35 +93,86 @@
         opacity: 0;
       }
 
+      header{
+        width: 100%;
+        height: 50px;
+        text-align: center;
+        margin-bottom: 7vh;
+      }
+
+      #paperFabs{
+        position: relative;
+        top: -60px;
+        left: -65px;
+        margin-bottom: -150px;
+      }
+
+      #paperFabs paper-fab{
+        margin-top: 25px;
+      }
+
+      #elmtName{
+        margin-bottom: 35px;
+      }
+
+      .infoIcon:hover {
+      fill: var(--google-yellow-700);
+      }
+
+      #infoElmts{
+        margin-bottom: 70px;
+      }
+
+      .infoElmt{
+        display: block;
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.15);
+        overflow: auto;
+      }
 
     </style>
 
     <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
 
 <div id="divRoot">
+  <header>
     <h2>Terminology</h2>
-    createNewTermFromHere + DiscardCurrent?
 
-    <paper-input label="Terminology name" char-counter value="{{itemElmt.label}}"></paper-input>
+    <div id="paperFabs">
+      <paper-fab icon="av:fiber-new"></paper-fab>
+      <!-- Display Voc graph -->
+      <paper-fab id="subsumptionRel" icon="icons:settings-input-component" active="{{openSubsumptionForm}}" toggles disabled="{{_computeHiddenAssumption(itemElmt)}}"></paper-fab>
+      <paper-fab id="discard" class="isHiddenWAnim" icon="icons:delete" disabled></paper-fab>
+    </div>
+  </header>
 
 
-    Type {{itemType}}
-    URI {{itemElmt.uri}}
+    <paper-input id="elmtName" label="Name of the term" char-counter value="{{itemElmt.label}}"></paper-input>
 
-    <div id="searchZone">
+    <div id="infoElmts">
+      <div>
+        <span class="infoElmt"><iron-icon class="infoIcon" icon="icons:info"></iron-icon> Type: <span style="font-style: italic;">{{itemType}}</span></span>
+      </div>
+      <div>
+
+        <span class="infoElmt"><iron-icon class="infoIcon" icon="icons:info"></iron-icon> URI: <span style="font-style: italic;">{{itemElmt.uri}}</span></span>
+      </div>
+    </div>
+
+    <div id="searchZone" hidden="{{_computeHiddenAssumption(itemElmt)}}">
       <paper-searchbox raise-forced="true" placeholder="Search for subsumption" value="{{query}}"></paper-searchbox>
     </div>
 
 
-    <div hidden="{{_computeHiddenAssumption(itemElmt)}}">
+    <div hidden="{{!openSubsumptionForm}}">
       <subsumption-element id="customRel" vocab="{{vocab}}" customcls="{{customcls}}" customproprs="{{customprops}}" rgte="{{rgte}}" selectedcls="{{itemElmt}}"></subsumption-element>
     </div>
 
-    <div class="subBlock leftSubBlock">
+    <div hidden="{{_computeHiddenAssumption(itemElmt)}}" class="subBlock leftSubBlock">
         <h4>Subsumed by the following terms</h4>
         <div class="elementBlock">
         <!-- <ul id="rdfClasses"></ul> -->
-        <template is="dom-repeat" items="{{itemElmt.subClassOf}}" filter="{{computeFilter(query)}}" index-as="index">
+        <template is="dom-repeat" items="{{subClassOfArray}}" filter="{{computeFilter(query, itemElmt)}}"as="item" index-as="index" restamp>
           <!-- <div> -->
               <div class$="[[_computeClass(index)]]">
                   <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >{{item.label}} <paper-ripple></paper-ripple> </div>
@@ -135,11 +186,11 @@
       </div>
     </div>
 
-  <div class="subBlock">
+  <div hidden="{{_computeHiddenAssumption(itemElmt)}}" class="subBlock">
       <h4>Subsumed terms</h4>
       <div class="elementBlock">
       <!-- <ul id="rdfClasses"></ul> -->
-      <template is="dom-repeat" items="{{itemElmt.subClasses}}" filter="{{computeFilter(query)}}" index-as="index">
+      <template is="dom-repeat" items="{{subClassesArray}}" filter="{{computeFilter(query, itemElmt)}}" index-as="index">
         <!-- <div> -->
             <div class$="[[_computeClass(index)]]">
                 <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >{{item.label}} <paper-ripple></paper-ripple> </div>
@@ -172,6 +223,7 @@
         {
           type: Object,
           notify: true,
+          observer: "_computeSubsumption",
         },
 
         query: String,//For quick search
@@ -222,11 +274,25 @@
         //Displaying
         lastSelectedSpan: Object, //for the lists
 
+        subClassOfArray : Array,
+        subClassesArray : Array,
+
       },
 
       observers: [
         "_onDataRouteChanged(data.*)",
+        // "_onLabelChange(itemElmt.label)",
       ],
+
+      attached: function()
+      {
+        this.$.customRel.addEventListener(SUBSUMPTION_CREATED_SIGNAL_ID, function(e){
+
+          var tmp = this.itemElmt;
+          this.itemElmt = null;
+          this.itemElmt = tmp;
+        }.bind(this));
+      },
 
     // === ROUTING
       _onDataRouteChanged: function(e)
@@ -252,6 +318,7 @@
       _openTerminology: function(evt)
       {
         this._selectItem();//For reset the last element. @TODO create a reset function for the component
+
         this.set('route.path', ''+evt.model.item.id);
       },
 
@@ -270,13 +337,13 @@
         if(res != null)
           return res;
 
-        res = this._findIdInRgte(id);
-        if(res != null)
-          return res;
-
-        res = this._findIdInRgtes(id);
-        if(res != null)
-          return res;
+        // res = this._findIdInRgte(id);
+        // if(res != null)
+        //   return res;
+        //
+        // res = this._findIdInRgtes(id);
+        // if(res != null)
+        //   return res;
 
         return null;
       },
@@ -323,7 +390,7 @@
         },
 
     // === SEARCH
-      computeFilter: function(query)
+      computeFilter: function(query, obj)
       {
         this._hideLastSelectedSpan();
         this.lastSelectedSpan = null;
@@ -363,6 +430,38 @@
       _computeHiddenAssumption: function(item)
       {
         return item instanceof CAPTENClass ? false : true;
+      },
+      _computeSubsumption: function(e)
+      {
+        if(this.itemElmt == null)
+          return;
+
+        var tmp = [];
+
+        for(var i in this.itemElmt.subClassOf)
+          tmp.push(this.itemElmt.subClassOf[i]);
+
+        this.subClassOfArray = tmp;
+
+        tmp = [];
+
+        for(var i in this.itemElmt.subClasses)
+          tmp.push(this.itemElmt.subClasses[i]);
+
+        this.subClassesArray = tmp;
+      },
+      getItems: function(item)
+      {
+        if(item == null)
+          return [];
+
+        var tab = [];
+        for(var i in item.subClassOf)
+        {
+          tab.push(item.subClassOf[i]);
+          console.log(tab[i]);
+        }
+        return tab;
       },
     });
   </script>
