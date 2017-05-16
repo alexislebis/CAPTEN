@@ -1,0 +1,37 @@
+/**
+ * RgtePool is the interface for the creation of new rgte.
+ * It keeps track of all the existent rgtes in the application.
+ */
+
+ function RgtePool()
+ {
+   this.pool = [];
+ }
+
+ RgtePool.prototype =
+ {
+   create: function()
+   {
+     var rgte = new RGTE();
+
+     this.pool.push(rgte);
+
+     return rgte;
+   },
+
+   getByID: function(id)
+   {
+     if(id == null || id < 0)
+      return;
+
+      for(var i = 0; i < this.pool.length; i++)
+        if(this.pool[i].id == id)
+          return this.pool[i];
+
+      return null;
+   },
+
+ }
+
+
+ var RGTE_POOL = new RgtePool();

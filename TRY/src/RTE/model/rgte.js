@@ -15,10 +15,14 @@ function RGTE(){
       this.addedElmtObservers= [];
       this.updatedElmtObservers= [];
       this.thisDeletedObservers = [];
+      this.KidentifiedObservers = []; //When a K is identified
+      this.KdeidentifiedObservers = [];
 
   this.nodes = [];//Need to be CAPTENCLass
   this.edges = [];
   this.edgesCardinality = []; //Array of edge (currently based on vis edge).
+
+  this.knowledges = []; //the this.nodes identified as Knowledge. Reference is maintened via derivedFrom
 
   this.context = null;
 
@@ -32,6 +36,7 @@ function RGTE(){
     this.lastAction = null;
     this.prevAlteredElement = null;//The element altered. In an add, nothing, in an update the initial, like in deletion
     this.prevSubstituteElement = null; //In add, the new, in update, the replacent, in remove nothing.
+    this.previousKnowledge = null; //The last added K
 }
 
 RGTE.nodeID = 0;
@@ -43,6 +48,8 @@ RGTE.ACTIONS = [];
   RGTE.ACTIONS.ADD    = "ADD";
   RGTE.ACTIONS.UPDATE = "UPDATE";
   RGTE.ACTIONS.REMOVE = "REMOVE";
+  RGTE.ACTIONS.K_ADD = "K_ADD";//Added a new Knowledge
+  RGTE.ACTIONS.K_DEL = "K_DEL";//Deleted a new Knowledge
 
 RGTE.NODES = "nodes";
 RGTE.EDGES = "edges";
@@ -357,6 +364,16 @@ RGTE.prototype = {
           if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.thisDeletedObservers))
             this.thisDeletedObservers.push([objCallback,callback]);
         },
+        registerObserverCallbackOnKnowledgeIdentified: function(objCallback, callback)
+        {
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.KidentifiedObservers))
+            this.KidentifiedObservers.push([objCallback,callback]);
+        },
+        registerObserverCallbackOnKnowledgeDeidentified: function(objCallback, callback)
+        {
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.KdeidentifiedObservers))
+            this.KdeidentifiedObservers.push([objCallback,callback]);
+        },
       // === NOTIFIER
         notifyRemove: function(elmtRemoved)
         {
@@ -394,6 +411,28 @@ RGTE.prototype = {
         notifyDelete: function()
         {
           this.thisDeletedObservers.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0], this.id);//e[0] define the `this` context for e[1]
+              }
+          }.bind(this));
+          this.notifyChange();
+        },
+        notifyKIdentification: function()
+        {
+          this.KidentifiedObservers.forEach(function(e)
+          {
+            console.log(e);
+              if (typeof e[1] === "function") {
+                e[1].call(e[0], this.id);//e[0] define the `this` context for e[1]
+              }
+          }.bind(this));
+          this.notifyChange();
+        },
+        notifyKDeidentification: function()
+        {
+          this.KdeidentifiedObservers.forEach(function(e)
           {
             console.log(e);
               if (typeof e[1] === "function") {
@@ -646,6 +685,12 @@ rollback: function()
     case RGTE.ACTIONS.REMOVE:
       this._rollbackRemove();
       break;
+    case RGTE.ACTIONS.K_ADD:
+      this._rollbackKnowledgeAdd();
+      break;
+    case RGTE.ACTIONS.K_DEL:
+      this._rollbackKnowledgeDelete();
+      break;
     default:
   }
 
@@ -746,6 +791,22 @@ _rollbackRemove: function()
   }
 
 },
+
+  _rollbackKnowledgeAdd: function()
+  {
+    if(this.previousKnowledge == null)
+      return;
+
+    this.removeKnowledgeFromSource(this.previousKnowledge.derivedFrom.id);
+  },
+
+  _rollbackKnowledgeDelete: function()
+  {
+    if(this.previousKnowledge == null)
+      return;
+
+    this.addKnowledgeFromSource(this.previousKnowledge.derivedFrom.id);
+  },
 // ===
 
 // === GETTERS ===
@@ -1007,6 +1068,89 @@ _rollbackRemove: function()
       }
     }
   },
+
+  // === KNOWLEDGE MANAGEMENT FUNCTION
+
+    KnowledgeExistsFromSource: function(idOfSource)//Try to find the source in derived from for K regarding the given id
+    {
+      if(this.getNodeById(idOfSource) == null)
+        return null;
+
+      return this._lazyKnowledgeExistsFromSource(idOfSource);
+    },
+
+    _lazyKnowledgeExistsFromSource: function(idOfSource)
+    {
+      for(var i = 0; i < this.knowledges.length; i++)
+      {
+        if(this.knowledges[i].derivedFrom != null && this.knowledges[i].derivedFrom.id == idOfSource)
+          return this.knowledges[i];
+      }
+      return null;
+    },
+
+    addKnowledgeFromSource: function(idOfSource)
+    {
+      var node = this.getNodeById(idOfSource);
+      if(node == null)
+        return null;
+
+      var isExisting = this._lazyKnowledgeExistsFromSource(idOfSource);
+      if(isExisting != null)
+        return isExisting;
+
+      var newK = new ExploitableOutput(node);
+
+      this.knowledges.push(newK);
+
+      this.lastAction = RGTE.ACTIONS.K_ADD;
+      this.previousKnowledge = newK;
+      this.notifyKIdentification();
+
+      return newK;
+    },
+
+    removeKnowledgeFromSource: function(idOfSource)
+    {
+      var indexToSplice = -1;
+      for(var i = 0; i < this.knowledges.length; i++)
+      {
+        if(this.knowledges[i].derivedFrom != null && this.knowledges[i].derivedFrom.id == idOfSource)
+        {
+          indexToSplice = i;
+          break;
+        }
+      }
+
+      if(indexToSplice == -1)
+        return;
+
+      var elmSliced = this.knowledges[indexToSplice];
+      elmSliced.derivedFrom.color = null;
+
+      this.knowledges.splice(indexToSplice,1);
+
+      this.lastAction = RGTE.ACTIONS.K_DEL;
+      this.previousKnowledge = elmSliced;
+      this.notifyKDeidentification();
+
+      return elmSliced;
+
+    },
+
+    getKnowledgeById: function(id)
+    {
+      for(var i = 0; i < this.knowledges.length; i++)
+        if(this.knowledges[i].id == id)
+          return this.knowledges[i];
+      return null;
+    },
+
+    getKnowledges: function()
+    {
+      return this.knowledges;
+    },
+  // === END OF K MANAGEMENT
 
   /**
    * Retrieve all the symbols used as cardinality for reuse. Avoid redundencies, ie not recreate another

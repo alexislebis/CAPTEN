@@ -16,21 +16,16 @@
         </style>
         <!-- <rgte-element id="rgte"></rgte-element> -->
         <!--<h1>RTE<span style="color:blue">#[[name]]</span></h1>-->
-        <rdf-store-reader-element id="FRE" vocab="{{vocab}}"></rdf-store-reader-element>
+        <!-- <rdf-store-reader-element id="FRE" vocab="{{vocab}}"></rdf-store-reader-element> -->
         <!-- <rdf-store-nomenclature-element id="rdn" vocab="{{vocab}}" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}" classes="{{rdfcls}}" props="{{rdfprops}}"></rdf-store-nomenclature-element> -->
 
-        <rgte-workzone-element id="rgteWorkzone" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+        <rgte-workzone-element id="rgteWorkzone" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" enable-edit></rgte-workzone-element>
 
         <!-- <rte-lister-element id="rteList" store="{{rdfStore}}" graph="{{graph}}" graphuri="{{graphuri}}" rdfcls="{{rdfcls}}" rdfprops="{{rdfprops}}"></rte-lister-element> -->
-        <rdf-store-displayer-element id="displayer" vocab="{{vocab}}"></rdf-store-displayer-element>
+        <!-- <rdf-store-displayer-element id="displayer" vocab="{{vocab}}"></rdf-store-displayer-element> -->
 
 
-        <paper-button raised on-tap="generateRDFGraphDisplay">Generate RDF Graph Display</paper-button>
-
-        <paper-input label="Number of nodes" type="number" value="{{valNbNodes}}">
-        </paper-input>
-        <div id="ttest" on-tap="tapFunc">DisplayRDFGraphValue</div>
-        <vis-element id="truc"></vis-element>
+        <!-- <paper-button raised on-tap="generateRDFGraphDisplay">Generate RDF Graph Display</paper-button> -->
         <!-- <rdflib-element id="chouette"></rdflib-element> -->
     </template>
     <script>
@@ -124,7 +119,7 @@
             },
             updateNbNodes: function()
             {
-                this.$.truc.setNodes(this.valNbNodes);
+                // this.$.truc.setNodes(this.valNbNodes);
             },
 
             // _onGraphChanged: function(n, o)

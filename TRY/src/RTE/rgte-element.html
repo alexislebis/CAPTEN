@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../RTE/rgte-displayer-element.html">
 <link rel="import" href="../RTE/rgte-cardinality-form-element.html">
+<link rel="import" href="../../bower_components/paper-swatch-picker/paper-swatch-picker.html">
 
 <dom-module id="rgte-element">
     <template>
@@ -12,6 +13,39 @@
         <style>
              :host {
                 display: block;
+            }
+
+            #paperFabModif{
+              margin-top: -32px;
+              margin-left: -25px;
+
+            }
+
+            #colorPickerFabK
+            {
+              margin-top: -32px;
+              margin-left: -25px;
+            }
+
+            #swatch{
+              @apply --layout-vertical;
+              @apply --layout-center-center;
+              background: var(--paper-fab-background, var(--accent-color));
+              border-radius: 50%;
+              box-sizing: border-box;
+              color: var(--text-primary-color);
+              cursor: pointer;
+              height: 56px;
+              min-width: 0;
+              outline: none;
+              padding: 16px;
+              position: relative;
+              -moz-user-select: none;
+              -ms-user-select: none;
+              -webkit-user-select: none;
+              user-select: none;
+              width: 56px;
+              z-index: 2;
             }
 
         </style>
@@ -28,11 +62,15 @@
 
         <rgte-displayer-element id="rgteview" rgte="{{rgte}}"></rgte-displayer-element>
 
+
+        <div hidden$="{{!enableKnowledge}}" id="colorPickerFabK"><paper-swatch-picker id="swatch"color="{{kcolor}}"><paper-swatch-picker></div>
+
+
         <template id="modif" is="dom-if" if="{{enableModification}}">
-          <iron-icon icon="settings" on-tap="_toggleOpenModif"></iron-icon>
+          <paper-fab id="paperFabModif" icon="settings" on-tap="_toggleOpenModif"></paper-fab>
         </template>
 
-        <template id="openModif" is="dom-if" if="{{isModificationEnabled}}">
+        <template id="openModif" is="dom-if" if="{{isModificationEnabled}}" restamp>
           <template id="noSelect" is="dom-if" if="{{_isNothingSelectedModif(nodeModification, edgeModification)}}">
             <p>You can edit or replace on-the-fly existing node or edge by clicking on it</p>
           </template>
@@ -107,10 +145,20 @@
             </div>
         </paper-dialog>
 
+        <paper-dialog id="removeKnowledgeModal" on-iron-overlay-opened="patchOverlay" modal>
+            <h2>Delete the selected knowledge?</h2>
+            <p>The selected concept is already flagged as a knowledge concept expected of the analysis process. Do you really want to remove it?
+            </p>
+            <div class="buttons">
+                <paper-button dialog-dismiss autofocus>No</paper-button>
+                <paper-button dialog-confirm autofocus on-click="_removeCurrentKnowledge">Yes</paper-button>
+            </div>
+        </paper-dialog>
 
-        <div hidden$="{{ disableCardinality }}">
+
+        <!-- <div hidden$="{{ disableCardinality }}">
           <rgte-cardinality-form-element id="rgteCard" rgte="{{rgte}}" edgeid="{{edgeIDSelected}}"></rgte-cardinality-form-element>
-        </div>
+        </div> -->
 
 
         <!-- TOASTY -->
@@ -141,6 +189,14 @@
           <paper-toast id="toastPropertyDeleted" text="Concept deleted">
             <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
           </paper-toast>
+
+          <paper-toast id="toastKAdded" text="Knowledge Added">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
+          </paper-toast>
+
+          <paper-toast id="toastKDeleted" text="Knowledge deleted">
+            <paper-button on-click="_rollbackAction" class="toastButton">UNDO</paper-button>
+          </paper-toast>
         <!-- END TOASTY -->
 
 </div> <!-- divRoot -->
@@ -169,6 +225,14 @@
                     type: Boolean,
                     notify: true,
                     value: false,
+                    observer: "_resetModificationZone",
+                },
+                enableKnowledge:
+                {
+                  type: Boolean,
+                  value: true,
+                  notify: true,
+                  observer: "_resetKnowledgeZone",
                 },
                 isModificationEnabled://When user want to modify smth
                 {
@@ -213,7 +277,7 @@
                 {
                   type: Object,
                   value: function(){
-                    return new RGTE();
+                    return RGTE_POOL.create();
                   },
                   notify: true,
                   // observer: "_test"
@@ -245,6 +309,15 @@
                   value: false,
                   notify: true,
                 },
+
+                // === COLOR
+                  kcolor:
+                  {
+                    type: String,
+                    value: KNOWLEDGE_COLOR,
+                    notify: true,
+                    observer: "_onColorChange",
+                  },
 
                 // === TOASTY
                   previousRGTENode:
@@ -523,6 +596,10 @@
                 {
                     this._linkingNodesBehavior(params, type);
                 }
+                else if(this.enableKnowledge)
+                {
+                  this._KIdentificationBehavior(params, type);
+                }
                 else if (this.isModificationEnabled)
                 {
                   this._modificationBehavior(params, type);
@@ -602,15 +679,56 @@
               }
             },
 
+            _KIdentificationBehavior: function(params, type)
+            {
+              if(type === EDGE) //Edge identification are not supported yet
+              {
+                console.log("Edge identification are not supported yet. Scientific relevance need to be investigate.");
+                return;
+              }
+
+              if(this.rgte.KnowledgeExistsFromSource(params.id))
+              {
+                this.nodeIDSelected = params.id;
+                this.$.removeKnowledgeModal.open();
+              }
+              else{
+                var res = this.rgte.addKnowledgeFromSource(params.id);
+
+                if(res == null)
+                  return;
+
+                this.$.toastKAdded.open();
+              }
+            },
+
+            _removeCurrentKnowledge: function(e)
+            {
+              if(this.nodeIDSelected == null)
+                return null;
+
+              this.rgte.removeKnowledgeFromSource(this.nodeIDSelected);
+              this.nodeIDSelected = null;
+
+              this.$.toastKDeleted.open();
+            },
+
             _toggleOpenModif: function()
             {
               this.isModificationEnabled = !this.isModificationEnabled;
 
-              if(!this.isModificationEnabled)//close lister if user quit the modif zone
+              if(!this.isModificationEnabled)//close lister if user quit the modif zone + reset state
               {
                 this._triggerListBehavior(true, true, true, true);
+                this._fireModifClosed();
                 this.nodeModification = false;
                 this.edgeModification = false;
+
+                this.editingState = null;
+              }
+              else{
+                this._fireModifOpened();
+                this.enableKnowledge = false;
               }
             },
 
@@ -638,7 +756,17 @@
             //Allow to notify Workzone to redsaplay the interefce of listing
             _triggerListBehavior: function(lister, adding, classes, properties)
             {
-              this.fire('MANAGE_LISTER_VISIBILITY', {isListerDisable:lister, isListerAddingDisable: adding, isClassesListerDisable: classes, isPropertiesListerDisable: properties});
+              console.log("OPTI: remove useless call to _triggerListBehavior");
+              // this.fire('MANAGE_LISTER_VISIBILITY', {isListerDisable:lister, isListerAddingDisable: adding, isClassesListerDisable: classes, isPropertiesListerDisable: properties});
+            },
+
+            _fireModifOpened: function()
+            {
+              this.fire(RGTE_MODIFICATION_ZONE_OPENED_SIGNAL_ID);
+            },
+            _fireModifClosed: function()
+            {
+              this.fire(RGTE_MODIFICATION_ZONE_CLOSED_SIGNAL_ID);
             },
 
             // === TOASTY BEHAVIORS
@@ -683,16 +811,28 @@
               {
                 this._changeEditingState(DELETE);
               },
-            // ===
-            // getNetwork: function()
-            // {
-            //     return this.network;
-            // },
 
-            // getEdgesCardinality: function()
-            // {
-            //     return this.edgesCardinality;
-            // },
+            // ===
+            _resetModificationZone: function()
+            {
+              // this.enableKnowledge = false;
+            },
+            _resetKnowledgeZone: function()
+            {
+              // console.log("Not implemented yet. Need to prevent both modification and K ident simultaneously");
+              //Force to reset the state and display of erlated to modif. Dry prog
+              // this.isModificationEnabled = true;
+              // this._toggleOpenModif();
+            },
+
+            _onColorChange: function(e)
+            {
+              KNOWLEDGE_COLOR = this.kcolor;
+
+              //Hard refresh
+              console.log("Hard refresh.");
+              this.rgte.notifyChange();
+            },
 
         });
       })();

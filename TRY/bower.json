@@ -52,7 +52,8 @@
     "vaadin-split-layout": "vaadin/vaadin-split-layout#^1.1.0",
     "paper-searchbox": "petja/paper-searchbox#^1.0.2",
     "paper-ripple": "PolymerElements/paper-ripple#^1.0.10",
-    "neon-animation": "PolymerElements/neon-animation#^1.2.5"
+    "neon-animation": "PolymerElements/neon-animation#^1.2.5",
+    "paper-swatch-picker": "PolymerElements/paper-swatch-picker#^2.0.0"
   },
   "resolutions": {
     "app-layout": "^0.10.7"

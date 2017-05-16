@@ -309,7 +309,7 @@
                       <span class="useButton hideUseButton selectedItem">
                           <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
                           <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
-                          <paper-icon-button class="removeElmt" icon="icons:system-update-alt" on-tap="_addClassToRGTE"></paper-icon-button>
+                          <paper-icon-button class="removeElmt" icon="{{icon}}" on-tap="_addClassToRGTE"></paper-icon-button>
                       </span>
 
                   </div>
@@ -346,13 +346,13 @@
                       <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]] <paper-ripple></paper-ripple></div>
                       <span class="useButton hideUseButton selectedItem">
                           <!-- <paper-iron-button icon$="[[iconForItem(selected)]]" class="star"></iron-icon> -->
-                          <paper-icon-button class="removeElmt" icon="icons:system-update-alt" on-tap="_addPropToRGTE"></paper-icon-button>
+                          <paper-icon-button class="removeElmt" icon="{{icon}}" on-tap="_addPropToRGTE"></paper-icon-button>
                       </span>
                   </div>
 
-                  <!-- <div class="border"></div>
-
-                </div> -->
+                  <!-- <div class="border"></div> -->
+                  <!--  icons:settings-backup-restore -->
+                <!-- </div> -->
             </template>
           </div>
             <!-- <iron-list id="ilCUSTPROPS" items="[[custompropsToDisplay]]" as="item" class="flex" selection-enabled>
@@ -374,7 +374,7 @@
       </div>
 
       <div id="default">
-        <rdf-store-lister-element id="lister" icon="icons:system-update-alt" filter="{{query}}" vocab="{{vocab}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rdf-store-lister-element>
+        <rdf-store-lister-element id="lister" icon="{{icon}}" filter="{{query}}" vocab="{{vocab}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rdf-store-lister-element>
       </div>
     </div>
 
@@ -519,7 +519,14 @@
                 lastSelectedSpan:
                 {
                   type: Object,
-                }
+                },
+
+                icon:
+                {
+                  type: String,
+                  value: 'icons:system-update-alt',
+                  notify: true,
+                },
             },
 
             observers: [

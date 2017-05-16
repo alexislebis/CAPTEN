@@ -137,11 +137,25 @@
 
                 //UPDATING NETWORK WITH NEW NODES.
                 //Update the node will not change ID of already existing (and identical) elements
-                this.rgte.getNodesSerializedJSON();
+                var n = this.rgte.getNodesSerializedJSON();
                 // rgteView.addNodes(this.rgte.getNodes());
                 // rgteView.addNodes(this.rgte.getNodesSerializedJSON());
                 // rgteView.addEdges(this.rgte.getEdges());
-                rgteView.addNodesAndEdges(this.rgte.getNodesSerializedJSON(), this.rgte.getEdges());
+
+                //Graph coloration (K, relation with operation...)
+
+                for(var i = 0; i < this.rgte.getKnowledges().length; i++)
+                {
+                  for(var j in n)
+                  {
+                    if(n[j].id == this.rgte.getKnowledges()[i].derivedFrom.id)
+                      n[j].color = KNOWLEDGE_COLOR;
+                  }
+                }
+
+                rgteView.addNodesAndEdges(n, this.rgte.getEdges());
+
+
 
                 //DRAW CARDINALITY
                 //Associate, for each edges notified in edgesCardinality{id,from,to}, its cardinality

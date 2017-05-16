@@ -29,32 +29,35 @@
         /*background-color: yellow;*/
       }
 
-
-      #show-toolbar{
-        display: block;
+      #fabMenu{
         position: relative;
-        width: 100%;
-        --paper-icon-button: {color: white};
-
-        --paper-morph-background: var(--default-primary-color);
-
-        --paper-morph-dropdown: {width: 100%;}
-
-        --paper-morph-content: {
-          background-color: var(--default-primary-color);
-          /*left: 0;
-          bottom: 0;*/
-          top:0;
-          height: 56px;
-          padding-top: 8px;
-          overflow: visible;
+        margin-bottom: -25px;
+        left: 8%;
+      }
+      paper-toolbar{
+          width: var(--rgte-common-width);
+          margin: 0 auto;
+        --paper-toolbar-content:{
           @apply(--layout-horizontal);
-          @apply(--layout-around-justified);
-        }
+          @apply(--layout-justified);
+        };
       }
 
-      #show-toolbar paper-fab {
-        --paper-fab-background: var(--default-primary-color);
+      .isHiddenWAnim{
+        opacity: 0;
+        height: 0;
+        overflow: hidden;
+        position: absolute;
+      }
+
+      .isActiveWAnim{
+        position: relative;
+        opacity: 1;
+        height: auto;
+        transition: opacity 1s ease-out;
+      }
+      .strikediag {
+        background: linear-gradient(to right top, transparent 47.75%, currentColor 49.5%, currentColor 50.5%, transparent 52.25%);
       }
 
   </style>
@@ -63,7 +66,7 @@
   <vaadin-split-layout>
 <div id="divRoot">
 
-  <paper-fab-morph id="show-toolbar" vertical-align="bottom" horizontal-align="right" >
+  <!-- <paper-fab-morph id="show-toolbar" vertical-align="bottom" horizontal-align="right" >
     <paper-fab icon="more-horiz" class="dropdown-trigger"></paper-fab>
     <div class="dropdown-content">
       <span hidden$="{{!enableModification}}"><paper-icon-button icon="add" ></paper-icon-button></span>
@@ -71,17 +74,30 @@
       <paper-icon-button icon="icons:speaker-notes"></paper-icon-button>
       <paper-icon-button icon="search"></paper-icon-button>
     </div>
-  </paper-fab-morph>
+  </paper-fab-morph> -->
+  <paper-fab id="fabMenu" on-click="_activateMenuVoc" icon="more-horiz"></paper-fab>
+  <div id="menuTB" class="isHiddenWAnim">
+    <paper-toolbar>
+        <paper-icon-button icon="menu" on-click="_deactivateMenuVoc"></paper-icon-button>
 
-  <rgte-element id="rgte" rgte="{{rgte}}" disable-Cardinality="{{disableCardinality}}" enable-Modification="{{enableModification}}"></rgte-element>
+        <!-- <span hidden$="{{!enableModification}}"><paper-icon-button icon="add" ></paper-icon-button></span> -->
+        <span hidden$="{{disableEdit}}"><paper-icon-button icon="create" toggles active="{{enableModification}}"></paper-icon-button></span>
+        <paper-icon-button class="strikediag" icon="icons:speaker-notes"></paper-icon-button>
+        <paper-icon-button icon="image:brush" toggles active="{{enableKnowledge}}"></paper-icon-button>
+        <paper-icon-button icon="search"></paper-icon-button>
+
+    </paper-toolbar>
+  </div>
+
+  <rgte-element id="rgte" rgte="{{rgte}}" enable-knowledge="{{enableKnowledge}}" disable-Cardinality="{{disableCardinality}}" enable-Modification="{{enableModification}}"></rgte-element>
 
 
-        <div hidden$="{{disableLoadMenu}}">
+        <!-- <div hidden$="{{disableLoadMenu}}">
           <rgte-file-reader-element id="rgteReader" rgte="{{rgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-file-reader-element>
-        </div>
+        </div> -->
 
-        <div hidden$="{{disableLister}}">
-          <rte-lister-element id="rteList" vocab="{{vocab}}" rgte="{{rgte}}" customcls="{{customcls}}" customprops="{{customprops}}" disable-Adding="{{disableAdding}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rte-lister-element>
+        <div hidden$="{{!enableModification}}">
+          <rte-lister-element id="rteList" icon="{{iconLister}}" vocab="{{vocab}}" rgte="{{rgte}}" customcls="{{customcls}}" customprops="{{customprops}}" disable-Adding="{{disableAdding}}" disable-Classes-Lister="{{disableClassesLister}}" disable-Properties-Lister="{{disablePropertiesLister}}"></rte-lister-element>
         </div>
 
         <div  hidden$="{{isHidden}}">
@@ -157,6 +173,12 @@
         },
 
         // === FEATURES BEHAVIORS
+        disableEdit:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
         disableSaveMenu:
         {
           type: Boolean,
@@ -211,6 +233,19 @@
           value: false,
           notify: true,
         },
+        enableKnowledge:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+
+
+        // === DISPLAY
+        iconLister: {
+          type: String,
+          notify: true,
+        },
 
       },
 
@@ -236,6 +271,14 @@
           this.disableAdding = p.detail.isListerAddingDisable;
           this.disableClassesLister = p.detail.isClassesListerDisable;
           this.disablePropertiesLister = p.detail.isPropertiesListerDisable;
+        }.bind(this));
+
+        this.$.rgte.addEventListener(RGTE_MODIFICATION_ZONE_OPENED_SIGNAL_ID, function(e){
+          this.iconLister = "icons:settings-backup-restore";
+        }.bind(this));
+
+        this.$.rgte.addEventListener(RGTE_MODIFICATION_ZONE_CLOSED_SIGNAL_ID, function(e){
+          this.iconLister = "icons:system-update-alt";
         }.bind(this));
 
       },
@@ -286,6 +329,29 @@
         var rgte = this.rgte;
         this.rgte = null;
         this.rgte = rgte;
+      },
+
+      // === DISPLAYING
+      _activateMenuVoc: function(e)
+      {
+        this.$.menuTB.classList.add('isActiveWAnim');
+        // this.$.menuTB.classList.remove('isHiddenWAnim');
+
+        this.$.fabMenu.classList.remove('isActiveWAnim');
+        this.$.fabMenu.classList.add('isHiddenWAnim');
+      },
+      _deactivateMenuVoc: function(e)
+      {
+        this.$.fabMenu.classList.add('isActiveWAnim');
+        // this.$.menuTB.classList.remove('isHiddenWAnim');
+
+        this.$.menuTB.classList.remove('isActiveWAnim');
+        this.$.menuTB.classList.add('isHiddenWAnim');
+      },
+
+      _actvateEdition: function(e)
+      {
+        this.$.enableModification = !this.enableModification;
       },
 
     });
