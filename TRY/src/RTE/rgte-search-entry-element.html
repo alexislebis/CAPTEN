@@ -1,0 +1,49 @@
+<dom-module id="rgte-search-entry-element">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+
+            #searchZone{
+              margin-bottom: 5vh;
+            }
+        </style>
+
+
+<div id="divRoot">
+
+  <rgte-displayer-element rgte="{{rgte}}"></rgte-displayer-element>
+
+  <div id="descriptionBlock">
+    <header>
+      <h3>Description</h3>
+    </header>
+    <p>
+      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum quis malesuada mauris, sit amet venenatis ipsum. Duis in bibendum purus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Fusce ut sapien gravida, efficitur ligula vitae, tristique neque. Ut cursus tincidunt purus in rhoncus. Nulla in augue a urna vehicula luctus. In hac habitasse platea dictumst. Duis cursus nec tellus vitae facilisis. Morbi fermentum iaculis ornare. Morbi interdum justo quis libero bibendum, eget euismod risus hendrerit. Nulla facilisi.
+
+      Aenean sit amet tristique eros. Ut maximus rutrum urna, at efficitur libero feugiat a. Ut tincidunt dui et fermentum ornare. Donec ac facilisis urna, ut posuere ante. Vivamus in sapien at mi molestie convallis quis a velit. Aliquam sit amet efficitur augue. Quisque venenatis risus at ipsum fermentum fermentum. Maecenas placerat vulputate dignissim. Morbi vitae augue tortor. Maecenas lorem eros, tincidunt faucibus porttitor sit amet, egestas quis lacus. In lacinia tincidunt ipsum at congue. Curabitur ut imperdiet justo, id posuere risus. Sed pulvinar felis vel nisi aliquet eleifend. In tempus dignissim augue eu tempus. Praesent in faucibus felis. Nam sit amet urna vulputate, dictum libero pharetra, efficitur nunc.
+    </p>
+  </div>
+
+</div>
+
+
+
+    </template>
+    <script>
+        Polymer(
+        {
+            is: 'rgte-search-entry-element',
+
+            properties:
+            {
+              rgte:
+              {
+                type: Object,
+                notify: true,
+              },
+            },
+        });
+    </script>
+</dom-module>

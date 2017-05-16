@@ -31,6 +31,11 @@
       return null;
    },
 
+   getPool: function()
+   {
+     return this.pool;
+   },
+
  }
 
 

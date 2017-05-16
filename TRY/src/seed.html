@@ -1,6 +1,9 @@
 <link rel="import" href="import/tools-import.html">
 <link rel="import" href="APE/ape-element.html">
+
 <link rel="import" href="RTE/rte.html">
+<link rel="import" href="RTE/rgte-search-element.html">
+<link rel="import" href="RTE/rgte-find-similar-element.html">
 <link rel="import" href="VOOG/voog.html">
 <link rel="import" href="./Vocabulary/vocabulary-lister-element.html">
 <link rel="import" href="./Vocabulary/terminology-element.html">
@@ -64,6 +67,8 @@
       <neon-animatable name='ape'><div name="ape"><ape-element id="apeElem" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></ape-element></div></neon-animatable>
       <neon-animatable name='vocabulary'><vocabulary-lister-element vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></vocabulary-lister-element></neon-animatable>
       <neon-animatable name='terminology'><terminology-element route="{{tailTopLevel}}" rgte="{{rgte}}" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></terminology-element></neon-animatable>
+      <neon-animatable name='rgtesearch'><rgte-search-element></rgte-search-element></neon-animatable>
+      <neon-animatable name='rgtesimilar'><rgte-find-similar-element></rgte-find-similar-element></neon-animatable>
     </neon-animated-pages>
 
 

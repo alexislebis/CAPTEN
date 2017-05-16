@@ -1,0 +1,56 @@
+<link rel="import" href="./rgte-search-entry-element.html">
+
+<dom-module id="rgte-search-element">
+    <template>
+        <style>
+            :host {
+                display: block;
+            }
+
+            #searchZone{
+              margin-bottom: 5vh;
+            }
+        </style>
+
+
+<div id="divRoot">
+
+  <h2>Graph of concepts available</h2>
+  Syncrhonisé avec RGTE
+  <div id="searchZone">
+    <paper-searchbox raise-forced="true" placeholder="Search some terms" value="{{query}}"></paper-searchbox>
+  </div>
+
+    <iron-list items="{{rgtes}}" as="item" scroll-target="document" grid>
+       <template>
+         <rgte-search-entry-element rgte="{{item}}"></rgte-search-entry-element>
+       </template>
+     </iron-list>
+
+</div>
+
+
+
+    </template>
+    <script>
+        Polymer(
+        {
+            is: 'rgte-search-element',
+
+            properties:
+            {
+              rgtes:
+              {
+                type: Object,
+                value: RGTE_POOL.getPool(),
+                notify: true,
+              },
+            },
+
+            attached: function()
+            {
+
+            },
+        });
+    </script>
+</dom-module>
