@@ -62,8 +62,8 @@
 
   </style>
 
-  <vaadin-split-layout>
-  <vaadin-split-layout>
+  <!-- <vaadin-split-layout>
+  <vaadin-split-layout> -->
 <div id="divRoot">
 
   <!-- <paper-fab-morph id="show-toolbar" vertical-align="bottom" horizontal-align="right" >
@@ -75,18 +75,20 @@
       <paper-icon-button icon="search"></paper-icon-button>
     </div>
   </paper-fab-morph> -->
-  <paper-fab id="fabMenu" on-click="_activateMenuVoc" icon="more-horiz"></paper-fab>
-  <div id="menuTB" class="isHiddenWAnim">
-    <paper-toolbar>
-        <paper-icon-button icon="menu" on-click="_deactivateMenuVoc"></paper-icon-button>
+  <div hidden$={{hideMenu}}>
+    <paper-fab id="fabMenu" on-click="_activateMenuVoc" icon="more-horiz"></paper-fab>
+    <div id="menuTB" class="isHiddenWAnim">
+      <paper-toolbar>
+          <paper-icon-button icon="menu" on-click="_deactivateMenuVoc"></paper-icon-button>
 
-        <!-- <span hidden$="{{!enableModification}}"><paper-icon-button icon="add" ></paper-icon-button></span> -->
-        <span hidden$="{{disableEdit}}"><paper-icon-button icon="create" toggles active="{{enableModification}}"></paper-icon-button></span>
-        <paper-icon-button class="strikediag" icon="icons:speaker-notes"></paper-icon-button>
-        <paper-icon-button icon="image:brush" toggles active="{{enableKnowledge}}"></paper-icon-button>
-        <paper-icon-button icon="search"></paper-icon-button>
+          <!-- <span hidden$="{{!enableModification}}"><paper-icon-button icon="add" ></paper-icon-button></span> -->
+          <span hidden$="{{disableEdit}}"><paper-icon-button icon="create" toggles active="{{enableModification}}"></paper-icon-button></span>
+          <paper-icon-button class="strikediag" icon="icons:speaker-notes"></paper-icon-button>
+          <paper-icon-button icon="image:brush" toggles active="{{enableKnowledge}}"></paper-icon-button>
+          <paper-icon-button icon="search"></paper-icon-button>
 
-    </paper-toolbar>
+      </paper-toolbar>
+    </div>
   </div>
 
   <rgte-element id="rgte" rgte="{{rgte}}" enable-knowledge="{{enableKnowledge}}" disable-Cardinality="{{disableCardinality}}" enable-Modification="{{enableModification}}"></rgte-element>
@@ -125,13 +127,13 @@
         </div>
 </div> <!-- divRoot -->
 
-<div>2</div>
-</vaadin-split-layout>
-<div>
-  3
-</div>
+<!-- <div>2</div> -->
+<!-- </vaadin-split-layout> -->
+<!-- <div> -->
+  <!-- 3 -->
+<!-- </div> -->
 <!-- <vaadin-split-layout><div>3</div></vaadin-split-layout> -->
-</vaadin-split-layout>
+<!-- </vaadin-split-layout> -->
       </template>
   <script>
     Polymer(

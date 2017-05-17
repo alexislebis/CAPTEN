@@ -31,6 +31,32 @@
       return null;
    },
 
+   register: function(rgte)
+   {
+     if( rgte == null || !(rgte instanceof RGTE) )
+       return null;
+
+     for(var i = 0; i < this.pool.length; i++) //Prevent duplicata
+       if(this.pool[i].id == rgte.id)
+         return null;
+
+     this.pool.push(rgte);
+
+     return this.pool[this.pool.length-1];
+   },
+
+   unregister: function(rgte)
+   {
+     if(rgte == null || !(rgte instanceof NarratedOperator))
+       return null;
+
+     for(var i = 0; i < this.pool.length; i++) //Prevent duplicata
+       if(this.pool[i].id == rgte.id)
+         return this.pool.splice(i,1);
+
+     return null;
+   },
+
    getPool: function()
    {
      return this.pool;

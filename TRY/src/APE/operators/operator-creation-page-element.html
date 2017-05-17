@@ -1,0 +1,1028 @@
+<!-- NOTE Need to use a VIS-ELEMENT in order to define its sensitive pattern for proc -->
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../../RTE/rgte-workzone-element.html">
+
+<dom-module id="operator-creation-page-element">
+    <template>
+    <style include="toasty-style"></style>
+    <style>
+      :host {
+        font-family: sans-serif;
+        --vis-element-width: 100%;
+        --vis-element-height: 21vw;
+      }
+      .propSelected{
+        background-color: red;
+      }
+
+      .container{
+        display: block;
+        position: relative;
+        max-width: var(--operator-creator-element-max-width, 366.666667px);
+        /*margin: 5px auto;*/
+      }
+
+      .card{
+        display: block;
+        position: relative;
+        box-sizing: border-box;
+        width: 100%;
+        background-color: #ffffff;
+        border-radius: 2px;
+        font-family: 'Roboto', 'Noto', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .fabAdd{
+        z-index: 1;
+        position: absolute;
+        transform: translate(var(--operator-creator-fabAdd-translate-left, 245px), var(--operator-creator-fabAdd-translate-top, -60px));
+        /* position: relative; */
+        /*transform: translate(-5%, 80%);*/
+      }
+
+      .fabCancel{
+        z-index: 1;
+        position: absolute;
+        transform: translate(var(--operator-creator-fabCancel-translate-left, 370px), var(--operator-creator-fabCancel-translate-top, -30px));
+      }
+
+
+
+
+      /**/
+      #divRoot{
+        width: 60%;
+        margin: 0 auto;
+        background-color: DodgerBlue;
+
+      }
+
+      #divRoot > header{
+        width: 100%;
+        text-align: center;
+        margin-bottom: 100px;
+      }
+
+      #divRoot > header > paper-input{
+        width: 50%;
+        margin: 0 auto;
+      }
+
+      #paperFabs{
+        position: relative;
+        top: -60px;
+        left: -65px;
+        margin-bottom: -380px;
+      }
+
+      #paperFabs paper-fab{
+        margin-top: 25px;
+      }
+
+      .narrativeContent{
+        width: 90%;
+        margin: 0 auto;
+        border: 1px solid black;
+        padding : 5px 30px;
+      }
+
+      #separator{
+        width: 100%;
+        margin: 50px 0px;
+        border-bottom: 1px solid black;
+      }
+
+      .headerSubSection{
+        width: 200px;
+        padding-left: 40px;
+        margin-bottom: 10px;
+      }
+
+        .headerSubSection > div{
+          border-bottom: 1px solid black;
+        }
+
+          .headerSubSection > div > span{
+            position: relative;
+            left: -40px;
+          }
+
+    #configurationZone > header{
+      display: block;
+      margin: 0 auto;
+      background-color: red;
+      text-align: center;
+    }
+
+    #forFlex{
+      @apply(--layout-horizontal);
+      @apply(--layout-justified);
+    }
+
+    #behaviors{
+      width: 45%;
+      background-color: PowderBlue;
+    }
+
+    #others{
+      width: 45%;
+    }
+
+    #outputBehavior, #inputBehavior, #parameterBehavior, #relationBetweenElements{
+      height: 25vw;
+      background-color: red;
+      margin-bottom: 10px;
+    }
+
+    #outputPattern, #inputPattern{
+      --rgte-common-width: 100%;
+    }
+
+    #parameterBehavior{
+      margin: 0 auto;
+    }
+
+    .paperFabSubSection{
+      left: -32px;
+      margin-bottom: -27px;
+    }
+
+    .center{
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /*#inputBehavior{
+      width: 300px;
+      height: 300px;
+    }*/
+
+    </style>
+
+<app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
+
+<div id="divRoot">
+
+  <header>
+    <h2> <span hidden$={{!isNew}}>New </span>Operator</h2>
+    <div id="paperFabs">
+      <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab>
+      <paper-fab icon="icons:file-upload" on-click="_openImportVocab"></paper-fab>
+      <paper-fab on-click="_openFormAdd" icon="add"></paper-fab>
+      <!-- Display Voc graph -->
+      <paper-fab id="visibilityOn" icon="icons:visibility" on-click="_makeVisible"></paper-fab>
+      <paper-fab id="visibilityOff" class="isHiddenWAnim" icon="icons:visibility-off" on-click="_makeUnvisible"></paper-fab>
+    </div>
+    <paper-input id="nameNOP" label="Narrated operator name" value="{{nopname}}" disbaled="{{disableModification}}" char-counter required maxlength="100"></paper-input>
+  </header>
+
+  <div id="narrativeInfo">
+    <div id="generalInformation">
+      <header>
+        <h4>General Information</h4>
+      </header>
+      <div id="gIContent" class="narrativeContent">
+        <paper-input id="objectif1NOP" label="The narrated operator's objective (#1)" value="{{nopobjectif1}}" char-counter maxlength="100"></paper-input>
+        <paper-input id="conceptConvoyed1" label="Concept conveyed by this narrated operator (#1)" value="{{nopconceptconvoyed1}}"></paper-input>
+        <paper-textarea label="Description of the narrated operator" value="{{nopdescription}}"></paper-textarea>
+        <paper-input id="creatorName" label="Tool handling the narrated operator (version). Example : KTBS (v0.2.5)" value="{{noptool1}}"></paper-input>
+      </div>
+    </div>
+    <div id="otherNarrative">
+      <header>
+        <h4>Other Narrative Information</h4>
+      </header>
+      <div id="oNIContent" class="narrativeContent">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius, est id ultrices lobortis, magna dolor aliquet ligula, non mollis augue turpis in nulla. Donec sit amet dui ornare, tempus nibh nec, pharetra tellus. Aliquam metus ex, convallis a tincidunt nec, tempus sit amet quam. Nullam at pellentesque tellus. Ut sollicitudin maximus lorem ac porttitor. Vivamus fringilla viverra nisl ut ultrices. Morbi aliquet sem lectus, sed malesuada velit facilisis sit amet. Donec volutpat, nunc quis ultrices aliquam, velit ante convallis purus, et malesuada mauris est accumsan magna. Vivamus nec nibh non arcu finibus posuere sed eget turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+      </div>
+    </div>
+  </div>
+
+  <div id="separator"></div>
+
+  <div id="configurationZone">
+    <header>
+      <h4>Representation of its behavior<br/>(How it is supposed to work in a general way)</h4>
+    </header>
+
+  <div id='forFlex'>
+    <div id="behaviors">
+      <div id="outputBehavior">
+        <header class="headerSubSection">
+          <div><span>Output behavior</span></div>
+        </header>
+
+        <paper-fab class="paperFabSubSection" icon="launch" on-click="_openOutputPattern"></paper-fab>
+
+        <rgte-workzone-element id="outputPattern" hide-menu disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopoutputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+      </div>
+
+      <div id="inputBehavior">
+        <header class="headerSubSection">
+          <div><span>Input behavior</span></div>
+        </header>
+
+        <paper-fab class="paperFabSubSection" icon="launch" on-click="_openInputPattern"></paper-fab>
+        <rgte-workzone-element id="inputPattern" hide-menu disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopinputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+      </div>
+    </div>
+
+    <div id="others">
+      <div id="parameterBehavior">
+        <header class="headerSubSection">
+          <div><span>Parameter behavior</span></div>
+        </header>
+        <div class="center">
+          <paper-fab id="fabParameter" disabled icon="add"></paper-fab>
+        </div>
+
+        <paper-input id="p1" label="Parameter concept #1 (e.g. Type of correlation measure)" value="{{nopparameter1}}"></paper-input>
+      </div>
+
+      <div id="relationBetweenElements">
+        Array of narrative elements to do
+      </div>
+
+    </div>
+    </div>
+  </div>
+</div>
+
+<paper-toast id="NOPRegistered" text='The narrated operator has been saved'>
+  <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
+</paper-toast>
+
+<paper-toast id="NOPNotYetRegistered" duration="Infinity" text='The narrated operator is not yet saved. Fill its name for saving it first.'>
+</paper-toast>
+
+<paper-toast id="NOPStillNotAdded" duration="Infinity" text='Fill the name to save your operator'>
+</paper-toast>
+
+<!-- <div class="container">
+    <div class="fabAdd" hidden="{{isNewNopHidden}}">
+      <paper-fab on-tap="_toggleNopHide" icon="add"></paper-fab>
+    </div>
+    <div class="fabCancel" hidden="{{!isNewNopHidden}}">
+      <paper-fab on-tap="_toggleNopHide" icon="clear"></paper-fab> -->
+      <!-- <span on-tap="_toggleNopHide">Close <iron-icon icon="clear" prefix></iron-icon></span> -->
+    <!-- </div>
+
+  <div hidden='{{!isNewNopHidden}}'>
+      <paper-card class="card">
+        <h3>Operator Creator</h3>
+        <form is="iron-form" method="get" action="/" id="newNopForm" on-iron-form-submit="_submitForm">
+        <div class="card-content">
+
+          <h4>Operator attributes <paper-icon-button id="pibCollapse1" on-tap="_toggleCollapse1" icon="icons:expand-more"></paper-icon-button></h4>
+
+          <iron-collapse id="collapse">
+
+            <paper-input id="creatorName" name="n" label="Creator's name" value="{{creatorName}}" required></paper-input>
+
+            <paper-input id="nameNOP" label="NOP's name" value="{{nopname}}" char-counter required maxlength="100"></paper-input>
+            <paper-textarea label="Description of the narrated operator" value="{{nopdescription}}"></paper-textarea>
+            <paper-textarea label="Example" value="{{nopexample1}}"></paper-textarea>
+
+            <paper-input id="objectif1NOP" label="NOP's objective (#1)" value="{{nopobjectif1}}" char-counter maxlength="100"></paper-input>
+
+            <div id="conceptsConveyed">
+              <paper-input id="conceptConvoyed1" label="Concept conveyed by the NOP (#1)" value="{{nopconceptconvoyed1}}"></paper-input>
+
+            </div>
+
+            <div>
+              <paper-input id="tag1" label="Tag" value="{{noptag1}}" char-counter maxlength="15"></paper-input> -->
+              <!-- TODO : Faire les multi-paper-inputs -->
+            <!-- </div> -->
+
+            <!-- <div> -->
+            <!-- <paper-textarea label="Example of utilization "></paper-textarea> -->
+            <!-- TODO multi text area  -->
+            <!-- </div> -->
+
+            <!-- <div id="relationNOP"> -->
+              <!-- Dérivé de, etc. -->
+              <!-- TODO : Relations sur les particularités, contraintes, etc... Utiliser Haeeceity sans doute vers elmts -->
+            <!-- </div>
+          </iron-collapse>
+
+          <h4>Operator graphs <paper-icon-button id="pibCollapse2" on-tap="_toggleCollapse2" icon="icons:expand-more"></paper-icon-button></h4>
+          <iron-collapse id="collapse2">
+
+            <div id="patterns">
+              <div>
+                <template is="dom-if" if="{{isBindingIO}}">
+                  <iron-icon icon="lightbulb-outline"></iron-icon> Clicking on a node in the operator input and output will bind them.
+                </template>
+                <div id="bindIToO">
+                  <iron-icon icon="trending-flat" on-tap="_toggleIOBinding"></iron-icon> Link concepts with the operation
+                </div>
+                <div id="bindPToO">
+                  <iron-icon icon="trending-flat" on-tap="_toggleRGTEParamsBinding"></iron-icon> Link concepts with parameters
+                </div>
+              </div>
+              <div id="inputP">
+                <div hidden$="{{isInputPatternDisplayed}}" on-tap="_toggleInputPatternDisplayed">
+                  Open input pattern <iron-icon icon="add-box"></iron-icon>
+                </div>
+                <div hidden$="{{!isInputPatternDisplayed}}">
+                  <span on-tap="_toggleInputPatternDisplayed"> Close input pattern  <iron-icon icon="clear"></iron-icon></span>
+                  <rgte-workzone-element id="inputPattern" disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopinputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+                </div>
+              </div>
+              <div id="outputP">
+                <div hidden$="{{isOutputPatternDisplayed}}" on-tap="_toggleOutputPatternDisplayed">
+                  Open output pattern <iron-icon icon="add-box"></iron-icon>
+                </div>
+                <div hidden$="{{!isOutputPatternDisplayed}}">
+                  <span on-tap="_toggleOutputPatternDisplayed"> Close output pattern  <iron-icon icon="clear"></iron-icon></span>
+                  <rgte-workzone-element id="outputPattern" disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopoutputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+                </div>
+              </div>
+              <div id="parametersP">
+                <div hidden$="{{isParameterPatternDisplayed}}" on-tap="_toggleParameterPatternDisplayed">
+                  Open parameters pattern <iron-icon icon="add-box"></iron-icon>
+                </div>
+                <div hidden$="{{!isParameterPatternDisplayed}}">
+                  <span on-tap="_toggleParameterPatternDisplayed"> Close parameters pattern  <iron-icon icon="clear"></iron-icon></span>
+
+                  <div id="divp1">
+                    P1 :
+                    <paper-input id="p1" label="Parameter concept (e.g. Type of correlation measure)" value="{{nopparameter1}}"></paper-input>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </iron-collapse>
+
+        <h4>Operator's relation with analysis tools <paper-icon-button id="pibCollapse3" on-tap="_toggleCollapse3" icon="icons:expand-more"></paper-icon-button></h4>
+        <iron-collapse id="collapse3">
+
+          <div id="toolsImplementation">
+            <paper-input id="creatorName" label="Tool handling the NOP (version). Example : KTBS (v0.2.5)" value="{{noptool1}}"></paper-input> -->
+            <!-- TODO : gestion plus pousser des outils. Par exemple lors d'un choix d'outils, sous menu pour indiquer op et configuration , version, etc..-->
+          <!-- </div>
+        </iron-collapse>
+
+          <paper-dialog on-iron-overlay-closed="_replaceOrAddIO" id="propertyIOModal" modal>
+              <h2>Replace or add ?</h2>
+              <p>Will this new property replace an existing one or be simply added ?</p>
+              <div class="buttons">
+                  <paper-button dialog-dismiss>Replace</paper-button>
+                  <paper-button dialog-confirm autofocus>Add</paper-button>
+              </div>
+          </paper-dialog>
+
+          <paper-dialog on-iron-overlay-closed="_selectPropIO" id="propertySelectIOModal" modal>
+              <h2>Select a property to replace</h2>
+              <template id="propsSelector" is="dom-repeat" items="[[props]]" index-as="index">
+                <div on-tap="_propSelect" id="prop[[idProp]]" class$="[[_computePropertySelection(index, indexSelectedProp)]]">
+                  {{item.uri}} : From {{item.from.uri}} to {{item.to.uri}}
+                </div>
+              </template>
+              <div class="buttons">
+                  <paper-button dialog-confirm autofocus>Ok</paper-button>
+              </div>
+          </paper-dialog>
+        </div>
+        <div class="card-actions">
+          <paper-button raised on-click="_submitted">Create !</paper-button>
+        </div>
+      </form>
+    </paper-card>
+  </div>
+</div> -->
+  </template>
+    <script>
+        Polymer(
+        {
+            is: 'operator-creation-page-element',
+
+            properties:
+            {
+              routeTopLevel:
+              {
+                type: Object,
+                notify: true,
+              },
+
+              route:
+              {
+                type: Object,
+                notify: true,
+              },
+
+              isNew: {
+                type: Boolean,
+                value: true,
+                notify: true,
+              },
+
+              nop:
+              {
+                type: Object,
+                value: function(){return new NarratedOperator();},
+                notify: true,
+                observer: "_onNOPChange",
+              },
+
+              isPoolRegistered:  //Keep a trace either or not the nop has been added to the pool
+              {
+                type: Boolean,
+                value: false,
+                notify: true,
+              },
+
+              disableModification:
+              {
+                type: Boolean,
+                value: false,
+                notify: true,
+              },
+            // === FORM VARIABLE
+              // FIXME TODO : remplacer les différents éléments 1 par des tableaux et permettre de récupérer plus d'une chaine de car dans le form via utilisation du multi input à dev !
+                nopname:
+                {
+                    type: String,
+                    value: "",
+                    notify: true,
+                    observer: "_onNopNameChange",
+                },
+
+                noptag1:
+                {
+                    type: String,
+                    value: "",
+                    notify: true,
+                },
+
+                nopobjectif1:
+                {
+                    type: String,
+                    value: "",
+                    notify: true,
+                },
+                nopexample1:
+                {
+                  type: String,
+                  value: "",
+                  notify: true,
+                },
+
+                nopdescription:
+                {
+                  type: String,
+                  value: "",
+                  notify: true,
+                },
+
+                nopconceptconvoyed1:
+                {
+                  type: String,
+                  value: "",
+                  notify: true,
+                },
+
+                nopparameter1:
+                {
+                  type: String,
+                  value: "",
+                  notify: true,
+                },
+
+                noptool1:
+                {
+                  type: String,
+                  value: "",
+                  notify: true,
+                },
+
+                currentProp://Memorize the last prop generated, for remplace or adding
+                {
+                  type: Object,
+                  value: null,
+                },
+                props://All the props to insert into the new operator
+                {
+                  type: Array,
+                  value: function(){return [];},
+                  notify: true,
+                },
+
+
+                creatorName:
+                {
+                    type: String,
+                    value: "",
+                    notify: true,
+                },
+
+                nopinputrgte:
+                {
+                    type: String,
+                    value: function()
+                    {
+                        return new RGTE();
+                    },
+                    notify: true,
+                },
+                nopoutputrgte:
+                {
+                    type: String,
+                    value: function()
+                    {
+                        return new RGTE();
+                    },
+                    notify: true,
+                },
+                nopsettingsrgte:
+                {
+                    type: String,
+                    value: function()
+                    {
+                        return new RGTE();
+                    },
+                    notify: true,
+                },
+
+                indexSelectedProp://For coloriate the selected prop
+                {
+                  type: Number,
+                  value: -1,
+                  notify: true,
+                },
+                //Async properties managment
+                isIOCompleted://Used for determine if a new row has to be added to the propAsyncBuildIO
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                propAsyncBuildIO://PropertyAsyncrhonousBuilder for Input to Output
+                {
+                  type: Object,
+                  value: function(){return new PropertyAsyncrhonousBuilder();},
+                  notify: true,
+                },
+                isBindingIO:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                isBindingParams:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                superrgte: // SuperRGTE = nopinputrgte U nopoutputrgte U nopsettingsrgte U additional_properties
+                {
+                    type: String,
+                    value: function()
+                    {
+                        return new RGTE();
+                    },
+                    notify: true,
+                },
+
+            // === DISPLAYER
+                isInputPatternDisplayed:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+
+                isOutputPatternDisplayed:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                isParameterPatternDisplayed:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+
+                vocab:
+                {
+                  type: Object,
+                },
+                customcls://used for file-reader
+                {
+                    type: Array,
+                    notify: true,
+                },
+                customprops:
+                {
+                    type: Array,
+                    notify: true,
+                },
+                isNewNopHidden:
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
+                // iconsForCollapser:
+                // {
+                //   type: Object,
+                //   value: function(return ["icons:expand-more","icons:expand-less"])
+                // },
+            },
+
+            observers: [
+              "_onDataRouteChanged(route)",
+            ],
+
+          // === ROUTING
+            _onDataRouteChanged: function(r)
+            {
+              this._resetComponent();
+
+              if(this.data.itemValue == null || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
+              {
+                this._generateDefaultConfig();
+                return;
+              }
+
+              var resItem = NARRATED_OPERATION_POOL.getNOPByID(this.data.itemValue);
+
+              if(resItem == null)
+              {
+                this._generateDefaultConfig();
+                return;
+              }
+
+              //==========REDO==========
+              this.nop = resItem;
+              //======================
+
+              this.isNew = false;
+              this.isPoolRegistered = true;
+            },
+
+            _openOutputPattern: function()
+            {
+              if(!this.isPoolRegistered)
+              {
+                this.$.NOPNotYetRegistered.open();
+                return;
+              }
+
+              this.set('routeTopLevel.path', '/rgte/'+this.nop.behaviors['output'].id);
+              window.scrollTo(0,0);
+            },
+
+            _openInputPattern: function()
+            {
+              if(!this.isPoolRegistered)
+              {
+                this.$.NOPNotYetRegistered.open();
+                return;
+              }
+
+              this.set('routeTopLevel.path', '/rgte/'+this.nop.behaviors['input'].id);
+              window.scrollTo(0,0);
+            },
+
+
+          // === NATIVE METHODS
+            attached: function()
+            {
+              if(this.isNew)
+                this.$.NOPStillNotAdded.open();
+
+              this.propAsyncBuildIO.setFirstObject(this.nopinputrgte);
+              this.propAsyncBuildIO.setSecondObject(this.nopoutputrgte);
+              this.propAsyncBuildIO.setArray(1);//Work only with 1 property a time. Added to this.props
+              this.propAsyncBuildIO.registerObserverCallbackOnCompletion(this, this._onIOCompletion);
+              this.propAsyncBuildIO.registerObserverCallbackOnUncompletion(this, this._onIOUncompletion);
+
+              this.$.inputPattern.addEventListener('NODE_CLICKED', function(p)
+              {
+                this._behaviorSelectorIOClicked(p.detail);
+              }.bind(this));
+              this.$.outputPattern.addEventListener('NODE_CLICKED', function(p)
+              {
+                this._behaviorSelectorIOClicked(p.detail);
+              }.bind(this));
+            },
+
+            detached: function()
+            {
+              this.$.NOPStillNotAdded.close();
+            },
+          // ===
+            // === PRIVATE METHODS
+            _onNopNameChange: function(change)
+            {
+              if( (this.nopname == null || this.nopname.length < 3) )
+              {
+                if(this.isPoolRegistered) //If the NOP is registered inside the pool, it can't be kept
+                {
+                  NARRATED_OPERATION_POOL.unregisterNOP(this.nop);
+                  this.isPoolRegistered = false;
+                }
+
+                this.$.NOPStillNotAdded.open();
+
+                return;
+              }
+
+              if(!this.isPoolRegistered) //if the nop is not yet registered into the pool
+              {
+                if(NARRATED_OPERATION_POOL.registerNOP(this.nop) != null)
+                {
+                  this.isPoolRegistered = true;
+                  this.$.NOPRegistered.open();
+                }
+              }
+
+              if(this.isPoolRegistered)
+                this.$.NOPStillNotAdded.close();
+
+            },
+
+            _resetComponent: function()
+            {
+              console.error("Implement resetComponent from operator-creation-page-element");
+            },
+
+            _generateDefaultConfig: function()
+            {
+              this.isNew = true;
+            },
+
+            _onNOPChange: function()
+            {
+              this._alignComponentAttribute();
+            },
+
+            _alignComponentAttribute: function()
+            {
+              this.nopname = this.nop.usualName;
+
+              //@TODO handle narrative element for NOP
+              console.error("HANDLE NARRATIION FOR BLOCKS ATTRs");
+            },
+// === OLD
+            _behaviorSelectorIOClicked: function(params)
+            {
+              if(this.isBindingIO && this.isBindingParams)
+              {
+                console.log('Curently, binding simultaneously input with param & output is not supported. Disable one of them to procced.');
+              }
+              else if(this.isBindingIO)
+                this._bindingIO(params);
+              else if(this.isBindingParams)
+                this._bindingIP(params);
+              else
+                this._defaultBehavior(params);
+            },
+
+            _defaultBehavior: function(params)
+            {
+
+            },
+
+            _bindingIO: function(params)
+            {
+              var obj = this.nopinputrgte.getNodeById(params.id);
+              if(obj == null)
+                obj = this.nopoutputrgte.getNodeById(params.id);
+
+              this.propAsyncBuildIO.bind(obj,INFLUENCES_URI,'influences');
+            },
+
+            _bindingIP: function(params)
+            {
+
+            },
+
+            _toggleIOBinding: function()
+            {
+              this.isBindingIO = !this.isBindingIO;
+            },
+
+            _onIOCompletion: function()
+            {
+              this.currentProp;
+              var arr = this.propAsyncBuildIO.getArrayFilled();
+
+              for(var i in arr)
+                this.currentProp = arr[i];
+
+              this.$.propertyIOModal.open();
+              this.propAsyncBuildIO.reset();
+            },
+
+            _propSelect: function(e)
+            {
+              this.indexSelectedProp = e.model.index;
+            },
+
+            _computePropertySelection: function(idxelem, currentIdx)
+            {
+              if(idxelem == currentIdx)
+                return 'propSelected';
+
+              return '';
+            },
+
+            _selectPropIO: function(e)//Triggered when the selection modal of prop is closed
+            {
+              if(this.indexSelectedProp == -1 || this.indexSelectedProp == null)
+                return;
+
+              this.splice('props', this.indexSelectedProp, 1);
+              this.push('props', this.currentProp);
+
+              this.indexSelectedProp = -1;
+              this.currentProp = null;
+            },
+
+            _onIOUncompletion: function()
+            {
+              this.isIOCompleted = false;
+            },
+
+            _close: function(change)
+            {
+                this.fire("-CloseNOPCreator");
+            },
+
+            _toggleInputPatternDisplayed: function()
+            {
+              this.isInputPatternDisplayed = !this.isInputPatternDisplayed;
+
+              if(this.isInputPatternDisplayed)
+              {
+                this.vocab.notifyChange();
+                this._updateCustoms();
+              }
+            },
+
+            _toggleOutputPatternDisplayed: function()
+            {
+              this.isOutputPatternDisplayed = !this.isOutputPatternDisplayed;
+
+              if(this.isOutputPatternDisplayed)
+              {
+                this.vocab.notifyChange();
+                this._updateCustoms();
+              }
+            },
+
+            _toggleParameterPatternDisplayed: function()
+            {
+              this.isParameterPatternDisplayed = !this.isParameterPatternDisplayed;
+            },
+
+            _updateCustoms: function()
+            {
+              var cls = this.customcls;
+              var props = this.customprops;
+
+              this.customcls = [];
+              this.customprops = [];
+
+              this.customcls = cls;
+              this.customprops = props;
+            },
+
+            _replaceOrAddIO: function(e)
+            {
+              if (e.detail.confirmed)//Add new prop
+              {
+                  this.push('props',this.currentProp);
+              }
+              else
+              { //Otherwise the user don't want to bind prop, thus it has to be reset
+                this.$.propertySelectIOModal.open();
+              }
+            },
+
+            /**
+             * Build the NOP from the data contained within the form
+             */
+            _buildNOP: function()
+            {
+              var nop = new NarratedOperator();
+
+              nop.usualName = this.nopname;
+              nop.uri = this.nopname;
+              nop.uriConceptConvoyed = this.nopconceptconvoyed1; //TODO array of uri concepts
+              // nop.annotation = [];
+              // nop.annotation.push(this.nopdescription);
+              // nop.annotation.push(this.nopexample1); //TODO array
+              nop.annotation = new Description(); console.error("Create a narrative block here!");
+              nop.annotation.content = this.nopdescription;
+              nop.objective = this.nopobjectif1; //TODO Array
+              nop.behaviors = [];
+              nop.behaviors['input'] = this.nopinputrgte;
+              nop.behaviors['output'] = this.nopoutputrgte;
+              nop.behaviors['parameters'] = this.nopparameter1;
+              nop.implementedByOperation = [];
+              nop.implementedByOperation.push(this.noptool1); //TODO array & operations
+              nop.author = new Author();
+              nop.author.authorName = this.creatorName; //TODO CREATE NARRATIVE BLOCK
+              console.log(nop.author);
+              nop.creationDate = new Date();
+
+              nop.properties = this.props;
+
+              console.log("RESET THE CARD !");
+
+              return nop;
+            },
+
+            _reset: function()
+            {
+              this.nopname = null;
+              this.creatorName = null;
+              this.nopconceptconvoyed1 = null; //TODO array of uri concepts
+              // nop.annotation = [];
+              // nop.annotation.push(this.nopdescription);
+              // nop.annotation.push(this.nopexample1); //TODO array
+              this.nopdescription = null;
+              this.nopobjectif1 = null;
+              this.nopinputrgte = new RGTE();
+              this.nopoutputrgte = new RGTE();
+              this.nopparameter1 = null;
+              this.noptool1 = null; //TODO array & operations;
+              this.props = [];
+            },
+
+            _toggleNopHide: function()
+            {
+              this.isNewNopHidden = !this.isNewNopHidden;
+            },
+
+            _toggleCollapse1: function()
+            {
+              this.$.collapse.toggle();
+              if(this.$.collapse.opened)
+                this.$.pibCollapse1.setAttribute('icon', 'icons:expand-less');
+              else
+                this.$.pibCollapse1.setAttribute('icon', 'icons:expand-more');
+            },
+            _toggleCollapse2: function()
+            {
+              this.$.collapse2.toggle();
+              if(this.$.collapse2.opened)
+                this.$.pibCollapse2.setAttribute('icon', 'icons:expand-less');
+              else
+                this.$.pibCollapse2.setAttribute('icon', 'icons:expand-more');
+            },
+            _toggleCollapse3: function()
+            {
+              this.$.collapse3.toggle();
+              if(this.$.collapse3.opened)
+                this.$.pibCollapse3.setAttribute('icon', 'icons:expand-less');
+              else
+                this.$.pibCollapse3.setAttribute('icon', 'icons:expand-more');
+            },
+
+
+// === SUBMISSION FORM
+            _submitted: function(event)
+            {
+                Polymer.dom(event).localTarget.parentElement.parentElement.submit();
+            },
+
+            _submitForm: function(event)
+            {
+              // var form = Polymer.dom(event).localTarget;
+
+              //Insuring that the submission does not comming from another form
+              if(event.path[0].id.indexOf('newNopForm') == -1)
+                return;
+
+              var nop = this._buildNOP();
+
+              this.fire('-NewNOP', nop);
+              this._reset();
+            },
+
+
+
+// === TOAST
+      _closeToast: function(e)
+      {
+        Polymer.dom(e).localTarget.parentElement.close();
+      },
+
+        });
+    </script>
+
+</dom-module>

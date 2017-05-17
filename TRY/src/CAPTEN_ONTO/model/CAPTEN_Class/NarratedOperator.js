@@ -18,8 +18,10 @@ function NarratedOperator(usualName)
     // this.inputPatterns = null; //Inputs RGTE pattern needed
     // this.outputPatterns = null; //Output pattern. : can be infered by behaviors(inputPatterns)
     // this.specificSettings = null; //Specific settings needed to this Indp. Op. such as _node1_ > 5
-    this.behaviors = null; //BehavioralPattern. The behaviors of a specific NarratedOperator.
-
+    this.behaviors = []; //BehavioralPattern. The behaviors of a specific NarratedOperator.
+      this.behaviors['output'] = new RGTE();//this RGTE is not register in the RGTE POOL
+      this.behaviors['input'] = new RGTE;//this RGTE is not register in the RGTE POOL
+      
     //Analysis tools links
     this.implementedByOperation = null; //For each tool : [T1:[OperatorList], T2:[OperatorList], ...]
 

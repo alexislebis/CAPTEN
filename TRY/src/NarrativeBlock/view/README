@@ -1,0 +1,12 @@
+# Créer un composant gérant l'affichage des propriétés pour un block donné
+
+### Attributs : Elmt1, Elmt2
+* Si seuelemtn Elmt1 -> Charge l'entiereté du block narratif sous forme de ligne et les réparties en fonction
+du type ( ***ssi*** `classifyFromType` is set to true)
+* Si Elmt1 et Elmt2 -> le block narratif récupère l'union des relations tq:
+```
+this.NB_POOL.getFrom(Elmt1).retrieveAllRelatedTo(Elmt2) U this.NB_POOL.getFrom(Elmt2).retrieveAllRelatedTo(Elmt1)
+```
+* Sinon, avec aucun -> demande à l'utilisateur
+
+END of README
