@@ -9,8 +9,10 @@
 
     </style>
 
+    <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
+
 <div id="divRoot">
-AU changement de route charger le tableau plutôt qu'à l'observation
+
     <paper-button raised>Create a new narrated operator</paper-button>
 
     <div id="searchZone" hidden="{{_computeHiddenAssumption(itemElmt)}}">
@@ -22,8 +24,8 @@ AU changement de route charger le tableau plutôt qu'à l'observation
     <header class="headerSubSection">
       <div><span>Operations</span></div>
     </header>
-
-    <template is="dom-repeat" items="{{operationsArray}}" filter="{{computeFilter(query)}}" index-as="index" restamp>
+<!--  -->
+    <template id="repeater" is="dom-repeat" items="{{operationsArray}}" filter="{{computeFilter(query)}}" index-as="index" restamp>
       <operator-displayer-element operator="{{item}}"><opeator-displayer-element>
       <!-- <div> -->
           <!-- <div class$="[[_computeClass(index)]]" on-tap="_custcTapped"> -->
@@ -58,17 +60,60 @@ AU changement de route charger le tableau plutôt qu'à l'observation
           type: Object,
           notify: true,
         },
+
+        route:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        query : String,
+      },
+
+      observers: [
+        "_onRouteChanged(route)",
+      ],
+
+      _onRouteChanged: function(route)
+      {
+        if(route.path != "/operation_search")
+          return null;
+
+
+        //@HACK force dom repeat redraw
+        this.operationsArray = [];
+        this.$.repeater.render();
+        //===
+
+        this.operationsArray = NARRATED_OPERATION_POOL.getAvailableOperations();
+
+        this.$.repeater.render();
+
+        console.log(this.operationsArray);
       },
 
       attached: function()
       {
-        NARRATED_OPERATION_POOL.registerObserverCallbackOnChange(this, this._updateOperationsArray);
+        // NARRATED_OPERATION_POOL.registerObserverCallbackOnChange(this, this._updateOperationsArray);
+      },
+
+      computeFilter: function(query)
+      {
+        if(!query || query == null)
+          return null;
+        else {
+          query = query.toLowerCase();
+          return function(item){
+            // return (item.uri.toLowerCase().includes(query) || item.label.toLowerCase().includes(query));
+            return true;
+          };
+        }
       },
 
       _updateOperationsArray: function()
       {
         // this.operationsArray = [];
-        this.set('operationsArray', NARRATED_OPERATION_POOL.getAvailableOperations());
+        // this.set('operationsArray', NARRATED_OPERATION_POOL.getAvailableOperations());
       },
 
     });
