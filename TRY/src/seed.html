@@ -2,10 +2,12 @@
 
 <link rel="import" href="APE/operators/operator-creation-page-element.html">
 <link rel="import" href="APE/ape-element.html">
+<link rel="import" href="APE/operation-search-element.html">
 
 <link rel="import" href="RTE/rte.html">
 <link rel="import" href="RTE/rgte-search-element.html">
 <link rel="import" href="RTE/rgte-find-similar-element.html">
+<link rel="import" href="RTE/rgte-page-element.html">
 
 <link rel="import" href="VOOG/voog.html">
 <link rel="import" href="./Vocabulary/vocabulary-lister-element.html">
@@ -65,14 +67,15 @@
                      attr-for-selected='name'
                      entry-animation='scale-up-animation'
                      exit-animation='slide-right-animation'>
-      <neon-animatable name='rgte'><div name="rte" ><main-rte id="rteElem" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></main-rte></div></neon-animatable>
+      <neon-animatable name='rgte'><div name="rte" ><rgte-page-element id="rteElem" route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-page-element></div></neon-animatable>
       <neon-animatable name='voog'><div name="voog"><main-voog></main-voog></div></neon-animatable>
       <neon-animatable name='ape'><div name="ape"><ape-element id="apeElem" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></ape-element></div></neon-animatable>
       <neon-animatable name='vocabulary'><vocabulary-lister-element vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></vocabulary-lister-element></neon-animatable>
       <neon-animatable name='terminology'><terminology-element route="{{tailTopLevel}}" rgte="{{rgte}}" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></terminology-element></neon-animatable>
-      <neon-animatable name='rgtesearch'><rgte-search-element></rgte-search-element></neon-animatable>
-      <neon-animatable name='rgtesimilar'><rgte-find-similar-element></rgte-find-similar-element></neon-animatable>
-      <neon-animatable name="NOP"><operator-creation-page-element route-top-level="{{route}}" route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operator-creation-page-element></neon-animatable>
+      <neon-animatable name='rgte_search'><rgte-search-element></rgte-search-element></neon-animatable>
+      <neon-animatable name='rgte_similar'><rgte-find-similar-element></rgte-find-similar-element></neon-animatable>
+      <neon-animatable name="nop"><operator-creation-page-element route-top-level="{{route}}" route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operator-creation-page-element></neon-animatable>
+      <neon-animatable name="operation_search"><operation-search-element></operation-search-element></neon-animatable>
     </neon-animated-pages>
 
 

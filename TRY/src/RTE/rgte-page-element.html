@@ -1,0 +1,379 @@
+<link rel="import" href="../wrapper/rgte-model-element.html">
+<link rel="import" href="../RTE/rte-lister-element.html">
+<link rel="import" href="../RTE/rgte-element.html">
+<link rel="import" href="../RTE/rgte-saver-xml-element.html">
+<link rel="import" href="../RTE/rgte-file-reader-element.html">
+
+<link rel="import" href="../../../bower_components/paper-fab-transitions/paper-fab-morph.html">
+<link rel="import" href="../../../bower_components/iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../../../bower_components/vaadin-split-layout/vaadin-split-layout.html">
+
+
+<dom-module id="rgte-page-element">
+  <template>
+    <style include="toasty-style"></style>
+      <style is="custom-style">
+            :host {
+                display: block;
+                --rgte-common-width: 80%;
+                --vis-element-background-color: white;
+            }
+
+      #divRoot{
+        width: var(--rgte-workzone-element-width, 100%);
+      }
+
+      #rgte{
+        margin: 0 auto;
+        width: var(--rgte-common-width);
+        /*background-color: yellow;*/
+      }
+
+      #fabMenu{
+        position: relative;
+        margin-bottom: -25px;
+        left: 8%;
+      }
+      paper-toolbar{
+          width: var(--rgte-common-width);
+          margin: 0 auto;
+        --paper-toolbar-content:{
+          @apply(--layout-horizontal);
+          @apply(--layout-justified);
+        };
+      }
+
+      .isHiddenWAnim{
+        opacity: 0;
+        height: 0;
+        overflow: hidden;
+        position: absolute;
+      }
+
+      .isActiveWAnim{
+        position: relative;
+        opacity: 1;
+        height: auto;
+        transition: opacity 1s ease-out;
+      }
+      .strikediag {
+        background: linear-gradient(to right top, transparent 47.75%, currentColor 49.5%, currentColor 50.5%, transparent 52.25%);
+      }
+
+  </style>
+
+
+<app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
+
+<div id="divRoot">
+
+  <header>
+    <h2> <span hidden$={{!isNew}}>New </span>Graph of concepts</h2>
+  </header>
+
+  <rgte-workzone-element id="rteElem" rgte="{{rgte}}" disable-edit="{{disableEdit}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+
+</div> <!-- divRoot -->
+
+
+  <paper-toast id="toastNotifyNowRgteCreated"  text='This new RGTE has been saved'>
+    <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
+  </paper-toast>
+
+</template>
+  <script>
+    Polymer(
+    {
+      is: 'rgte-page-element',
+
+      properties:
+      {
+      // === ROUTING
+      route:
+      {
+        type: Object,
+        notify: true,
+      },
+
+      isNew: {
+        type: Boolean,
+        value: true,
+        notify: true,
+      },
+
+      // ============
+        isHidden:
+        {
+          type: Boolean,
+          value: true,
+          notify: true,
+        },
+        rgte:
+        {
+          type: Object,
+          value: function()
+          {
+            return new RGTE();
+          },
+          notify: true,
+          observer: "_test",
+        },
+
+        vocab:
+        {
+          type: Object,
+        },
+        customcls: //used for file-reader
+        {
+          type: Array,
+          notify: true,
+        },
+        customprops:
+        {
+          type: Array,
+          notify: true,
+        },
+
+        // === FEATURES BEHAVIORS
+        disableEdit:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        disableSaveMenu:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        disableBagMenu:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        disableLoadMenu:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        disableLister:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        disableAdding: //Used in the RGTE LISTER for prevent addition of new element
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        disableCardinality:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        enableModification:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        disableClassesLister:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        disablePropertiesLister:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        enableKnowledge:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+
+
+        // === DISPLAY
+        iconLister: {
+          type: String,
+          notify: true,
+        },
+
+      },
+
+      behaviors: [
+        Polymer.IronFormElementBehavior
+      ],
+
+      observers: [
+        "_onDataRouteChanged(route)",
+      ],
+
+      // === ROUTING
+        _onDataRouteChanged: function(r)
+        {
+          if(r.prefix != "/rgte")
+            return;
+
+          this._resetComponent();
+
+          if(this.data.itemValue == null || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue == ''|| this.data.itemValue.search(/\D+/) != -1)
+          {
+            this._generateDefaultConfig();
+            return;
+          }
+
+          var resItem = RGTE_POOL.getByID(this.data.itemValue);
+
+          if(resItem == null)
+          {
+            this._generateDefaultConfig();
+            return;
+          }
+
+          this.rgte = resItem;
+
+          this.isNew = false;
+        },
+
+      attached: function()
+      {
+        if(this.isNew)
+        {
+          setTimeout( function(){this.$.toastNotifyNowRgteCreated.open();}.bind(this), 2000);
+        }
+
+
+        // this.$.rteList.addEventListener('-ClassAddedToRGTE', function(e)
+        // {
+        //   this.$.rgte.classDispatcherBehavior(e.detail.val);
+        // }.bind(this));
+        //
+        // this.$.rteList.addEventListener('-PropAddedToRGTE', function(e)
+        // {
+        //   this.$.rgte.propertyDispatcherBehavior(e.detail.val);
+        // }.bind(this));
+        //
+        // this.$.rgte.addEventListener('MANAGE_LISTER_VISIBILITY', function(p)
+        // {
+        //   this.disableLister = p.detail.isListerDisable;
+        //   this.disableAdding = p.detail.isListerAddingDisable;
+        //   this.disableClassesLister = p.detail.isClassesListerDisable;
+        //   this.disablePropertiesLister = p.detail.isPropertiesListerDisable;
+        // }.bind(this));
+        //
+        // this.$.rgte.addEventListener(RGTE_MODIFICATION_ZONE_OPENED_SIGNAL_ID, function(e){
+        //   this.iconLister = "icons:settings-backup-restore";
+        // }.bind(this));
+        //
+        // this.$.rgte.addEventListener(RGTE_MODIFICATION_ZONE_CLOSED_SIGNAL_ID, function(e){
+        //   this.iconLister = "icons:system-update-alt";
+        // }.bind(this));
+
+      },
+
+      _resetComponent: function()
+      {
+
+      },
+
+      _generateDefaultConfig: function()
+      {
+        this.rgte = RGTE_POOL.create();
+        this.isNew = true;
+
+        this.$.toastNotifyNowRgteCreated.open();
+      },
+
+      _test: function()
+      {
+        console.log("In change");
+      },
+
+      //@HACK
+      patchOverlay: function (e) {
+        if (e.target.withBackdrop) {
+          e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
+        }
+      },
+
+      _generateAddRGTE: function()
+      {
+        this.$.OnlyOneRGTEATM.open();
+
+        // console.log("DELETE BELOW");
+        // this.rgte.parseJSON('lol','1');
+      },
+
+      _saveRGTEToXML: function()
+      {
+        this.isHidden = false;
+        // this.$.xmlSaver.save(this.network);
+      },
+
+      _isAccepted: function(e)
+      {
+        if (!e.detail.confirmed)
+          return;
+
+        //var RGTE = {network: this.$.rgte.getNetwork(), cardinality: this.$.rgte.getEdgesCardinality()};
+        this.fire("-RGTEAddedToTheBag", this.rgte);
+      },
+
+      _computeHidden: function(isHidden)
+      {
+        console.log("cH:" + isHidden);
+        return isHidden;
+      },
+
+      notifyRGTEChange: function()
+      {
+        var rgte = this.rgte;
+        this.rgte = null;
+        this.rgte = rgte;
+      },
+
+      // === DISPLAYING
+      _activateMenuVoc: function(e)
+      {
+        this.$.menuTB.classList.add('isActiveWAnim');
+        // this.$.menuTB.classList.remove('isHiddenWAnim');
+
+        this.$.fabMenu.classList.remove('isActiveWAnim');
+        this.$.fabMenu.classList.add('isHiddenWAnim');
+      },
+      _deactivateMenuVoc: function(e)
+      {
+        this.$.fabMenu.classList.add('isActiveWAnim');
+        // this.$.menuTB.classList.remove('isHiddenWAnim');
+
+        this.$.menuTB.classList.remove('isActiveWAnim');
+        this.$.menuTB.classList.add('isHiddenWAnim');
+      },
+
+      _actvateEdition: function(e)
+      {
+        this.$.enableModification = !this.enableModification;
+      },
+
+      // === TOAST
+            _closeToast: function(e)
+            {
+              Polymer.dom(e).localTarget.parentElement.close();
+            },
+
+    });
+  </script>
+
+</dom-module>

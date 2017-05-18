@@ -6,10 +6,31 @@
 function NarratedOperatorPool()
 {
   this.pool = [];
+
+  this.observers = [];
 }
 
 NarratedOperatorPool.prototype =
 {
+  // === OBSERVATION ===
+  registerObserverCallbackOnChange: function(objCallback, callback)
+  {
+    if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observers))
+      this.observers.push([objCallback,callback]);
+  },
+
+    // === NOTIFICATION
+    notifyChange: function()
+    {
+      this.observers.forEach(function(e)
+      {
+          if (typeof e[1] === "function") {
+            e[1].call(e[0]);//e[0] define the `this` context for e[1]
+          }
+      });
+    },
+  // ===================
+
   create: function()
   {
     var nop = new NarratedOperator();
@@ -17,6 +38,8 @@ NarratedOperatorPool.prototype =
     this.pool.push(nop);
     RGTE_POOL.register(nop.behaviors['output']);
     RGTE_POOL.register(nop.behaviors['input']);
+
+    this.notifyChange();
 
     return nop;
   },
@@ -36,6 +59,7 @@ NarratedOperatorPool.prototype =
     RGTE_POOL.register(nop.behaviors['output']);
     RGTE_POOL.register(nop.behaviors['input']);
 
+    this.notifyChange();
 
     return this.pool[this.pool.length-1];
   },
@@ -61,6 +85,8 @@ NarratedOperatorPool.prototype =
       RGTE_POOL.unregister(nop.behaviors['output']);
       RGTE_POOL.unregister(nop.behaviors['input']);
     }
+
+    this.notifyChange();
 
     return res;
   },
@@ -88,7 +114,7 @@ NarratedOperatorPool.prototype =
       return true;
 
     return false;
-  }
+  },
 
 }
 

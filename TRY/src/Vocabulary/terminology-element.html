@@ -358,7 +358,7 @@
       {
         this._resetComponent();
 
-        if(this.data.itemValue == null || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
+        if(this.data.itemValue == null || this.data.itemValue == '' || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
         {
           this._generateDefaultConfig();
           return;

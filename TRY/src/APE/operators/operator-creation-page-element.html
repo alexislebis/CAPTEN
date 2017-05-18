@@ -179,7 +179,7 @@
       <paper-fab id="visibilityOn" icon="icons:visibility" on-click="_makeVisible"></paper-fab>
       <paper-fab id="visibilityOff" class="isHiddenWAnim" icon="icons:visibility-off" on-click="_makeUnvisible"></paper-fab>
     </div>
-    <paper-input id="nameNOP" label="Narrated operator name" value="{{nopname}}" disbaled="{{disableModification}}" char-counter required maxlength="100"></paper-input>
+    <paper-input id="nameNOP" label="Narrated operator name" value="{{nopname}}" disabled="{{disableModification}}" char-counter required maxlength="100"></paper-input>
   </header>
 
   <div id="narrativeInfo">
@@ -525,7 +525,7 @@
 
                 nopinputrgte:
                 {
-                    type: String,
+                    type: Object,
                     value: function()
                     {
                         return new RGTE();
@@ -534,11 +534,8 @@
                 },
                 nopoutputrgte:
                 {
-                    type: String,
-                    value: function()
-                    {
-                        return new RGTE();
-                    },
+                    type: Object,
+                    value: null,
                     notify: true,
                 },
                 nopsettingsrgte:
@@ -647,6 +644,9 @@
           // === ROUTING
             _onDataRouteChanged: function(r)
             {
+              if(r.prefix.toLowerCase() != "/nop")
+                return;
+
               this._resetComponent();
 
               if(this.data.itemValue == null || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
@@ -663,9 +663,8 @@
                 return;
               }
 
-              //==========REDO==========
+
               this.nop = resItem;
-              //======================
 
               this.isNew = false;
               this.isPoolRegistered = true;
@@ -699,8 +698,10 @@
           // === NATIVE METHODS
             attached: function()
             {
-              if(this.isNew)
+              if(!this.isPoolRegistered)
+              {
                 this.$.NOPStillNotAdded.open();
+              }
 
               this.propAsyncBuildIO.setFirstObject(this.nopinputrgte);
               this.propAsyncBuildIO.setSecondObject(this.nopoutputrgte);
@@ -726,6 +727,8 @@
             // === PRIVATE METHODS
             _onNopNameChange: function(change)
             {
+              this.nop.usualName = this.nopname;
+
               if( (this.nopname == null || this.nopname.length < 3) )
               {
                 if(this.isPoolRegistered) //If the NOP is registered inside the pool, it can't be kept
@@ -734,6 +737,7 @@
                   this.isPoolRegistered = false;
                 }
 
+                this.$.NOPStillNotAdded.close();
                 this.$.NOPStillNotAdded.open();
 
                 return;
@@ -756,10 +760,14 @@
             _resetComponent: function()
             {
               console.error("Implement resetComponent from operator-creation-page-element");
+              this.isPoolRegistered = false;
             },
 
             _generateDefaultConfig: function()
             {
+              this.nop = new NarratedOperator();
+              console.log(this.nop);
+
               this.isNew = true;
             },
 
@@ -770,6 +778,9 @@
 
             _alignComponentAttribute: function()
             {
+                this.nopoutputrgte = this.nop.behaviors['output'];
+                this.nopinputrgte = this.nop.behaviors['input'];
+
               this.nopname = this.nop.usualName;
 
               //@TODO handle narrative element for NOP

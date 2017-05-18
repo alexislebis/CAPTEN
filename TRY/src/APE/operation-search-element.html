@@ -1,0 +1,76 @@
+<dom-module id="operation-search-element">
+  <template>
+    <style>
+
+    #searchZone paper-searchbox{
+      --paper-searchbox-background: var(--paper-searchbox-dark-background);
+      --paper-searchbox-color: black;
+    }
+
+    </style>
+
+<div id="divRoot">
+AU changement de route charger le tableau plutôt qu'à l'observation
+    <paper-button raised>Create a new narrated operator</paper-button>
+
+    <div id="searchZone" hidden="{{_computeHiddenAssumption(itemElmt)}}">
+      <paper-searchbox raise-forced="true" placeholder="Search operation" value="{{query}}"></paper-searchbox>
+    </div>
+
+    <paper-button raised>Show search options</paper-button>
+
+    <header class="headerSubSection">
+      <div><span>Operations</span></div>
+    </header>
+
+    <template is="dom-repeat" items="{{operationsArray}}" filter="{{computeFilter(query)}}" index-as="index" restamp>
+      <operator-displayer-element operator="{{item}}"><opeator-displayer-element>
+      <!-- <div> -->
+          <!-- <div class$="[[_computeClass(index)]]" on-tap="_custcTapped"> -->
+              <!-- <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >[[item.uri]] <paper-ripple></paper-ripple> </div> -->
+              <!-- <span class="useButton hideUseButton selectedItem"> -->
+                  <!-- <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
+                  <!-- <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
+                  <!-- <paper-icon-button class="removeElmt" icon="icons:launch" on-click="_openTerminology"></paper-icon-button> -->
+              <!-- </span> -->
+          <!-- </div> -->
+    </template>
+
+    <header class="headerSubSection">
+      <div><span>Previous operations used</span></div>
+    </header>
+
+    <header class="headerSubSection">
+      <div><span>Suggested operations</span></div>
+    </header>
+
+</div>
+
+  </template>
+  <script>
+    Polymer(
+    {
+      is: 'operation-search-element',
+
+      properties:{
+        operationsArray:
+        {
+          type: Object,
+          notify: true,
+        },
+      },
+
+      attached: function()
+      {
+        NARRATED_OPERATION_POOL.registerObserverCallbackOnChange(this, this._updateOperationsArray);
+      },
+
+      _updateOperationsArray: function()
+      {
+        // this.operationsArray = [];
+        this.set('operationsArray', NARRATED_OPERATION_POOL.getAvailableOperations());
+      },
+
+    });
+  </script>
+</dom-module>

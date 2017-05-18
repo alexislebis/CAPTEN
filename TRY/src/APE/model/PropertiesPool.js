@@ -113,6 +113,6 @@ PropertiesPool.prototype = {
     return related;
   },
 
-};
+}
 
 var PROPERTIES_POOL = new PropertiesPool();

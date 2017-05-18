@@ -830,6 +830,9 @@
               KNOWLEDGE_COLOR = this.kcolor;
 
               //Hard refresh
+              if(this.rgte == null)
+                return;
+                
               console.log("Hard refresh.");
               this.rgte.notifyChange();
             },

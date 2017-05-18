@@ -15,10 +15,34 @@
  {
    this.nopPool = nopPool;
    this.napPool = napPool;
+
+
+   this.nopPool.registerObserverCallbackOnChange(this, this.notifyChange);
+   this.napPool.registerObserverCallbackOnChange(this, this.notifyChange);
+
+   this.observers = [];
  }
 
  NarratedOperationPool.prototype =
  {
+   // === OBSERVATION ===
+   registerObserverCallbackOnChange: function(objCallback, callback)
+   {
+     if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observers))
+       this.observers.push([objCallback,callback]);
+   },
+
+     // === NOTIFICATION
+     notifyChange: function()
+     {
+       this.observers.forEach(function(e)
+       {
+           if (typeof e[1] === "function") {
+             e[1].call(e[0]);//e[0] define the `this` context for e[1]
+           }
+       });
+     },
+   // ===================
    createNOP: function()
    {
       return this.nopPool.create();
@@ -47,6 +71,11 @@
    unregisterNOP: function(nop)
    {
      return this.nopPool.unregister(nop);
+   },
+
+   getAvailableOperations: function()
+   {
+     return this.nopPool.pool.concat(this.napPool.pool);
    },
  }
 
