@@ -2,50 +2,68 @@
   <template>
     <style>
 
+    #searchZone{
+      @apply(--layout-horizontal);
+      margin-bottom: 50px;
+    }
+
     #searchZone paper-searchbox{
+      @apply(--layout-flex);
       --paper-searchbox-background: var(--paper-searchbox-dark-background);
       --paper-searchbox-color: black;
     }
 
+    #divRoot{
+      width: 60%;
+      margin: 0 auto;
+    }
+
+    #new{
+      @apply(--layout-vertical);
+      @apply(--layout-center);
+      margin-bottom: 50px;
+    }
+
     </style>
+
+    <app-location route="{{routeTopLevel}}" use-hash-as-path></app-location>
 
     <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
 
 <div id="divRoot">
 
-    <paper-button raised>Create a new narrated operator</paper-button>
+  <div id="new">
+    <paper-button raised on-click="_openNew">Create a new narrated operator</paper-button>
+  </div>
 
     <div id="searchZone" hidden="{{_computeHiddenAssumption(itemElmt)}}">
       <paper-searchbox raise-forced="true" placeholder="Search operation" value="{{query}}"></paper-searchbox>
+      <paper-button raised disabled>Show search options</paper-button>
     </div>
 
-    <paper-button raised>Show search options</paper-button>
-
-    <header class="headerSubSection">
-      <div><span>Operations</span></div>
-    </header>
-<!--  -->
+  <div id="result">
+    <div id="normal">
+      <header class="headerSubSection">
+        <div><span><h3>Operations</h3></span></div>
+      </header>
+  <!--  -->
     <template id="repeater" is="dom-repeat" items="{{operationsArray}}" filter="{{computeFilter(query)}}" index-as="index" restamp>
-      <operator-displayer-element operator="{{item}}"><opeator-displayer-element>
-      <!-- <div> -->
-          <!-- <div class$="[[_computeClass(index)]]" on-tap="_custcTapped"> -->
-              <!-- <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >[[item.uri]] <paper-ripple></paper-ripple> </div> -->
-              <!-- <span class="useButton hideUseButton selectedItem"> -->
-                  <!-- <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
-                  <!-- <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
-                  <!-- <paper-icon-button class="removeElmt" icon="icons:launch" on-click="_openTerminology"></paper-icon-button> -->
-              <!-- </span> -->
-          <!-- </div> -->
+        <operator-displayer-element operator="{{item}}"><opeator-displayer-element>
     </template>
+    </div>
+    <div id="previous">
+      <header class="headerSubSection">
+        <div><span>Previous operations used</span></div>
+      </header>
+    </div>
+    <div>
+      <header class="headerSubSection">
+        <div><span>Suggested operations</span></div>
+      </header>
+    </div>
 
-    <header class="headerSubSection">
-      <div><span>Previous operations used</span></div>
-    </header>
-
-    <header class="headerSubSection">
-      <div><span>Suggested operations</span></div>
-    </header>
-
+    (note:lier nop avec voc pour leur type pour emergence des relations)
+  </div>
 </div>
 
   </template>
@@ -61,6 +79,8 @@
           notify: true,
         },
 
+        routeTopLevel: Object,
+
         route:
         {
           type: Object,
@@ -73,6 +93,11 @@
       observers: [
         "_onRouteChanged(route)",
       ],
+
+      _openNew: function()
+      {
+        this.set('route.path', '/nop/new');
+      },
 
       _onRouteChanged: function(route)
       {
@@ -89,7 +114,6 @@
 
         this.$.repeater.render();
 
-        console.log(this.operationsArray);
       },
 
       attached: function()
@@ -104,8 +128,7 @@
         else {
           query = query.toLowerCase();
           return function(item){
-            // return (item.uri.toLowerCase().includes(query) || item.label.toLowerCase().includes(query));
-            return true;
+            return (item.usualName.toLowerCase().includes(query));
           };
         }
       },

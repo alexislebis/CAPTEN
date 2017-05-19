@@ -19,3 +19,6 @@
 
     // === SUBSUMPTION
       var SUBSUMPTION_CREATED_SIGNAL_ID = "-6e35ge78gr79hre6h67rqehq";
+
+    // === NOP
+      var NOP_SELECTED_SIGNAL_ID = "-854LmfenBWbvbevo5zfea3f";
