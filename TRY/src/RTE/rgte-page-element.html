@@ -249,10 +249,10 @@
 
       attached: function()
       {
-        if(this.isNew)
+        this.$.rteElem.addEventListener('-ClassAddedToRGTE', function(e)
         {
-          setTimeout( function(){this.$.toastNotifyNowRgteCreated.open();}.bind(this), 2000);
-        }
+          this._lazyRegisterRGTE();
+        }.bind(this));
 
 
         // this.$.rteList.addEventListener('-ClassAddedToRGTE', function(e)
@@ -283,6 +283,16 @@
 
       },
 
+      _lazyRegisterRGTE: function() //lazy checking if the rgte has at least on element. If so, does not register him. Otherwise, register
+      {
+        if(this.rgte.nodes.length > 0)//Lazy verification. Not check into the pool
+          return;
+
+        RGTE_POOL.register(this.rgte);
+
+        this.$.toastNotifyNowRgteCreated.open();
+      },
+
       _resetComponent: function()
       {
 
@@ -290,10 +300,10 @@
 
       _generateDefaultConfig: function()
       {
-        this.rgte = RGTE_POOL.create();
+        // this.rgte = RGTE_POOL.create();
+        this.rgte = new RGTE();
         this.isNew = true;
 
-        this.$.toastNotifyNowRgteCreated.open();
       },
 
       _test: function()
