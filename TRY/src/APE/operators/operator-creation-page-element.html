@@ -173,13 +173,17 @@
     <h2> <span hidden$={{!isNew}}>New </span>Operator</h2>
     <div id="paperFabs">
       <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab>
+
+      <!-- <div hidden$="{{isNew}}">
+        <paper-fab icon="icons:save"></paper-fab>
+      </div> -->
       <!-- <paper-fab icon="icons:file-upload" on-click="_openImportVocab"></paper-fab>
       <paper-fab on-click="_openFormAdd" icon="add"></paper-fab> -->
       <!-- Display Voc graph -->
       <!-- <paper-fab id="visibilityOn" icon="icons:visibility" on-click="_makeVisible"></paper-fab>
       <paper-fab id="visibilityOff" class="isHiddenWAnim" icon="icons:visibility-off" on-click="_makeUnvisible"></paper-fab> -->
     </div>
-    <paper-input id="nameNOP" label="Narrated operator name" value="{{nopname}}" disabled="{{!isNew}}" char-counter required maxlength="100"></paper-input>
+    <paper-input id="nameNOP" label="Narrated operator name" value="{{nopname}}" char-counter required maxlength="100"></paper-input>
   </header>
 
   <div id="narrativeInfo">
@@ -218,7 +222,7 @@
           <div><span>Output behavior</span></div>
         </header>
 
-        <paper-fab class="paperFabSubSection" icon="launch" on-click="_openOutputPattern"></paper-fab>
+        <paper-fab class="paperFabSubSection" disabled="{{!isPoolRegistered}}" icon="launch" on-click="_openOutputPattern"></paper-fab>
 
         <rgte-workzone-element id="outputPattern" hide-menu disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopoutputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
       </div>
@@ -228,7 +232,7 @@
           <div><span>Input behavior</span></div>
         </header>
 
-        <paper-fab class="paperFabSubSection" icon="launch" on-click="_openInputPattern"></paper-fab>
+        <paper-fab class="paperFabSubSection" disabled="{{!isPoolRegistered}}" icon="launch" on-click="_openInputPattern"></paper-fab>
         <rgte-workzone-element id="inputPattern" hide-menu disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopinputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
       </div>
     </div>
@@ -734,6 +738,9 @@
             {
               this.nop.usualName = this.nopname;
 
+              if(!this.isNew) //if the operation is not new, then it is not concerned about pool referencing
+                return;
+
               if( (this.nopname == null || this.nopname.length < 3) )
               {
                 if(this.isPoolRegistered) //If the NOP is registered inside the pool, it can't be kept
@@ -759,6 +766,7 @@
 
               if(this.isPoolRegistered)
                 this.$.NOPStillNotAdded.close();
+
 
             },
 
