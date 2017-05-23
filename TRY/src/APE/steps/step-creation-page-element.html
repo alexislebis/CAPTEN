@@ -1,0 +1,154 @@
+<dom-module id="step-creation-page-element">
+  <template>
+    <style>
+      :host{
+
+      }
+    </style>
+
+<app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
+
+<div id="divRoot">
+
+  <header>
+    <h2> <span hidden$={{!isNew}}>New </span>Step</h2>
+    <div id="paperFabs">
+      <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
+
+    </div>
+    <paper-input id="nameNOP" label="Narrated operator name" value="{{stepName}}" char-counter required maxlength="100"></paper-input>
+  </header>
+
+  <div id="narrativeInfo">
+    <div id="generalInformation">
+      <header>
+        <h4>General Information</h4>
+      </header>
+      <div id="gIContent" class="narrativeContent">
+        <paper-input id="objectif1Step" label="The step's objective (#1)" value="{{stepobjectif1}}" char-counter maxlength="100"></paper-input>
+      </div>
+    </div>
+    <div id="otherNarrative">
+      <header>
+        <h4>Other Narrative Information</h4>
+      </header>
+      <div id="oNIContent" class="narrativeContent">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius, est id ultrices lobortis, magna dolor aliquet ligula, non mollis augue turpis in nulla. Donec sit amet dui ornare, tempus nibh nec, pharetra tellus. Aliquam metus ex, convallis a tincidunt nec, tempus sit amet quam. Nullam at pellentesque tellus. Ut sollicitudin maximus lorem ac porttitor. Vivamus fringilla viverra nisl ut ultrices. Morbi aliquet sem lectus, sed malesuada velit facilisis sit amet. Donec volutpat, nunc quis ultrices aliquam, velit ante convallis purus, et malesuada mauris est accumsan magna. Vivamus nec nibh non arcu finibus posuere sed eget turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+      </div>
+    </div>
+  </div>
+
+
+  <div id="separator"></div>
+
+  <div id="configurationZone">
+
+<!-- CONFIGURATION ZONE  -->
+
+    <header>
+      <h4>Representation of its behavior<br/>(How it is supposed to work in a general way)</h4>
+    </header>
+
+    <div id="stepState">
+      <h3 id="stateTitle">Step State</h3>
+      <div id="stepStateError">
+        <div id="sSEHead">
+          <h4 class="title">Error to solve before completing the step</h4>
+        </div>
+        <div id="sSESubDiv">
+        </div>
+      </div>
+      <div id="stepStateLinking">
+        <div id="sSLHead">
+          <h4 class="title">@removeInputs concepts to Operator linkage</h4>
+        </div>
+        <div id="sSLSubDiv">
+
+        </div>
+      </div>
+      <div id="identifK">
+        <h4 class="title">@removeIdentify knowledge concepts</h4>
+        <paper-fab id="kFab" icon="image:brush" on-tap="_toggleKnowledgeIdentification">
+      </div>
+    </div>
+
+    <vaadin-split-layout>
+      <vaadin-split-layout>
+        <div><rgte-page-element></rgte-page-element></div>
+        <div>
+          <neon-animated-pages selected='{{operationSection}}'
+                           attr-for-selected='name'
+                           entry-animation='scale-up-animation'
+                           exit-animation='slide-right-animation'>
+
+             <neon-animatable name='searchOperation'><operation-search-element id="ose" enable-use="true"></operation-search-element></neon-animatable>
+             <neon-animatable name='operationZone'><main-voog></main-voog></neon-animatable>
+
+          </neon-animated-pages>
+        </div>
+      </vaadin-split-layout>
+        <div><rgte-page-element></rgte-page-element></div>
+    </vaadin-split-layout>
+
+    <div id="graphsRelations">
+      Tableau de relations ici.
+      Intégrer les relations avec les éléments narratifs.
+      Rajouter un color picker à la fin de la ligne.
+    </div>
+
+<!-- END CONFIGURATION ZONE  -->
+
+  </div>
+</div>
+  </template>
+  <script>
+    Polymer(
+    {
+      is:"step-creation-page-element",
+
+
+      properties:
+      {
+        route:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        // === Page
+        operationSection:
+        {
+            type: String,
+            value: "searchOperation",
+            notify: true,
+        },
+        operationSectionStack: // Used to remember the user navigation. Usefull? 
+        {
+          type: Array,
+          value: function(){return [];},
+          notify: true,
+        }
+      },
+
+      observers: [
+        "_onRouteChanged(route)",
+      ],
+
+      attached: function()
+      {
+        this.$.ose.addEventListener(OPERATION_USE_FROM_SEARCH_SIGNAL_ID, function(e){
+          this.operationSection = "operationZone";
+        }.bind(this));
+      },
+
+      _onRouteChanged: function(route)
+      {
+        if(route.prefix.toLowerCase() != "/step")
+          return;
+
+        this.$.ose.update();
+      },
+
+    });
+  </script>
+</dom-module>

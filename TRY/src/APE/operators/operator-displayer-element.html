@@ -32,6 +32,13 @@ Display expected input pattern, some example, description, review, etc... -->
       margin-top: 7.5px;
     }
 
+    #launchOp{
+      width: 40px;
+      height: 40px;
+      margin: 0 auto;
+      background-color: #DDD;
+    }
+
 
     .item {
         @apply --layout-horizontal;
@@ -51,7 +58,7 @@ Display expected input pattern, some example, description, review, etc... -->
       }
 
       .selectedItem{
-        background-color: var(--paper-blue-600);
+        background-color: var(--paper-blue-500);
       }
 
       .pad {
@@ -96,13 +103,16 @@ Display expected input pattern, some example, description, review, etc... -->
   <div>
             <div class$="[[getClassForItem(operator, selected)]]" tabindex$="[[tabIndex]]" on-click="_toggleSelected">
               <!-- <iron-image class="avatar" sizing="contain" src="icons:add"></iron-image> -->
-              <div id="indic" class$="[[computeSelection(selected)]]"><paper-icon-button icon="launch" on-click="_openOperator"></paper-icon-button>
+              <div id="indic" class$="[[computeSelection(selected)]]"><paper-icon-button icon="{{_computeIcon(enableUse)}}" on-click="_dispatcherBehavior"></paper-icon-button>
               </div>
 
               <div class="pad">
                 <div class="primary">[[operator.usualName]]</div>
                 <div class="shortText">Narrated Operator</div>
                 <div class="longText">
+                  <p id="launchOp" class$="item" hidden$="{{!enableUse}}">
+                    <paper-icon-button icon="launch" on-click="_openOperator"></paper-icon-button>
+                  <p>
                   <p><iron-icon icon="description" class="icon">description</iron-icon>{{operator.annotation.content}}</p>
                   <p><iron-icon icon="icons:explore">objectif</iron-icon></p>
                   <p><iron-icon icon="account-circle" class="icon">account-circle</iron-icon> {{operator.author.authorName}}</p>
@@ -143,6 +153,13 @@ Polymer({
 
   properties:
   {
+    enableUse: //Indicates the state of the display ; true indicates that the operator can be "used"
+    {
+      type: Boolean,
+      value: false,
+      notify: true,
+    },
+
     selected:
     {
         type: Boolean,
@@ -183,6 +200,11 @@ Polymer({
     },
   // ===
 
+  _computeIcon: function(enableUse)
+  {
+    return enableUse ? "input" : "launch";
+  },
+
   getClassForItem: function(item, selected) {
           return selected ? 'item expanded' : 'item';
         },
@@ -201,6 +223,17 @@ Polymer({
   _toggleSelected: function()
   {
     this.selected = !this.selected;
+  },
+
+  _dispatcherBehavior: function(enableUse)
+  {
+    enableUse ? this._onUse() : this._openOperator();
+  },
+
+  _onUse: function()
+  {
+    console.log("FIRING ON USE");
+    this.fire(OPERATION_USE_FROM_SEARCH_SIGNAL_ID, {operation: this.operator});
   },
 
 

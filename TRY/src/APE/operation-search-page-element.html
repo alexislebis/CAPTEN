@@ -1,0 +1,46 @@
+<dom-module id="operation-search-page-element">
+  <template>
+    <style>
+    </style>
+
+    <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
+
+<div id="divRoot">
+
+  <operation-search-element id="ose" enable-use="{{enableUse}}" ></operation-search-element>
+
+</div>
+
+  </template>
+  <script>
+    Polymer(
+    {
+      is: 'operation-search-page-element',
+
+      properties:{
+
+        route:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        query : String,
+      },
+
+      observers: [
+        "_onRouteChanged(route)",
+      ],
+
+      _onRouteChanged: function(route)
+      {
+        if(route.path != "/operation_search")
+          return null;
+
+
+        this.$.ose.update();
+      },
+
+    });
+  </script>
+</dom-module>

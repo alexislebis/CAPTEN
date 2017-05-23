@@ -28,8 +28,6 @@
 
     <app-location route="{{routeTopLevel}}" use-hash-as-path></app-location>
 
-    <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
-
 <div id="divRoot">
 
   <div id="new">
@@ -44,11 +42,11 @@
   <div id="result">
     <div id="normal">
       <header class="headerSubSection">
-        <div><span><h3>Operations</h3></span></div>
+        <div><span><h3>{{_computeHeaderName(query)}}</h3></span></div>
       </header>
   <!--  -->
     <template id="repeater" is="dom-repeat" items="{{operationsArray}}" filter="{{computeFilter(query)}}" index-as="index" restamp>
-        <operator-displayer-element operator="{{item}}"><opeator-displayer-element>
+        <operator-displayer-element enable-use="{{enableUse}}" operator="{{item}}"><opeator-displayer-element>
     </template>
     </div>
     <div id="previous">
@@ -81,30 +79,37 @@
 
         routeTopLevel: Object,
 
-        route:
-        {
-          type: Object,
-          notify: true,
-        },
-
         query : String,
       },
 
-      observers: [
-        "_onRouteChanged(route)",
-      ],
+      // observers: [
+      //   "_onRouteChanged(route)",
+      // ],
 
       _openNew: function()
       {
-        this.set('route.path', '/nop/new');
+        this.set('routeTopLevel.path', '/nop/new');
       },
 
-      _onRouteChanged: function(route)
+      // _onRouteChanged: function(route)
+      // {
+      //   if(route.path != "/operation_search")
+      //     return null;
+      //
+      //
+      //   //@HACK force dom repeat redraw
+      //   this.operationsArray = [];
+      //   this.$.repeater.render();
+      //   //===
+      //
+      //   this.operationsArray = NARRATED_OPERATION_POOL.getAvailableOperations();
+      //
+      //   this.$.repeater.render();
+      //
+      // },
+      //
+      attached: function()
       {
-        if(route.path != "/operation_search")
-          return null;
-
-
         //@HACK force dom repeat redraw
         this.operationsArray = [];
         this.$.repeater.render();
@@ -113,12 +118,18 @@
         this.operationsArray = NARRATED_OPERATION_POOL.getAvailableOperations();
 
         this.$.repeater.render();
-
       },
 
-      attached: function()
+      update: function()
       {
-        // NARRATED_OPERATION_POOL.registerObserverCallbackOnChange(this, this._updateOperationsArray);
+        //@HACK force dom repeat redraw
+        this.operationsArray = [];
+        this.$.repeater.render();
+        //===
+
+        this.operationsArray = NARRATED_OPERATION_POOL.getAvailableOperations();
+
+        this.$.repeater.render();
       },
 
       computeFilter: function(query)
@@ -137,6 +148,11 @@
       {
         // this.operationsArray = [];
         // this.set('operationsArray', NARRATED_OPERATION_POOL.getAvailableOperations());
+      },
+
+      _computeHeaderName: function(query)
+      {
+        return query.length == 0 ? 'Operations' : 'Search results';
       },
 
     });
