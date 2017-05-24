@@ -1,0 +1,1007 @@
+<!-- Dulicata of operation-creation-page, used for displaying operator inside a step -->
+
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-textarea.html">
+<link rel="import" href="../../../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../RTE/rgte-workzone-element.html">
+
+<dom-module id="operation-step-display-element">
+    <template>
+    <style include="toasty-style"></style>
+    <style>
+      :host {
+        font-family: sans-serif;
+        --vis-element-width: 100%;
+        /*--vis-element-height: 100%;*/
+      }
+      .propSelected{
+        background-color: red;
+      }
+
+      .container{
+        display: block;
+        position: relative;
+        max-width: var(--operator-creator-element-max-width, 366.666667px);
+        /*margin: 5px auto;*/
+      }
+
+      .card{
+        display: block;
+        position: relative;
+        box-sizing: border-box;
+        width: 100%;
+        background-color: #ffffff;
+        border-radius: 2px;
+        font-family: 'Roboto', 'Noto', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .fabAdd{
+        z-index: 1;
+        position: absolute;
+        transform: translate(var(--operator-creator-fabAdd-translate-left, 245px), var(--operator-creator-fabAdd-translate-top, -60px));
+        /* position: relative; */
+        /*transform: translate(-5%, 80%);*/
+      }
+
+      .fabCancel{
+        z-index: 1;
+        position: absolute;
+        transform: translate(var(--operator-creator-fabCancel-translate-left, 370px), var(--operator-creator-fabCancel-translate-top, -30px));
+      }
+
+
+
+
+      /**/
+      #divRoot{
+        width: 100%;
+        margin: 0 auto;
+        background-color: DodgerBlue;
+
+      }
+
+      #divRoot > header{
+        width: 100%;
+        text-align: center;
+        margin-bottom: 100px;
+      }
+
+      #divRoot > header > paper-input{
+        width: 50%;
+        margin: 0 auto;
+      }
+
+      #paperFabs{
+        /*position: absolute;*/
+        /*top: 1px;
+        left: 2px;*/
+        /*margin-bottom: -60px;*/
+      }
+
+      #paperFabs paper-fab{
+        display: inline;
+        /*margin-top: 15px;*/
+      }
+
+      .narrativeContent{
+        width: 90%;
+        margin: 0 auto;
+        border: 1px solid black;
+        padding : 5px 30px;
+      }
+
+      #separator{
+        width: 100%;
+        margin: 50px 0px;
+        border-bottom: 1px solid black;
+      }
+
+      .headerSubSection{
+        @apply(--layout-horizontal);
+        @apply(--layout-justified);
+        width: 180px;
+        margin-bottom: 10px;
+      }
+
+        /*.headerSubSection > div{
+          border-bottom: 1px solid black;
+        }
+
+          .headerSubSection > div > span{
+            position: relative;
+            left: -40px;
+          }*/
+
+    #configurationZone > header{
+      display: block;
+      margin: 0 auto;
+      background-color: red;
+      text-align: center;
+    }
+
+    #flexDiv{
+      height: 200px;
+      @apply(--layout-horizontal);
+      @apply(--layout-justified);
+    }
+
+    #behaviors{
+      width: 45%;
+      background-color: PowderBlue;
+    }
+
+    #others{
+      width: 45%;
+    }
+
+    #narrativeInfo{
+      max-height: 450px;
+      width: 90%;
+      margin: 0 auto;
+      /*overflow-x: visible;*/
+      overflow: hidden;
+      overflow-y: auto;
+    }
+
+    #outputBehavior, #inputBehavior, #parameterBehavior, #relationBetweenElements{
+      /*height: 25vw;*/
+      background-color: red;
+      margin-bottom: 10px;
+    }
+
+    #outputBehavior, #inputBehavior
+    {
+      width: 20%;
+      height: 650px;
+      overflow: hidden;
+    }
+
+    #outputPattern, #inputPattern{
+      --rgte-common-width: 100%;
+    }
+
+    #parameterBehavior{
+      max-height: 300px;
+      width: 60%;
+      overflow: hidden;
+      overflow-y: auto;
+      margin: 16px auto 0 auto;
+    }
+
+    .paperFabSubSection{
+      margin-top: 5px;
+      /*left: -38px;*/
+      /*left: 90%;*/
+      /*margin-bottom: -27px;*/
+    }
+
+    .center{
+
+      /*@apply(--layout-horizontal);
+      @apply(--layout-justified);*/
+    }
+
+    #vaadinContent{
+      margin-top : -100px;
+    }
+
+    #fab1{
+      z-index: 5;
+    }
+    #fab2{
+      z-index: 6;
+    }
+
+    #relationBetweenElements{
+      max-height: 300px;
+      width: 90%;
+      margin : 32px auto 0 auto;
+    }
+
+    /*#inputBehavior{
+      width: 300px;
+      height: 300px;
+    }*/
+
+    </style>
+
+<app-location route="{{routeTopLevel}}" use-hash-as-path></app-location>
+
+<!-- <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route> -->
+
+<div id="divRoot">
+
+  <header id="mainHeader">
+    <h2> {{operationName}}</h2>
+    <div id="paperFabs">
+      <paper-fab id="fab1" icon="icons:find-replace" on-click="_replaceOperation"></paper-fab>
+      <paper-fab id="fab2" icon="icons:launch" on-click="_openOperation"></paper-fab>
+    </div>
+  </header>
+
+  <div id="vaadinContent">
+    <vaadin-split-layout>
+      <vaadin-split-layout>
+        <div id="inputBehavior">
+          <header class="headerSubSection">
+            <div><paper-fab class="paperFabSubSection" icon="launch" on-click="_openInputPattern"></paper-fab></div>
+            <div><h4>Input behavior</h4> </div>
+          </header>
+
+          <rgte-workzone-element id="inputPattern" hide-menu disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{inputBehavior}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+        </div>
+
+        <div id="center">
+
+          <div id="narrativeInfo">
+            <div id="generalInformation">
+              <header>
+                <h4>General Information</h4>
+              </header>
+              <div id="gIContent" class="narrativeContent">
+                <paper-input id="objectif1NOP" label="TODOThe narrated operator's objective (#1)" value="{{nopobjectif1}}" char-counter maxlength="100"></paper-input>
+                <paper-input id="conceptConvoyed1" label="TODOConcept conveyed by this narrated operator (#1)" value="{{nopconceptconvoyed1}}"></paper-input>
+                <paper-textarea label="TODODescription of the narrated operator" value="{{nopdescription}}"></paper-textarea>
+                <paper-input id="creatorName" label="TODOTool handling the narrated operator (version). Example : KTBS (v0.2.5)" value="{{noptool1}}"></paper-input>
+              </div>
+            </div>
+            <div id="otherNarrative">
+              <header>
+                <h4>Other Narrative Information</h4>
+              </header>
+              <div id="oNIContent" class="narrativeContent">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius, est id ultrices lobortis, magna dolor aliquet ligula, non mollis augue turpis in nulla. Donec sit amet dui ornare, tempus nibh nec, pharetra tellus. Aliquam metus ex, convallis a tincidunt nec, tempus sit amet quam. Nullam at pellentesque tellus. Ut sollicitudin maximus lorem ac porttitor. Vivamus fringilla viverra nisl ut ultrices. Morbi aliquet sem lectus, sed malesuada velit facilisis sit amet. Donec volutpat, nunc quis ultrices aliquam, velit ante convallis purus, et malesuada mauris est accumsan magna. Vivamus nec nibh non arcu finibus posuere sed eget turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+              </div>
+            </div>
+          </div>
+
+          <div id="parameterBehavior">
+            <header class="headerSubSection">
+              <div><span>Parameter behavior</span></div>
+            </header>
+            <div class="center">
+              <paper-fab id="fabParameter" disabled icon="add"></paper-fab>
+            </div>
+
+            <paper-input id="p1" label="Parameter concept #1 (e.g. Type of correlation measure)" value="{{nopparameter1}}"></paper-input>
+          </div>
+
+
+          <div id="relationBetweenElements">
+            <paper-fab icon="icons:settings-input-composite"></paper-fab>
+            Array of narrative elements to do
+          </div>
+
+        </div>
+
+      </vaadin-split-layout>
+
+      <div id="outputBehavior">
+        <header class="headerSubSection">
+          <div><paper-fab class="paperFabSubSection" icon="launch" on-click="_openOutputPattern"></paper-fab></div>
+          <div><h4>Output behavior</h4></div>
+
+        </header>
+
+        <rgte-workzone-element id="outputPattern" hide-menu disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{outputBehavior}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+      </div>
+    </vaadin-split-layout>
+  </div>
+
+</div>
+
+  </template>
+    <script>
+        Polymer(
+        {
+            is: 'operation-step-display-element',
+
+            properties:
+            {
+              // === FOR operation-step-display-element
+              operation:
+              {
+                type: Object,
+                notify: true,
+              },
+                inputBehavior:
+                {
+                  type: Object,
+                  notify: true,
+                },
+                outputBehavior:
+                {
+                  type: Object,
+                  notify: true,
+                },
+              operationName:
+              {
+                type: String,
+                notify: true,
+              },
+
+
+            // === REQUIRED FOR WKZON
+              vocab:
+              {
+                type: Object,
+              },
+              customcls://used for file-reader
+              {
+                  type: Array,
+                  notify: true,
+              },
+              customprops:
+              {
+                  type: Array,
+                  notify: true,
+              },
+
+            // === OLD FROM DUPLICATION
+              routeTopLevel:
+              {
+                type: Object,
+                notify: true,
+              },
+
+              route:
+              {
+                type: Object,
+                notify: true,
+              },
+
+              isNew: {
+                type: Boolean,
+                value: true,
+                notify: true,
+              },
+
+              nop:
+              {
+                type: Object,
+                value: function(){return new NarratedOperator();},
+                notify: true,
+                observer: "_onNOPChange",
+              },
+
+              isPoolRegistered:  //Keep a trace either or not the nop has been added to the pool
+              {
+                type: Boolean,
+                value: false,
+                notify: true,
+              },
+
+              disableModification:
+              {
+                type: Boolean,
+                value: false,
+                notify: true,
+              },
+            // === FORM VARIABLE
+              // FIXME TODO : remplacer les différents éléments 1 par des tableaux et permettre de récupérer plus d'une chaine de car dans le form via utilisation du multi input à dev !
+                nopname:
+                {
+                    type: String,
+                    value: "",
+                    notify: true,
+                    // observer: "_onNopNameChange",
+                },
+
+                noptag1:
+                {
+                    type: String,
+                    value: "",
+                    notify: true,
+                },
+
+                nopobjectif1:
+                {
+                    type: String,
+                    value: "",
+                    notify: true,
+                },
+                nopexample1:
+                {
+                  type: String,
+                  value: "",
+                  notify: true,
+                },
+
+                nopdescription:
+                {
+                  type: String,
+                  value: "",
+                  notify: true,
+                },
+
+                nopconceptconvoyed1:
+                {
+                  type: String,
+                  value: "",
+                  notify: true,
+                },
+
+                nopparameter1:
+                {
+                  type: String,
+                  value: "",
+                  notify: true,
+                },
+
+                noptool1:
+                {
+                  type: String,
+                  value: "",
+                  notify: true,
+                },
+
+                currentProp://Memorize the last prop generated, for remplace or adding
+                {
+                  type: Object,
+                  value: null,
+                },
+                props://All the props to insert into the new operator
+                {
+                  type: Array,
+                  value: function(){return [];},
+                  notify: true,
+                },
+
+
+                creatorName:
+                {
+                    type: String,
+                    value: "",
+                    notify: true,
+                },
+
+                nopinputrgte:
+                {
+                    type: Object,
+                    value: function()
+                    {
+                        return new RGTE();
+                    },
+                    notify: true,
+                },
+                nopoutputrgte:
+                {
+                    type: Object,
+                    value: null,
+                    notify: true,
+                },
+                nopsettingsrgte:
+                {
+                    type: String,
+                    value: function()
+                    {
+                        return new RGTE();
+                    },
+                    notify: true,
+                },
+
+                indexSelectedProp://For coloriate the selected prop
+                {
+                  type: Number,
+                  value: -1,
+                  notify: true,
+                },
+                //Async properties managment
+                isIOCompleted://Used for determine if a new row has to be added to the propAsyncBuildIO
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                propAsyncBuildIO://PropertyAsyncrhonousBuilder for Input to Output
+                {
+                  type: Object,
+                  value: function(){return new PropertyAsyncrhonousBuilder();},
+                  notify: true,
+                },
+                isBindingIO:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                isBindingParams:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                superrgte: // SuperRGTE = nopinputrgte U nopoutputrgte U nopsettingsrgte U additional_properties
+                {
+                    type: String,
+                    value: function()
+                    {
+                        return new RGTE();
+                    },
+                    notify: true,
+                },
+
+            // === DISPLAYER
+                isInputPatternDisplayed:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+
+                isOutputPatternDisplayed:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                isParameterPatternDisplayed:
+                {
+                  type: Boolean,
+                  value: false,
+                  notify: true,
+                },
+                isNewNopHidden:
+                {
+                  type: Boolean,
+                  notify: true,
+                  value: false,
+                },
+                // iconsForCollapser:
+                // {
+                //   type: Object,
+                //   value: function(return ["icons:expand-more","icons:expand-less"])
+                // },
+            },
+
+            observers: [
+              "_onDataRouteChanged(route)",
+              "_onOperationChange(operation)",
+            ],
+
+            // === For operation-step-display-element
+            _onOperationChange: function()
+            {
+              if(this.operation == null)
+                return;
+
+              // Verif if the op is a NOP or a NAP
+              if(this.operation instanceof NarratedOperator)
+                this._operatorChange();
+              else if(this.operation instanceof NarratedAnalysisProcess)
+                this._analysisChange();
+              else
+                return;
+            },
+              _operatorChange: function()
+              {
+                this.operationName = this.operation.usualName;
+                this.inputBehavior = this.operation.behaviors['input'];
+                this.outputBehavior = this.operation.behaviors['output'];
+              },
+
+              _analysisChange: function()
+              {
+                console.error("Unimplemented _analysisChange function. NAP is not handled.");
+              },
+
+            _replaceOperation: function()
+            {
+              this.fire(STEP_OPERATION_REPLACEMENT_REQUESTED_SIGNAL_ID);
+            },
+          // === ROUTING
+            _openOperation: function()
+            {
+              if(this.operation == null)
+                return;
+
+              if(this.operation instanceof NarratedOperator)
+              {
+                this.set('routeTopLevel.path', '/nop/'+this.operation.id);
+                console.error("ICI, mettre a jour une variable qui sera passé à tout les éléments indiquant un ensemble d'états. Ca va permettre de dire les enable-use par exemple");
+              }
+              else if(this.operation instanceof NarratedAnalysisProcess)
+              {
+                this.set('routeTopLevel.path', '/nap/'+this.operation.id);
+                //IDEM;
+              }
+              else
+                return;
+            },
+
+            _onDataRouteChanged: function(r)
+            {
+              if(r.prefix.toLowerCase() != "/nop")
+                return;
+
+              this._resetComponent();
+
+              if(this.data.itemValue == null || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
+              {
+                this._generateDefaultConfig();
+                return;
+              }
+
+              var resItem = NARRATED_OPERATION_POOL.getNOPByID(this.data.itemValue);
+
+              if(resItem == null)
+              {
+                this._generateDefaultConfig();
+                return;
+              }
+
+
+              this.nop = resItem;
+
+              this.isNew = false;
+              this.isPoolRegistered = true;
+            },
+
+            _openVocabularyNewItemPage: function()
+            {
+              this.set('route.path', '/new');
+            },
+
+            _openOutputPattern: function()
+            {
+              this.set('routeTopLevel.path', '/rgte/'+this.nop.behaviors['output'].id);
+              window.scrollTo(0,0);
+            },
+
+            _openInputPattern: function()
+            {
+              this.set('routeTopLevel.path', '/rgte/'+this.nop.behaviors['input'].id);
+              window.scrollTo(0,0);
+            },
+
+
+          // === NATIVE METHODS
+            attached: function()
+            {
+              // if(!this.isPoolRegistered)
+              // {
+              //   this.$.NOPStillNotAdded.open();
+              // }
+
+              this.propAsyncBuildIO.setFirstObject(this.nopinputrgte);
+              this.propAsyncBuildIO.setSecondObject(this.nopoutputrgte);
+              this.propAsyncBuildIO.setArray(1);//Work only with 1 property a time. Added to this.props
+              this.propAsyncBuildIO.registerObserverCallbackOnCompletion(this, this._onIOCompletion);
+              this.propAsyncBuildIO.registerObserverCallbackOnUncompletion(this, this._onIOUncompletion);
+
+              this.$.inputPattern.addEventListener('NODE_CLICKED', function(p)
+              {
+                this._behaviorSelectorIOClicked(p.detail);
+              }.bind(this));
+              this.$.outputPattern.addEventListener('NODE_CLICKED', function(p)
+              {
+                this._behaviorSelectorIOClicked(p.detail);
+              }.bind(this));
+            },
+
+            detached: function()
+            {
+              this.$.NOPStillNotAdded.close();
+            },
+          // ===
+            // === PRIVATE METHODS
+            _onNopNameChange: function(change)
+            {
+              this.nop.usualName = this.nopname;
+
+              if(!this.isNew) //if the operation is not new, then it is not concerned about pool referencing
+                return;
+
+              if( (this.nopname == null || this.nopname.length < 3) )
+              {
+                if(this.isPoolRegistered) //If the NOP is registered inside the pool, it can't be kept
+                {
+                  NARRATED_OPERATION_POOL.unregisterNOP(this.nop);
+                  this.isPoolRegistered = false;
+                }
+
+                this.$.NOPStillNotAdded.close();
+                this.$.NOPStillNotAdded.open();
+
+                return;
+              }
+
+              if(!this.isPoolRegistered) //if the nop is not yet registered into the pool
+              {
+                if(NARRATED_OPERATION_POOL.registerNOP(this.nop) != null)
+                {
+                  this.isPoolRegistered = true;
+                  this.$.NOPRegistered.open();
+                }
+              }
+
+              if(this.isPoolRegistered)
+                this.$.NOPStillNotAdded.close();
+
+
+            },
+
+            _resetComponent: function()
+            {
+              console.error("Implement resetComponent from operator-creation-page-element");
+              this.isPoolRegistered = false;
+            },
+
+            _generateDefaultConfig: function()
+            {
+              this.nop = new NarratedOperator();
+              console.log(this.nop);
+
+              this.isNew = true;
+            },
+
+            _onNOPChange: function()
+            {
+              this._alignComponentAttribute();
+            },
+
+            _alignComponentAttribute: function()
+            {
+                this.nopoutputrgte = this.nop.behaviors['output'];
+                this.nopinputrgte = this.nop.behaviors['input'];
+
+              this.nopname = this.nop.usualName;
+
+              //@TODO handle narrative element for NOP
+              console.error("HANDLE NARRATIION FOR BLOCKS ATTRs");
+            },
+// === OLD
+            _behaviorSelectorIOClicked: function(params)
+            {
+              if(this.isBindingIO && this.isBindingParams)
+              {
+                console.log('Curently, binding simultaneously input with param & output is not supported. Disable one of them to procced.');
+              }
+              else if(this.isBindingIO)
+                this._bindingIO(params);
+              else if(this.isBindingParams)
+                this._bindingIP(params);
+              else
+                this._defaultBehavior(params);
+            },
+
+            _defaultBehavior: function(params)
+            {
+
+            },
+
+            _bindingIO: function(params)
+            {
+              var obj = this.nopinputrgte.getNodeById(params.id);
+              if(obj == null)
+                obj = this.nopoutputrgte.getNodeById(params.id);
+
+              this.propAsyncBuildIO.bind(obj,INFLUENCES_URI,'influences');
+            },
+
+            _bindingIP: function(params)
+            {
+
+            },
+
+            _toggleIOBinding: function()
+            {
+              this.isBindingIO = !this.isBindingIO;
+            },
+
+            _onIOCompletion: function()
+            {
+              this.currentProp;
+              var arr = this.propAsyncBuildIO.getArrayFilled();
+
+              for(var i in arr)
+                this.currentProp = arr[i];
+
+              this.$.propertyIOModal.open();
+              this.propAsyncBuildIO.reset();
+            },
+
+            _propSelect: function(e)
+            {
+              this.indexSelectedProp = e.model.index;
+            },
+
+            _computePropertySelection: function(idxelem, currentIdx)
+            {
+              if(idxelem == currentIdx)
+                return 'propSelected';
+
+              return '';
+            },
+
+            _selectPropIO: function(e)//Triggered when the selection modal of prop is closed
+            {
+              if(this.indexSelectedProp == -1 || this.indexSelectedProp == null)
+                return;
+
+              this.splice('props', this.indexSelectedProp, 1);
+              this.push('props', this.currentProp);
+
+              this.indexSelectedProp = -1;
+              this.currentProp = null;
+            },
+
+            _onIOUncompletion: function()
+            {
+              this.isIOCompleted = false;
+            },
+
+            _close: function(change)
+            {
+                this.fire("-CloseNOPCreator");
+            },
+
+            _toggleInputPatternDisplayed: function()
+            {
+              this.isInputPatternDisplayed = !this.isInputPatternDisplayed;
+
+              if(this.isInputPatternDisplayed)
+              {
+                this.vocab.notifyChange();
+                this._updateCustoms();
+              }
+            },
+
+            _toggleOutputPatternDisplayed: function()
+            {
+              this.isOutputPatternDisplayed = !this.isOutputPatternDisplayed;
+
+              if(this.isOutputPatternDisplayed)
+              {
+                this.vocab.notifyChange();
+                this._updateCustoms();
+              }
+            },
+
+            _toggleParameterPatternDisplayed: function()
+            {
+              this.isParameterPatternDisplayed = !this.isParameterPatternDisplayed;
+            },
+
+            _updateCustoms: function()
+            {
+              var cls = this.customcls;
+              var props = this.customprops;
+
+              this.customcls = [];
+              this.customprops = [];
+
+              this.customcls = cls;
+              this.customprops = props;
+            },
+
+            _replaceOrAddIO: function(e)
+            {
+              if (e.detail.confirmed)//Add new prop
+              {
+                  this.push('props',this.currentProp);
+              }
+              else
+              { //Otherwise the user don't want to bind prop, thus it has to be reset
+                this.$.propertySelectIOModal.open();
+              }
+            },
+
+            /**
+             * Build the NOP from the data contained within the form
+             */
+            _buildNOP: function()
+            {
+              var nop = new NarratedOperator();
+
+              nop.usualName = this.nopname;
+              nop.uri = this.nopname;
+              nop.uriConceptConvoyed = this.nopconceptconvoyed1; //TODO array of uri concepts
+              // nop.annotation = [];
+              // nop.annotation.push(this.nopdescription);
+              // nop.annotation.push(this.nopexample1); //TODO array
+              nop.annotation = new Description(); console.error("Create a narrative block here!");
+              nop.annotation.content = this.nopdescription;
+              nop.objective = this.nopobjectif1; //TODO Array
+              nop.behaviors = [];
+              nop.behaviors['input'] = this.nopinputrgte;
+              nop.behaviors['output'] = this.nopoutputrgte;
+              nop.behaviors['parameters'] = this.nopparameter1;
+              nop.implementedByOperation = [];
+              nop.implementedByOperation.push(this.noptool1); //TODO array & operations
+              nop.author = new Author();
+              nop.author.authorName = this.creatorName; //TODO CREATE NARRATIVE BLOCK
+              console.log(nop.author);
+              nop.creationDate = new Date();
+
+              nop.properties = this.props;
+
+              console.log("RESET THE CARD !");
+
+              return nop;
+            },
+
+            _reset: function()
+            {
+              this.nopname = null;
+              this.creatorName = null;
+              this.nopconceptconvoyed1 = null; //TODO array of uri concepts
+              // nop.annotation = [];
+              // nop.annotation.push(this.nopdescription);
+              // nop.annotation.push(this.nopexample1); //TODO array
+              this.nopdescription = null;
+              this.nopobjectif1 = null;
+              this.nopinputrgte = new RGTE();
+              this.nopoutputrgte = new RGTE();
+              this.nopparameter1 = null;
+              this.noptool1 = null; //TODO array & operations;
+              this.props = [];
+            },
+
+            _toggleNopHide: function()
+            {
+              this.isNewNopHidden = !this.isNewNopHidden;
+            },
+
+            _toggleCollapse1: function()
+            {
+              this.$.collapse.toggle();
+              if(this.$.collapse.opened)
+                this.$.pibCollapse1.setAttribute('icon', 'icons:expand-less');
+              else
+                this.$.pibCollapse1.setAttribute('icon', 'icons:expand-more');
+            },
+            _toggleCollapse2: function()
+            {
+              this.$.collapse2.toggle();
+              if(this.$.collapse2.opened)
+                this.$.pibCollapse2.setAttribute('icon', 'icons:expand-less');
+              else
+                this.$.pibCollapse2.setAttribute('icon', 'icons:expand-more');
+            },
+            _toggleCollapse3: function()
+            {
+              this.$.collapse3.toggle();
+              if(this.$.collapse3.opened)
+                this.$.pibCollapse3.setAttribute('icon', 'icons:expand-less');
+              else
+                this.$.pibCollapse3.setAttribute('icon', 'icons:expand-more');
+            },
+
+
+// === SUBMISSION FORM
+            _submitted: function(event)
+            {
+                Polymer.dom(event).localTarget.parentElement.parentElement.submit();
+            },
+
+            _submitForm: function(event)
+            {
+              // var form = Polymer.dom(event).localTarget;
+
+              //Insuring that the submission does not comming from another form
+              if(event.path[0].id.indexOf('newNopForm') == -1)
+                return;
+
+              var nop = this._buildNOP();
+
+              this.fire('-NewNOP', nop);
+              this._reset();
+            },
+
+
+
+// === TOAST
+      _closeToast: function(e)
+      {
+        Polymer.dom(e).localTarget.parentElement.close();
+      },
+
+        });
+    </script>
+
+</dom-module>

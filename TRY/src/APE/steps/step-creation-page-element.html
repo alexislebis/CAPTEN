@@ -1,3 +1,5 @@
+<link rel="import" href="../operation-step-display-element.html">
+
 <dom-module id="step-creation-page-element">
   <template>
     <style>
@@ -74,20 +76,27 @@
 
     <vaadin-split-layout>
       <vaadin-split-layout>
-        <div><rgte-page-element></rgte-page-element></div>
         <div>
+          <h2>Input</h2>
+          <rgte-page-element></rgte-page-element>
+        </div>
+        <div>
+          <h2>Operation</h2>
           <neon-animated-pages selected='{{operationSection}}'
                            attr-for-selected='name'
                            entry-animation='scale-up-animation'
                            exit-animation='slide-right-animation'>
 
-             <neon-animatable name='searchOperation'><operation-search-element id="ose" enable-use="true"></operation-search-element></neon-animatable>
-             <neon-animatable name='operationZone'><main-voog></main-voog></neon-animatable>
+             <neon-animatable name='searchOperation'><operation-search-element id="ose" enable-rewind="{{_computeRewindAuthorized(operation)}}" enable-use="true"></operation-search-element></neon-animatable>
+             <neon-animatable name='operationZone'><operation-step-display-element id="osde" operation="{{operation}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operation-step-display-element></neon-animatable>
 
           </neon-animated-pages>
         </div>
       </vaadin-split-layout>
-        <div><rgte-page-element></rgte-page-element></div>
+        <div>
+          <h2>Output</h2>
+          <rgte-page-element></rgte-page-element>
+        </div>
     </vaadin-split-layout>
 
     <div id="graphsRelations">
@@ -115,6 +124,12 @@
           notify: true,
         },
 
+        operation:
+        {
+          type: Object,
+          notify: true,
+        },
+
         // === Page
         operationSection:
         {
@@ -122,12 +137,37 @@
             value: "searchOperation",
             notify: true,
         },
-        operationSectionStack: // Used to remember the user navigation. Usefull? 
+        operationSectionStack: // Used to remember the user navigation. Usefull?
         {
           type: Array,
           value: function(){return [];},
           notify: true,
-        }
+        },
+        // === EndPage
+
+        vocab:
+        {
+          type: Object,
+          value: function(){ return new CONTROLLED_VOCABULARY();},
+        },
+        customcls://used for file-reader
+        {
+            type: Array,
+            notify: true,
+            value: function()
+            {
+                return [];
+            },
+        },
+        customprops:
+        {
+            type: Array,
+            notify: true,
+            value: function()
+            {
+                return [];
+            },
+        },
       },
 
       observers: [
@@ -137,8 +177,27 @@
       attached: function()
       {
         this.$.ose.addEventListener(OPERATION_USE_FROM_SEARCH_SIGNAL_ID, function(e){
-          this.operationSection = "operationZone";
+          this._loadOperationPage(e.detail.operation);
         }.bind(this));
+
+        this.$.ose.addEventListener(OPERATION_REWIND_REQUESTED_SIGNAL_ID, function(e){
+          this._loadOperationPage(this.operation);
+        }.bind(this));
+
+        this.$.osde.addEventListener(STEP_OPERATION_REPLACEMENT_REQUESTED_SIGNAL_ID, function(e){
+          this._loadSearchOperationPage();
+        }.bind(this));
+      },
+
+      _loadOperationPage: function(operation)
+      {
+        this.operation = operation;
+        this.operationSection = "operationZone";
+      },
+
+      _loadSearchOperationPage: function()
+      {
+        this.operationSection = "searchOperation";
       },
 
       _onRouteChanged: function(route)
@@ -147,6 +206,11 @@
           return;
 
         this.$.ose.update();
+      },
+
+      _computeRewindAuthorized: function(operation)
+      {
+        return operation == null ? "false" : "true";
       },
 
     });

@@ -5,6 +5,7 @@
     // === STEP
       var STEP_RESET_DEPENDENCIES_SIGNAL_ID = "-Pj6hyuI4geibPUFZpof6";
       var STEP_KNOWLEDGE_IDENTIFIED_SIGNAL_ID = "-8JguepzMmgne$v5365dv";
+      var STEP_OPERATION_REPLACEMENT_REQUESTED_SIGNAL_ID = "-95rKjrogerPLPGnrberbprbsw6";
 
     // === NARRATIVE BLOCK
       var NARRATIVE_BLOCK_NODE_IN_STEP_EDITOR_LEFT_CLICKED_SIGNAL_ID = "-pLkiJnBfduehU5745";
@@ -22,5 +23,6 @@
 
     // === NARRATED OPERATION
       var OPERATION_USE_FROM_SEARCH_SIGNAL_ID = "-555fzefzegoOPOKF?Elvbr;ebrepb";
+      var OPERATION_REWIND_REQUESTED_SIGNAL_ID = "-8o<Jfeuzov:frbpbp<ïePOEJNEjNs";
       // === NOP
         var NOP_SELECTED_SIGNAL_ID = "-854LmfenBWbvbevo5zfea3f";

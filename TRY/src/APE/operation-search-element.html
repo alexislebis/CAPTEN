@@ -30,6 +30,10 @@
 
 <div id="divRoot">
 
+  <div id="fabRewind" hidden$={{!enableRewind}}>
+    <paper-fab icon="icons:reply" on-click="_goBack"></paper-fab>
+  </div>
+
   <div id="new">
     <paper-button raised on-click="_openNew">Create a new narrated operator</paper-button>
   </div>
@@ -80,6 +84,13 @@
         routeTopLevel: Object,
 
         query : String,
+
+        enableRewind:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        }
       },
 
       // observers: [
@@ -153,6 +164,11 @@
       _computeHeaderName: function(query)
       {
         return query.length == 0 ? 'Operations' : 'Search results';
+      },
+
+      _goBack: function()
+      {
+        this.fire(OPERATION_REWIND_REQUESTED_SIGNAL_ID);
       },
 
     });
