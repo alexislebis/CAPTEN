@@ -173,6 +173,8 @@ Step.prototype.constructor = Step;
       }
     }
 
+    RGTE_POOL.register(outputs);
+    
     return outputs;
   }
 
@@ -399,6 +401,11 @@ Step.prototype.constructor = Step;
 
   Step.prototype.bindRGTENOP = function(params)
   {
+      if(this.inputs == null || this.operator == null)
+      {
+        console.log("Binding is impossible, one of the two elements is null. Aborting...");
+        return;
+      }
       if (this.isStateComputed)
       {
           console.log("===WARNING===");

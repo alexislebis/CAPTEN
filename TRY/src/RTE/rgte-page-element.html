@@ -285,7 +285,7 @@
 
       _lazyRegisterRGTE: function() //lazy checking if the rgte has at least on element. If so, does not register him. Otherwise, register
       {
-        if(this.rgte.nodes.length > 0)//Lazy verification. Not check into the pool
+        if(this.rgte.nodes.length <= 0)//Lazy verification. Not check into the pool
           return;
 
         RGTE_POOL.register(this.rgte);

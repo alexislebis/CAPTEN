@@ -14,6 +14,9 @@
       var RGTE_MENU_BAR_RGTE_CLICKED_SIGNAL_ID = "-ItenJebg4z4g554123.vbr";
       var RGTE_MODIFICATION_ZONE_OPENED_SIGNAL_ID = "-LQjke8eknN8e7DD9t6t1";
       var RGTE_MODIFICATION_ZONE_CLOSED_SIGNAL_ID = "-ONTEO759ejdzP.berb6";
+      var RGTE_USE_FROM_SEARCH_SIGNAL_ID = "-98evzevveMpkkezjgnsNJrhgep23.";
+      var RGTE_REWIND_REQUESTED_SIGNAL_ID = "-92KhrgerkgKuyzegnN,nNncqlqc";
+      var RGTE_REPLACEMENT_REQUESTED_SIGNAL_ID = "-5fze4Ebr2gf f3ns6qzFEfzg4r54v";
 
     // === RDF
       var RDF_STORE_LISTER_ELEMENT_SELECTED_ID = "-68756e4f6KEFnegzlezegL";
@@ -24,5 +27,6 @@
     // === NARRATED OPERATION
       var OPERATION_USE_FROM_SEARCH_SIGNAL_ID = "-555fzefzegoOPOKF?Elvbr;ebrepb";
       var OPERATION_REWIND_REQUESTED_SIGNAL_ID = "-8o<Jfeuzov:frbpbp<ïePOEJNEjNs";
+      var OPERATION_INPUT_PATTERN_NODE_CLICKED_SIGNAL_ID = "-5e4ze66reger7g79scxxcwc3wx1c3vbz";
       // === NOP
         var NOP_SELECTED_SIGNAL_ID = "-854LmfenBWbvbevo5zfea3f";

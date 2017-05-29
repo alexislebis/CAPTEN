@@ -15,7 +15,7 @@
       <style is="custom-style">
             :host {
                 display: block;
-                --rgte-common-width: 80%;
+                /*--rgte-common-width: 80%;*/
                 --vis-element-background-color: white;
             }
 
@@ -25,7 +25,7 @@
 
       #rgte{
         margin: 0 auto;
-        width: var(--rgte-common-width);
+        width: var(--rgte-common-width, 80%);
         /*background-color: yellow;*/
       }
 
@@ -62,6 +62,8 @@
 
   </style>
 
+  <app-location route="{{route}}" use-hash-as-path></app-location>
+
   <!-- <vaadin-split-layout>
   <vaadin-split-layout> -->
 <div id="divRoot">
@@ -85,7 +87,9 @@
           <span hidden$="{{disableEdit}}"><paper-icon-button icon="create" toggles active="{{enableModification}}"></paper-icon-button></span>
           <paper-icon-button class="strikediag" icon="icons:speaker-notes"></paper-icon-button>
           <paper-icon-button icon="image:brush" toggles active="{{enableKnowledge}}"></paper-icon-button>
-          <paper-icon-button icon="search"></paper-icon-button>
+          <div hidden$="{{!enableUse}}"> <paper-icon-button id="replace" icon="icons:find-replace" on-click="_replaceRGTE"></paper-icon-button></div>
+          <div hidden$="{{!enableUse}}"> <paper-icon-button id="expand" icon="icons:launch" on-click="_openRGTE"></paper-icon-button> </div>
+          <div hidden$="{{enableUse}}"> <paper-icon-button icon="search"></paper-icon-button> </div>
 
       </paper-toolbar>
     </div>
@@ -241,6 +245,12 @@
           value: false,
           notify: true,
         },
+        enableUse: //If true, allows its utilisation, ie, rollback feature
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
 
 
         // === DISPLAY
@@ -296,6 +306,18 @@
           e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
         }
       },
+
+      // === On Use
+        _openRGTE: function()
+        {
+          this.set('route.path', '/rgte/'+this.rgte.id);
+        },
+
+        _replaceRGTE: function()
+        {
+          this.fire(RGTE_REPLACEMENT_REQUESTED_SIGNAL_ID, {rgte: this.rgte});
+        },
+      // === END On use
 
       _generateAddRGTE: function()
       {

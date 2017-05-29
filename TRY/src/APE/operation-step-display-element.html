@@ -662,6 +662,10 @@
           // === NATIVE METHODS
             attached: function()
             {
+              this.$.inputPattern.addEventListener('NODE_CLICKED', function(e){
+                this.fire(OPERATION_INPUT_PATTERN_NODE_CLICKED_SIGNAL_ID, e.detail);
+              }.bind(this));
+
               // if(!this.isPoolRegistered)
               // {
               //   this.$.NOPStillNotAdded.open();
@@ -673,14 +677,14 @@
               this.propAsyncBuildIO.registerObserverCallbackOnCompletion(this, this._onIOCompletion);
               this.propAsyncBuildIO.registerObserverCallbackOnUncompletion(this, this._onIOUncompletion);
 
-              this.$.inputPattern.addEventListener('NODE_CLICKED', function(p)
-              {
-                this._behaviorSelectorIOClicked(p.detail);
-              }.bind(this));
-              this.$.outputPattern.addEventListener('NODE_CLICKED', function(p)
-              {
-                this._behaviorSelectorIOClicked(p.detail);
-              }.bind(this));
+              // this.$.inputPattern.addEventListener('NODE_CLICKED', function(p)
+              // {
+              //   this._behaviorSelectorIOClicked(p.detail);
+              // }.bind(this));
+              // this.$.outputPattern.addEventListener('NODE_CLICKED', function(p)
+              // {
+              //   this._behaviorSelectorIOClicked(p.detail);
+              // }.bind(this));
             },
 
             detached: function()

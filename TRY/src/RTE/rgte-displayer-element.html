@@ -48,10 +48,10 @@
                 rgte:
                 {
                     type: Object,
-                    value: function()
-                    {
-                        return new RGTE();
-                    },
+                    // value: function()
+                    // {
+                    //     return new RGTE();
+                    // },
                     notify: true,
                     observer: '_onChange',
                 },
@@ -192,7 +192,7 @@
 
             replaceRGTE: function(rgte)
             {
-              if(rgte == null)
+              if(rgte == null || !(rgte instanceof RGTE) )
                 return;
 
               var oldRGTE = this.rgte;

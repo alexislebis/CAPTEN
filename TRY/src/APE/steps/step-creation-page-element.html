@@ -4,7 +4,8 @@
   <template>
     <style>
       :host{
-
+        --rgte-common-width: 100%;
+        --vis-element-width: 100%;
       }
     </style>
 
@@ -72,13 +73,26 @@
         <h4 class="title">@removeIdentify knowledge concepts</h4>
         <paper-fab id="kFab" icon="image:brush" on-tap="_toggleKnowledgeIdentification">
       </div>
+
+      <div>
+        <paper-fab icon="icons:settings-input-component" on-click="_toggleRelationMode"></paper-fab>
+      </div>
     </div>
 
     <vaadin-split-layout>
       <vaadin-split-layout>
         <div>
           <h2>Input</h2>
-          <rgte-page-element></rgte-page-element>
+          <neon-animated-pages selected='{{inputSection}}'
+                           attr-for-selected='name'
+                           entry-animation='scale-up-animation'
+                           exit-animation='slide-right-animation'>
+
+             <neon-animatable name='searchInput'><rgte-search-element id="rsei" enable-rewind="{{_computeRewindAuthorized(input)}}" enable-use="true"></rgte-search-element></neon-animatable>
+             <neon-animatable name='inputZone'><rgte-workzone-element id="rwei" rgte="{{input}}" enable-use disable-edit vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element></neon-animatable>
+
+          </neon-animated-pages>
+
         </div>
         <div>
           <h2>Operation</h2>
@@ -95,7 +109,7 @@
       </vaadin-split-layout>
         <div>
           <h2>Output</h2>
-          <rgte-page-element></rgte-page-element>
+          <rgte-workzone-element id="inputElement" rgte="{{output}}" disable-edit="{{disableEdit}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
         </div>
     </vaadin-split-layout>
 
@@ -124,7 +138,26 @@
           notify: true,
         },
 
+        step:
+        {
+          type: Object,
+          value: function(){return new Step();},
+          notify: true,
+        },
+
         operation:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        input:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        output:
         {
           type: Object,
           notify: true,
@@ -143,7 +176,20 @@
           value: function(){return [];},
           notify: true,
         },
+        inputSection:
+        {
+          type: String,
+          value: "searchInput",
+          notify: true,
+        },
         // === EndPage
+
+        relationModeI_NOP: //used for linking input with nop
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
 
         vocab:
         {
@@ -176,6 +222,27 @@
 
       attached: function()
       {
+        //@TODO  + deferencing into narrativeblock iff chang
+
+        // === INPUT
+        this.$.rsei.addEventListener(RGTE_USE_FROM_SEARCH_SIGNAL_ID, function(e){
+          this._loadInputPage(e.detail.rgte);
+        }.bind(this));
+
+        this.$.rsei.addEventListener(RGTE_REWIND_REQUESTED_SIGNAL_ID, function(e)
+        {
+          this._loadInputPage(this.input);
+        }.bind(this));
+
+        this.$.rwei.addEventListener(RGTE_REPLACEMENT_REQUESTED_SIGNAL_ID, function(e){
+          this._loadSearchInputPage();
+        }.bind(this));
+
+        this.$.rwei.addEventListener('NODE_CLICKED', function(e){
+          this._behaviorManager(e.detail);
+        }.bind(this));
+
+        // === NOP
         this.$.ose.addEventListener(OPERATION_USE_FROM_SEARCH_SIGNAL_ID, function(e){
           this._loadOperationPage(e.detail.operation);
         }.bind(this));
@@ -187,11 +254,52 @@
         this.$.osde.addEventListener(STEP_OPERATION_REPLACEMENT_REQUESTED_SIGNAL_ID, function(e){
           this._loadSearchOperationPage();
         }.bind(this));
+
+        this.$.osde.addEventListener(OPERATION_INPUT_PATTERN_NODE_CLICKED_SIGNAL_ID, function(e){
+          this._behaviorManager(e.detail);
+        }.bind(this));
+
+
+        // === OUTPUT
+        this.step.registerObserverCallbackOnOutputsComputation(this, this._outputComputed);
       },
 
+      // === RESET behaviors
+      reset: function()
+      {
+        //todo reattacher listener sur nouvelle step
+      },
+
+      _behaviorManager: function(obj)
+      {
+        if(this.relationModeI_NOP)
+        {
+          this.step.bindRGTENOP(obj);
+        }
+        else // default behaviors : nothing to do
+        {
+          return;
+        }
+      },
+
+    // === INPUT page
+      _loadInputPage: function(rgte)
+      {
+        this.input = rgte;
+        this.step.changeRGTE(this.input);
+        this.inputSection = "inputZone";
+      },
+
+      _loadSearchInputPage: function()
+      {
+        this.inputSection = "searchInput";
+      },
+    // === END Input Page
+    // === NOP page Dedicated Function
       _loadOperationPage: function(operation)
       {
         this.operation = operation;
+        this.step.changeOperator(this.operation);
         this.operationSection = "operationZone";
       },
 
@@ -199,18 +307,31 @@
       {
         this.operationSection = "searchOperation";
       },
+    // === END NOP page Dedicated function
 
       _onRouteChanged: function(route)
       {
         if(route.prefix.toLowerCase() != "/step")
           return;
 
+        this.$.rsei.update();
         this.$.ose.update();
       },
 
       _computeRewindAuthorized: function(operation)
       {
         return operation == null ? "false" : "true";
+      },
+
+      _toggleRelationMode: function()
+      {
+        this.relationModeI_NOP = !this.relationModeI_NOP;
+        return;
+      },
+
+      _outputComputed: function()
+      {
+        this.output = this.step.outputs;
       },
 
     });
