@@ -86,10 +86,10 @@
           <!-- <span hidden$="{{!enableModification}}"><paper-icon-button icon="add" ></paper-icon-button></span> -->
           <span hidden$="{{disableEdit}}"><paper-icon-button icon="create" toggles active="{{enableModification}}"></paper-icon-button></span>
           <paper-icon-button class="strikediag" icon="icons:speaker-notes"></paper-icon-button>
-          <paper-icon-button icon="image:brush" toggles active="{{enableKnowledge}}"></paper-icon-button>
-          <div hidden$="{{!enableUse}}"> <paper-icon-button id="replace" icon="icons:find-replace" on-click="_replaceRGTE"></paper-icon-button></div>
-          <div hidden$="{{!enableUse}}"> <paper-icon-button id="expand" icon="icons:launch" on-click="_openRGTE"></paper-icon-button> </div>
-          <div hidden$="{{enableUse}}"> <paper-icon-button icon="search"></paper-icon-button> </div>
+          <div hidden$="{{disableKnowledge}}"><paper-icon-button icon="image:brush" toggles active="{{enableKnowledge}}"></paper-icon-button></div>
+          <div hidden$="{{disableReplace}}"> <paper-icon-button id="replace" icon="icons:find-replace" on-click="_replaceRGTE"></paper-icon-button></div>
+          <div hidden$="{{disableLaunch}}"> <paper-icon-button id="expand" icon="icons:launch" on-click="_openRGTE"></paper-icon-button> </div>
+          <div hidden$="{{disableSearch}}"> <paper-icon-button icon="search"></paper-icon-button> </div>
 
       </paper-toolbar>
     </div>
@@ -251,7 +251,30 @@
           value: false,
           notify: true,
         },
-
+        disableKnowledge:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        disableLaunch:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        disableReplace:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        disableSearch:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
 
         // === DISPLAY
         iconLister: {

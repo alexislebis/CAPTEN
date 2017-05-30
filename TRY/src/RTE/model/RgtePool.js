@@ -19,6 +19,20 @@
      return rgte;
    },
 
+   delete: function(rgte)
+   {
+     if(rgte == null)
+      return;
+
+     var res = this.getByID(rgte.id);
+
+     if(res == null)
+      return;
+
+    res._delete();
+    return this.unregister(res);
+   },
+
    getByID: function(id)
    {
      if(id == null || id < 0)
@@ -47,7 +61,7 @@
 
    unregister: function(rgte)
    {
-     if(rgte == null || !(rgte instanceof NarratedOperator))
+     if(rgte == null || !(rgte instanceof RGTE))
        return null;
 
      for(var i = 0; i < this.pool.length; i++) //Prevent duplicata

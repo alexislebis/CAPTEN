@@ -1,4 +1,5 @@
 <link rel="import" href="../operation-step-display-element.html">
+<link rel="import" href="./step-status-displayer-element.html">
 
 <dom-module id="step-creation-page-element">
   <template>
@@ -6,6 +7,10 @@
       :host{
         --rgte-common-width: 100%;
         --vis-element-width: 100%;
+      }
+
+      #vaadinOperation{
+        min-height: 800px;
       }
     </style>
 
@@ -89,12 +94,12 @@
                            exit-animation='slide-right-animation'>
 
              <neon-animatable name='searchInput'><rgte-search-element id="rsei" enable-rewind="{{_computeRewindAuthorized(input)}}" enable-use="true"></rgte-search-element></neon-animatable>
-             <neon-animatable name='inputZone'><rgte-workzone-element id="rwei" rgte="{{input}}" enable-use disable-edit vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element></neon-animatable>
+             <neon-animatable name='inputZone'><rgte-workzone-element id="rwei" rgte="{{input}}" disable-edit disable-search disable-knowledge vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element></neon-animatable>
 
           </neon-animated-pages>
 
         </div>
-        <div>
+        <div id="vaadinOperation">
           <h2>Operation</h2>
           <neon-animated-pages selected='{{operationSection}}'
                            attr-for-selected='name'
@@ -109,7 +114,16 @@
       </vaadin-split-layout>
         <div>
           <h2>Output</h2>
-          <rgte-workzone-element id="inputElement" rgte="{{output}}" disable-edit="{{disableEdit}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+          <neon-animated-pages selected='{{outputSection}}'
+                           attr-for-selected='name'
+                           entry-animation='scale-up-animation'
+                           exit-animation='slide-right-animation'>
+
+             <neon-animatable name='outputZone'><rgte-workzone-element id="rweo" rgte="{{output}}" disable-edit disable-replace disable-search enable-launch vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element></operation-search-element></neon-animatable>
+             <neon-animatable name='stepStateZone'><step-status-displayer-element id="ssde" step="{{step}}"></step-status-displayer-element></neon-animatable>
+
+          </neon-animated-pages>
+
         </div>
     </vaadin-split-layout>
 
@@ -182,7 +196,20 @@
           value: "searchInput",
           notify: true,
         },
+        outputSection:
+        {
+          type: String,
+          value: "stepStateZone",
+          notify: true,
+        },
         // === EndPage
+
+        placeboOutput: //A placebo output used to reset the display and for prevent the useless creation of new tmp RGTE.
+        { // DO NOT MODIFY ITS CONTENT
+          type: Object,
+          value: function(){return new RGTE();},
+          notify: true,
+        },
 
         relationModeI_NOP: //used for linking input with nop
         {
@@ -262,6 +289,14 @@
 
         // === OUTPUT
         this.step.registerObserverCallbackOnOutputsComputation(this, this._outputComputed);
+        this.step.registerObserverCallbackOnOutputsReset(this, this._resetOutput);
+        this.step.registerObserverCallbackOnUncompletion(this, this._uncompletedStep);
+
+        // === RGTE_POOL
+          // @TODO RGTE_POOL must notify on change. If the current input is not referenced anymore, delete it from input.
+          // This is the case when the user use the output of a step as an input of the same step. The RGTE is deleted from the pool
+          // but it always exist in step-creation-page-element.input and thus can be used; The step does not update *this* because
+          // it is not linked (on page change we made a input = this.step.operator + retrieve the rgte for the research page)
       },
 
       // === RESET behaviors
@@ -285,13 +320,19 @@
     // === INPUT page
       _loadInputPage: function(rgte)
       {
+        var oldInput = this.input;
         this.input = rgte;
-        this.step.changeRGTE(this.input);
+
         this.inputSection = "inputZone";
+
+        if(this.input.id == oldInput.id)//if ident, no update for the step (prevent unregistering and recomputing of output)
+          return;
+        this.step.changeRGTE(this.input);
       },
 
       _loadSearchInputPage: function()
       {
+        this.$.rsei.update();
         this.inputSection = "searchInput";
       },
     // === END Input Page
@@ -316,6 +357,7 @@
 
         this.$.rsei.update();
         this.$.ose.update();
+        this.$.ssde.computeStepState();
       },
 
       _computeRewindAuthorized: function(operation)
@@ -329,9 +371,22 @@
         return;
       },
 
+      _uncompletedStep: function()
+      {
+        this.$.ssde.computeStepState();
+      },
+
       _outputComputed: function()
       {
         this.output = this.step.outputs;
+        this.outputSection = "outputZone";
+      },
+
+      _resetOutput: function()
+      {
+        this.output = this.placeboOutput;
+        this.$.ssde.computeStepState();
+        this.outputSection = "stepStateZone";
       },
 
     });

@@ -1,0 +1,220 @@
+<link rel="import" href="../operation-step-display-element.html">
+
+<dom-module id="step-status-displayer-element">
+  <template>
+    <style>
+
+    #icon{
+      width: 8vw;
+      margin: 20px auto 50px auto;
+    }
+
+      .avatar {
+        height: 8vw;
+        width: 8vw;
+        border-radius: 4vw;
+        box-sizing: border-box;
+        background-color: #DDD;
+        color: var(--paper-blue-500);
+        transition: color 0.5s ease-out;
+      }
+
+      .bad{
+        color: var(--paper-red-500);
+      }
+
+      .medium{
+        color: var(--paper-orange-500);
+      }
+
+
+    </style>
+
+<div id="divRoot">
+
+
+  <div id="icon">
+      <iron-icon id='ii' icon="icons:info" class$="[[_determineCategory(nbIssues)]]"></iron-icon>
+  </div>
+
+  <div id="content">
+    <p id="head">
+      Step's status before obtaining output :
+    </p>
+
+    <div id="sSESubDiv">
+    </div>
+  </div>
+</div>
+
+  </template>
+  <script>
+
+  Polymer({
+    is: "step-status-displayer-element",
+
+    properties:{
+      step:
+      {
+        type: Object,
+        notify: true,
+      },
+
+      nbIssues:
+      {
+        type: Number,
+        value: 7, //0111
+        notify: true,
+      },
+    },
+
+    computeStepState: function()
+    {
+      this._computeStepStateDisplay();
+    },
+
+    _computeStepStateDisplay: function()
+    {
+      this._computeSSESubDiv();
+
+      // this._computeSSLSubDiv();
+    },
+    _computeSSESubDiv: function()
+    {
+      this._resetDiv('sSESubDiv');
+      var issueValue = 0;
+
+      var isError = false;
+      var ul = document.createElement('ul');
+      var li;
+
+      if(this.step.inputs == null)
+      {
+        issueValue += 4;
+        isError = true;
+        li = document.createElement('li');
+        li.textContent = "No inputs concepts are selected";
+        ul.appendChild(li);
+      }
+      if(this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
+      {
+        issueValue += 2;
+        isError = true;
+        li = document.createElement('li');
+        li.textContent = "No operation is selected";
+        ul.appendChild(li);
+      }
+      if(this.step.propAsyncBuild.lengthArray != 0 && this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength() > 0)
+      {
+        issueValue += 1;
+        isError = true;
+        li = document.createElement('li');
+        li.textContent = this.step.propAsyncBuild.lengthArray - this.step.propAsyncBuild.getArrayToFillCurrentLength()+" remaining concepts to bind between operator and inputs concepts ("+this._getNameOfRemainingConceptsUnboundOperator()+')';
+        ul.appendChild(li);
+      }
+      //if PARAM
+
+      if(!isError)
+      {
+        ul = document.createElement('paper-fab');
+        ul.setAttribute('icon', 'icons:done-all');
+        ul.setAttribute('id', 'validateFab');
+      }
+
+      this.nbIssues = issueValue;
+      this.$.sSESubDiv.appendChild(ul);
+    },
+    _computeSSLSubDiv: function()
+    {
+      if(this.step == null)
+        return;
+
+      this._resetDiv('sSLSubDiv');
+      var ul = document.createElement('ul');
+      var li;
+
+      if(this.step.propAsyncBuild.getArrayToFillCurrentLength == 0)
+      {
+        ul = document.createElement('p');
+        ul.textContent = "No association is Currently made";
+        this.$.sSLSubDiv.appendChild(ul);
+      }
+
+      for(var i in this.step.propAsyncBuild.arrayToFill)
+      {
+        li = document.createElement('li');
+        li.textContent = '[@inputs]'+this.step.propAsyncBuild.arrayToFill[i].from.label+" ------> "+this.step.propAsyncBuild.arrayToFill[i].to.label+"[@operator]";
+        ul.appendChild(li);
+      }
+
+      this.$.sSLSubDiv.appendChild(ul);
+    },
+    _resetDiv: function(divID)
+    {
+      var myNode = this.$$('#'+divID);
+
+      if(myNode)
+        while (myNode.firstChild)
+            myNode.removeChild(myNode.firstChild);
+    },
+    _getNameOfRemainingConceptsUnboundOperator: function()
+    {
+      var labels = [];
+      var label;
+      var nodesToCompare;
+
+      if(this.step == null || this.step.operator == null || this.step.operator.behaviors == null || this.step.operator.behaviors.input == null)
+        return labels;
+
+      nodesToCompare = this.step.operator.behaviors.input.getNodes();
+      for(var i in nodesToCompare)
+      {
+        label =  nodesToCompare[i].label;
+
+        for(var j in this.step.propAsyncBuild.arrayToFill)
+        {
+          if(nodesToCompare[i].id == this.step.propAsyncBuild.arrayToFill[j].to.id)
+            label = null;
+        }
+
+        if(label)
+          labels.push(label);
+      }
+
+      var str = "";
+      if(labels.length == 1)
+        return labels[0];
+      //else
+      for(var i = 0; i < labels.length - 1; i++)
+      {
+        str += labels[i];
+        if(i < labels.length -2)
+          str +=', ';
+      }
+      str += ' and '+labels[labels.length-1]
+      return str;
+    },
+  // === END STEP STATE
+
+  _determineCategory: function()
+  {
+    var res = "avatar ";
+    var b2 = (this.nbIssues).toString(2);
+
+    // if(!(b2^('6'.toString(2))))
+    //   res += "bad ";
+    // else if(!(b2^('4'.toString(2)) || !(b2^('2'.toString(2)))))
+    //   res += "medium ";
+
+    if(this.nbIssues >= 6)
+      res += "bad ";
+    else if(this.nbIssues >= 2 && this.nbIssues <=5)
+      res += "medium ";
+
+    return res;
+  },
+
+  });
+
+  </script>
+</dom-module>

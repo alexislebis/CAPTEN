@@ -174,7 +174,7 @@ Step.prototype.constructor = Step;
     }
 
     RGTE_POOL.register(outputs);
-    
+
     return outputs;
   }
 
@@ -282,8 +282,13 @@ Step.prototype.constructor = Step;
 
     Step.prototype._callbackRGTEDeleted = function(graphID)//Handled in the super structure (here NAP). It could be manged by a notification system between rgte & step, but a counter is more hard to maintain
     {
+      if(this.input == null)
+        return;
+
       if(graphID == this.inputs.id)
         this.removeInputs();
+
+        //NTD if output, already handled from verifyOutputsEligibility
     }
 
     Step.prototype._callbackRGTEReceiveUpdate = function(from, elmt)
@@ -365,7 +370,7 @@ Step.prototype.constructor = Step;
       this.verifyOutputsEligibility();
   }
 
-  Step.prototype.changeRGTE = function(rgte)
+  Step.prototype.changeRGTE = function(rgte) // Input is considered as always in the pool
   {
       if (rgte == null)
           return;
@@ -392,8 +397,11 @@ Step.prototype.constructor = Step;
     if(this.isStateComputed)
     {
       var oldOutputs = this.outputs;
+      RGTE_POOL.delete(this.outputs);
       this.outputs = null;
+
       this.isStateComputed = false; //Reset state of computation;
+
       this.notifyOutputReset(oldOutputs);
     }
     this.notifyUncompletion();
