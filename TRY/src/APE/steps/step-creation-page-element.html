@@ -1,5 +1,6 @@
 <link rel="import" href="../operation-step-display-element.html">
 <link rel="import" href="./step-status-displayer-element.html">
+<link rel="import" href="./step-relation-tab-element.html">
 
 <dom-module id="step-creation-page-element">
   <template>
@@ -128,6 +129,7 @@
     </vaadin-split-layout>
 
     <div id="graphsRelations">
+      <step-relation-tab-element composites="{{compositeIOP}}"></step-relation-tab-element>
       Tableau de relations ici.
       Intégrer les relations avec les éléments narratifs.
       Rajouter un color picker à la fin de la ligne.
@@ -172,6 +174,12 @@
         },
 
         output:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        compositeIOP:
         {
           type: Object,
           notify: true,
@@ -291,6 +299,7 @@
         this.step.registerObserverCallbackOnOutputsComputation(this, this._outputComputed);
         this.step.registerObserverCallbackOnOutputsReset(this, this._resetOutput);
         this.step.registerObserverCallbackOnUncompletion(this, this._uncompletedStep);
+        this.step.registerObserverCallbackOnIOPCompositeRelationChange(this, this._changeOnCompositeIOP);
 
         // === RGTE_POOL
           // @TODO RGTE_POOL must notify on change. If the current input is not referenced anymore, delete it from input.
@@ -387,6 +396,12 @@
         this.output = this.placeboOutput;
         this.$.ssde.computeStepState();
         this.outputSection = "stepStateZone";
+      },
+
+      _changeOnCompositeIOP: function()
+      {
+        this.compositeIOP = null;
+        this.compositeIOP = this.step._compositeRelations;
       },
 
     });

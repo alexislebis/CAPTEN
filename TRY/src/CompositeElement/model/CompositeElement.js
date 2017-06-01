@@ -56,6 +56,7 @@ CompositeElement.prototype =
       // === NOTIFICATION
       notifyDeletion: function()
       {
+        this.notifyChange();
         this.observersDelete.forEach(function(e)
         {
           console.log(e);
@@ -115,4 +116,61 @@ CompositeElement.prototype =
       this.notifyDeletion();
     },
   // === END MANAGING COMPOSITE ELEMENT CONSTITUTION
+
+  // === COMPOSITE ELEMENTS VERIFICATION
+    containsAll: function(objIDArray)//Comparison is made from id
+    {
+      var isFound = false;
+
+      for(var i in objIDArray)
+      {
+        for(var j in this.elements)
+        {
+          if(this.elements[j].id == objIDArray[i])
+          {
+            isFound = true;
+            break;
+          }
+        }
+
+        if(!isFound) //If the id of one element from objArray was not found, does not contains all
+          return false;
+
+        isFound = false; //prepare variable for redo
+      }
+
+      return true;
+    },
+  // === END CEV
+
+  // === COMPOSITE ELEMENT OPTIONS
+    addOption: function(option) // add new option as a JSON line key : value;
+    {
+      var key = null; var value = null;
+      for(var i in option)
+      {
+        key = i; value = option[i];
+        break;
+      }
+
+      if(key == null || value == null)
+        return;
+
+      this.options[key] = value;
+    },
+  // === END CEP
+
+  // === GETTER
+    getElementsID: function()
+    {
+      var res = [];
+
+      for(var i in this.elements)
+      {
+        res.push(this.elements[i].id);
+      }
+
+      return res;
+    }
+  // === END GETTER
 };

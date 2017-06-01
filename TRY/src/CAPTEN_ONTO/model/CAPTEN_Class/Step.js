@@ -24,6 +24,7 @@ function Step() {
     this.observersUnc = []; //Uncomp observer
     this.observersReset = []; //When compute output is reseted
     this.observersInputs = []; //Any modification on inputs are notified
+    this.observersIOPCompositeRelations = []; //Any modification of the relations between A -> B from Input and NOP
 
     this.isStateComputed = false; //If the output has been computed. MUST BE @ true when all the node expected are aligned with the input node
     this.usedComputationInput = []; //State of the computation. Associative array. All the op.beh.inpu node must be aligned with one this.input.node
@@ -32,6 +33,9 @@ function Step() {
       this.propAsyncBuild.registerObserverCallbackOnUncompletion(this, this._callbackUCIUncompletion);
 
     this.htmlify = "a step";
+
+
+    this._compositeRelations = []; //An array of compositeelement. Each are a 4-tuples : one node input, one node ope.behaviors.inputs, one prop linking them and one options.color
 }
 
 Step.prototype = new CAPTENClass();
@@ -120,6 +124,24 @@ Step.prototype.constructor = Step;
                 }
             });
           }
+          // === COMPOSITE RELATIONS I NOP CHANGE
+          Step.prototype.registerObserverCallbackOnIOPCompositeRelationChange = function(objCallback, callback)
+          {
+            if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersIOPCompositeRelations))
+              this.observersIOPCompositeRelations.push([objCallback,callback]);
+          }
+
+            // === NOTIFICATION
+            Step.prototype.notifyIOPCompositeRelationChange = function()
+            {
+              this.observersIOPCompositeRelations.forEach(function(e)
+              {
+                console.log(e);
+                  if (typeof e[1] === "function") {
+                    e[1].call(e[0], this);//e[0] define the `this` context for e[1]
+                  }
+              }.bind(this));
+            }
     // ===
 
   // === CALLBACK BEHAVIORS FROM PROPASYNC
@@ -367,6 +389,8 @@ Step.prototype.constructor = Step;
 
       this.displayOperatorInputs = true;
 
+      this._flushCompositeRelations();
+
       this.verifyOutputsEligibility();
   }
 
@@ -386,6 +410,10 @@ Step.prototype.constructor = Step;
       this._updateUsedConcepts();
 
       this.displayRGTE = true;
+
+      this._flushCompositeRelations();
+
+      this.notifyInputsChange();
 
       this.verifyOutputsEligibility();
   }
@@ -428,12 +456,24 @@ Step.prototype.constructor = Step;
 
       this.propAsyncBuild.bind(obj, USED_AS, 'usedAs');
 
+      this._updateCompositeRelations();
+
       return;
   }
 
   Step.prototype.bindRGTEParams = function(params) {
 
   }
+
+  Step.prototype._flushCompositeRelations = function() //reset the array by calling delete
+  {
+    for(var i in this._compositeRelations)
+      this._compositeRelations[i].delete();
+
+    this._compositeRelations = [];
+
+    this.notifyIOPCompositeRelationChange();
+  };
 
   Step.prototype.findDependencies = function(steps, arrows)
   {
@@ -786,6 +826,87 @@ Step.prototype.constructor = Step;
         return edges[i];
 
     return null;
+  }
+
+  Step.prototype._updateCompositeRelations = function()
+  {
+    var compositesToAdd = [];
+
+    for(var i in this.propAsyncBuild.arrayToFill)
+    {
+      var ce = new CompositeElement();
+      ce.addElements([this.propAsyncBuild.arrayToFill[i], this.inputs.getNodeById(this.propAsyncBuild.arrayToFill[i].from), this.operator.behaviors.input.getNodeById(this.propAsyncBuild.arrayToFill[i].to)]);
+      ce.addOption({color: DEFAULT_RELATION_COLOR});
+      compositesToAdd.push(ce);
+    }
+
+    var indexToSplice = [];
+    for(var i in this._compositeRelations)
+    {
+      for(var j in compositesToAdd)
+      {
+        if(this._compositeRelations[i].containsAll(compositesToAdd[j].getElementsID()))
+        {
+          indexToSplice.push(j);
+        }
+      }
+    }
+
+    var offset = 0;//Used to relacibrate for splicing
+    for(var i in indexToSplice)
+    {
+      compositesToAdd.splice(indexToSplice[i]-offset,1);
+      offset++;
+    }
+
+    for(var i = 0; i < compositesToAdd.length; i++)
+    {
+      this._compositeRelations.push(compositesToAdd[i]);
+      this._compositeRelations[this._compositeRelations.length-1].registerObserverCallbackOnChange(this, this._onCompositeElementChange);
+
+      this.notifyIOPCompositeRelationChange();
+    }
+    return;
+
+    // for(var i in this.propAsyncBuild.arrayToFill)
+    // {
+    //   if(this._compositeRelations.length == 0)
+    //   {
+    //     var ce = new CompositeElement();
+    //     ce.addElements([this.propAsyncBuild.arrayToFill[i], this.inputs.getNodeById(this.propAsyncBuild.arrayToFill[i].from), this.operator.behaviors.input.getNodeById(this.propAsyncBuild.arrayToFill[i].to)]);
+    //     ce.addOption({color: DEFAULT_RELATION_COLOR});
+    //     compositesToAdd.push(ce);
+    //     break;
+    //   }
+    //
+    //   for(var j in this._compositeRelations)
+    //   {
+    //     if(!this._compositeRelations[j].containsAll([this.propAsyncBuild.arrayToFill[i].id, this.propAsyncBuild.arrayToFill[i].from, this.propAsyncBuild.arrayToFill[i].to]))
+    //     {
+    //       var ce = new CompositeElement();
+    //       ce.addElements([this.propAsyncBuild.arrayToFill[i], this.inputs.getNodeById(this.propAsyncBuild.arrayToFill[i].from), this.operator.behaviors.input.getNodeById(this.propAsyncBuild.arrayToFill[i].to)]);
+    //       ce.addOption({color: DEFAULT_RELATION_COLOR});
+    //       compositesToAdd.push(ce);
+    //     }
+    //   }
+    // }
+    //
+    // if(compositesToAdd.length == 0)
+    //   return;
+    //
+    // for(var i = 0; i < compositesToAdd.length; i++)
+    // {
+    //   this._compositeRelations.push(compositesToAdd[i]);
+    //   this._compositeRelations[this._compositeRelations.length-1].registerObserverCallbackOnChange(this, this._onCompositeElementChange);
+    //
+    //   this.notifyIOPCompositeRelationChange();
+    // }
+    // return;
+  }
+
+  Step.prototype._onCompositeElementChange = function()
+  {
+    this.notifyIOPCompositeRelationChange();
   }
 
 // === POLYMER ELEMENTS

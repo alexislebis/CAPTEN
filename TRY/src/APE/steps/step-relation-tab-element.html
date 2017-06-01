@@ -1,0 +1,101 @@
+<link rel="import" href="../../../bower_components/brainy-table/brainy-table.html">
+
+<dom-module id="step-relation-tab-element">
+  <template>
+    <style>
+
+    </style>
+
+    <!--to us : bower install --save OWOX/brainy-table  -->
+
+    step-relation-tab-element
+
+    <template is="dom-repeat" items="{{composites}}" index-as="index">
+
+    </template>
+
+    <brainy-table id="a" items="[[organizedArray]]" page-size="5" details-enabled>
+      <brainy-table-column name="From (Graph of concept)" filter-by="from.label" sort-by="from.label">
+        <template>[[item.from.label]]</template>
+      </brainy-table-column>
+      <brainy-table-column name="Relation" filter-by="rel.label" sort-by="rel.label">
+        <template>[[item.rel.label]]</template>
+      </brainy-table-column>
+      <brainy-table-column name="To (Operator input concept)" filter-by="to.label" sort-by="to.label">
+        <template>[[item.to.label]]</template>
+      </brainy-table-column>
+      <brainy-table-column name="Relation color">
+        <template><paper-swatch-picker id="swatch" color="{{item.color}}"><paper-swatch-picker></template>
+      </brainy-table-column>
+      <!-- <brainy-table-column name="Last Name" sort-by="user.name.last">
+        <template>[[item.user.name.last]]</template>
+      </brainy-table-column>
+      <brainy-table-column name="Phone" sort-by="user.phone" align-right>
+        <template>[[item.user.phone]]</template>
+      </brainy-table-column>
+      <brainy-table-column width="30px" align-right flex="0">
+        <template>
+          <template is="dom-if" if="[[!expanded]]">
+            <iron-icon icon="icons:expand-more"></iron-icon>
+          </template>
+          <template is="dom-if" if="[[expanded]]">
+            <iron-icon icon="icons:expand-less"></iron-icon>
+          </template>
+        </template>
+      </brainy-table-column>
+      <template is="row-detail">
+        <div>[[item.user.location.street]], [[item.user.location.city]], [[item.user.location.state]]</div>
+      </template> -->
+      <div no-results>No relations found</div>
+    </brainy-table>
+
+  </template>
+  <script>
+    Polymer({
+      is : "step-relation-tab-element",
+
+      properties:
+      {
+        composites:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        organizedArray:
+        {
+          type: Object,
+          notify: true,
+        },
+
+      },
+
+      observers:
+      [
+        "_onCompositesChange(composites)",
+      ],
+
+      _onCompositesChange: function(composites)
+      {
+        console.log("COMPOSITE ON CHANGE");
+        console.log(this.composites);
+
+        // this.$.a.render();
+        // this.$.b.render();
+        // this.$.c.render();
+        //
+        // this.$.d.render();
+        var array = [];
+
+        for(var i in this.composites)
+        {
+          array.push({from: this.composites[i].elements[1], to: this.composites[i].elements[2], rel: this.composites[i].elements[0], color: this.composites[i].options['color']});
+        }
+
+        this.organizedArray = null;
+        this.organizedArray = array;
+      },
+
+    });
+  </script>
+</dom-module>
