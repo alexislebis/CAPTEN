@@ -53,7 +53,8 @@
     "paper-searchbox": "petja/paper-searchbox#^1.0.2",
     "paper-ripple": "PolymerElements/paper-ripple#^1.0.10",
     "neon-animation": "PolymerElements/neon-animation#^1.2.5",
-    "paper-swatch-picker": "PolymerElements/paper-swatch-picker#^2.0.0"
+    "paper-swatch-picker": "PolymerElements/paper-swatch-picker#^2.0.0",
+    "brainy-table": "OWOX/brainy-table#^1.7.3"
   },
   "resolutions": {
     "app-layout": "^0.10.7"
