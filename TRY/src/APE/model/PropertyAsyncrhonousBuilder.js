@@ -5,6 +5,8 @@
 
 //TODO add constraints. The array is validated iff all the contraints (i.e. all the to.uniqueIdentifier supplied) are satisfied
 
+//@WARNING : It seems that propAsync does not handle multi link to one target *to*, since property.to is used as reference
+
 function PropertyAsyncrhonousBuilder(A, B, length)
 {
   this.id = CAPTEN.ID++;
@@ -15,6 +17,7 @@ function PropertyAsyncrhonousBuilder(A, B, length)
 
   this.observers = [];
   this.observersUnc = [];
+  this.observersUpdate = [];
 
   this.lengthArray = length;
 
@@ -31,7 +34,8 @@ PropertyAsyncrhonousBuilder.prototype = {
   // === OBSERVATION
     registerObserverCallbackOnCompletion: function(objCallback, callback)
     {
-      this.observers.push([objCallback,callback]);
+      if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observers))
+        this.observers.push([objCallback,callback]);
     },
 
       // === NOTIFICATION
@@ -48,7 +52,8 @@ PropertyAsyncrhonousBuilder.prototype = {
 
       registerObserverCallbackOnUncompletion: function(objCallback, callback)
       {
-        this.observersUnc.push([objCallback,callback]);
+        if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersUnc))
+          this.observersUnc.push([objCallback,callback]);
       },
 
         // === NOTIFICATION
@@ -62,6 +67,24 @@ PropertyAsyncrhonousBuilder.prototype = {
               }
           });
         },
+
+        registerObserverCallbackOnUpdate: function(objCallback, callback)//Fired when prop is replaced
+        {
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersUpdate))
+            this.observersUpdate.push([objCallback,callback]);
+        },
+
+          // === NOTIFICATION
+          notifyPropertyReplaced: function(oldProp, newProp)
+          {
+            this.observersUpdate.forEach(function(e)
+            {
+              console.log(e);
+                if (typeof e[1] === "function") {
+                  e[1].call(e[0], oldProp, newProp);//e[0] define the `this` context for e[1]
+                }
+            });
+          },
   // ===
 
   verifyCompatibility: function(smth)
@@ -219,6 +242,9 @@ PropertyAsyncrhonousBuilder.prototype = {
     console.log(property);
     // if(this.arrayToFill[property.to.retrieveUniqueIdentifier()] === undefined)
     //   throw new Error('The array of '+this+" does not include such a key "+property.to.retrieveUniqueIdentifier());
+
+    if(this.arrayToFill[property.to] != null)
+      this.notifyPropertyReplaced(this.arrayToFill[property.to], property);
 
     this.arrayToFill[property.to] = property;
 

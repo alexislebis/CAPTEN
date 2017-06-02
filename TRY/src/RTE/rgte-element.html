@@ -60,7 +60,7 @@
       </div>
 
 
-        <rgte-displayer-element id="rgteview" rgte="{{rgte}}"></rgte-displayer-element>
+        <rgte-displayer-element id="rgteview" colorization="{{colorization}}" rgte="{{rgte}}"></rgte-displayer-element>
 
 
         <div hidden$="{{!enableKnowledge}}" id="colorPickerFabK"><paper-swatch-picker id="swatch"color="{{kcolor}}"><paper-swatch-picker></div>
@@ -220,6 +220,12 @@
             properties:
             {
 
+              colorization:
+              {
+                type: Array,
+                notify: true,
+              },
+
                 enableModification:
                 {
                     type: Boolean,
@@ -330,6 +336,15 @@
                     type: Object,
                     notify: true,
                   },
+            },
+
+            observers: [
+              "_onColorChange(colorization.*)",
+            ],
+
+            _onColorChange: function()
+            {
+              console.log(this.colorization);
             },
 
 
@@ -832,7 +847,7 @@
               //Hard refresh
               if(this.rgte == null)
                 return;
-                
+
               console.log("Hard refresh.");
               this.rgte.notifyChange();
             },

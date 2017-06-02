@@ -45,6 +45,11 @@
                     },
                     notify: true,
                 },
+                dataSet:
+                {
+                  type: Object,
+                  notify: true,
+                },
                 options: {
                     type: Object,
                     value: function() {
@@ -162,20 +167,47 @@
               });
             },
 
-            addNodesAndEdges: function(n, e)
+            addNodesAndEdges: function(n, e, colors)
             {
               this.nodes = n;
               this.edges = e;
 
               console.log(this.edges);
               console.log(this.network);
+              this.dataSet = new vis.DataSet();
+
+              for(var i in this.nodes)
+                this.dataSet.add(this.nodes[i]);
+
+              if(colors != null)
+              {
+                for(var i in colors)
+                {
+                  var node = this.dataSet.get(colors[i].id);
+                  if(node != null)
+                  {
+                    node.color = colors[i].color;
+                    this.dataSet.update(node);
+                  }
+                }
+              }
+
               this.network.setData(
                 {
-                  nodes: this.nodes,
+                  nodes: this.dataSet,
                   edges: this.edges,
                 }
               );
             },
+
+            // paint: function(array) //Array is expected to be a repetition of {id, color}*
+            // {
+            //   console.log(this);
+            //   for(var i in array)
+            //   {
+            //     this.network.
+            //   }
+            // },
 
             redraw: function()
             {

@@ -56,6 +56,12 @@
                     observer: '_onChange',
                 },
 
+                colorization:
+                {
+                  type: Array,
+                  notify: true,
+                },
+
                 enableModification:
                 {
                   type: Boolean,
@@ -83,9 +89,16 @@
                 },
 
             },
-            // observers: [
-            //     "_onRgteChanged(rgte.*)",
-            // ],
+            observers: [
+              "_onColorChange(colorization.*)",
+            ],
+
+            _onColorChange: function()
+            {
+              console.log(this.colorization);
+            },
+
+
 
             attached: function()
             {
@@ -153,7 +166,7 @@
                   }
                 }
 
-                rgteView.addNodesAndEdges(n, this.rgte.getEdges());
+                rgteView.addNodesAndEdges(n, this.rgte.getEdges(), this.colorization);
 
 
 
@@ -186,6 +199,8 @@
                         };
                     }
                 }.bind(this));
+
+                // rgteView.paint(this.colorization);
 
                 rgteView.redraw();
             },

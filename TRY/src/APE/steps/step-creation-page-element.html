@@ -95,7 +95,7 @@
                            exit-animation='slide-right-animation'>
 
              <neon-animatable name='searchInput'><rgte-search-element id="rsei" enable-rewind="{{_computeRewindAuthorized(input)}}" enable-use="true"></rgte-search-element></neon-animatable>
-             <neon-animatable name='inputZone'><rgte-workzone-element id="rwei" rgte="{{input}}" disable-edit disable-search disable-knowledge vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element></neon-animatable>
+             <neon-animatable name='inputZone'><rgte-workzone-element id="rwei" rgte="{{input}}" colorization="{{inputsColor}}" disable-edit disable-search disable-knowledge vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element></neon-animatable>
 
           </neon-animated-pages>
 
@@ -108,7 +108,7 @@
                            exit-animation='slide-right-animation'>
 
              <neon-animatable name='searchOperation'><operation-search-element id="ose" enable-rewind="{{_computeRewindAuthorized(operation)}}" enable-use="true"></operation-search-element></neon-animatable>
-             <neon-animatable name='operationZone'><operation-step-display-element id="osde" operation="{{operation}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operation-step-display-element></neon-animatable>
+             <neon-animatable name='operationZone'><operation-step-display-element id="osde" colorization="{{operationInputsColor}}" operation="{{operation}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operation-step-display-element></neon-animatable>
 
           </neon-animated-pages>
         </div>
@@ -185,6 +185,20 @@
           notify: true,
         },
 
+        // === Graphs coloration
+        inputsColor:
+        {
+          type: Array,
+          notify: true,
+          value: function(){return [];},
+        },
+        operationInputsColor:
+        {
+          type: Array,
+          notify: true,
+          value: function(){return [];},
+        },
+
         // === Page
         operationSection:
         {
@@ -253,7 +267,13 @@
 
       observers: [
         "_onRouteChanged(route)",
+        "_onColorChange(operationInputsColor.*)",
       ],
+
+      _onColorChange: function()
+      {
+        console.log(this.operationInputsColor);
+      },
 
       attached: function()
       {
@@ -300,6 +320,7 @@
         this.step.registerObserverCallbackOnOutputsReset(this, this._resetOutput);
         this.step.registerObserverCallbackOnUncompletion(this, this._uncompletedStep);
         this.step.registerObserverCallbackOnIOPCompositeRelationChange(this, this._changeOnCompositeIOP);
+        this.step.registerObserverCallbackOnIOPCompositeOptionsChange(this, this._changeOnCompositeIOPOptions);
 
         // === RGTE_POOL
           // @TODO RGTE_POOL must notify on change. If the current input is not referenced anymore, delete it from input.
@@ -396,12 +417,41 @@
         this.output = this.placeboOutput;
         this.$.ssde.computeStepState();
         this.outputSection = "stepStateZone";
+
+        // color reseting
+        this.inputsColor = [];
+        this.operationInputsColor = [];
       },
 
       _changeOnCompositeIOP: function()
       {
         this.compositeIOP = null;
         this.compositeIOP = this.step._compositeRelations;
+      },
+
+      _changeOnCompositeIOPOptions: function(elmt)
+      {
+        console.log("_changeOnCompositeIOPOptions: function(elmt)");
+        console.log(elmt);
+
+        if(elmt.options['color'] == null)
+        {
+          console.error("elmt.options['color'] is null.");
+          return;
+        }
+
+        //@WARNING Strong dependencies with the Step model. It depends on the push order of the elements
+        var idInput = elmt.elements[1].id;
+        var idOpInput = elmt.elements[2].id;
+
+        this.push("inputsColor", {id: elmt.elements[1].id, color: elmt.options['color']});
+        this.push("operationInputsColor", {id: elmt.elements[2].id, color: elmt.options['color']});
+
+        // this.input.getNodeById(idInput).color = elmt.options['color'];
+        // this.$.rwei.notifyRGTEChange();
+        //
+        // this.operation.behaviors['input'].getNodeById(idOpInput).color = elmt.options['color'];
+        // this.$.osde.refreshInputs();
       },
 
     });

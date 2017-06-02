@@ -25,12 +25,14 @@ function Step() {
     this.observersReset = []; //When compute output is reseted
     this.observersInputs = []; //Any modification on inputs are notified
     this.observersIOPCompositeRelations = []; //Any modification of the relations between A -> B from Input and NOP
+    this.observersIOPCompositeOptions = []; //Any modif in the composite elements' option will be forwarded by the step
 
     this.isStateComputed = false; //If the output has been computed. MUST BE @ true when all the node expected are aligned with the input node
     this.usedComputationInput = []; //State of the computation. Associative array. All the op.beh.inpu node must be aligned with one this.input.node
     this.propAsyncBuild = new PropertyAsyncrhonousBuilder();
       this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackUsedConceptsInputComplete);
       this.propAsyncBuild.registerObserverCallbackOnUncompletion(this, this._callbackUCIUncompletion);
+      this.propAsyncBuild.registerObserverCallbackOnUpdate(this, this._callbackPropertyAsyncUpdate);
 
     this.htmlify = "a step";
 
@@ -139,6 +141,25 @@ Step.prototype.constructor = Step;
                 console.log(e);
                   if (typeof e[1] === "function") {
                     e[1].call(e[0], this);//e[0] define the `this` context for e[1]
+                  }
+              }.bind(this));
+            }
+
+          // === COMPOSITE ELEMENTS I NOP OPTION CHANGE
+          Step.prototype.registerObserverCallbackOnIOPCompositeOptionsChange = function(objCallback, callback)
+          {
+            if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersIOPCompositeOptions))
+              this.observersIOPCompositeOptions.push([objCallback,callback]);
+          }
+
+            // === NOTIFICATION
+            Step.prototype.notifyIOPCompositeOptionsChange = function(concernedCompositeElement)//elmt is the CompositeElement concerned
+            {
+              this.observersIOPCompositeOptions.forEach(function(e)
+              {
+                console.log(e);
+                  if (typeof e[1] === "function") {
+                    e[1].call(e[0], concernedCompositeElement);//e[0] define the `this` context for e[1]
                   }
               }.bind(this));
             }
@@ -863,6 +884,7 @@ Step.prototype.constructor = Step;
     {
       this._compositeRelations.push(compositesToAdd[i]);
       this._compositeRelations[this._compositeRelations.length-1].registerObserverCallbackOnChange(this, this._onCompositeElementChange);
+      this._compositeRelations[this._compositeRelations.length-1].registerObserverCallbackOnOptionsChange(this, this._onCompositeElementOptionsChange);
 
       this.notifyIOPCompositeRelationChange();
     }
@@ -907,7 +929,34 @@ Step.prototype.constructor = Step;
   Step.prototype._onCompositeElementChange = function()
   {
     this.notifyIOPCompositeRelationChange();
-  }
+  },
+
+  Step.prototype._onCompositeElementOptionsChange = function(elmt)
+  {
+    this.notifyIOPCompositeOptionsChange(elmt);
+  },
+
+  Step.prototype._callbackPropertyAsyncUpdate = function(oldP, newP)
+  {
+    var ce = new CompositeElement();
+    ce.addElements([newP, this.inputs.getNodeById(newP.from), this.operator.behaviors.input.getNodeById(newP.to)]);
+
+    for(var i in this._compositeRelations)
+    {
+      if(this._compositeRelations[i].containsAll([oldP.id, oldP.from, oldP.to]))
+      {
+        this._compositeRelations.splice(i, 1);
+        break;
+      }
+    }
+
+    this._compositeRelations.push(ce);
+
+    this._compositeRelations[this._compositeRelations.length-1].registerObserverCallbackOnChange(this, this._onCompositeElementChange);
+    this._compositeRelations[this._compositeRelations.length-1].registerObserverCallbackOnOptionsChange(this, this._onCompositeElementOptionsChange);
+
+    this.notifyIOPCompositeRelationChange();
+  },
 
 // === POLYMER ELEMENTS
   // === NAMER ELEMENT

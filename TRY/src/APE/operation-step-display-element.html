@@ -232,7 +232,7 @@
             <div><h4>Input behavior</h4> </div>
           </header>
 
-          <rgte-workzone-element id="inputPattern" hide-menu disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{inputBehavior}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+          <rgte-workzone-element id="inputPattern" colorization="{{colorization}}" hide-menu disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{inputBehavior}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
         </div>
 
         <div id="center">
@@ -321,6 +321,12 @@
               operationName:
               {
                 type: String,
+                notify: true,
+              },
+
+              colorization:
+              {
+                type: Array,
                 notify: true,
               },
 
@@ -561,8 +567,13 @@
             observers: [
               "_onDataRouteChanged(route)",
               "_onOperationChange(operation)",
+              "_onColorChange(colorization.*)",
             ],
 
+            _onColorChange: function()
+            {
+              console.log(this.colorization);
+            },
             // === For operation-step-display-element
             _onOperationChange: function()
             {
@@ -974,6 +985,12 @@
                 this.$.pibCollapse3.setAttribute('icon', 'icons:expand-less');
               else
                 this.$.pibCollapse3.setAttribute('icon', 'icons:expand-more');
+            },
+
+
+            refreshInputs: function()
+            {
+              this.$.inputPattern.notifyRGTEChange();
             },
 
 

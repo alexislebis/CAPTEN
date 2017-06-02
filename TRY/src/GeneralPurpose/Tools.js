@@ -60,4 +60,4 @@ var PREVENT_REDUDANCY_OBSERVATION = function(elmInstance, observersArray)
 
 // === COLORS
   var KNOWLEDGE_COLOR = "#57bb8a";
-  var DEFAULT_RELATION_COLOR = "#B333DE";
+  var DEFAULT_RELATION_COLOR = "#97C2FC";

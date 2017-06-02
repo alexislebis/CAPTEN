@@ -95,7 +95,7 @@
     </div>
   </div>
 
-  <rgte-element id="rgte" rgte="{{rgte}}" enable-knowledge="{{enableKnowledge}}" disable-Cardinality="{{disableCardinality}}" enable-Modification="{{enableModification}}"></rgte-element>
+  <rgte-element id="rgte" rgte="{{rgte}}" colorization="{{colorization}}" enable-knowledge="{{enableKnowledge}}" disable-Cardinality="{{disableCardinality}}" enable-Modification="{{enableModification}}"></rgte-element>
 
 
         <!-- <div hidden$="{{disableLoadMenu}}">
@@ -173,6 +173,12 @@
           notify: true,
         },
         customprops:
+        {
+          type: Array,
+          notify: true,
+        },
+
+        colorization:
         {
           type: Array,
           notify: true,
@@ -287,6 +293,15 @@
       behaviors: [
         Polymer.IronFormElementBehavior
       ],
+
+      observers: [
+        "_onColorChange(colorization.*)",
+      ],
+
+      _onColorChange: function()
+      {
+        console.log(this.colorization);
+      },
 
       attached: function()
       {

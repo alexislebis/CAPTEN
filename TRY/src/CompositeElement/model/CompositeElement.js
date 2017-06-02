@@ -22,6 +22,7 @@ function CompositeElement()
   // === Observers
     this.observers = [];
     this.observersDelete = [];
+    this.observersOptions = [];
 
 
   this.elements = [];
@@ -33,7 +34,8 @@ CompositeElement.prototype =
   // === OBSERVATION
     registerObserverCallbackOnChange: function(objCallback, callback)
     {
-      this.observers.push([objCallback,callback]);
+      if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observers))
+        this.observers.push([objCallback,callback]);
     },
 
       // === NOTIFICATION
@@ -48,9 +50,28 @@ CompositeElement.prototype =
         });
       },
 
+    registerObserverCallbackOnOptionsChange: function(objCallback, callback)
+    {
+      if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersOptions))
+        this.observersOptions.push([objCallback,callback]);
+    },
+
+      // === NOTIFICATION
+      notifyOptionsChange: function()
+      {
+        this.observersOptions.forEach(function(e)
+        {
+          console.log(e);
+            if (typeof e[1] === "function") {
+              e[1].call(e[0], this);//e[0] define the `this` context for e[1]
+            }
+        }.bind(this));
+      },
+
     registerObserverCallbackOnDeletion: function(objCallback, callback)
     {
-      this.observersDelete.push([objCallback,callback]);
+      if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersDelete))
+        this.observersDelete.push([objCallback,callback]);
     },
 
       // === NOTIFICATION
@@ -114,6 +135,9 @@ CompositeElement.prototype =
       this.options = {};
 
       this.notifyDeletion();
+      this.observers = [];
+      this.observersDelete = [];
+      this.observersOptions = [];
     },
   // === END MANAGING COMPOSITE ELEMENT CONSTITUTION
 
@@ -157,6 +181,8 @@ CompositeElement.prototype =
         return;
 
       this.options[key] = value;
+
+      this.notifyOptionsChange();
     },
   // === END CEP
 
