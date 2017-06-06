@@ -48,7 +48,17 @@
       }
 
       #linkingZone > paper-fab{
-        margin: 0 auto -10px auto;
+        margin: 0 auto -17px auto;
+      }
+
+      #addNarrative{
+        width: 100%;
+        margin: 15px 0 5px 0;
+        text-align: center;
+      }
+
+      #addNarrative > paper-fab{
+        margin: 0 auto -17px auto;
       }
 
 
@@ -84,6 +94,11 @@
         <div id="oNIContent" class="narrativeContent">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius, est id ultrices lobortis, magna dolor aliquet ligula, non mollis augue turpis in nulla. Donec sit amet dui ornare, tempus nibh nec, pharetra tellus. Aliquam metus ex, convallis a tincidunt nec, tempus sit amet quam. Nullam at pellentesque tellus. Ut sollicitudin maximus lorem ac porttitor. Vivamus fringilla viverra nisl ut ultrices. Morbi aliquet sem lectus, sed malesuada velit facilisis sit amet. Donec volutpat, nunc quis ultrices aliquam, velit ante convallis purus, et malesuada mauris est accumsan magna. Vivamus nec nibh non arcu finibus posuere sed eget turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus.
         </div>
+      </div>
+
+      <div id="addNarrative">
+        <paper-fab icon="add" disabled="true"></paper-fab>
+        <p>Add additional information related to the step</p>
       </div>
     </div>
 
@@ -125,7 +140,7 @@
     </div> -->
 
     <div id="linkingZone">
-      <paper-fab icon="icons:settings-input-component" active="[[relationModeI_NOP]]" disabled$="{{_isLinkingDisabled(input, operation)}}" on-click="_toggleRelationMode"></paper-fab>
+      <paper-fab id="linkingFab" icon="icons:settings-input-component" active="[[relationModeI_NOP]]" disabled$="{{_isLinkingDisabled(input, operation)}}" on-click="_toggleRelationMode"></paper-fab>
       <p hidden$="{{relationModeI_NOP}}">Bind your concepts with the input operator pattern</p>
       <p hidden$="{{!relationModeI_NOP}}">Click on a node within your concept and on a node within the input operator pattern for binding them</p>
     </div>
@@ -368,9 +383,7 @@
         this.step.registerObserverCallbackOnIOPCompositeOptionsChange(this, this._changeOnCompositeIOPOptions);
 
         // === LINKING FAB
-        var i = this.operation;
-        this.operation = null;
-        this.operation = i; //Force redraw to actualise fab state
+        this.$.linkingFab.disabled = this._isLinkingDisabled(this.input, this.operation);
 
         // === RGTE_POOL
           // @TODO RGTE_POOL must notify on change. If the current input is not referenced anymore, delete it from input.
@@ -405,7 +418,7 @@
 
         this.inputSection = "inputZone";
 
-        if(this.input.id == oldInput.id)//if ident, no update for the step (prevent unregistering and recomputing of output)
+        if(oldInput != null && this.input.id == oldInput.id)//if ident, no update for the step (prevent unregistering and recomputing of output)
           return;
         this.step.changeRGTE(this.input);
       },
