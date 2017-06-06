@@ -13,40 +13,81 @@
       #vaadinOperation{
         min-height: 800px;
       }
+
+      #commonInfo{
+        width: 60%;
+        margin: 0 auto;
+        background-color: DodgerBlue;
+
+      }
+
+      #commonInfo > header{
+        width: 100%;
+        text-align: center;
+        margin-bottom: 100px;
+      }
+
+      #separator{
+        width: 95%;
+        margin: 50px auto;
+        border-bottom: 1px solid black;
+      }
+
+      #configurationZone{
+        width: 100%;
+      }
+
+      #configurationZone > header{
+        text-align: center;
+      }
+
+      #linkingZone
+      {
+        width: 100%;
+        text-align: center;
+      }
+
+      #linkingZone > paper-fab{
+        margin: 0 auto -10px auto;
+      }
+
+
     </style>
 
 <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
 
 <div id="divRoot">
 
-  <header>
-    <h2> <span hidden$={{!isNew}}>New </span>Step</h2>
-    <div id="paperFabs">
-      <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
+  <div id="commonInfo">
+    <header>
+      <h2> <span hidden$={{!isNew}}>New </span>Step</h2>
+      <div id="paperFabs">
+        <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
 
-    </div>
-    <paper-input id="nameNOP" label="Narrated operator name" value="{{stepName}}" char-counter required maxlength="100"></paper-input>
-  </header>
+      </div>
+      <paper-input id="nameNOP" label="Narrated operator name" value="{{stepName}}" char-counter required maxlength="100"></paper-input>
+    </header>
 
-  <div id="narrativeInfo">
-    <div id="generalInformation">
-      <header>
-        <h4>General Information</h4>
-      </header>
-      <div id="gIContent" class="narrativeContent">
-        <paper-input id="objectif1Step" label="The step's objective (#1)" value="{{stepobjectif1}}" char-counter maxlength="100"></paper-input>
+    <div id="narrativeInfo">
+      <div id="generalInformation">
+        <header>
+          <h4>General Information</h4>
+        </header>
+        <div id="gIContent" class="narrativeContent">
+          <paper-input id="objectif1Step" label="The step's objective (#1)" value="{{stepobjectif1}}" char-counter maxlength="100"></paper-input>
+        </div>
+      </div>
+      <div id="otherNarrative">
+        <header>
+          <h4>Other Narrative Information</h4>
+        </header>
+        <div id="oNIContent" class="narrativeContent">
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius, est id ultrices lobortis, magna dolor aliquet ligula, non mollis augue turpis in nulla. Donec sit amet dui ornare, tempus nibh nec, pharetra tellus. Aliquam metus ex, convallis a tincidunt nec, tempus sit amet quam. Nullam at pellentesque tellus. Ut sollicitudin maximus lorem ac porttitor. Vivamus fringilla viverra nisl ut ultrices. Morbi aliquet sem lectus, sed malesuada velit facilisis sit amet. Donec volutpat, nunc quis ultrices aliquam, velit ante convallis purus, et malesuada mauris est accumsan magna. Vivamus nec nibh non arcu finibus posuere sed eget turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+        </div>
       </div>
     </div>
-    <div id="otherNarrative">
-      <header>
-        <h4>Other Narrative Information</h4>
-      </header>
-      <div id="oNIContent" class="narrativeContent">
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius, est id ultrices lobortis, magna dolor aliquet ligula, non mollis augue turpis in nulla. Donec sit amet dui ornare, tempus nibh nec, pharetra tellus. Aliquam metus ex, convallis a tincidunt nec, tempus sit amet quam. Nullam at pellentesque tellus. Ut sollicitudin maximus lorem ac porttitor. Vivamus fringilla viverra nisl ut ultrices. Morbi aliquet sem lectus, sed malesuada velit facilisis sit amet. Donec volutpat, nunc quis ultrices aliquam, velit ante convallis purus, et malesuada mauris est accumsan magna. Vivamus nec nibh non arcu finibus posuere sed eget turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus.
-      </div>
-    </div>
+
   </div>
-
 
   <div id="separator"></div>
 
@@ -58,7 +99,7 @@
       <h4>Representation of its behavior<br/>(How it is supposed to work in a general way)</h4>
     </header>
 
-    <div id="stepState">
+    <!-- <div id="stepState">
       <h3 id="stateTitle">Step State</h3>
       <div id="stepStateError">
         <div id="sSEHead">
@@ -80,9 +121,13 @@
         <paper-fab id="kFab" icon="image:brush" on-tap="_toggleKnowledgeIdentification">
       </div>
 
-      <div>
-        <paper-fab icon="icons:settings-input-component" on-click="_toggleRelationMode"></paper-fab>
-      </div>
+
+    </div> -->
+
+    <div id="linkingZone">
+      <paper-fab icon="icons:settings-input-component" active="[[relationModeI_NOP]]" disabled$="{{_isLinkingDisabled(input, operation)}}" on-click="_toggleRelationMode"></paper-fab>
+      <p hidden$="{{relationModeI_NOP}}">Bind your concepts with the input operator pattern</p>
+      <p hidden$="{{!relationModeI_NOP}}">Click on a node within your concept and on a node within the input operator pattern for binding them</p>
     </div>
 
     <vaadin-split-layout>
@@ -322,6 +367,11 @@
         this.step.registerObserverCallbackOnIOPCompositeRelationChange(this, this._changeOnCompositeIOP);
         this.step.registerObserverCallbackOnIOPCompositeOptionsChange(this, this._changeOnCompositeIOPOptions);
 
+        // === LINKING FAB
+        var i = this.operation;
+        this.operation = null;
+        this.operation = i; //Force redraw to actualise fab state
+
         // === RGTE_POOL
           // @TODO RGTE_POOL must notify on change. If the current input is not referenced anymore, delete it from input.
           // This is the case when the user use the output of a step as an input of the same step. The RGTE is deleted from the pool
@@ -392,7 +442,7 @@
 
       _computeRewindAuthorized: function(operation)
       {
-        return operation == null ? "false" : "true";
+        return operation == null ? false : true;
       },
 
       _toggleRelationMode: function()
@@ -452,6 +502,11 @@
         //
         // this.operation.behaviors['input'].getNodeById(idOpInput).color = elmt.options['color'];
         // this.$.osde.refreshInputs();
+      },
+
+      _isLinkingDisabled: function(input, operation)
+      {
+        return (input == null || operation == null) ? true : false;
       },
 
     });
