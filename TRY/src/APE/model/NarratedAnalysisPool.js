@@ -53,6 +53,21 @@
       return null;
    },
 
+   findStepByID: function(stepID)
+   {
+     if(stepID == null)
+      return;
+
+    for(var i = 0; i < this.pool.length; i++)
+    {
+      for(var j in this.pool[i].steps)
+      {
+        if(this.pool[i].steps[j].id == stepID)
+          return {operation: this.pool[i], index: j, step: this.pool[i].steps[j]};
+      }
+    }
+   },
+
  }
 
  var NARRATED_ANALYSIS_POOL = new NarratedAnalysisPool();

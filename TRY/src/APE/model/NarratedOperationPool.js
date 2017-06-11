@@ -77,6 +77,13 @@
    {
      return this.nopPool.pool.concat(this.napPool.pool);
    },
+
+   findStepByID: function(stepID)
+   {
+     var res = this.napPool.findStepByID(stepID);
+
+     return res != null ? res : this.nopPool.findStepByID(stepID);
+   },
  }
 
  var NARRATED_OPERATION_POOL = new NarratedOperationPool(NARRATED_OPERATOR_POOL, NARRATED_ANALYSIS_POOL);
