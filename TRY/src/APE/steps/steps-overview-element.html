@@ -1,0 +1,64 @@
+<dom-module id="steps-overview-element">
+  <template>
+    <style>
+    </style>
+
+    <template id="repeater" is="dom-repeat" items="{{nap.steps}}" index-as="index">
+      <step-card-element step="{{item}}" belongs-to="{{nap.name}}" position="{{index}}" to-stack="{{nap}}"></step>
+    </template>
+
+    <new-step-card-element id="nsce"></new-step-card-element>
+
+  </template>
+  <script>
+    Polymer({
+      is: "steps-overview-element",
+
+      properties:
+      {
+        nap:
+        {
+          type: Object,
+          notify: true,
+        },
+      },
+
+      observers:
+      [
+        "_onNAPChanged(nap)",
+      ],
+
+      attached: function()
+      {
+
+      },
+
+      _onNAPChanged: function(nap)
+      {
+        if(this.nap == null)
+          return;
+
+        this._attachListenersNAP();
+        this.$.repeater.render();
+      },
+
+      _attachListenersNAP: function()
+      {
+        if(this.nap == null)
+          return;
+
+        this.nap.registerObserverCallbackOnChange(this, this._updated);
+      },
+
+      _updated: function()
+      {
+        this.$.repeater.render();
+      },
+
+
+    });
+  </script>
+
+
+
+</dom-module>

@@ -20,9 +20,30 @@ ToolEvent.prototype = {
     return (event.srcEvent.button == 0);
   },
 
+  isAltClick: function(event)
+  {
+    if(event == null)
+      return false;
+
+    return event.altKey;
+  },
+
+  isLeftArrowClick: function(event)
+  {
+    if(event == null)
+      return false;
+
+    return event.key == 'ArrowLeft';
+  },
+
   isCtrlLeftClick: function(event)
   {
     return (this.isCtrlClick(event) && this.isLeftClick(event));
+  },
+
+  isAltLeftArrowClick: function(event)
+  {
+    return (this.isAltClick(event) && this.isLeftArrowClick(event));
   },
 
 };

@@ -1,0 +1,122 @@
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+
+<dom-module id="step-card-element">
+  <template>
+    <style>
+
+    #main{
+      width: var(--step-card-width, 300px);
+      --paper-card-content : {height: var(--step-card-height, 250px);}
+    }
+
+    .step-header { @apply(--paper-font-headline); }
+    .step-light { color: var(--paper-grey-600); }
+    .step-location {
+      float: right;
+      font-size: 15px;
+      vertical-align: middle;
+    }
+    .step-expand { color: var(--google-blue-500); }
+    iron-icon.star {
+      --iron-icon-width: 16px;
+      --iron-icon-height: 16px;
+      color: var(--paper-amber-500);
+    }
+    iron-icon.star:last-of-type { color: var(--paper-grey-500); }
+
+    .card-actions{
+      @apply(--layout-horizontal);
+      @apply(--layout-justified);
+    }
+
+    </style>
+
+<app-location route="{{route}}" use-hash-as-path></app-location>
+
+
+  <paper-card id="main">
+    <div class="card-content">
+      <div class="step-header">{{step.name}}
+        <div class="step-location step-light">
+          <div id="rating" class="step-rating">
+            <iron-icon class="star" icon="star"></iron-icon>
+            <iron-icon class="star" icon="star"></iron-icon>
+            <iron-icon class="star" icon="star"></iron-icon>
+            <iron-icon class="star" icon="star"></iron-icon>
+            <iron-icon class="star" icon="star"></iron-icon>
+          </div>
+          <paper-tooltip for="rating">Assumed relevance</paper-tooltip>
+          <!-- <iron-icon icon="launch"></iron-icon> -->
+          <!-- <span>250ft</span> -->
+        </div>
+      </div>
+
+      <p>A step <span hidden$="{{!belongsTo}}">of {{belongsTo}}</span></p>
+      <!-- TODO make dom repeat on objective inside a UL  -->
+      <p class="step-light">Objective#1: [[step.objective]]</p>
+      <p class="step-light">Other info#1: Lorem ipsum dolor sit aem.</p>
+      <p class="step-light">Position: [[position]]</p>
+    </div>
+
+    <div class="card-actions">
+      <paper-icon-button icon="icons:delete"></paper-icon-button>
+      <paper-icon-button icon="favorite"></paper-icon-button>
+      <paper-icon-button icon="launch" on-click="redirect"></paper-icon-button>
+    </div>
+    <!-- <div class="card-actions">
+      <p>Assumed relevance</p>
+      <div class="horizontal justified">
+        <div class="step-rating">
+          <iron-icon class="star" icon="star"></iron-icon>
+          <iron-icon class="star" icon="star"></iron-icon>
+          <iron-icon class="star" icon="star"></iron-icon>
+          <iron-icon class="star" icon="star"></iron-icon>
+          <iron-icon class="star" icon="star"></iron-icon>
+        </div>
+      </div>
+      <paper-button class="step-expand">EXPAND</paper-button>
+    </div> -->
+</paper-card>
+
+
+  </template>
+  <script>
+    Polymer({
+      is: "step-card-element",
+
+      properties:
+      {
+        step:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        belongsTo:
+        {
+          type: String,
+        },
+
+        position:
+        {
+          type: Number,
+          notify: true,
+        },
+
+        toStack:
+        {
+          type: Object,
+          notify: true,
+        },
+      },
+
+      redirect: function()
+      {
+        PREVIOUS_MANAGER.stack(this.toStack);
+        this.set('route.path', '/step/'+this.step.id);
+      },
+
+
+    });
+  </script>
+</dom-module>

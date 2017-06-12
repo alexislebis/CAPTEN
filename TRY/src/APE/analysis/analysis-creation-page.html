@@ -1,0 +1,314 @@
+<dom-module id="analysis-creation-page">
+  <template>
+    <style include="toasty-style"></style>
+    <style>
+
+    :host{
+      --vis-element-height: 300px;
+    }
+
+    #commonInfo{
+      width: 60%;
+      margin: 0 auto;
+      background-color: DodgerBlue;
+    }
+
+    #commonInfo{
+      width: 70%;
+      margin: 0 auto;
+      background-color: DodgerBlue;
+
+    }
+
+    #commonInfo > header{
+      width: 100%;
+      text-align: center;
+      margin-bottom: 100px;
+    }
+
+    #separator{
+      width: 95%;
+      margin: 50px auto;
+      border-bottom: 1px solid black;
+    }
+
+    .miniSeparator{
+      width: 20%;
+      margin: 50px auto 0px auto;
+      border-bottom: 1px solid black;
+    }
+
+    #configurationZone{
+      width: 100%;
+    }
+
+    #configurationZone > header{
+      text-align: center;
+    }
+
+    .subConfigZone > h4{
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    #sde{
+
+      width: 60%;
+      margin: 0 auto;
+    }
+
+    </style>
+
+    <app-location route="{{topLevelRoute}}" use-hash-as-path></app-location>
+
+
+    <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
+
+    <div id="divRoot">
+      <div id="commonInfo">
+        <header>
+          <h2> <span hidden$={{!isNew}}>New </span>Analysis</h2>
+          <div id="paperFabs">
+            <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
+
+          </div>
+          <paper-input id="nameNAP" label="Analysis name" value="{{napName}}" char-counter required maxlength="100"></paper-input>
+        </header>
+
+        <div id="narrativeInfo">
+          <div id="generalInformation">
+            <header>
+              <h4>General Information</h4>
+            </header>
+            <div id="gIContent" class="narrativeContent">
+              <paper-input id="objectif1NAP" label="The analysis's objective (#1)" value="{{napobjectif1}}" char-counter maxlength="100"></paper-input>
+            </div>
+          </div>
+          <div id="otherNarrative">
+            <header>
+              <h4>Other Narrative Information</h4>
+            </header>
+            <div id="oNIContent" class="narrativeContent">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius, est id ultrices lobortis, magna dolor aliquet ligula, non mollis augue turpis in nulla. Donec sit amet dui ornare, tempus nibh nec, pharetra tellus. Aliquam metus ex, convallis a tincidunt nec, tempus sit amet quam. Nullam at pellentesque tellus. Ut sollicitudin maximus lorem ac porttitor. Vivamus fringilla viverra nisl ut ultrices. Morbi aliquet sem lectus, sed malesuada velit facilisis sit amet. Donec volutpat, nunc quis ultrices aliquam, velit ante convallis purus, et malesuada mauris est accumsan magna. Vivamus nec nibh non arcu finibus posuere sed eget turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus.
+            </div>
+          </div>
+
+          <div id="addNarrative">
+            <paper-fab icon="add" disabled="true"></paper-fab>
+            <p>Add additional information related to the step</p>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div id="separator"></div>
+
+      <div id="configurationZone">
+
+    <!-- CONFIGURATION ZONE  -->
+
+        <header>
+          <h4>Detailed view<br/>(How the analysis is made and narrated)</h4>
+        </header>
+
+        <div class="miniSeparator"></div>
+
+        <div id="stepOverview" class="subConfigZone">
+          <h4>Steps overview</h4>
+
+          <steps-overview-element nap="{{nap}}"></steps-overview-element>
+
+        </div>
+
+        <div class="miniSeparator"></div>
+
+        <div id="analysisFlow" class="subConfigZone">
+          <h4>Analysis flow</h4>
+
+          <steps-displayer-element id="sde" steps="{{steps}}"></steps-displayer-element>
+
+        </div>
+
+        <div class="miniSeparator"></div>
+
+        <div id="conceptRequired" class="subConfigZone">
+          <h4>Initial concepts required</h4>
+
+        </div>
+
+      </div>
+
+
+      <paper-toast id="NAPRegistered" text='The narrated analysis has been saved'>
+        <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
+      </paper-toast>
+
+
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: "analysis-creation-page",
+
+      properties:
+      {
+        nap:
+        {
+          type: Object,
+          notify: true,
+          value: function(){
+            var a = new NarratedAnalysisProcess();
+            var s1 = new Step();
+            s1.name = "coucou";
+            var s2 = new Step();
+            s2.name = "ze";
+            a.steps = [];
+            a.steps.push(s1);
+            a.steps.push(s2);
+          }
+        },
+
+        steps:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        route:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        isNew:
+        {
+          type: Object,
+          notify: true,
+          value: false,
+        }
+
+      },
+
+      observers:
+      [
+        "_onNAPChanged(nap)",
+        "_onRouteChanged(route)",
+        "_onNameChanged(napName)",
+      ],
+
+      attached: function()
+      {
+        // === DELME
+        var a = new NarratedAnalysisProcess();
+        a.name = "NAPLooool";
+        var s1 = new Step();
+        s1.name = "coucou";
+        var s2 = new Step();
+        s2.name = "ze";
+        a.steps = [];
+        a.steps.push(s1);
+        a.steps.push(s2);
+
+        this.nap = a;
+        NARRATED_OPERATION_POOL.registerNAP(this.nap)
+        // === END DELME
+
+        this.$.stepOverview.addEventListener(NEW_STEP_FOR_NAP_SIGNAL_ID, function(){
+          this.openNewStep();
+        }.bind(this));
+      },
+
+      // === ROUTING
+        _onRouteChanged: function(route)
+        {
+          if(route.prefix.toLowerCase() != "/analysis")
+            return;
+
+          if(this.data.itemValue == null || this.data.itemValue == "" || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
+            this._generateDefaultConfig();
+          else
+          {
+            var success = this._generateSpecificConfig(this.data.itemValue);
+
+            if(!success)
+            {
+              console.error("No nap found. Booting on default configuration");
+              this._generateDefaultConfig();
+            }
+          }
+        },
+
+          _generateDefaultConfig: function()
+          {
+            this.isNew = true;
+            this.nap = new NarratedAnalysisProcess();
+          },
+
+          _generateSpecificConfig: function(idToFind)
+          {
+            var res = NARRATED_ANALYSIS_POOL.getByID(idToFind);
+
+            if(res == null)
+              return false;
+
+            this.isNew = false;
+            this.nap = res;
+          },
+
+      _onNAPChanged: function(nap)
+      {
+        if(nap == null)
+          return;
+
+        this._attachListenersNAP();
+        this.steps = nap.steps;
+      },
+
+      _attachListenersNAP: function()
+      {
+        if(this.nap == null)
+          return;
+
+        this.nap.registerObserverCallbackOnChange(this, this._updated);
+      },
+
+      _onNameChanged: function(name)
+      {
+        if(this.nap == null)
+          return;
+
+        this.nap.name = name;
+
+        if(!this.isNew)//If the nap isn't new, then don't need to try to register it
+          return;
+
+        if(name!= null && name.length >= 3)
+        {
+          NARRATED_OPERATION_POOL.registerNAP(this.nap);
+          this.isNew = false;
+          this.$.NAPRegistered.open();
+        }
+      },
+
+        _updated: function()
+        {
+          //NTD for now;
+        },
+
+      openNewStep: function()
+      {
+        PREVIOUS_MANAGER.stack(this.nap);
+        this.set("topLevelRoute.path", "/step/new");
+      },
+
+// === TOAST
+      _closeToast: function(e)
+      {
+        Polymer.dom(e).localTarget.parentElement.close();
+      },
+
+    });
+  </script>
+</dom-module>

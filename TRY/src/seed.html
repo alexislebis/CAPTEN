@@ -1,3 +1,4 @@
+<link rel="import" href="wrapper/capten-onto-model-element.html">
 <link rel="import" href="import/tools-import.html">
 
 <link rel="import" href="import/composite-element-import.html">
@@ -6,7 +7,11 @@
 <link rel="import" href="APE/ape-element.html">
 <link rel="import" href="APE/operation-search-element.html">
 <link rel="import" href="APE/operation-search-page-element.html">
+<link rel="import" href="APE/steps/step-card-element.html">
+<link rel="import" href="APE/steps/new-step-card-element.html">
 <link rel="import" href="APE/steps/step-creation-page-element.html">
+<link rel="import" href="APE/steps/steps-overview-element.html">
+<link rel="import" href="APE/analysis/analysis-creation-page.html">
 
 <link rel="import" href="RTE/rte.html">
 <link rel="import" href="RTE/rgte-search-element.html">
@@ -19,7 +24,7 @@
 
 <link rel="import" href="wrapper/vis-element.html">
 <link rel="import" href="wrapper/narrative-block-model-element.html">
-<link rel="import" href="wrapper/capten-onto-model-element.html">
+
 
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
@@ -81,6 +86,7 @@
       <neon-animatable name="nop"><operator-creation-page-element route-top-level="{{route}}" route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operator-creation-page-element></neon-animatable>
       <neon-animatable name="operation_search"><operation-search-page-element route="{{route}}"></operation-search-page-element></neon-animatable>
       <neon-animatable name="step"><step-creation-page-element route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-creation-page-element></neon-animatable>
+      <neon-animatable name="analysis"><analysis-creation-page route="{{tailTopLevel}}" nap="{{nap}}"></analysis-creation-page></neon-animatable>
     </neon-animated-pages>
 
 
@@ -95,6 +101,10 @@
 
     <paper-toast id="toastAddBag" text='Graph copied to the "APE" section'>
       <paper-button on-click="_rollbackBagAdd" class="toastButton">UNDO</paper-button>
+    </paper-toast>
+
+    <paper-toast id="toastGoBack" text="You can't go back this way. Use the menu instead">
+      <paper-button on-click="_closeToast" class="toastButton">UNDO</paper-button>
     </paper-toast>
 
     <h1>{{data.page}}</h1>
@@ -169,6 +179,9 @@
 
       attached: function()
       {
+        PREVIOUS_MANAGER.registerObserverCallbackOnFail(this, this._openToastFailure);
+        PREVIOUS_MANAGER.stack(new Step());
+
         this.$.rteElem.addEventListener("-RGTEAddedToTheBag", function(e)
         {
           // console.log("WARNING: Currently, only one RGTE can be used simultaneously.");//TODO
@@ -224,6 +237,15 @@
         this.splice('rgtes', index, 1);
       },
 
+      _openToastFailure: function()
+      {
+          this.$.toastGoBack.open();
+      },
+
+      _closeToast: function(e)
+      {
+        Polymer.dom(e).localTarget.parentElement.close();
+      },
 
     });
   </script>

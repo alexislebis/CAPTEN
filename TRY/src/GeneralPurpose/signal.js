@@ -30,3 +30,7 @@
       var OPERATION_INPUT_PATTERN_NODE_CLICKED_SIGNAL_ID = "-5e4ze66reger7g79scxxcwc3wx1c3vbz";
       // === NOP
         var NOP_SELECTED_SIGNAL_ID = "-854LmfenBWbvbevo5zfea3f";
+
+    // === ANALYSIS PROCESS
+      // === STEPS OVERVIEW
+        var NEW_STEP_FOR_NAP_SIGNAL_ID = "-4segejgzg?KG?keeg:dvsdv2vez";

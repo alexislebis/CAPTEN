@@ -73,6 +73,11 @@
      return this.nopPool.unregister(nop);
    },
 
+   registerNAP: function(nap)
+   {
+     return this.napPool.register(nap);
+   },
+
    getAvailableOperations: function()
    {
      return this.nopPool.pool.concat(this.napPool.pool);

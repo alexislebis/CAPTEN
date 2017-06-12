@@ -1,0 +1,103 @@
+<link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+
+<dom-module id="new-step-card-element">
+  <template>
+    <style>
+
+    #main{
+      width: var(--step-card-width, 300px);
+      --paper-card-content : {height: var(--step-card-heightn, 250px);}
+    }
+
+    .step-header { @apply(--paper-font-headline); text-align: center; margin-bottom: 50px;}
+    .step-light { color: var(--paper-grey-600); }
+    .step-location {
+      float: right;
+      font-size: 15px;
+      vertical-align: middle;
+    }
+    .step-expand { color: var(--google-blue-500); }
+    iron-icon.star {
+      --iron-icon-width: 16px;
+      --iron-icon-height: 16px;
+      color: var(--paper-amber-500);
+    }
+    iron-icon.star:last-of-type { color: var(--paper-grey-500); }
+
+    .card-actions{
+      @apply(--layout-horizontal);
+      @apply(--layout-justified);
+    }
+
+    .big{
+      margin-left: 31%;
+
+      --paper-icon-button:
+      {
+        width: 100px;
+        height: 100px;
+      }
+    }
+
+    </style>
+
+<app-location route="{{route}}" use-hash-as-path></app-location>
+
+
+  <paper-card id="main">
+    <div class="card-content">
+      <div class="step-header">Continue to define the Analysis
+        <!-- <div class="step-location step-light">
+          <div id="rating" class="step-rating">
+            <iron-icon class="star" icon="star"></iron-icon>
+            <iron-icon class="star" icon="star"></iron-icon>
+            <iron-icon class="star" icon="star"></iron-icon>
+            <iron-icon class="star" icon="star"></iron-icon>
+            <iron-icon class="star" icon="star"></iron-icon>
+          </div>
+          <paper-tooltip for="rating">Assumed relevance</paper-tooltip> -->
+        </div>
+        <paper-icon-button class="big" icon="icons:add-circle-outline" on-click="newStep"></paper-icon-button>
+
+      </div>
+
+
+    <!-- <div class="card-actions">
+      <paper-icon-button icon="icons:delete"></paper-icon-button>
+      <paper-icon-button icon="favorite"></paper-icon-button>
+      <paper-icon-button icon="launch" on-click="redirect"></paper-icon-button>
+    </div> -->
+    <!-- <div class="card-actions">
+      <p>Assumed relevance</p>
+      <div class="horizontal justified">
+        <div class="step-rating">
+          <iron-icon class="star" icon="star"></iron-icon>
+          <iron-icon class="star" icon="star"></iron-icon>
+          <iron-icon class="star" icon="star"></iron-icon>
+          <iron-icon class="star" icon="star"></iron-icon>
+          <iron-icon class="star" icon="star"></iron-icon>
+        </div>
+      </div>
+      <paper-button class="step-expand">EXPAND</paper-button>
+    </div> -->
+</paper-card>
+
+
+  </template>
+  <script>
+    Polymer({
+      is: "new-step-card-element",
+
+      properties:
+      {
+      },
+
+      newStep: function()
+      {
+        this.fire(NEW_STEP_FOR_NAP_SIGNAL_ID);
+      },
+
+
+    });
+  </script>
+</dom-module>

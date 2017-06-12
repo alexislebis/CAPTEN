@@ -53,6 +53,32 @@
       return null;
    },
 
+   register: function(nap)
+   {
+
+     if( this._isBadNAP(nap) )
+       return null;
+
+     for(var i = 0; i < this.pool.length; i++) //Prevent duplicata
+       if(this.pool[i].id == nap.id)
+         return null;
+
+     this.pool.push(nap);
+
+     this.notifyChange();
+
+     return this.pool[this.pool.length-1];
+   },
+
+   _isBadNAP: function(nap)
+   {
+     if(    nap == null
+         || !(nap instanceof NarratedAnalysisPool)  )
+       return true;
+
+     return false;
+   },
+
    findStepByID: function(stepID)
    {
      if(stepID == null)

@@ -4,6 +4,7 @@
 
 <dom-module id="step-creation-page-element">
   <template>
+    <style include="toasty-style"></style>
     <style>
       :host{
         --rgte-common-width: 100%;
@@ -15,7 +16,7 @@
       }
 
       #commonInfo{
-        width: 60%;
+        width: 70%;
         margin: 0 auto;
         background-color: DodgerBlue;
 
@@ -198,6 +199,14 @@
 <!-- END CONFIGURATION ZONE  -->
 
   </div>
+
+  <paper-toast id="StepRegisteredWithinNAP" text="The analysis's step has been saved">
+    <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
+  </paper-toast>
+
+  <paper-toast id="StepRegistered" text='The step has been saved'>
+    <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
+  </paper-toast>
 </div>
   </template>
   <script>
@@ -218,7 +227,7 @@
         {
           type: Object,
           notify: true,
-        }
+        },
 
         step:
         {
@@ -342,6 +351,7 @@
         "_onRouteChanged(route)",
         "_onColorChange(operationInputsColor.*)",
         "_onStepChanged(step)",
+        "_onNameChanged(stepName)",
       ],
 
       _onColorChange: function()
@@ -535,7 +545,36 @@
 
         // === LINKING FAB
         this.$.linkingFab.disabled = this._isLinkingDisabled(this.input, this.operation);
+      },
 
+      _onNameChanged: function(name)
+      {
+        if(this.step == null)
+          return;
+          
+        this.step.name = name;
+
+        if(!this.isNew)//If the nap isn't new, then don't need to try to register it
+          return;
+
+        if(name!= null && name.length >= 3)
+        {
+          // TODO SAVE step in the current NAP
+          if(this.nap != null)
+          {
+            var res = this.nap.addStep(this.step);
+
+            if(res == null)
+              console.error("The step already exists and couldn't be added");
+            else
+              this.$.StepRegisteredWithinNAP.open();
+          }
+          else {
+            console.error("Currently, no independent pool of steps is managed. Aborting");
+            return;
+          }
+          this.isNew = false;
+        }
       },
 
       _computeRewindAuthorized: function(operation)
@@ -605,6 +644,12 @@
       _isLinkingDisabled: function(input, operation)
       {
         return (input == null || operation == null) ? true : false;
+      },
+
+// === TOAST
+      _closeToast: function(e)
+      {
+        Polymer.dom(e).localTarget.parentElement.close();
       },
 
     });

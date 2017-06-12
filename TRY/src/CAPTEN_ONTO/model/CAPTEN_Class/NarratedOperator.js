@@ -7,7 +7,7 @@ function NarratedOperator(usualName)
     this.uriConceptConvoyed = null; //Allow to have a dictionary of the different concept of operation. Comme *Find* et *Correlation*
 
     //UPDATE from 22/09/216 : operators[] remove from IAP & become a part of an IOP
-    this.steps = null; //Associative array : [RelationOrder]:[ListOfSteps]
+    this.steps = []; //NOT Used : Associative array : [RelationOrder]:[ListOfSteps]
 
     this.annotation = null; //Annotation regarding the IndpOp
 
@@ -21,7 +21,7 @@ function NarratedOperator(usualName)
     this.behaviors = []; //BehavioralPattern. The behaviors of a specific NarratedOperator.
       this.behaviors['output'] = new RGTE();//this RGTE is not register in the RGTE POOL
       this.behaviors['input'] = new RGTE;//this RGTE is not register in the RGTE POOL
-      
+
     //Analysis tools links
     this.implementedByOperation = null; //For each tool : [T1:[OperatorList], T2:[OperatorList], ...]
 
@@ -29,6 +29,9 @@ function NarratedOperator(usualName)
     this.author = null;
 
     // this.notation = null; //NOTE notation of the operation. Don't forget for future version
+
+    // === OBSERVATION
+      this.observersSteps = [];
 }
 
 /**
@@ -38,6 +41,28 @@ function NarratedOperator(usualName)
 NarratedOperator.prototype = Object.create(CAPTENClass.prototype);
 
 NarratedOperator.prototype = {
+
+    // === OBSERVATION
+      resetAllObservers: function()
+      {
+        this.observersSteps = [];
+      },
+
+      registerObserverCallbackOnChange: function(objCallback, callback)
+      {
+        if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersSteps))
+          this.observersSteps.push([objCallback,callback]);
+      },
+
+      notifyChange: function()
+      {
+        this.observersSteps.forEach(function(e){
+          if(typeof e[1] === "function")
+          {
+            e[1].call(e[0], this);
+          }
+        }.bind(this));
+      },
 
     solve: function(inputs)
     {
@@ -50,5 +75,22 @@ NarratedOperator.prototype = {
     isEqual: function(nop)
     {
 
+    },
+
+    addStep: function(step)
+    {
+      if(!(step instanceof Step))
+        return;
+
+      if(!this.alreadyExists(step))
+        this.steps.push(step);
+    },
+
+    alreadyExists: function(step)
+    {
+      for(var i in this.steps)
+        if(this.steps[i].id == step.id)
+          return true;
+      return false;
     },
 };
