@@ -117,7 +117,7 @@
         <div id="stepOverview" class="subConfigZone">
           <h4>Steps overview</h4>
 
-          <steps-overview-element nap="{{nap}}"></steps-overview-element>
+          <steps-overview-element id="soe" nap="{{nap}}"></steps-overview-element>
 
         </div>
 
@@ -200,20 +200,20 @@
 
       attached: function()
       {
-        // === DELME
-        var a = new NarratedAnalysisProcess();
-        a.name = "NAPLooool";
-        var s1 = new Step();
-        s1.name = "coucou";
-        var s2 = new Step();
-        s2.name = "ze";
-        a.steps = [];
-        a.steps.push(s1);
-        a.steps.push(s2);
-
-        this.nap = a;
-        NARRATED_OPERATION_POOL.registerNAP(this.nap)
-        // === END DELME
+        // // === DELME
+        // var a = new NarratedAnalysisProcess();
+        // a.name = "NAPLooool";
+        // var s1 = new Step();
+        // s1.name = "coucou";
+        // var s2 = new Step();
+        // s2.name = "ze";
+        // a.steps = [];
+        // a.steps.push(s1);
+        // a.steps.push(s2);
+        //
+        // this.nap = a;
+        // // NARRATED_OPERATION_POOL.registerNAP(this.nap)
+        // // === END DELME
 
         this.$.stepOverview.addEventListener(NEW_STEP_FOR_NAP_SIGNAL_ID, function(){
           this.openNewStep();
@@ -238,6 +238,9 @@
               this._generateDefaultConfig();
             }
           }
+
+          HISTORY_MANAGER.stack(this.nap);
+          this.$.soe.update();
         },
 
           _generateDefaultConfig: function()
@@ -255,6 +258,7 @@
 
             this.isNew = false;
             this.nap = res;
+            return true;
           },
 
       _onNAPChanged: function(nap)
@@ -299,7 +303,7 @@
 
       openNewStep: function()
       {
-        PREVIOUS_MANAGER.stack(this.nap);
+        // HISTORY_MANAGER.stack(this.nap);
         this.set("topLevelRoute.path", "/step/new");
       },
 

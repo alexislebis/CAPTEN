@@ -303,6 +303,11 @@
             properties:
             {
               // === FOR operation-step-display-element
+              step:
+              {
+                type: Object,
+                notify: true,
+              },
               operation:
               {
                 type: Object,
@@ -612,11 +617,13 @@
 
               if(this.operation instanceof NarratedOperator)
               {
+                // HISTORY_MANAGER.stack(this.step);
                 this.set('routeTopLevel.path', '/nop/'+this.operation.id);
-                console.error("ICI, mettre a jour une variable qui sera passé à tout les éléments indiquant un ensemble d'états. Ca va permettre de dire les enable-use par exemple");
+                // console.error("ICI, mettre a jour une variable qui sera passé à tout les éléments indiquant un ensemble d'états. Ca va permettre de dire les enable-use par exemple");
               }
               else if(this.operation instanceof NarratedAnalysisProcess)
               {
+                // HISTORY_MANAGER.stack(this.step);
                 this.set('routeTopLevel.path', '/nap/'+this.operation.id);
                 //IDEM;
               }

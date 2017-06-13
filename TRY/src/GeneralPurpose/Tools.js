@@ -36,6 +36,14 @@ ToolEvent.prototype = {
     return event.key == 'ArrowLeft';
   },
 
+  isRightArrowClick: function(event)
+  {
+    if(event == null)
+      return false;
+
+    return event.key == "ArrowRight";
+  },
+
   isCtrlLeftClick: function(event)
   {
     return (this.isCtrlClick(event) && this.isLeftClick(event));
@@ -44,6 +52,11 @@ ToolEvent.prototype = {
   isAltLeftArrowClick: function(event)
   {
     return (this.isAltClick(event) && this.isLeftArrowClick(event));
+  },
+
+  isAltRightArrowClick: function(event)
+  {
+    return (this.isAltClick(event) && this.isRightArrowClick(event));
   },
 
 };

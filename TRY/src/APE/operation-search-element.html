@@ -90,7 +90,13 @@
           type: Boolean,
           value: false,
           notify: true,
-        }
+        },
+
+        toStack:
+        {
+          type: Object,
+          notify: true,
+        },
       },
 
       // observers: [
@@ -99,6 +105,7 @@
 
       _openNew: function()
       {
+        // HISTORY_MANAGER.stack(this.toStack);
         this.set('routeTopLevel.path', '/nop/new');
       },
 

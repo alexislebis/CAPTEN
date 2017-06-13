@@ -179,8 +179,8 @@
 
       attached: function()
       {
-        PREVIOUS_MANAGER.registerObserverCallbackOnFail(this, this._openToastFailure);
-        PREVIOUS_MANAGER.stack(new Step());
+        HISTORY_MANAGER.registerObserverCallbackOnFail(this, this._openToastFailure);
+        // HISTORY_MANAGER.stack(new Step());
 
         this.$.rteElem.addEventListener("-RGTEAddedToTheBag", function(e)
         {

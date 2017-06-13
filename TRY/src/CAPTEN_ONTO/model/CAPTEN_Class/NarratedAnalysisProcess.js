@@ -9,6 +9,9 @@ function NarratedAnalysisProcess() {
   //TODO Add specific element such as context application & description, etc..
   this.utilisabilityContext = null;
 
+  // === Integration state of new component
+  this.integrationState = false; //If on, then represent the fact that the analysis w8 a new step
+
 }
 
 NarratedAnalysisProcess.prototype = Object.create(NarratedOperator.prototype);

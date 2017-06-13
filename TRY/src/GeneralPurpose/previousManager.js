@@ -2,26 +2,39 @@
 window.onkeydown = function (e) {
   if(TOOL_EVENT.isAltLeftArrowClick(e))
   {
-    alert("Handle deplacement gauche droite avec liste");
     e.preventDefault();
 
-    var url = PREVIOUS_MANAGER._getRedirectionURL(PREVIOUS_MANAGER.consume());
+    var url = HISTORY_MANAGER._getRedirectionURL(HISTORY_MANAGER.back());
 
     if(url != null)
     {
-      window.location.href = PREVIOUS_MANAGER.route + url;
+      window.location.href = HISTORY_MANAGER.route + url;
     }
     else {
-      PREVIOUS_MANAGER.notifyFailure();
+      HISTORY_MANAGER.notifyFailure();
     }
+  }
+  else if (TOOL_EVENT.isAltRightArrowClick(e))
+  {
+    var url = HISTORY_MANAGER._getRedirectionURL(HISTORY_MANAGER.forward());
+
+    if(url != null)
+    {
+      window.location.href = HISTORY_MANAGER.route + url;
+    }
+
   }
 
   // else NTD
 }
 
-function PreviousManager()
+function PreviousManager()//Object to rename
 {
-  this.previousStack = [];
+  this.history = [];
+  this.index = -1;
+
+  this.redirectState = false; //Boolean indicating that the redirection has been made and therefore the next stack invok should not be takeninto account
+
   this.route = (window.location.href).split("#")[0]+'#';
 
   this.observers = []; // For notification of failure
@@ -50,17 +63,74 @@ PreviousManager.prototype = {
 
   stack: function(item)
   {
-    this.previousStack.push(item);
+    if(this.redirectState)
+    {
+      this.redirectState = false;
+      return;
+    }
+    // if(this.index != -1 && this.history.length > 0)
+    //   return null;//NTD since the current element is the element. Due to direct access
+
+    if(this.index == this.history.length-1)
+    {
+      this.index++;
+      this.history.push(item);
+    }
+    else {
+        this.index++
+        this.history.splice(this.index);
+        this.history.push(item);
+      // this.history.push(item); // The item is supposed to be from where the new history is built
+      // this.index++;
+    }
   },
 
-  consume: function()
+  // consume: function()
+  // {
+  //   return this.history.splice(this.history.length-1, 1)[0];
+  // },
+  back: function()
   {
-    return this.previousStack.splice(this.previousStack.length-1, 1)[0];
+    if(this.history.length <= 1 || this.index <= 0)
+      return null;
+
+    this.index--;
+    this.redirectState = true;
+    return this.history[this.index];
+
+    // return res;
   },
+
+  forward: function()
+  {
+    if(this.history.length <= 1)
+      return null;
+
+    if(this.index >= this.history.length -1 )
+      return null;
+
+    this.index++;
+    this.redirectState = true;
+    var res = this.history[this.index];
+
+    return res;
+  },
+
 
   reset: function()
   {
-    this.previousStack = [];
+    this.history = [];
+  },
+
+  getFirstAntichronologicalElement: function(instance)
+  {
+    for(var i = this.history.length-1; i >= 0; i--)
+    {
+      if(this.history[i] instanceof instance)
+        return this.history[i];
+    }
+
+    return null;
   },
 
   _getRedirectionURL: function(item)
@@ -74,4 +144,4 @@ PreviousManager.prototype = {
   },
 };
 
-var PREVIOUS_MANAGER = new PreviousManager();
+var HISTORY_MANAGER = new PreviousManager();

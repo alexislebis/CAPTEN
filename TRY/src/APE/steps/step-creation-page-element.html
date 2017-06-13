@@ -71,7 +71,7 @@
 
   <div id="commonInfo">
     <header>
-      <h2> <span hidden$={{!isNew}}>New </span>Step</h2>
+      <h2> <span hidden$={{!isNew}}>New </span>Step <span hidden$={{!nap}}>of the {{nap.name}} analysis</span></h2> <!-- Have to be updated with the nap when name change with notify change -->
       <div id="paperFabs">
         <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
 
@@ -168,8 +168,8 @@
                            entry-animation='scale-up-animation'
                            exit-animation='slide-right-animation'>
 
-             <neon-animatable name='searchOperation'><operation-search-element id="ose" enable-rewind="{{_computeRewindAuthorized(operation)}}" enable-use="true"></operation-search-element></neon-animatable>
-             <neon-animatable name='operationZone'><operation-step-display-element id="osde" colorization="{{operationInputsColor}}" operation="{{operation}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operation-step-display-element></neon-animatable>
+             <neon-animatable name='searchOperation'><operation-search-element id="ose" enable-rewind="{{_computeRewindAuthorized(operation)}}" enable-use="true" to-stack="{{step}}"></operation-search-element></neon-animatable>
+             <neon-animatable name='operationZone'><operation-step-display-element id="osde" colorization="{{operationInputsColor}}" step="{{step}}" operation="{{operation}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operation-step-display-element></neon-animatable>
 
           </neon-animated-pages>
         </div>
@@ -200,7 +200,7 @@
 
   </div>
 
-  <paper-toast id="StepRegisteredWithinNAP" text="The analysis's step has been saved">
+  <paper-toast id="StepRegisteredWithinNAP" text="This step is now a step of {{nap.name}}">
     <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
   </paper-toast>
 
@@ -473,7 +473,10 @@
           return;
 
         if(this.data.itemValue == null || this.data.itemValue == "" || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
+        {
           this._generateDefaultConfig();
+          this.nap = HISTORY_MANAGER.getFirstAntichronologicalElement(NarratedAnalysisProcess);
+        }
         else
         {
           var success = this._generateSpecificConfig(this.data.itemValue);
@@ -482,8 +485,11 @@
           {
             console.error("No step found. Booting on default configuration");
             this._generateDefaultConfig();
+            this.nap = HISTORY_MANAGER.getFirstAntichronologicalElement(NarratedAnalysisProcess);
           }
         }
+
+        HISTORY_MANAGER.stack(this.step);
       },
           _generateDefaultConfig: function()
           {
@@ -503,6 +509,7 @@
               return false;
 
             this.step = res.step;
+            this.nap = res.operation;
 
             this.isNew = false; //iff step found
 
@@ -551,7 +558,7 @@
       {
         if(this.step == null)
           return;
-          
+
         this.step.name = name;
 
         if(!this.isNew)//If the nap isn't new, then don't need to try to register it
@@ -562,7 +569,7 @@
           // TODO SAVE step in the current NAP
           if(this.nap != null)
           {
-            var res = this.nap.addStep(this.step);
+            var res = this.nap.addStep(this.step); //res NULL shouldn't be
 
             if(res == null)
               console.error("The step already exists and couldn't be added");

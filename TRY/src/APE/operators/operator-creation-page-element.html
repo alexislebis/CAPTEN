@@ -656,6 +656,7 @@
               if(this.data.itemValue == null || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
               {
                 this._generateDefaultConfig();
+                HISTORY_MANAGER.stack(this.nop);
                 return;
               }
 
@@ -664,12 +665,13 @@
               if(resItem == null)
               {
                 this._generateDefaultConfig();
+                HISTORY_MANAGER.stack(this.nop);
                 return;
               }
 
 
               this.nop = resItem;
-
+              HISTORY_MANAGER.stack(this.nop);
               this.isNew = false;
               this.isPoolRegistered = true;
             },

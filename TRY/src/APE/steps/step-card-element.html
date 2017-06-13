@@ -36,7 +36,7 @@
 
   <paper-card id="main">
     <div class="card-content">
-      <div class="step-header">{{step.name}}
+      <div class="step-header">[[step.name]]
         <div class="step-location step-light">
           <div id="rating" class="step-rating">
             <iron-icon class="star" icon="star"></iron-icon>
@@ -110,10 +110,25 @@
         },
       },
 
+      observers:
+      [
+        "_onStepChanged(step)",
+      ],
+
       redirect: function()
       {
-        PREVIOUS_MANAGER.stack(this.toStack);
+        // HISTORY_MANAGER.stack(this.toStack);
         this.set('route.path', '/step/'+this.step.id);
+      },
+
+      attached: function()
+      {
+        console.log(this.step);
+      },
+
+      _onStepChanged: function(step)
+      {
+        console.log(step);
       },
 
 

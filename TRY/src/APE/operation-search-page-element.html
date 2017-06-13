@@ -7,7 +7,7 @@
 
 <div id="divRoot">
 
-  <operation-search-element id="ose" enable-use="{{enableUse}}" ></operation-search-element>
+  <operation-search-element id="ose" to-stack="{{toStack}}" enable-use="{{enableUse}}" ></operation-search-element>
 
 </div>
 
@@ -20,6 +20,12 @@
       properties:{
 
         route:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        toStack:
         {
           type: Object,
           notify: true,

@@ -1,14 +1,32 @@
+<link rel="import" src="./step-card-element.html">
+
 <dom-module id="steps-overview-element">
   <template>
     <style>
+
+    #layout{
+      @apply(--layout-horizontal);
+      @apply(--layout-around-justified);
+      @apply(--layout-wrap);
+    }
+
+    .card{
+      margin-top: 10px;
+    }
     </style>
 
-    <template id="repeater" is="dom-repeat" items="{{nap.steps}}" index-as="index">
-      <step-card-element step="{{item}}" belongs-to="{{nap.name}}" position="{{index}}" to-stack="{{nap}}"></step>
+  <div id="layout">
+
+    <template id="repeater" is="dom-repeat" items="{{steps}}" index-as="index">
+      <div class="card">
+        <step-card-element step="[[item]]" belongs-to="{{nap.name}}" position="{{index}}" to-stack="{{nap}}"></step-card-element>
+      </div>
     </template>
 
-    <new-step-card-element id="nsce"></new-step-card-element>
-
+    <div class="card">
+      <new-step-card-element id="nsce"></new-step-card-element>
+    </div>
+  </div>
   </template>
   <script>
     Polymer({
@@ -19,6 +37,12 @@
         nap:
         {
           type: Object,
+          notify: true,
+        },
+
+        steps:
+        {
+          type: Array,
           notify: true,
         },
       },
@@ -39,7 +63,7 @@
           return;
 
         this._attachListenersNAP();
-        this.$.repeater.render();
+        this._updated();
       },
 
       _attachListenersNAP: function()
@@ -50,8 +74,21 @@
         this.nap.registerObserverCallbackOnChange(this, this._updated);
       },
 
+      update: function()//Public update function
+      {
+        this._updated();
+      },
+
       _updated: function()
       {
+        this.steps = [];
+        this.$.repeater.render();
+        // this.steps = this.nap.steps;
+        // this.$.repeater.render();
+        var s = this.nap.steps;
+        for(var i in s)
+          this.push("steps", s[i]);
+
         this.$.repeater.render();
       },
 

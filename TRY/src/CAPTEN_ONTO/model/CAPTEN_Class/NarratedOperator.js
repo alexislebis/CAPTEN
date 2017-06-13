@@ -31,7 +31,7 @@ function NarratedOperator(usualName)
     // this.notation = null; //NOTE notation of the operation. Don't forget for future version
 
     // === OBSERVATION
-      this.observersSteps = [];
+      this.observers = [];
 }
 
 /**
@@ -45,18 +45,18 @@ NarratedOperator.prototype = {
     // === OBSERVATION
       resetAllObservers: function()
       {
-        this.observersSteps = [];
+        this.observers = [];
       },
 
       registerObserverCallbackOnChange: function(objCallback, callback)
       {
-        if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersSteps))
-          this.observersSteps.push([objCallback,callback]);
+        if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observers))
+          this.observers.push([objCallback,callback]);
       },
 
       notifyChange: function()
       {
-        this.observersSteps.forEach(function(e){
+        this.observers.forEach(function(e){
           if(typeof e[1] === "function")
           {
             e[1].call(e[0], this);
@@ -83,7 +83,13 @@ NarratedOperator.prototype = {
         return;
 
       if(!this.alreadyExists(step))
+      {
         this.steps.push(step);
+
+        this.notifyChange();
+        
+        return this.steps[this.steps.length-1];
+      }
     },
 
     alreadyExists: function(step)
