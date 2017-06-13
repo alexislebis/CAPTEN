@@ -73,7 +73,7 @@
    _isBadNAP: function(nap)
    {
      if(    nap == null
-         || !(nap instanceof NarratedAnalysisPool)  )
+         || !(nap instanceof NarratedAnalysisProcess)  )
        return true;
 
      return false;
