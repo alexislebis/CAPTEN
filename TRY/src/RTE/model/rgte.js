@@ -1152,6 +1152,21 @@ _rollbackRemove: function()
     },
   // === END OF K MANAGEMENT
 
+  isEmpty: function()
+  {
+    var counter == 0;
+
+    for(var i in this.nodes)
+    {
+      if(counter > 0)
+        return false;
+
+      counter++;
+    }
+
+    return true;
+  },
+
   /**
    * Retrieve all the symbols used as cardinality for reuse. Avoid redundencies, ie not recreate another
    * "d" cardinality value with another meaning for the system.
