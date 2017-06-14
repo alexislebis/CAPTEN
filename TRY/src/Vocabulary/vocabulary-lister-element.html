@@ -265,9 +265,9 @@
 
         </style>
 
-<app-location use-hash-as-path route="{{route}}"></app-location>
+<app-location use-hash-as-path route="{{routeTopLevel}}"></app-location>
 
-  <!-- <app-route route="{{route}}" pattern="/:idItemOrAction" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route> -->
+  <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
 
 
   <!-- <neon-animated-pages selected='{{data.idItemOrAction}}'
@@ -361,10 +361,10 @@
 
             <div class="elementBlock">
             <!-- <ul id="rdfClasses"></ul> -->
-            <template is="dom-repeat" items="{{customcls}}" filter="{{computeFilter(query)}}" index-as="index">
+            <template id="customCLSRepeater" is="dom-repeat" items="{{customcls}}" filter="{{computeFilter(query)}}" index-as="index">
               <!-- <div> -->
                   <div class$="[[_computeClass(index)]]" on-tap="_custcTapped">
-                      <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >[[item.uri]] <paper-ripple></paper-ripple> </div>
+                      <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >[[_computeLabelorURI(item)]] <paper-ripple></paper-ripple> </div>
                       <span class="useButton hideUseButton selectedItem">
                           <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
                           <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
@@ -379,7 +379,7 @@
             <h4>Custom Properties</h4>
 
             <div class="elementBlock" >
-            <template is="dom-repeat" items="{{customprops}}" filter="{{computeFilter(query)}}" index-as="index">
+            <template id="customPropsRepeater" is="dom-repeat" items="{{customprops}}" filter="{{computeFilter(query)}}" index-as="index">
               <!-- <div> -->
                   <div class$="[[_computeClass(index)]]" on-tap="_custpTapped">
                       <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]] <paper-ripple></paper-ripple></div>
@@ -549,7 +549,8 @@
 
             observers: [
                 "_onCustomClsChanged(customcls.splices)",
-                "_onCustomPropsChanged(customprops.splices)"
+                "_onCustomPropsChanged(customprops.splices)",
+                "_onRouteChanged(route)",
             ],
 
             _test: function()
@@ -591,6 +592,34 @@
                 this.$.lister.addEventListener(RDF_STORE_LISTER_ELEMENT_SELECTED_ID, function(e){
                   this._hideLastSelectedSpan();
                 }.bind(this));
+            },
+
+            _onRouteChanged: function(route)
+            {
+              if(route.prefix.toLowerCase() != "/vocabulary")
+                return;
+
+              this.update();
+            },
+
+            update: function()
+            {
+              var tmp1 = this.customcls;
+              var tmp2 = this.customprops;
+
+              this.customcls = [];
+              this.customprops = [];
+
+              this.$.customCLSRepeater.render();
+              this.$.customPropsRepeater.render();
+
+              this.customcls = tmp1;
+              this.customprops = tmp2;
+
+              this.$.customCLSRepeater.render();
+              this.$.customPropsRepeater.render();
+
+              this.$.lister.update();
             },
 
             //@HACK
@@ -833,12 +862,12 @@
 
             _openVocabularyPage: function(e)
             {
-              this.set('route.path', '/vocabulary');
+              this.set('routeTopLevel.path', '/vocabulary');
             },
 
             _openVocabularyNewItemPage: function(e)
             {
-              this.set('route.path', '/terminology/new');
+              this.set('routeTopLevel.path', '/terminology/new');
             },
 
             _openImportVocab: function(e)
@@ -906,12 +935,17 @@
 
             _openTerminology: function(evt)
             {
-              this.set('route.path', '/terminology/'+evt.model.item.id);
+              this.set('routeTopLevel.path', '/terminology/'+evt.model.item.id);
             },
 
             _openTerminologyWId: function(id)
             {
-              this.set('route.path', '/terminology/'+id);
+              this.set('routeTopLevel.path', '/terminology/'+id);
+            },
+
+            _computeLabelorURI: function(item)
+            {
+              return item.label != null ? item.label : item.uri;
             },
         });
     </script>

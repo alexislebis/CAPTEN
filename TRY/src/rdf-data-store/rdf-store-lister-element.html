@@ -154,7 +154,7 @@
                 <!-- <ul id="rdfClasses"></ul> -->
                 <!-- <iron-collapse id="classRDFCollapse"> -->
                   <div class="elementBlock">
-                  <template is="dom-repeat" items="{{rdfclasses}}" filter="{{computeFilter(filter)}}" index-as="index">
+                  <template is="dom-repeat" id="clsRepeater" items="{{rdfclasses}}" filter="{{computeFilter(filter)}}" index-as="index">
                     <!-- <div> -->
                         <div class$="[[_computeClass(index)]]">
                             <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.label]]<paper-ripple></paper-ripple></div>
@@ -198,7 +198,7 @@
 
             <!-- <iron-collapse id="propRDFCollapse"> -->
               <div class="elementBlock">
-                <template is="dom-repeat" items="{{rdfprops}}" filter="{{computeFilter(filter)}}" index-as="index">
+                <template is="dom-repeat" id="propsRepeater" items="{{rdfprops}}" filter="{{computeFilter(filter)}}" index-as="index">
                   <!-- <div> -->
                       <div class$="[[_computeClass(index)]]">
                           <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.label]]<paper-ripple></paper-ripple></div>                          <span class="useButton hideUseButton selectedItem">
@@ -298,6 +298,18 @@
       attached: function()
       {
         this.vocab.registerObserverCallbackOnChange(this, this._onVocabularyChange);
+      },
+
+      update: function()
+      {
+        this.rdfclasses = [];
+        this.rdfprops = [];
+
+        this.$.clsRepeater.render();
+        this.$.propsRepeater.render();
+
+        this.rdfclasses = this.vocab.getClasses();
+        this.rdfprops = this.vocab.getPropertiesArrayed();
       },
 
       // === PRIVATE METHODS ===
