@@ -38,23 +38,24 @@ function NarratedOperator(usualName)
  * All NarratedOperator must be able to resolve the RGTEs ( [] ) giving in parameters if they match
  * its expected patterns ( [] ).
  */
-NarratedOperator.prototype = Object.create(CAPTENClass.prototype);
+NarratedOperator.prototype = new CAPTENClass();
+NarratedOperator.prototype.constructor = NarratedOperator;
 
-NarratedOperator.prototype = {
+
 
     // === OBSERVATION
-      resetAllObservers: function()
+      NarratedOperator.prototype.resetAllObservers = function()
       {
         this.observers = [];
-      },
+      }
 
-      registerObserverCallbackOnChange: function(objCallback, callback)
+      NarratedOperator.prototype.registerObserverCallbackOnChange = function(objCallback, callback)
       {
         if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observers))
           this.observers.push([objCallback,callback]);
-      },
+      }
 
-      notifyChange: function()
+      NarratedOperator.prototype.notifyChange = function()
       {
         this.observers.forEach(function(e){
           if(typeof e[1] === "function")
@@ -62,22 +63,22 @@ NarratedOperator.prototype = {
             e[1].call(e[0], this);
           }
         }.bind(this));
-      },
+      }
 
-    solve: function(inputs)
+    NarratedOperator.prototype.solve = function(inputs)
     {
         console.log("solving");
-    },
+    }
 
     /**
      * Test if a NOP is equal to an another NOP. The equality should be mostly defined by the patterns
      */
-    isEqual: function(nop)
+    NarratedOperator.prototype.isEqual = function(nop)
     {
 
-    },
+    }
 
-    addStep: function(step)
+    NarratedOperator.prototype.addStep= function(step)
     {
       if(!(step instanceof Step))
         return;
@@ -87,16 +88,15 @@ NarratedOperator.prototype = {
         this.steps.push(step);
 
         this.notifyChange();
-        
+
         return this.steps[this.steps.length-1];
       }
-    },
+    }
 
-    alreadyExists: function(step)
+    NarratedOperator.prototype.alreadyExists= function(step)
     {
       for(var i in this.steps)
         if(this.steps[i].id == step.id)
           return true;
       return false;
-    },
-};
+    }

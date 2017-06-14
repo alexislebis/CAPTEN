@@ -65,6 +65,8 @@ PreviousManager.prototype = {
   {
     if(this.redirectState)
     {
+      if(item && item.id != this.history[this.index].id)
+        this.history[this.index] = item; //update of the item because the pool created new element
       this.redirectState = false;
       return;
     }
@@ -135,12 +137,20 @@ PreviousManager.prototype = {
 
   _getRedirectionURL: function(item)
   {
-    if(item instanceof NarratedAnalysisProcess)
+    if(item == null)
+      return;
+    else if(item instanceof NarratedAnalysisProcess)
       return "/analysis/"+item.id;
     else if(item instanceof NarratedOperator)
       return "/nop/"+item.id;
     else if(item instanceof Step)
       return "/step/"+item.id;
+    else if(item instanceof RGTE)
+      return '/rgte/'+item.id;
+    else if(item == "VOCABULARY")
+      return "/vocabulary";
+    else if(item.includes && item.includes("terminology") )
+      return item;
   },
 };
 

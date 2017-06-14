@@ -572,6 +572,12 @@ Step.prototype.constructor = Step;
     narrativeblock.addElement(name, prop);//Adding the new addendum inside the corresponding narrative block
 
     this.name = name;
+    // this.label = this.name;//By default, the label name of the step is its name
+  }
+
+  Step.prototype.getName = function()
+  {
+    return this.name.name;
   }
 
   Step.prototype.setAuthor = function(author)

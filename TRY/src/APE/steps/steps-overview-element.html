@@ -19,7 +19,7 @@
 
     <template id="repeater" is="dom-repeat" items="{{steps}}" index-as="index">
       <div class="card">
-        <step-card-element step="[[item]]" belongs-to="{{nap.name}}" position="{{index}}" to-stack="{{nap}}"></step-card-element>
+        <step-card-element step="[[item]]" belongs-to="{{nap.name}}" is-start="_computeStartPosition(item)" position="{{index}}" to-stack="{{nap}}"></step-card-element>
       </div>
     </template>
 
@@ -90,6 +90,19 @@
           this.push("steps", s[i]);
 
         this.$.repeater.render();
+      },
+
+      _computeStartPosition: function(item)
+      {
+        if(this.nap == null)
+          return null;
+
+        var startingSteps = this.nap.getStartingSteps();
+        for(var i in startingSteps)
+          if(startingSteps[i].id == item.id)
+            return true;
+
+        return false;
       },
 
 

@@ -112,12 +112,12 @@
         rgte:
         {
           type: Object,
-          value: function()
-          {
-            return new RGTE();
-          },
+          // value: function()
+          // {
+          //   return new RGTE();
+          // },
           notify: true,
-          observer: "_test",
+          // observer: "_test",
         },
 
         vocab:
@@ -231,6 +231,7 @@
           if(this.data.itemValue == null || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue == ''|| this.data.itemValue.search(/\D+/) != -1)
           {
             this._generateDefaultConfig();
+            HISTORY_MANAGER.stack(this.rgte);
             return;
           }
 
@@ -239,12 +240,15 @@
           if(resItem == null)
           {
             this._generateDefaultConfig();
+            HISTORY_MANAGER.stack(this.rgte);
             return;
           }
 
           this.rgte = resItem;
 
           this.isNew = false;
+
+          HISTORY_MANAGER.stack(this.rgte);
         },
 
       attached: function()
@@ -288,9 +292,10 @@
         if(this.rgte.nodes.length <= 0)//Lazy verification. Not check into the pool
           return;
 
-        RGTE_POOL.register(this.rgte);
+        var res = RGTE_POOL.register(this.rgte);
 
-        this.$.toastNotifyNowRgteCreated.open();
+        if(res)
+          this.$.toastNotifyNowRgteCreated.open();
       },
 
       _resetComponent: function()

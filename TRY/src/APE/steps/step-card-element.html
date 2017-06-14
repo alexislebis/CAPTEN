@@ -36,7 +36,7 @@
 
   <paper-card id="main">
     <div class="card-content">
-      <div class="step-header">[[step.name]]
+      <div class="step-header">[[_computeName(step)]]
         <div class="step-location step-light">
           <div id="rating" class="step-rating">
             <iron-icon class="star" icon="star"></iron-icon>
@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <p>A step <span hidden$="{{!belongsTo}}">of {{belongsTo}}</span></p>
+      <p><span hidden$="{{!isStart}}"> <iron-icon icon="maps:my-location"></iron-icon> </span>A step <span hidden$="{{!belongsTo}}">of {{belongsTo}}</span></p>
       <!-- TODO make dom repeat on objective inside a UL  -->
       <p class="step-light">Objective#1: [[step.objective]]</p>
       <p class="step-light">Other info#1: Lorem ipsum dolor sit aem.</p>
@@ -103,6 +103,12 @@
           notify: true,
         },
 
+        isStart:
+        {
+          type: Boolean,
+          notify: true,
+        },
+
         toStack:
         {
           type: Object,
@@ -129,6 +135,11 @@
       _onStepChanged: function(step)
       {
         console.log(step);
+      },
+
+      _computeName: function(step)
+      {
+        return step.getName();
       },
 
 

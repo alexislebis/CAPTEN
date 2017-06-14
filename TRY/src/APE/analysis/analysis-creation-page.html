@@ -1,10 +1,13 @@
+<link rel="import" href="../../RTE/rgte-card-add-element.html">
+
 <dom-module id="analysis-creation-page">
   <template>
     <style include="toasty-style"></style>
     <style>
 
     :host{
-      --vis-element-height: 300px;
+      --vis-element-height: 400px;
+      --rgte-common-width: 400px;
     }
 
     #commonInfo{
@@ -54,7 +57,13 @@
     #sde{
 
       width: 60%;
-      margin: 0 auto;
+      margin: 0 auto 50px auto;
+    }
+
+    #layoutConcept{
+      background-color: green;
+      @apply(--layout-horizontal);
+      @apply(--layout-around-justified);
     }
 
     </style>
@@ -114,6 +123,28 @@
 
         <div class="miniSeparator"></div>
 
+        <div id="conceptRequired" class="subConfigZone">
+          <h4>Initial concepts required</h4>
+
+          <div id="layoutConcept">
+            <div hidden$="{{!_showConceptsComponents(stateRGTE,newState)}}">
+              <rgte-card-add-element id="rcae" text="Define the initial concepts available for the analysis"></rgte-card-add-element>
+            </div>
+            <div hidden$="{{!_showConceptsComponents(stateRGTE,searchState)}}">
+              <rgte-search-element id="rsei" enable-rewind="{{_computeRewindAuthorized(rgte)}}" enable-use="true"></rgte-search-element>
+            </div>
+            <!-- TODO : FOR LATER -->
+            <!-- <div hidden$="{{!_showConceptsComponents(stateRGTE,displayState)}}">
+              <rgte-narrative-info></rgte-narrative-info>
+            </div> -->
+            <div hidden$="{{!_showConceptsComponents(stateRGTE,displayState)}}">
+              <rgte-workzone-element id="rwei" rgte="{{rgte}}" colorization="{{inputsColor}}" disable-edit disable-search disable-knowledge vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+            </div>
+          </div>
+        </div>
+
+        <div class="miniSeparator"></div>
+
         <div id="stepOverview" class="subConfigZone">
           <h4>Steps overview</h4>
 
@@ -127,13 +158,6 @@
           <h4>Analysis flow</h4>
 
           <steps-displayer-element id="sde" steps="{{steps}}"></steps-displayer-element>
-
-        </div>
-
-        <div class="miniSeparator"></div>
-
-        <div id="conceptRequired" class="subConfigZone">
-          <h4>Initial concepts required</h4>
 
         </div>
 
@@ -187,7 +211,32 @@
           type: Object,
           notify: true,
           value: false,
-        }
+        },
+
+        stateRGTE:
+        {
+          type: Number,
+          notify: true,
+          value: -1, // -1 : Add a New RGTE; 1: RGTE zone + narrative info; 0 : RGTE search
+        },
+          newState:{
+            type: Number,
+            value: -1,
+          },
+          searchState:{
+            type: Number,
+            value: 0,
+          },
+          displayState:{
+            type: Number,
+            value: 1,
+          },
+
+        rgte:
+        {
+          type: Object,
+          notify: true,
+        },
 
       },
 
@@ -218,6 +267,24 @@
         this.$.stepOverview.addEventListener(NEW_STEP_FOR_NAP_SIGNAL_ID, function(){
           this.openNewStep();
         }.bind(this));
+
+        this.$.rcae.addEventListener(NEW_RGTE_FOR_NAP_SIGNAL_ID, function(){
+          this._beginCreation();
+        }.bind(this));
+
+        this.$.rsei.addEventListener(RGTE_USE_FROM_SEARCH_SIGNAL_ID, function(e){
+          this._loadInputPage(e.detail.rgte);
+        }.bind(this));
+
+        this.$.rwei.addEventListener(RGTE_REPLACEMENT_REQUESTED_SIGNAL_ID, function(e){
+          this._loadSearchInputPage();
+        }.bind(this));
+
+        this.$.rsei.addEventListener(RGTE_REWIND_REQUESTED_SIGNAL_ID, function(e)
+        {
+          this._loadInputPage();
+        }.bind(this));
+
       },
 
       // === ROUTING
@@ -225,6 +292,9 @@
         {
           if(route.prefix.toLowerCase() != "/analysis")
             return;
+
+          if(this.isNew && this.nap)
+            this.nap.willBeReplaced();
 
           if(this.data.itemValue == null || this.data.itemValue == "" || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
             this._generateDefaultConfig();
@@ -240,13 +310,15 @@
           }
 
           HISTORY_MANAGER.stack(this.nap);
-          this.$.soe.update();
+          this.update();
         },
 
           _generateDefaultConfig: function()
           {
             this.isNew = true;
             this.nap = new NarratedAnalysisProcess();
+            this.nap.setExpectedConcept(RGTE_POOL.create()); //INFO : if the rgte isn't created with the pool, then when accessing the rgte creation page, there will be a new rgte since the current rgte will not be found
+            this.rgte = this.nap.expectedConcepts;
           },
 
           _generateSpecificConfig: function(idToFind)
@@ -258,6 +330,7 @@
 
             this.isNew = false;
             this.nap = res;
+            this.rgte = this.nap.expectedConcepts;
             return true;
           },
 
@@ -301,10 +374,59 @@
           //NTD for now;
         },
 
+      update: function()
+      {
+        this.steps = null;
+        this.steps = this.nap.steps;
+
+        if(this._showConceptsComponents(this.stateRGTE, this.searchState))//Only update the rsei list if it is displayed
+          this.$.rsei.update();
+
+        this.$.soe.update();
+      },
+
       openNewStep: function()
       {
         // HISTORY_MANAGER.stack(this.nap);
         this.set("topLevelRoute.path", "/step/new");
+      },
+
+      _showConceptsComponents: function(state, id)
+      {
+        return state == id;
+      },
+
+      changeRGTEZoneState: function(state)
+      {
+        this.stateRGTE = state;
+      },
+
+      _beginCreation: function()
+      {
+        this.nap.setExpectedConcept(RGTE_POOL.create());
+
+        this.rgte = this.nap.expectedConcepts;
+
+        this.changeRGTEZoneState(this.displayState);
+      },
+
+      _loadInputPage: function(rgte)//when the display rgte is requested after selected one rgte
+      {
+        this.nap.setExpectedConcept(rgte);
+        this.rgte = this.nap.expectedConcepts;
+
+        this.changeRGTEZoneState(this.displayState);
+      },
+
+      _loadSearchInputPage: function()
+      {
+        this.$.rsei.update();
+        this.changeRGTEZoneState(this.searchState);
+      },
+
+      _computeRewindAuthorized: function(operation)
+      {
+        return operation == null ? false : true;
       },
 
 // === TOAST

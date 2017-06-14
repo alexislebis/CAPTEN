@@ -1,12 +1,12 @@
 <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
 
-<dom-module id="new-step-card-element">
+<dom-module id="rgte-card-add-element">
   <template>
     <style>
 
     #main{
-      width: var(--step-card-width, 300px);
-      --paper-card-content : {height: var(--step-card-height, 250px);}
+      width: var(--step-card-width, 400px);
+      --paper-card-content : {height: var(--step-card-height, 350px);}
     }
 
     .step-header { @apply(--paper-font-headline); text-align: center; margin-bottom: 50px;}
@@ -30,7 +30,8 @@
     }
 
     .big{
-      margin-left: 31%;
+      left: 37%;
+      margin-top: 75px;
 
       --paper-icon-button:
       {
@@ -46,7 +47,7 @@
 
   <paper-card id="main">
     <div class="card-content">
-      <div class="step-header">Continue to define the Analysis
+      <div class="step-header">{{_computeText(text)}}
         <!-- <div class="step-location step-light">
           <div id="rating" class="step-rating">
             <iron-icon class="star" icon="star"></iron-icon>
@@ -57,7 +58,7 @@
           </div>
           <paper-tooltip for="rating">Assumed relevance</paper-tooltip> -->
         </div>
-        <paper-icon-button class="big" icon="icons:add-circle-outline" on-click="newStep"></paper-icon-button>
+        <paper-icon-button class="big" icon="social:share" on-click="newRGTE"></paper-icon-button>
 
       </div>
 
@@ -86,16 +87,27 @@
   </template>
   <script>
     Polymer({
-      is: "new-step-card-element",
+      is: "rgte-card-add-element",
 
       properties:
       {
+        text:
+        {
+          type: String,
+        }
       },
 
-      newStep: function()
+      newRGTE: function()
       {
-        this.fire(NEW_STEP_FOR_NAP_SIGNAL_ID);
+        this.fire(NEW_RGTE_FOR_NAP_SIGNAL_ID);
       },
+
+      _computeText: function(text)
+      {
+        if(text == null || text == "")
+          return "Define a new graph of concepts";
+        return text;
+      }
 
 
     });

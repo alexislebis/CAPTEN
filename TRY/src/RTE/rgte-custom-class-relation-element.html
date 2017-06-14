@@ -105,13 +105,22 @@
             observers: [
                 "_onCustomClsChanged(customcls.splices)",
                 "_onCustomPropsChanged(customprops.splices)",
-                "_onNbOfFormsChanged(nbOfForms.splices)"
+                "_onNbOfFormsChanged(nbOfForms.splices)",
+                "_onRGTEChanged(rgte)",
             ],
 
             attached: function()
             {
                 this.vocab.registerObserverCallbackOnChange(this, this._onVocabularyChange);
-                this.rgte.registerObserverCallbackOnChange(this, this._onRGTEChange);
+                // this.rgte.registerObserverCallbackOnChange(this, this._onRGTEChange);
+            },
+
+            _onRGTEChanged: function()
+            {
+              if(this.rgte == null)
+
+                return;
+              this.rgte.registerObserverCallbackOnChange(this, this._onRGTEChanged);
             },
 
             // === OBSERVERs

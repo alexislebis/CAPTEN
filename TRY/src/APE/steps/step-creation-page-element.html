@@ -559,7 +559,7 @@
         if(this.step == null)
           return;
 
-        this.step.name = name;
+        this.step.setName(new EntityName(name)); // WARNING Creation of a narrative block for a potentially temporary step
 
         if(!this.isNew)//If the nap isn't new, then don't need to try to register it
           return;

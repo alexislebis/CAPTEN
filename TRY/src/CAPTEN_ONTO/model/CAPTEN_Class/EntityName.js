@@ -2,10 +2,10 @@
  * EntityName represents the name that an user can give to an entity. For example : for a step, an entityname could be "My favorite step"
  */
 
- function EntityName()
+ function EntityName(name)
 {
   NarrativeElement.call(this);
-  this.name = null;
+  this.name = name;
 }
 
 EntityName.prototype = new NarrativeElement();

@@ -1164,7 +1164,7 @@ _rollbackRemove: function()
       counter++;
     }
 
-    return true;
+    return counter > 0 ? false : true;
   },
 
   /**

@@ -356,11 +356,15 @@
     // === ROUTING
       _onDataRouteChanged: function(r)
       {
+        if(r.prefix.toLowerCase() != "/terminology")
+          return;
+
         this._resetComponent();
 
         if(this.data.itemValue == null || this.data.itemValue == '' || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
         {
           this._generateDefaultConfig();
+          HISTORY_MANAGER.stack("/terminology/new");
           return;
         }
 
@@ -377,6 +381,7 @@
         this.itemElmt = resItem.value;
         this.itemType = resItem.type;
         this.isNew = false;
+        HISTORY_MANAGER.stack("/terminology/"+this.data.itemValue);
       },
 
       _generateDefaultConfig: function()

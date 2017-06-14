@@ -599,6 +599,7 @@
               if(route.prefix.toLowerCase() != "/vocabulary")
                 return;
 
+              HISTORY_MANAGER.stack("VOCABULARY");
               this.update();
             },
 

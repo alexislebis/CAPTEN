@@ -34,3 +34,5 @@
     // === ANALYSIS PROCESS
       // === STEPS OVERVIEW
         var NEW_STEP_FOR_NAP_SIGNAL_ID = "-4segejgzg?KG?keeg:dvsdv2vez";
+      // === RGTE CREATOR
+        var NEW_RGTE_FOR_NAP_SIGNAL_ID = "-5ZpOoPKKekvkldsvx;c:wLMeg";
