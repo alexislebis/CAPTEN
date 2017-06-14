@@ -1154,7 +1154,7 @@ _rollbackRemove: function()
 
   isEmpty: function()
   {
-    var counter == 0;
+    var counter = 0;
 
     for(var i in this.nodes)
     {
