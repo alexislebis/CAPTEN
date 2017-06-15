@@ -1,16 +1,16 @@
-<link rel="import" href="../../../bower_components/brainy-table/brainy-table.html">
-
 <dom-module id="step-relation-tab-element">
   <template>
     <style>
-
+      #divRoot{
+        /*min-height: 200px;*/
+      }
     </style>
 
 
-    <template is="dom-repeat" items="{{composites}}" index-as="index">
+    <!-- <template is="dom-repeat" items="{{composites}}" index-as="index">
 
-    </template>
-
+    </template> -->
+<div id="divRoot">
     <brainy-table id="a" items="[[organizedArray]]" page-size="5" details-enabled>
       <brainy-table-column name="From (Graph of concept)" filter-by="from.label" sort-by="from.label">
         <template>[[item.from.label]]</template>
@@ -26,7 +26,7 @@
       </brainy-table-column>
       <div no-results>No relations found</div>
     </brainy-table>
-
+</div>
   </template>
   <script>
     Polymer({
@@ -76,8 +76,8 @@
           array.push({id: this.composites[i].id, from: this.composites[i].elements[1], to: this.composites[i].elements[2], rel: this.composites[i].elements[0], color: this.composites[i].options['color']});
         }
 
-          this.organizedArray = null;
-          this.organizedArray = array;
+          this.organizedArray = [];
+          this.set('organizedArray',  array);
       },
 
       _colorChanged: function(e)

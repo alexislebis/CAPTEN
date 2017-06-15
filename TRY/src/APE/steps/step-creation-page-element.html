@@ -146,6 +146,8 @@
       <p hidden$="{{!relationModeI_NOP}}">Click on a node within your concept and on a node within the input operator pattern for binding them</p>
     </div>
 
+
+
     <vaadin-split-layout>
       <vaadin-split-layout>
         <div>
@@ -155,8 +157,13 @@
                            entry-animation='scale-up-animation'
                            exit-animation='slide-right-animation'>
 
-             <neon-animatable name='searchInput'><rgte-search-element id="rsei" enable-rewind="{{_computeRewindAuthorized(input)}}" enable-use="true"></rgte-search-element></neon-animatable>
-             <neon-animatable name='inputZone'><rgte-workzone-element id="rwei" rgte="{{input}}" colorization="{{inputsColor}}" disable-edit disable-search disable-knowledge vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element></neon-animatable>
+             <neon-animatable name='searchInput'>
+               <rgte-search-element id="rsei" enable-rewind="{{_computeRewindAuthorized(input)}}" enable-use="true"></rgte-search-element>
+             </neon-animatable>
+             <neon-animatable name='inputZone'>
+               <rgte-workzone-element id="rwei" rgte="{{input}}" colorization="{{inputsColor}}" disable-edit disable-search disable-knowledge
+                                      vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+            </neon-animatable>
 
           </neon-animated-pages>
 
@@ -168,8 +175,12 @@
                            entry-animation='scale-up-animation'
                            exit-animation='slide-right-animation'>
 
-             <neon-animatable name='searchOperation'><operation-search-element id="ose" enable-rewind="{{_computeRewindAuthorized(operation)}}" enable-use="true" to-stack="{{step}}"></operation-search-element></neon-animatable>
-             <neon-animatable name='operationZone'><operation-step-display-element id="osde" colorization="{{operationInputsColor}}" step="{{step}}" operation="{{operation}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operation-step-display-element></neon-animatable>
+             <neon-animatable name='searchOperation'>
+               <operation-search-element id="ose" enable-rewind="{{_computeRewindAuthorized(operation)}}" unproposed="{{operationToUnproposed}}" enable-use="true" to-stack="{{step}}"></operation-search-element>
+             </neon-animatable>
+             <neon-animatable name='operationZone'>
+               <operation-step-display-element id="osde" colorization="{{operationInputsColor}}" step="{{step}}" operation="{{operation}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operation-step-display-element>
+             </neon-animatable>
 
           </neon-animated-pages>
         </div>
@@ -181,20 +192,19 @@
                            entry-animation='scale-up-animation'
                            exit-animation='slide-right-animation'>
 
-             <neon-animatable name='outputZone'><rgte-workzone-element id="rweo" rgte="{{output}}" disable-edit disable-replace disable-search enable-launch vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element></operation-search-element></neon-animatable>
-             <neon-animatable name='stepStateZone'><step-status-displayer-element id="ssde" step="{{step}}"></step-status-displayer-element></neon-animatable>
+             <neon-animatable name='outputZone'>
+               <rgte-workzone-element id="rweo" rgte="{{output}}" disable-edit disable-replace disable-search enable-launch vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+             </neon-animatable>
+             <neon-animatable name='stepStateZone'>
+               <step-status-displayer-element id="ssde" step="{{step}}"></step-status-displayer-element>
+             </neon-animatable>
 
           </neon-animated-pages>
 
         </div>
     </vaadin-split-layout>
 
-    <div id="graphsRelations">
-      <step-relation-tab-element composites="{{compositeIOP}}"></step-relation-tab-element>
-      Tableau de relations ici.
-      Intégrer les relations avec les éléments narratifs.
-      Rajouter un color picker à la fin de la ligne.
-    </div>
+    <step-relation-tab-element composites="{{compositeIOP}}"></step-relation-tab-element>
 
 <!-- END CONFIGURATION ZONE  -->
 
@@ -206,6 +216,10 @@
 
   <paper-toast id="StepRegistered" text='The step has been saved'>
     <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
+  </paper-toast>
+
+  <paper-toast id="toastAutoLoadNAPStep" text='Step automatically configured with your initial concepts'>
+    <paper-button on-click="_undoAutoLoad" class="toastButton">UNDO</paper-button>
   </paper-toast>
 </div>
   </template>
@@ -234,6 +248,13 @@
           type: Object,
           value: function(){return new Step();},
           notify: true,
+        },
+
+        operationToUnproposed:
+        {
+          type: Array,
+          notify: true,
+          value: function(){return [];},
         },
 
         operation:
@@ -352,8 +373,14 @@
         "_onColorChange(operationInputsColor.*)",
         "_onStepChanged(step)",
         "_onNameChanged(stepName)",
+        // "_onInputChanged(input)",
+        "_onCompositeElementChanged(compositeIOP)",
       ],
 
+      _onCompositeElementChanged: function(composite)
+      {
+        console.log('changed');
+      },
       _onColorChange: function()
       {
         console.log(this.operationInputsColor);
@@ -472,10 +499,18 @@
         if(route.prefix.toLowerCase() != "/step")
           return;
 
+        this.reset();
+
         if(this.data.itemValue == null || this.data.itemValue == "" || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
         {
           this._generateDefaultConfig();
           this.nap = HISTORY_MANAGER.getFirstAntichronologicalElement(NarratedAnalysisProcess);
+
+          if(this.nap && !this.nap.hasAtLeastOneStep() && !this.nap.getExpectedConcepts().isEmpty())
+          {
+            this._loadInputPage(this.nap.getExpectedConcepts());
+            this.$.toastAutoLoadNAPStep.open();
+          }
         }
         else
         {
@@ -486,19 +521,50 @@
             console.error("No step found. Booting on default configuration");
             this._generateDefaultConfig();
             this.nap = HISTORY_MANAGER.getFirstAntichronologicalElement(NarratedAnalysisProcess);
+
+            if(this.nap && !this.nap.hasAtLeastOneStep() && !this.nap.getExpectedConcepts().isEmpty())
+            {
+              this._loadInputPage(this.nap.getExpectedConcepts());
+              this.$.toastAutoLoadNAPStep.open();
+            }
           }
         }
 
+        this.operationToUnproposed = [];
+        this.push('operationToUnproposed', this.nap);
+
         HISTORY_MANAGER.stack(this.step);
+
+        this.update();
       },
+
+      reset: function()
+      {
+        this.step = null;
+
+        this.input = null;
+        this.operaion = null;
+        this.output = null;
+        this.compositeIOP = null;
+        this.inputsColor = [];
+        this.operationInputsColor = [];
+        this.inputSection = "searchInput";
+        this.operationSection = "searchOperation";
+
+        this.stepName = "";
+      },
+
+      update: function()
+      {
+        this.$.rsei.update();
+        this.$.ose.update();
+        this.$.ssde.computeStepState();
+      },
+
           _generateDefaultConfig: function()
           {
             this.isNew = true;
             this.step = new Step();
-
-            this.$.rsei.update();
-            this.$.ose.update();
-            this.$.ssde.computeStepState();
           },
 
           _generateSpecificConfig: function(idToFind)
@@ -509,13 +575,15 @@
               return false;
 
             this.step = res.step;
+
+            this.set('compositeIOP', this.step.getCompositeRelations());
+            this._bootColoration();
+
             this.nap = res.operation;
 
             this.isNew = false; //iff step found
 
-            this.$.rsei.update();
-            this.$.ose.update();
-            this.$.ssde.computeStepState();
+            return true;
           },
 
       _onStepChanged: function(step)
@@ -525,6 +593,8 @@
           console.log("STEP CHANGED!");
           this._attachListenersStep();
 
+          this.stepName = this.step.getName();
+
           if(this.step.inputs == null)
             this._loadSearchInputPage();
           else
@@ -532,13 +602,17 @@
             this.input = this.step.inputs;
             this.inputSection = "inputZone";
           }
-          if(this.step.operation == null)
+          if(this.step.operator == null)
             this._loadSearchOperationPage();
           else
           {
-            this.operation = this.step.operation;
+            this.operation = this.step.operator;
             this.operationSection = "operationZone";
           }
+          if(this.step.outputs == null)
+            this._resetOutput();
+          else
+            this._outputComputed();
         }
       },
 
@@ -620,7 +694,21 @@
       _changeOnCompositeIOP: function()
       {
         this.compositeIOP = null;
-        this.compositeIOP = this.step._compositeRelations;
+        this.set('compositeIOP', this.step._compositeRelations);
+      },
+
+      _bootColoration: function()
+      {
+        var elmt = null;
+        for(var i in this.compositeIOP)
+        {
+          elmt = this.compositeIOP[i];
+          if(elmt.options['color'])
+          {
+            this.push("inputsColor", {id: elmt.elements[1].id, color: elmt.options['color']});
+            this.push("operationInputsColor", {id: elmt.elements[2].id, color: elmt.options['color']});
+          }
+        }
       },
 
       _changeOnCompositeIOPOptions: function(elmt)
@@ -653,11 +741,24 @@
         return (input == null || operation == null) ? true : false;
       },
 
+      // _onInputChanged: function(input)
+      // {
+      //   console.log("New function. Potential board effect with input. Check if there is no input modified whithout updating step");
+      //   this.step.changeRGTE(input);
+      // },
+
 // === TOAST
       _closeToast: function(e)
       {
         Polymer.dom(e).localTarget.parentElement.close();
       },
+
+      _undoAutoLoad: function(e)
+      {
+        this.input = null;
+        this.inputSection = "searchInput";
+        Polymer.dom(e).localTarget.parentElement.close();
+      }
 
     });
   </script>

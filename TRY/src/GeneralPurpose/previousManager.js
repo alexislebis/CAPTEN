@@ -126,7 +126,7 @@ PreviousManager.prototype = {
 
   getFirstAntichronologicalElement: function(instance)
   {
-    for(var i = this.history.length-1; i >= 0; i--)
+    for(var i = this.index; i >= 0; i--)
     {
       if(this.history[i] instanceof instance)
         return this.history[i];

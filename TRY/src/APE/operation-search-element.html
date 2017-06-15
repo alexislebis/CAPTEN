@@ -1,3 +1,5 @@
+<link rel="import" href="./operation-displayer-element.html">
+
 <dom-module id="operation-search-element">
   <template>
     <style>
@@ -49,8 +51,8 @@
         <div><span><h3>{{_computeHeaderName(query)}}</h3></span></div>
       </header>
   <!--  -->
-    <template id="repeater" is="dom-repeat" items="{{operationsArray}}" filter="{{computeFilter(query)}}" index-as="index" restamp>
-        <operator-displayer-element enable-use="{{enableUse}}" operator="{{item}}"><opeator-displayer-element>
+    <template id="repeater" is="dom-repeat" items="{{operationsArray}}" filter="{{computeFilter(query, unproposed)}}" index-as="index" restamp>
+      <operation-displayer-element enable-use="{{enableUse}}" operator="{{item}}"></operation-displayer-element>
     </template>
     </div>
     <div id="previous">
@@ -97,11 +99,17 @@
           type: Object,
           notify: true,
         },
+
+        unproposed:
+        {
+          type: Array,
+          notify: true,
+        }
       },
 
-      // observers: [
-      //   "_onRouteChanged(route)",
-      // ],
+      observers: [
+        "_onUnproposedChanged(unproposed.*)",
+      ],
 
       _openNew: function()
       {
@@ -130,12 +138,17 @@
       {
         //@HACK force dom repeat redraw
         this.operationsArray = [];
-        this.$.repeater.render();
+        // this.$.repeater.render();
         //===
 
         this.operationsArray = NARRATED_OPERATION_POOL.getAvailableOperations();
 
-        this.$.repeater.render();
+        // this.$.repeater.render();
+      },
+
+      _onUnproposedChanged: function(e)
+      {
+        // this.$.repeater.render();
       },
 
       update: function()
@@ -145,19 +158,43 @@
         this.$.repeater.render();
         //===
 
-        this.operationsArray = NARRATED_OPERATION_POOL.getAvailableOperations();
+        var unp = this.unproposed;
+        this.unproposed = [];
+        this.unproposed = unp;
 
-        this.$.repeater.render();
+        this.set('operationsArray',NARRATED_OPERATION_POOL.getAvailableOperations());
+
+        // this.$.repeater.render();
       },
 
-      computeFilter: function(query)
+      computeFilter: function(query, unproposed)
       {
-        if(!query || query == null)
+        if((!query || query == null) && this.unproposed.length == 0)
           return null;
         else {
           query = query.toLowerCase();
+          // TODO REDO homogenisation with narrative name element
           return function(item){
-            return (item.usualName.toLowerCase().includes(query));
+
+            for(var i in unproposed)
+            {
+              if(unproposed[i] && unproposed[i].id == item.id)
+                return false;
+            }
+
+            if(item == null)
+              return;
+
+            var behavior = (item instanceof NarratedOperator) ? 0 : 1;
+
+            if(behavior == 0)
+            {
+              return (item.usualName.toLowerCase().includes(query));
+            }
+            else
+            {
+              return (item.name.toLowerCase().includes(query));
+            }
           };
         }
       },

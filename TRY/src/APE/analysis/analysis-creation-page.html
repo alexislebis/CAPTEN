@@ -76,7 +76,7 @@
     <div id="divRoot">
       <div id="commonInfo">
         <header>
-          <h2> <span hidden$={{!isNew}}>New </span>Analysis</h2>
+          <h2> <span hidden$={{!isNew}}>New Analysis</span><span hidden$="{{isNew}}">Analysis: {{napName}} </span></h2>
           <div id="paperFabs">
             <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
 
@@ -131,14 +131,14 @@
               <rgte-card-add-element id="rcae" text="Define the initial concepts available for the analysis"></rgte-card-add-element>
             </div>
             <div hidden$="{{!_showConceptsComponents(stateRGTE,searchState)}}">
-              <rgte-search-element id="rsei" enable-rewind="{{_computeRewindAuthorized(rgte)}}" enable-use="true"></rgte-search-element>
+              <rgte-search-element id="rsei" enable-rewind="{{_computeRewindAuthorized(rgte)}}" enable-use="true" disable-steps-related-graph></rgte-search-element>
             </div>
             <!-- TODO : FOR LATER -->
             <!-- <div hidden$="{{!_showConceptsComponents(stateRGTE,displayState)}}">
               <rgte-narrative-info></rgte-narrative-info>
             </div> -->
             <div hidden$="{{!_showConceptsComponents(stateRGTE,displayState)}}">
-              <rgte-workzone-element id="rwei" rgte="{{rgte}}" colorization="{{inputsColor}}" disable-edit disable-search disable-knowledge vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+              <rgte-workzone-element id="rwei" rgte="{{rgte}}" colorization="{{inputsColor}}" disable-save-menu disable-bag-menu disable-edit disable-search disable-knowledge vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
             </div>
           </div>
         </div>
@@ -168,6 +168,13 @@
         <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
       </paper-toast>
 
+      <paper-toast id="toastNamedNAP" text='Please named your analysis before'>
+        <paper-button on-click="_goToName" class="toastButton">GOT IT</paper-button>
+      </paper-toast>
+
+      <paper-toast id="toastRGTECreated" text='Find or enrich your concepts'>
+        <paper-button on-click="_goOnRelatedRWEI" class="toastButton">EDIT IT</paper-button>
+      </paper-toast>
 
     </div>
 
@@ -403,11 +410,19 @@
 
       _beginCreation: function()
       {
+        if(NARRATED_OPERATION_POOL.getNAPByID(this.nap.id) == null)
+        {
+          this.$.toastNamedNAP.open();
+          return;
+        }
+
         this.nap.setExpectedConcept(RGTE_POOL.create());
 
         this.rgte = this.nap.expectedConcepts;
 
         this.changeRGTEZoneState(this.displayState);
+
+        this.$.toastRGTECreated.open();
       },
 
       _loadInputPage: function(rgte)//when the display rgte is requested after selected one rgte
@@ -429,10 +444,21 @@
         return operation == null ? false : true;
       },
 
+
 // === TOAST
+      _goOnRelatedRWEI: function()
+      {
+        this.$.rwei._openRGTE();
+      },
       _closeToast: function(e)
       {
         Polymer.dom(e).localTarget.parentElement.close();
+      },
+      _goToName: function(e)
+      {
+        window.scroll(0,0);
+        this._closeToast(e);
+        this.$.nameNAP.focus();
       },
 
     });

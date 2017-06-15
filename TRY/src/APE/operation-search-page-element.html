@@ -7,7 +7,7 @@
 
 <div id="divRoot">
 
-  <operation-search-element id="ose" to-stack="{{toStack}}" enable-use="{{enableUse}}" ></operation-search-element>
+  <operation-search-element id="ose" unproposed="{{unproposed}}" to-stack="{{toStack}}" enable-use="{{enableUse}}" ></operation-search-element>
 
 </div>
 
@@ -28,6 +28,12 @@
         toStack:
         {
           type: Object,
+          notify: true,
+        },
+
+        unproposed:
+        {
+          type: Array,
           notify: true,
         },
 

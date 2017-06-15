@@ -35,6 +35,11 @@ NarratedAnalysisProcess.prototype.getStartingSteps = function()
   return sSteps;
 }
 
+NarratedAnalysisProcess.prototype.getExpectedConcepts = function()
+{
+  return this.expectedConcepts;
+}
+
 NarratedAnalysisProcess.prototype.setExpectedConcept = function(rgte)
 {
   if(rgte == null)
@@ -55,4 +60,9 @@ NarratedAnalysisProcess.prototype.willBeReplaced = function()
 {
   if(this.expectedConcepts && this.expectedConcepts.isEmpty())
     RGTE_POOL.delete(this.expectedConcepts);
+}
+
+NarratedAnalysisProcess.prototype.hasAtLeastOneStep = function()
+{
+  return this.steps.length > 0 ? true : false;
 }

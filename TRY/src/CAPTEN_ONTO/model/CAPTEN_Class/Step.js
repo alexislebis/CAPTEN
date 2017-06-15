@@ -30,6 +30,7 @@ function Step() {
     this.isStateComputed = false; //If the output has been computed. MUST BE @ true when all the node expected are aligned with the input node
     this.usedComputationInput = []; //State of the computation. Associative array. All the op.beh.inpu node must be aligned with one this.input.node
     this.propAsyncBuild = new PropertyAsyncrhonousBuilder();
+      this.propAsyncBuild.setValidationFunction(this._propertyAsyncValidationFunction);
       this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackUsedConceptsInputComplete);
       this.propAsyncBuild.registerObserverCallbackOnUncompletion(this, this._callbackUCIUncompletion);
       this.propAsyncBuild.registerObserverCallbackOnUpdate(this, this._callbackPropertyAsyncUpdate);
@@ -377,6 +378,32 @@ Step.prototype.constructor = Step;
     }
   // === END CALLBACK BEHAVIORS FROM INPUTS & OUTPUTS
 
+  // === PROPASYNC VALIDATION FUNCTION
+  Step.prototype._propertyAsyncValidationFunction= function(A, B, arrayToFill)
+  {
+    if( !(B instanceof RGTE) )
+    {
+      console.error("VALIDATION FUNCTION FROM STEP: B IS NOT A GRAPH");
+      return;
+    }
+
+    var max = 0; var counted = 0;
+    for(var i in this.B.getNodes()) // each node have to be linked with other item once
+    {
+      for(var j in this.arrayToFill)
+      {
+        if(this.B.nodes[i].id == this.arrayToFill[j].to)//We have on property goind toward this.B.nodes[i].id.
+          counted++;
+      }
+      max++;
+    }
+
+    if(max == counted)
+      return true;
+    return false;
+  },
+  // === END PROPASYNC
+
   // === PUBLIC
   Step.prototype.isComplete = function()
   {
@@ -494,7 +521,12 @@ Step.prototype.constructor = Step;
     this._compositeRelations = [];
 
     this.notifyIOPCompositeRelationChange();
-  };
+  }
+
+  Step.prototype.getCompositeRelations= function()
+  {
+    return this._compositeRelations;
+  }
 
   Step.prototype.findDependencies = function(steps, arrows)
   {
@@ -577,6 +609,8 @@ Step.prototype.constructor = Step;
 
   Step.prototype.getName = function()
   {
+    if(this.name == null)
+      return;
     return this.name.name;
   }
 
