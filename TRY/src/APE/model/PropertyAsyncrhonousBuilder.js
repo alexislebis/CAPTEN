@@ -20,6 +20,7 @@ function PropertyAsyncrhonousBuilder(A, B, length)
   this.observersUpdate = [];
 
   this.lengthArray = length;
+  this.validationFunction = null;
 
   this.reset();
 
@@ -290,11 +291,21 @@ PropertyAsyncrhonousBuilder.prototype = {
     console.log(this.A);
     console.log(this.B);
 
-    var counter = 0;
-    for(var i in this.arrayToFill)
-      counter++;
+    var validated = false;
+    if(this.validationFunction == null) //Compatibility code for previous call
+    {
+      var counter = 0;
+      for(var i in this.arrayToFill)
+        counter++;
 
-    if(counter == this.lengthArray)
+      if(counter == this.lengthArray)
+        validated = true;
+    }
+    else {
+      validated = this.validationFunction(this.A, this.B, this.arrayToFill);
+    }
+
+    if(validated)
     {
       this.notifyCompletion();
       return true;
@@ -327,6 +338,12 @@ PropertyAsyncrhonousBuilder.prototype = {
   {
     this.fromObject = null; this.toObject = null;
   },
+
+  setValidationFunction: function(func)
+  {
+    if (typeof func === "function")
+      this.validationFunction = func;
+  }
 
 
 };
