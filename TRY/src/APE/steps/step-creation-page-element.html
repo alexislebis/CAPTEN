@@ -1,6 +1,7 @@
 <link rel="import" href="../operation-step-display-element.html">
 <link rel="import" href="./step-status-displayer-element.html">
 <link rel="import" href="./step-relation-tab-element.html">
+<link rel="import" href="../analysis/localisation-in-analysis-element.html">
 
 <dom-module id="step-creation-page-element">
   <template>
@@ -9,6 +10,13 @@
       :host{
         --rgte-common-width: 100%;
         --vis-element-width: 100%;
+      }
+
+      #nextStep{
+        position: fixed;
+        top:49%;
+        right: 1px;
+        z-index: 10;
       }
 
       #vaadinOperation{
@@ -64,10 +72,18 @@
 
 
     </style>
+<app-location route="{{routeTopLevel}}" use-hash-as-path></app-location>
 
 <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
-<p>Behavior on step access. If no NAP is defined -> Create a new one before. Otherwise retrieve associated Step</p>
+
+<div hidden$="{{!_isNext}}">
+  <paper-fab id="nextStep" icon="av:fast-forward" on-click="_goNext"></paper-fab>
+  <paper-tooltip for="nextStep">Create or go to the direct following step</paper-tooltip>
+</div>
+
 <div id="divRoot">
+
+  <localisation-in-analysis-element id="liae"></localisation-in-analysis-element>
 
   <div id="commonInfo">
     <header>
@@ -218,6 +234,10 @@
     <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
   </paper-toast>
 
+  <paper-toast id="toastStepFromThePrevious" text='This step now follow the previous one'>
+    <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
+  </paper-toast>
+
   <paper-toast id="toastAutoLoadNAPStep" text='Step automatically configured with your initial concepts'>
     <paper-button on-click="_undoAutoLoad" class="toastButton">UNDO</paper-button>
   </paper-toast>
@@ -232,6 +252,12 @@
       properties:
       {
         route:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        _inputsFromNext://used as a tmp variable when changing step from isNextable
         {
           type: Object,
           notify: true,
@@ -444,10 +470,6 @@
       },
 
       // === RESET behaviors
-      reset: function()
-      {
-        //todo reattacher listener sur nouvelle step
-      },
 
       _behaviorManager: function(obj)
       {
@@ -556,15 +578,33 @@
 
       update: function()
       {
-        this.$.rsei.update();
+        if(this.inputSection == "searchInput")
+          this.$.rsei.update();
+        else
+          this.$.rwei.update();
+
         this.$.ose.update();
         this.$.ssde.computeStepState();
+        this._isNextable();
+
+        this.$.liae.update();
       },
 
           _generateDefaultConfig: function()
           {
             this.isNew = true;
             this.step = new Step();
+
+            if(this._inputsFromNext)
+            {
+              this.step.changeRGTE(this._inputsFromNext);
+              this.input = this.step.getInputs();
+              this.inputSection = "inputZone";
+
+              this._inputsFromNext = null;
+              this.$.toastStepFromThePrevious.open();
+            }
+
           },
 
           _generateSpecificConfig: function(idToFind)
@@ -678,6 +718,8 @@
       {
         this.output = this.step.outputs;
         this.outputSection = "outputZone";
+
+        this._isNextable();
       },
 
       _resetOutput: function()
@@ -689,6 +731,8 @@
         // color reseting
         this.inputsColor = [];
         this.operationInputsColor = [];
+
+        this._isNextable();
       },
 
       _changeOnCompositeIOP: function()
@@ -747,6 +791,14 @@
       //   this.step.changeRGTE(input);
       // },
 
+      _openNewStep: function(step)
+      {
+        if(step)
+          this.set('routeTopLevel.path', '/step/'+step.id);
+        else
+          this.set('routeTopLevel.path', '/step/new');
+      },
+
 // === TOAST
       _closeToast: function(e)
       {
@@ -758,7 +810,50 @@
         this.input = null;
         this.inputSection = "searchInput";
         Polymer.dom(e).localTarget.parentElement.close();
+      },
+
+// === FAB
+    _isNextable: function()
+    {
+      if(this.step == null || this.nap == null)
+      {
+        this._isNext = false;
+        return;
       }
+
+      var res = this.nap.getNexts(this.step);
+      if(res && res.length > 0)
+      {
+        this._isNext = true;
+        return;
+      }
+
+      if(this.step.isComplete())
+      {
+          this._isNext = true;
+         return;
+      }
+
+      this._isNext = false;
+      return;
+    },
+
+    _goNext: function()
+    {
+      var res = this.nap.getNexts(this.step);
+      if(res && res.length > 0)
+      {
+        this._openNewStep(res[0]);
+        return;
+      }
+      if(this.step.isComplete())
+      {
+        this._inputsFromNext = this.step.getOutputs();
+        this._openNewStep();
+        return;
+      }
+      return;
+    },
 
     });
   </script>

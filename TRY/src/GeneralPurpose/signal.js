@@ -36,3 +36,6 @@
         var NEW_STEP_FOR_NAP_SIGNAL_ID = "-4segejgzg?KG?keeg:dvsdv2vez";
       // === RGTE CREATOR
         var NEW_RGTE_FOR_NAP_SIGNAL_ID = "-5ZpOoPKKekvkldsvx;c:wLMeg";
+
+    // === HISTORY_MANAGER
+      var HISTORY_PREVIOUS_REQUESTED_SIGNAL_ID = "-5EGE464688EO?,,,K,kve,gzgeapapozretsw";

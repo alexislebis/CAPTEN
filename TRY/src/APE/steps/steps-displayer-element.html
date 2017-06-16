@@ -51,14 +51,32 @@
           if(stepView == null || stepView.getNetwork() == null)
             return;
 
-          stepView.addNodes(this._stepsToNodes());
+          var n = null; var e = null; var c = null;
 
+          n = this._stepsToNodes();
           if(s != null)
-          {
-            stepView.addEdges(this._edgesDependencies());
-          }
+            e = this._edgesDependencies();
+          c = this._stepsColorisation();
+
+          stepView.addNodesAndEdges(n,e,c);
+          // stepView.addNodes(this._stepsToNodes());
+          //
+          // if(s != null)
+          // {
+          //   stepView.addEdges(this._edgesDependencies());
+          // }
 
           stepView.redraw();
+        },
+
+        _stepsColorisation: function()
+        {
+          var color = [];
+          for(var i in this.steps)
+            if(!this.steps[i].isComplete())
+              color.push({color: '#DEE2E3', id: this.steps[i].id});
+
+          return color;
         },
 
         // === PRIVATE

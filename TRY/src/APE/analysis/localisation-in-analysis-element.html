@@ -1,0 +1,66 @@
+<dom-module id="localisation-in-analysis-element">
+<template>
+  <style>
+  </style>
+
+  <div hidden$="{{_isHidden(nap)}}">
+    <steps-displayer-element id="sde" steps="{{steps}}"></steps-displayer-element>
+  </div>
+
+</template>
+<script>
+  Polymer(
+    {
+      is: "localisation-in-analysis-element",
+
+      properties:
+      {
+        nap:
+        {
+          type: Object,
+          notify: true,
+          value: function(){return null;},
+        },
+
+        steps:
+        {
+          type: Array,
+          notify: true,
+        },
+      },
+
+      observers:
+      [
+        "_onChangedNAP(nap)",
+      ],
+
+      update: function()
+      {
+        if(this.nap && this.nap.removeMeFromObservation)
+          this.nap.removeMeFromObservation(this);
+
+        this.nap = null;
+        this.nap = HISTORY_MANAGER.getFirstAntichronologicalElement(NarratedAnalysisProcess);
+
+        if(this.nap)
+          this.nap.registerObserverCallbackOnChange(this, this._onChangedNAP);
+      },
+
+      _onChangedNAP: function(nap)
+      {
+        this.steps = null;
+
+        if(this.nap == null)
+          return;
+
+        this.set('steps', this.nap.steps);
+      },
+
+      _isHidden: function(nap)
+      {
+        return this.nap == null ? true : false;
+      },
+
+    });
+</script>
+</dom-module>

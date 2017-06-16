@@ -4,7 +4,7 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 
 <dom-module id="rgte-displayer-element">
-    <template>
+  <template>
         <style>
              :host {
                 display: block;
@@ -17,17 +17,17 @@
           <iron-icon icon="settings" on-tap="_toggleOpenModif"></iron-icon>
         </template>
 
-        <template id="openModif" is="dom-if" if="{{isModificationEnabled}}">
+  <template id="openModif" is="dom-if" if="{{isModificationEnabled}}">
           <template id="noSelect" is="dom-if" if="{{_isNothingSelected(nodeSelected, edgeSelected)}}">
             <p>You can edit or replace on-the-fly existing node or edge by clicking on it</p>
           </template>
-          <template id="nodeSelect" is="dom-if" if="{{_isNodeSelected(nodeSelected)}}">
+  <template id="nodeSelect" is="dom-if" if="{{_isNodeSelected(nodeSelected)}}">
             <form is="iron-form" method="get" action="/" id="nodeRenameForm" on-iron-form-submit="submitForm">
                 <paper-input id="updateNodeName" name="name" label="Name" required></paper-input>
                 <paper-button raised on-click="replace">Replace</paper-button>
             </form>
           </template>
-          <template id="edgeSelect" is="dom-if" if="{{_isEdgeSelected(edgeSelected)}}">
+  <template id="edgeSelect" is="dom-if" if="{{_isEdgeSelected(edgeSelected)}}">
             <form is="iron-form" method="get" action="/" id="EdgeRenameForm" on-iron-form-submit="submitForm">
                 <paper-input id="updateEdgeName" name="name" label="Name" required></paper-input>
                 <paper-button raised on-click="replace">Replace</paper-button>
@@ -35,285 +35,304 @@
 
             <paper-button raised>Relink</paper-button>
           </template>
-        </template>
+  </template>
 
-      </template>
-    <script>
-        Polymer(
+  </template>
+  <script>
+    Polymer(
+    {
+      is: 'rgte-displayer-element',
+
+      properties:
+      {
+        rgte:
         {
-            is: 'rgte-displayer-element',
+          type: Object,
+          // value: function()
+          // {
+          //     return new RGTE();
+          // },
+          notify: true,
+          observer: '_onChange',
+        },
 
-            properties:
+        colorization:
+        {
+          type: Array,
+          notify: true,
+        },
+
+        enableModification:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+
+        isModificationEnabled: //When user want to modify smth
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        nodeSelected:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+        edgeSelected:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
+        },
+
+      },
+      observers: [
+        "_onColorChange(colorization.*)",
+      ],
+
+      _onColorChange: function()
+      {
+        console.log(this.colorization);
+      },
+
+
+
+      attached: function()
+      {
+        this.$.rgteview.addEventListener('NETWORK_CLICKED', function(p)
+        {
+          this._eventDispatcher(p.detail);
+        }.bind(this));
+
+        this.$.rgteview.addEventListener("NETWORK_GENERATED", function(p) //Used for refresh the graph when network became available. Otherwise, some desyncrho may appear regarding the display of the graph
+          {
+            this.draw();
+          }.bind(this));
+
+        if (this.rgte != null)
+        {
+          this.rgte.registerObserverCallbackOnChange(this, this._callbackOnRGTEChanged);
+
+        }
+
+      },
+
+      // _onRgteChanged: function(change)
+      // {
+      //     console.log(this.rgte);
+      //     this.draw();
+      // },
+
+      // === OBSERVATION METHODS
+      _callbackOnRGTEChanged: function()
+      {
+        this.draw();
+      },
+
+      _onChange: function() // Native from polymer
+      {
+        console.log(this.rgte);
+        this.replaceRGTE(this.rgte);
+        this.draw();
+      },
+      // ===
+
+      update: function()
+      {
+        this.draw();
+      },
+
+      draw: function()
+      {
+        var rgteView = this.$.rgteview;
+
+        if (rgteView.getNetwork() == null)
+          return;
+        if (this.rgte == null)
+          return;
+
+        //UPDATING NETWORK WITH NEW NODES.
+        //Update the node will not change ID of already existing (and identical) elements
+        var n = this.rgte.getNodesSerializedJSON();
+        // rgteView.addNodes(this.rgte.getNodes());
+        // rgteView.addNodes(this.rgte.getNodesSerializedJSON());
+        // rgteView.addEdges(this.rgte.getEdges());
+
+        //Graph coloration (K, relation with operation...)
+
+        for (var i = 0; i < this.rgte.getKnowledges().length; i++)
+        {
+          for (var j in n)
+          {
+            if (n[j].id == this.rgte.getKnowledges()[i].derivedFrom.id)
+              n[j].color = KNOWLEDGE_COLOR;
+          }
+        }
+
+        rgteView.addNodesAndEdges(n, this.rgte.getEdges(), this.colorization);
+
+
+
+        //DRAW CARDINALITY
+        //Associate, for each edges notified in edgesCardinality{id,from,to}, its cardinality
+        //Since the modification of arrows is directly applied in the network, the edges affected
+        //Will NOT be changed nor they ID. It is important because this.edges=this.network.edgesHandler.edges must
+        //be kept synch with this.edgesCardinality
+
+        this.rgte.getEdgesCardinality().forEach(function(e, i)
+        {
+          var focusEdge = this.$.rgteview.getNetwork().edgesHandler.body.edges[e.edgeId];
+          if (focusEdge != null) //If the network has a node focusEdge
+          {
+            focusEdge.options.arrows.from.enabled = true;
+            focusEdge.options.arrows.to.enabled = true;
+
+            var that = this;
+            focusEdge.drawArrows = function drawArrows(ctx, arrowData)
             {
-                rgte:
-                {
-                    type: Object,
-                    // value: function()
-                    // {
-                    //     return new RGTE();
-                    // },
-                    notify: true,
-                    observer: '_onChange',
-                },
-
-                colorization:
-                {
-                  type: Array,
-                  notify: true,
-                },
-
-                enableModification:
-                {
-                  type: Boolean,
-                  value: false,
-                  notify: true,
-                },
-
-                isModificationEnabled://When user want to modify smth
-                {
-                  type: Boolean,
-                  value: false,
-                  notify: true,
-                },
-                nodeSelected:
-                {
-                  type: Boolean,
-                  value: false,
-                  notify: true,
-                },
-                edgeSelected:
-                {
-                  type: Boolean,
-                  value: false,
-                  notify: true,
-                },
-
-            },
-            observers: [
-              "_onColorChange(colorization.*)",
-            ],
-
-            _onColorChange: function()
-            {
-              console.log(this.colorization);
-            },
-
-
-
-            attached: function()
-            {
-              this.$.rgteview.addEventListener('NETWORK_CLICKED', function(p)
+              if (this.options.arrows.from.enabled === true)
               {
-                  this._eventDispatcher(p.detail);
-              }.bind(this));
-
-              this.$.rgteview.addEventListener("NETWORK_GENERATED", function(p)//Used for refresh the graph when network became available. Otherwise, some desyncrho may appear regarding the display of the graph
-              {
-                this.draw();
-              }.bind(this));
-
-              if(this.rgte != null){
-                this.rgte.registerObserverCallbackOnChange(this, this._callbackOnRGTEChanged);
-
-                }
-
-            },
-
-            // _onRgteChanged: function(change)
-            // {
-            //     console.log(this.rgte);
-            //     this.draw();
-            // },
-
-// === OBSERVATION METHODS
-            _callbackOnRGTEChanged: function()
-            {
-              this.draw();
-            },
-
-            _onChange: function() // Native from polymer
-            {
-              console.log(this.rgte);
-              this.replaceRGTE(this.rgte);
-              this.draw();
-            },
-// ===
-
-            draw: function()
-            {
-                var rgteView = this.$.rgteview;
-
-                if (rgteView.getNetwork() == null)
-                    return;
-                if(this.rgte == null)
-                  return;
-
-                //UPDATING NETWORK WITH NEW NODES.
-                //Update the node will not change ID of already existing (and identical) elements
-                var n = this.rgte.getNodesSerializedJSON();
-                // rgteView.addNodes(this.rgte.getNodes());
-                // rgteView.addNodes(this.rgte.getNodesSerializedJSON());
-                // rgteView.addEdges(this.rgte.getEdges());
-
-                //Graph coloration (K, relation with operation...)
-
-                for(var i = 0; i < this.rgte.getKnowledges().length; i++)
-                {
-                  for(var j in n)
-                  {
-                    if(n[j].id == this.rgte.getKnowledges()[i].derivedFrom.id)
-                      n[j].color = KNOWLEDGE_COLOR;
-                  }
-                }
-
-                rgteView.addNodesAndEdges(n, this.rgte.getEdges(), this.colorization);
-
-
-
-                //DRAW CARDINALITY
-                //Associate, for each edges notified in edgesCardinality{id,from,to}, its cardinality
-                //Since the modification of arrows is directly applied in the network, the edges affected
-                //Will NOT be changed nor they ID. It is important because this.edges=this.network.edgesHandler.edges must
-                //be kept synch with this.edgesCardinality
-
-                this.rgte.getEdgesCardinality().forEach(function(e, i)
-                {
-                    var focusEdge = this.$.rgteview.getNetwork().edgesHandler.body.edges[e.edgeId];
-                    if (focusEdge != null) //If the network has a node focusEdge
-                    {
-                        focusEdge.options.arrows.from.enabled = true;
-                        focusEdge.options.arrows.to.enabled = true;
-
-                        var that = this;
-                        focusEdge.drawArrows = function drawArrows(ctx, arrowData)
-                        {
-                            if (this.options.arrows.from.enabled === true)
-                            {
-                                that._drawCardinalityFrom(ctx, this.selected, this.hover, arrowData.from, e.fromCardinality);
-                            }
-                            if (this.options.arrows.to.enabled === true)
-                            {
-                                that._drawCardinalityTo(ctx, this.selected, this.hover, arrowData.to, e.toCardinality);
-                                this.edgeType.drawArrowHead(ctx, this.selected, this.hover, arrowData.to);
-                            }
-                        };
-                    }
-                }.bind(this));
-
-                // rgteView.paint(this.colorization);
-
-                rgteView.redraw();
-            },
-
-            replaceRGTE: function(rgte)
-            {
-              if(rgte == null || !(rgte instanceof RGTE) )
-                return;
-
-              var oldRGTE = this.rgte;
-
-              this.rgte = rgte;
-              this.rgte.registerObserverCallbackOnChange(this, this._callbackOnRGTEChanged);
-
-              return oldRGTE;
-            },
-
-            _drawCardinalityFrom: function(ctx, selected, hover, arrowData, fromCard)
-            {
-                if (selected)
-                {
-                    ctx.font = 'bold 16px sans-serif';
-                }
-                else
-                {
-                    ctx.font = 'bold 16px sans-serif';
-                }
-                ctx.fillStyle = '#2A8F09';
-                ctx.fillText(fromCard,
-                    arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
-                    arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
-            },
-
-            _drawCardinalityTo: function(ctx, selected, hover, arrowData, toCard)
-            {
-                var oldStyle = ctx.strokeStyle;
-                if (selected)
-                {
-                    ctx.font = 'bold 16px sans-serif';
-                }
-                else
-                {
-                    ctx.font = 'bold 16px sans-serif';
-                }
-                ctx.fillStyle = '#2A8F09';
-                ctx.fillText(toCard,
-                    arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
-                    arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
-
-                ctx.strokeStyle = oldStyle;
-                ctx.fillStyle = ctx.strokeStyle;
-                // ctx.lineWidth = this.getLineWidth(selected, hover);
-
-                // // draw arrow at the end of the line
-                ctx.arrow(arrowData.point.x, arrowData.point.y, arrowData.angle, arrowData.length);
-                //
-                // // draw shadow if enabled
-                // this.enableShadow(ctx);
-                // ctx.fill();
-                // // disable shadows for other elements.
-                // this.disableShadow(ctx);
-            },
-
-            _eventDispatcher: function(params)
-            {
-              if(!this.isModificationEnabled)
-              {
-                if(params.nodes.length != 0)
-                {
-                  this.fire('NODE_CLICKED', {'id':params.nodes[0], 'nodeLabel' : params.nodes[0], 'graph': this.rgte, 'event': params.event});
-                }
-                else if(params.edges.length != 0)
-                {
-                  this.fire('EDGE_CLICKED', {'id':params.edges[0], 'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label, 'graph': this.rgte, 'even': params.event});
-                }
+                that._drawCardinalityFrom(ctx, this.selected, this.hover, arrowData.from, e.fromCardinality);
               }
-              //if user want to modify the rgte
-              else {
-                if(params.nodes.length != 0)//Node clicked
-                {
-                  this.nodeSelected = true;
-                  this.edgeSelected = false;
-                }
-                else if(params.edges.length != 0)
-                {
-                  this.nodeSelected = false;
-                  this.edgeSelected = true;
-                }
+              if (this.options.arrows.to.enabled === true)
+              {
+                that._drawCardinalityTo(ctx, this.selected, this.hover, arrowData.to, e.toCardinality);
+                this.edgeType.drawArrowHead(ctx, this.selected, this.hover, arrowData.to);
               }
-            },
+            };
+          }
+        }.bind(this));
 
-            _toggleOpenModif: function()
+        // rgteView.paint(this.colorization);
+
+        rgteView.redraw();
+      },
+
+      replaceRGTE: function(rgte)
+      {
+        if (rgte == null || !(rgte instanceof RGTE))
+          return;
+
+        var oldRGTE = this.rgte;
+
+        this.rgte = rgte;
+        this.rgte.registerObserverCallbackOnChange(this, this._callbackOnRGTEChanged);
+
+        return oldRGTE;
+      },
+
+      _drawCardinalityFrom: function(ctx, selected, hover, arrowData, fromCard)
+      {
+        if (selected)
+        {
+          ctx.font = 'bold 16px sans-serif';
+        }
+        else
+        {
+          ctx.font = 'bold 16px sans-serif';
+        }
+        ctx.fillStyle = '#2A8F09';
+        ctx.fillText(fromCard,
+          arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
+          arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
+      },
+
+      _drawCardinalityTo: function(ctx, selected, hover, arrowData, toCard)
+      {
+        var oldStyle = ctx.strokeStyle;
+        if (selected)
+        {
+          ctx.font = 'bold 16px sans-serif';
+        }
+        else
+        {
+          ctx.font = 'bold 16px sans-serif';
+        }
+        ctx.fillStyle = '#2A8F09';
+        ctx.fillText(toCard,
+          arrowData.point.x - arrowData.length * 0.9 * Math.cos(arrowData.angle),
+          arrowData.point.y - arrowData.length * 0.9 * Math.sin(arrowData.angle));
+
+        ctx.strokeStyle = oldStyle;
+        ctx.fillStyle = ctx.strokeStyle;
+        // ctx.lineWidth = this.getLineWidth(selected, hover);
+
+        // // draw arrow at the end of the line
+        ctx.arrow(arrowData.point.x, arrowData.point.y, arrowData.angle, arrowData.length);
+        //
+        // // draw shadow if enabled
+        // this.enableShadow(ctx);
+        // ctx.fill();
+        // // disable shadows for other elements.
+        // this.disableShadow(ctx);
+      },
+
+      _eventDispatcher: function(params)
+      {
+        if (!this.isModificationEnabled)
+        {
+          if (params.nodes.length != 0)
+          {
+            this.fire('NODE_CLICKED',
             {
-              this.isModificationEnabled = !this.isModificationEnabled;
-              console.log(this.isModificationEnabled);
-            },
-
-            _isNothingSelected: function(nodeSelected, edgeSelected)
+              'id': params.nodes[0],
+              'nodeLabel': params.nodes[0],
+              'graph': this.rgte,
+              'event': params.event
+            });
+          }
+          else if (params.edges.length != 0)
+          {
+            this.fire('EDGE_CLICKED',
             {
-              console.log((!nodeSelected && !edgeSelected));
-              return (!nodeSelected && !edgeSelected);
-            },
+              'id': params.edges[0],
+              'edgeLabel': this.$.rgteview.getNetwork().body.edges[params.edges[0]].options.label,
+              'graph': this.rgte,
+              'even': params.event
+            });
+          }
+        }
+        //if user want to modify the rgte
+        else
+        {
+          if (params.nodes.length != 0) //Node clicked
+          {
+            this.nodeSelected = true;
+            this.edgeSelected = false;
+          }
+          else if (params.edges.length != 0)
+          {
+            this.nodeSelected = false;
+            this.edgeSelected = true;
+          }
+        }
+      },
 
-            _isNodeSelected: function(nodeSelected)
-            {
-              return nodeSelected;
-            },
+      _toggleOpenModif: function()
+      {
+        this.isModificationEnabled = !this.isModificationEnabled;
+        console.log(this.isModificationEnabled);
+      },
 
-            _isEdgeSelected: function(edgeSelected)
-            {
-              return edgeSelected;
-            },
+      _isNothingSelected: function(nodeSelected, edgeSelected)
+      {
+        console.log((!nodeSelected && !edgeSelected));
+        return (!nodeSelected && !edgeSelected);
+      },
 
-        });
-    </script>
+      _isNodeSelected: function(nodeSelected)
+      {
+        return nodeSelected;
+      },
+
+      _isEdgeSelected: function(edgeSelected)
+      {
+        return edgeSelected;
+      },
+
+    });
+  </script>
 </dom-module>

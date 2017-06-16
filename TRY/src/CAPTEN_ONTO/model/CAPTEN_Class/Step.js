@@ -326,7 +326,7 @@ Step.prototype.constructor = Step;
 
     Step.prototype._callbackRGTEDeleted = function(graphID)//Handled in the super structure (here NAP). It could be manged by a notification system between rgte & step, but a counter is more hard to maintain
     {
-      if(this.input == null)
+      if(this.inputs == null)
         return;
 
       if(graphID == this.inputs.id)
@@ -612,6 +612,15 @@ Step.prototype.constructor = Step;
     if(this.name == null)
       return;
     return this.name.name;
+  }
+
+  Step.prototype.getInputs = function()
+  {
+    return this.inputs;
+  }
+  Step.prototype.getOutputs = function()
+  {
+    return this.outputs;
   }
 
   Step.prototype.setAuthor = function(author)

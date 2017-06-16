@@ -49,6 +49,24 @@ NarratedOperator.prototype.constructor = NarratedOperator;
         this.observers = [];
       }
 
+      NarratedOperator.prototype.removeMeFromObservation = function(obj)
+      {
+        if(obj == null)
+          return null;
+
+        var indexToSplice = [];
+        for(var i in this.observers)
+          if(this.observers[i].id && this.observers[i].id == obj.id)
+            indexToSplice.push(i);
+
+        var offset = 0;
+        for(var i in indexToSplice)
+        {
+          this.observers.splice(i-offset, 1);
+          offset++;
+        }
+      }
+
       NarratedOperator.prototype.registerObserverCallbackOnChange = function(objCallback, callback)
       {
         if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observers))
@@ -85,6 +103,9 @@ NarratedOperator.prototype.constructor = NarratedOperator;
 
       if(!this.alreadyExists(step))
       {
+        step.isRegistered = true;
+        step.registerObserverCallbackOnOutputsComputation(this, this.notifyChange);
+        step.registerObserverCallbackOnUncompletion(this, this.notifyChange);
         this.steps.push(step);
 
         this.notifyChange();
@@ -99,4 +120,17 @@ NarratedOperator.prototype.constructor = NarratedOperator;
         if(this.steps[i].id == step.id)
           return true;
       return false;
+    }
+
+    NarratedOperator.prototype.getNexts = function(step)
+    {
+      if(step == null)
+        return null;
+      var res = [];
+      for(var i in this.steps)
+      {
+        if(step.getOutputs() && this.steps[i].getInputs() && step.getOutputs().id == this.steps[i].getInputs().id)
+          res.push(this.steps[i]);
+      }
+      return res;
     }

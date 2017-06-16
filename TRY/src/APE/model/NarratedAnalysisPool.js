@@ -35,6 +35,8 @@
    {
      var nap = new NarratedAnalysis();
 
+     nap.isRegistered = true;
+
      this.pool.push(nap);
      this.notifyChange();
 
@@ -63,6 +65,7 @@
        if(this.pool[i].id == nap.id)
          return null;
 
+      nap.isRegistered = true;
      this.pool.push(nap);
 
      this.notifyChange();

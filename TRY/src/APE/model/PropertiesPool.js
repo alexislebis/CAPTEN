@@ -14,6 +14,7 @@ PropertiesPool.prototype = {
   create: function(uri, label, from, to, additionalConstraints)
   {
     var prop = new Property(uri, label, from, to, additionalConstraints);
+    prop.isRegistered = true;
 
     return this._addingToPool(prop);
     // this.pool.push(prop);
@@ -77,6 +78,7 @@ PropertiesPool.prototype = {
       if(this.pool[i] === prop)
       {
         index = i;
+        this.pool[index].isRegistered = null;
         this.pool.splice(index,1);
         return true;
       }

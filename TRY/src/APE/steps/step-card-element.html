@@ -36,7 +36,12 @@
 
   <paper-card id="main">
     <div class="card-content">
-      <div class="step-header">[[_computeName(step)]]
+      <div class="step-header">
+        <span id="notComplete" hidden$="{{_isComputed(step)}}"><iron-icon icon="icons:error"></iron-icon></span>
+        <span id="complete" hidden$="{{!_isComputed(step)}}"><iron-icon icon="icons:check-circle"></iron-icon></span>
+      [[_computeName(step)]]
+          <paper-tooltip for="notComplete">This step has not been completed yet</paper-tooltip>
+          <paper-tooltip for="complete">This step has been completed</paper-tooltip>
         <div class="step-location step-light">
           <div id="rating" class="step-rating">
             <iron-icon class="star" icon="star"></iron-icon>
@@ -140,6 +145,11 @@
       _computeName: function(step)
       {
         return step.getName();
+      },
+
+      _isComputed: function(step)
+      {
+        return step.isComplete();
       },
 
 

@@ -34,6 +34,7 @@ NarratedOperatorPool.prototype =
   create: function()
   {
     var nop = new NarratedOperator();
+    nop.isRegistered = true;
 
     this.pool.push(nop);
     RGTE_POOL.register(nop.behaviors['output']);
@@ -54,6 +55,7 @@ NarratedOperatorPool.prototype =
       if(this.pool[i].id == nop.id)
         return null;
 
+    nop.isRegistered = true;
     this.pool.push(nop);
 
     RGTE_POOL.register(nop.behaviors['output']);
@@ -75,6 +77,7 @@ NarratedOperatorPool.prototype =
     {
       if(this.pool[i].id == nop.id)
       {
+        this.pool[i].isRegistered = null;
         res = this.pool.splice(i,1);
         break;
       }

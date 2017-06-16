@@ -4,15 +4,18 @@ window.onkeydown = function (e) {
   {
     e.preventDefault();
 
-    var url = HISTORY_MANAGER._getRedirectionURL(HISTORY_MANAGER.back());
-
-    if(url != null)
-    {
-      window.location.href = HISTORY_MANAGER.route + url;
-    }
-    else {
-      HISTORY_MANAGER.notifyFailure();
-    }
+    // var url = HISTORY_MANAGER._getRedirectionURL(HISTORY_MANAGER.back());
+    //
+    // if(url != null)
+    // {
+    //   window.location.href = HISTORY_MANAGER.route + url;
+    // }
+    // else {
+    //   HISTORY_MANAGER.notifyFailure();
+    // }
+    var ev = new Event(HISTORY_PREVIOUS_REQUESTED_SIGNAL_ID, {"bubbles":true, "cancelable":false});
+    ev.data = {current: HISTORY_MANAGER.getCurrentItem(), callback: proceedBack, initialEvent: e, callbackFail: doNotProceedBack};
+    document.dispatchEvent(ev);
   }
   else if (TOOL_EVENT.isAltRightArrowClick(e))
   {
@@ -24,8 +27,27 @@ window.onkeydown = function (e) {
     }
 
   }
-
   // else NTD
+}
+
+function proceedBack(e)
+{
+  e.preventDefault();
+
+  var url = HISTORY_MANAGER._getRedirectionURL(HISTORY_MANAGER.back());
+
+  if(url != null)
+  {
+    window.location.href = HISTORY_MANAGER.route + url;
+  }
+  else {
+    HISTORY_MANAGER.notifyFailure();
+  }
+}
+
+function doNotProceedBack(e)
+{
+  e.preventDefault();
 }
 
 function PreviousManager()//Object to rename
@@ -133,6 +155,11 @@ PreviousManager.prototype = {
     }
 
     return null;
+  },
+
+  getCurrentItem: function()
+  {
+    return this.history[this.index];
   },
 
   _getRedirectionURL: function(item)
