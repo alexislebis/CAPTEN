@@ -167,6 +167,8 @@
 
 <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
 
+  <localisation-in-analysis-element id="liae"></localisation-in-analysis-element>
+
 <div id="divRoot">
 
   <header>
@@ -652,6 +654,8 @@
                 return;
 
               this._resetComponent();
+
+              this.$.liae.update();
 
               if(this.data.itemValue == null || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
               {

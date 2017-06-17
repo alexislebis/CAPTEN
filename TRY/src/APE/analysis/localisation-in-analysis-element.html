@@ -1,11 +1,94 @@
 <dom-module id="localisation-in-analysis-element">
 <template>
   <style>
+
+    :host{
+      --vis-element-height: 220px;
+      --rgte-common-width: 400px;
+    }
+
+    #main{
+      background-color: var(--google-grey-300);
+    }
+
+    #divRoot{
+      position: fixed;
+      top:0;
+      width: 100%;
+      z-index: 20;
+    }
+
+    #head{
+      @apply(--layout-horizontal);
+      @apply(--layout-flex);
+      @apply(--layout-around-justified);
+    }
+
+    #display{
+      width: 60%;
+      margin: 0 auto 0 auto;
+    }
+
+    .onHidden
+    {
+      height: 25px;
+      background-color: none;
+    }
+
+    .onDisplayed{
+      height: 50px;
+      background-color: var(--google-grey-300);
+    }
+
+    #bottomLine{
+      border-bottom: 1px solid black;
+      margin-bottom: -25px;
+    }
+
+    #pib{
+      /*display: inline;*/
+      left: 48vw;
+      --paper-icon-button:{
+        width: 52px;
+        height: 52px;
+        border-radius: 40px;
+        background: var(--paper-blue-500);
+      }
+    }
+
   </style>
 
-  <div hidden$="{{_isHidden(nap)}}">
-    <steps-displayer-element id="sde" steps="{{steps}}"></steps-displayer-element>
+  <app-location route="{{routeTopLevel}}" use-hash-as-path></app-location>
+
+  <div  id="divRoot" hidden$="{{_isHidden(nap)}}">
+    <iron-collapse id="collapser" opened="{{state}}">
+      <div id="main">
+        <div id="head">
+          <div>
+            <h4>Overview of the {{nap.name}} analysis</h4> <paper-icon-button id="icon" icon="launch" on-click="_openNAP"></paper-icon-button>
+          </div>
+        </div>
+        <div id="display">
+          <steps-displayer-element id="sde" steps="{{steps}}"></steps-displayer-element>
+        </div>
+      </div>
+    </iron-collapse>
+    <div id="opener">
+      <div id="bottomLine" class$="{{_classFromState(state)}}"></div>
+    </div>
+    <paper-icon-button id="pib" icon="{{_iconDependingCollapser(state)}}" class="{{(state)}}" on-click="_toggleCollapser"></paper-icon-button>
   </div>
+
+  <paper-dialog on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="_isEditionAccepted" id="edgeEdition" modal>
+    <h2>Relation between step</h2>
+    <p>By continuing, you will be able to edit and explain the relation between the step.
+      <br/>To do so, you will leave the current page and all your unsaved change will be lost.<br/><br/>
+    Would you like to proceed?</p>
+    <div class="buttons">
+      <paper-button raised dialog-dismiss autofocus>No</paper-button>
+      <paper-button raised dialog-confirm>Yes</paper-button>
+    </div>
+  </paper-dialog>
 
 </template>
 <script>
@@ -34,6 +117,23 @@
         "_onChangedNAP(nap)",
       ],
 
+      //@HACK
+      patchOverlay: function (e) {
+        if (e.target.withBackdrop) {
+          e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
+        }
+      },
+
+
+
+      attached: function()
+      {
+        this.$.sde.addEventListener('NETWORK_CLICKED', function(p)
+        {
+          this._eventDispatcher(p.detail);
+        }.bind(this));
+      },
+
       update: function()
       {
         if(this.nap && this.nap.removeMeFromObservation)
@@ -59,6 +159,55 @@
       _isHidden: function(nap)
       {
         return this.nap == null ? true : false;
+      },
+
+      _eventDispatcher: function(params)
+      {
+        if (params.nodes.length != 0) //nodeclicked
+          {
+            this._openStep(this.nap.getStepByID(params.nodes[0]));
+          }
+          else if (params.edges.length != 0) //edgeclicked
+          {
+            this.$.edgeEdition.open();
+          }
+      },
+
+      _isEditionAccepted: function(e)
+      {
+        if(e.detail.confirmed)
+        {
+          console.error("TODO: open narrative component. Graph representation of elements related ?");
+        }
+        else
+        {
+
+        }
+      },
+
+      _openStep: function(step)
+      {
+        this.set('routeTopLevel.path', '/step/'+step.id);
+      },
+
+      _toggleCollapser: function()
+      {
+        this.$.collapser.toggle();
+      },
+
+      _iconDependingCollapser: function(state)
+      {
+        return state ? "icons:arrow-drop-up" : "icons:arrow-drop-down";
+      },
+
+      _openNAP: function()
+      {
+        this.set('routeTopLevel.path', "/analysis/"+this.nap.id);
+      },
+
+      _classFromState: function(state)
+      {
+        return state ? "onDisplayed" : "onHidden";
       },
 
     });

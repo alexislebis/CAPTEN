@@ -85,6 +85,9 @@ PreviousManager.prototype = {
 
   stack: function(item)
   {
+    if(item == null)
+      return;
+
     if(this.redirectState)
     {
       if(item && item.id != this.history[this.index].id)
@@ -94,6 +97,14 @@ PreviousManager.prototype = {
     }
     // if(this.index != -1 && this.history.length > 0)
     //   return null;//NTD since the current element is the element. Due to direct access
+
+    // === PREVENTING DOUBLE INSERTION
+    if(item.id)
+      if(this.history[this.index] && item.id == this.history[this.index].id)
+        return;
+    else if(item == this.history[this.index])
+      return;
+    //===============
 
     if(this.index == this.history.length-1)
     {

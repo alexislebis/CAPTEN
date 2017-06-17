@@ -122,6 +122,16 @@ NarratedOperator.prototype.constructor = NarratedOperator;
       return false;
     }
 
+    NarratedOperator.prototype.getStepByID= function(id)
+    {
+      if(id instanceof Step)
+        id = id.id;
+
+      for(var i in this.steps)
+        if(this.steps[i].id == id)
+          return this.steps[i];
+    }
+
     NarratedOperator.prototype.getNexts = function(step)
     {
       if(step == null)
