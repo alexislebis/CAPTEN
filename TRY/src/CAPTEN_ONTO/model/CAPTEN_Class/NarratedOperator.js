@@ -8,6 +8,7 @@ function NarratedOperator(usualName)
 
     //UPDATE from 22/09/216 : operators[] remove from IAP & become a part of an IOP
     this.steps = []; //NOT Used : Associative array : [RelationOrder]:[ListOfSteps]
+      this._lastUpdatedStep = null; //Record the last step computed
 
     this.annotation = null; //Annotation regarding the IndpOp
 
@@ -114,6 +115,12 @@ NarratedOperator.prototype.constructor = NarratedOperator;
       }
     }
 
+    NarratedOperator.prototype._stepComputed= function(step)
+    {
+      this._lastUpdatedStep = step;
+      this.notifyChange(step);
+    }
+
     NarratedOperator.prototype.alreadyExists= function(step)
     {
       for(var i in this.steps)
@@ -142,5 +149,51 @@ NarratedOperator.prototype.constructor = NarratedOperator;
         if(step.getOutputs() && this.steps[i].getInputs() && step.getOutputs().id == this.steps[i].getInputs().id)
           res.push(this.steps[i]);
       }
+      return res;
+    }
+
+    NarratedOperator.prototype.getSteps= function()
+    {
+      return this.steps;
+    }
+
+    NarratedOperator.prototype.getLastComputedStep = function()
+    {
+      return this._lastUpdatedStep;
+    }
+
+    NarratedOperator.prototype.getPositionOfStep = function(step)
+    {
+      if(step == null)
+        return;
+
+      for(var i in this.steps)
+        if(this.steps[i].id == step.id)
+          return i;
+
+      return null;
+    }
+
+    NarratedOperator.prototype.getPreviousStepsTo = function(step)
+    {
+      if(step == null || step.getInputs() == null || step.getOutputs() == null)
+        return null;
+
+      var res = [];
+
+      for(var i in this.steps)
+      {
+        if(this.steps[i].getOutputs() && this.steps[i].getOutputs().id == step.getInputs().id)
+        {
+          var tmp = this.getPreviousStepsTo(this.steps[i]);
+
+          if(tmp)
+            for(var j in tmp)
+              res.push(tmp[j]);
+
+          res.push(this.steps[i]);
+        }
+      }
+
       return res;
     }

@@ -53,9 +53,11 @@
           <paper-icon-button id="stepRGTEpib" icon="expand-more"></paper-icon-button>
         </div>
       </header>
-      <template id="repeaterRelated" is="dom-repeat" items="{{rgteRelated}}" index-as="index" restamp>
-          <rgte-inline-displayer-element enable-use="{{enableUse}}" rgte="{{item}}"><rgte-inline-displayer-element>
-      </template>
+      <iron-collapse id="collapseRG">
+        <template id="repeaterRelated" is="dom-repeat" items="{{rgteRelated}}" index-as="index" restamp>
+            <rgte-inline-displayer-element enable-use="{{enableUse}}" rgte="{{item.rgte}}" specificity="{{item.specificity}}" from="{{item.producedIn}}" from-position="{{item.position}}"><rgte-inline-displayer-element>
+        </template>
+      </iron-collapse>
     </div>
 
     <div id="normal">
@@ -93,6 +95,16 @@
       is: 'rgte-search-element',
 
       properties:{
+        currentNapStep:
+        {
+          type: Object,
+          notify: true,
+        },
+        nap:
+        {
+          type: Object,
+          notify: true,
+        },
         rgteArray:
         {
           type: Object,
@@ -117,9 +129,9 @@
         }
       },
 
-      // observers: [
-      //   "_onRouteChanged(route)",
-      // ],
+      observers: [
+        "_onNAPChanged(nap)",
+      ],
 
       _openNew: function()
       {
@@ -157,6 +169,9 @@
 
         for(var i = 0; i < a.length; i++)
           this.push("rgteArray", a[i]);
+
+
+        this._updatedRelatedArray();
 
       },
 
@@ -200,12 +215,56 @@
       },
       _toggleCollapseStepRGTE: function()
       {
-        this.$.collapsePS.toggle();
-        if(this.$.collapsePS.opened)
+        this.$.collapseRG.toggle();
+        if(this.$.collapseRG.opened)
           this.$.stepRGTEpib.setAttribute('icon', 'icons:expand-less');
         else
           this.$.stepRGTEpib.setAttribute('icon', 'icons:expand-more');
-      }
+      },
+
+      _onNAPChanged: function(nap)
+      {
+        this._updatedRelatedArray();
+      },
+
+      _updatedRelatedArray: function()
+      {
+        if(this.nap == null)
+          return;
+
+        var res = [];
+
+        var firstsRGTE = this.nap.getExpectedConcepts();
+
+        var lastProduction = this.nap.getLastComputedStep();
+
+        if(this.currentNapStep == null || (!this.currentNapStep.isComplete() || !this.nap.alreadyExists(this.currentNapStep)) )
+          var tmp = this.nap.getSteps();
+        else
+          var tmp = this.nap.getPreviousStepsTo(this.currentNapStep);
+
+        if(firstsRGTE)
+          res.push({rgte: firstsRGTE, producedIn: "None", position: "Initial", specificity: "INITIAL_CONCEPTS_NAP"});
+
+          for(var i in tmp)
+          {
+            if(lastProduction && lastProduction.isComplete())
+            {
+              if(tmp[i] && tmp[i].isComplete() && tmp[i].getOutputs().id != lastProduction.id)
+              {
+                res.push({rgte: tmp[i].getOutputs(), producedIn: tmp[i], position: this.nap.getPositionOfStep(tmp[i]), specificity: "PRODUCED_IN_NAP" });
+              }
+            }
+            else if(tmp[i] && tmp[i].getOutputs())
+              res.push({rgte: tmp[i].getOutputs(), producedIn: tmp[i], position: this.nap.getPositionOfStep(tmp[i]), specificity: "PRODUCED_IN_NAP" });
+          }
+
+        if(lastProduction)
+          res.push({rgte: lastProduction.getOutputs(), producedIn: lastProduction, position: this.nap.getPositionOfStep(lastProduction), specificity: "LAST_IN_NAP"});
+
+        this.rgteRelated = null;
+        this.set('rgteRelated', res);
+      },
 
     });
   </script>

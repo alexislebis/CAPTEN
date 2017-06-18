@@ -174,7 +174,7 @@
                            exit-animation='slide-right-animation'>
 
              <neon-animatable name='searchInput'>
-               <rgte-search-element id="rsei" enable-rewind="{{_computeRewindAuthorized(input)}}" enable-use="true"></rgte-search-element>
+               <rgte-search-element id="rsei" nap="{{nap}}" current-nap-step="{{step}}" enable-rewind="{{_computeRewindAuthorized(input)}}" enable-use="true"></rgte-search-element>
              </neon-animatable>
              <neon-animatable name='inputZone'>
                <rgte-workzone-element id="rwei" rgte="{{input}}" colorization="{{inputsColor}}" disable-edit disable-search disable-knowledge

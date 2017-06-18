@@ -91,6 +91,22 @@ var PREVENT_REDUDANCY_OBSERVATION = function(elmInstance, observersArray)
   return true;
 };
 
+// === TRANSLATER FOR NAP SPECIFICITY (LIKE INITIAL Step)
+var TRANSLATE_NAP_SPECIFICITY = function(spec, position)
+{
+  switch(spec)
+  {
+    case "INITIAL_CONCEPTS_NAP":
+      return "Part of the initial concepts required for the analysis";
+    case "LAST_IN_NAP":
+      return "The last expected concepts you produced";
+    case "PRODUCED_IN_NAP":
+      return position != null ? "Concepts produced in the analysis" : "Concepts produced in the "+position+" step of the analysis";
+    default:
+      return;
+  }
+}
+
 
 // === COLORS
   var KNOWLEDGE_COLOR = "#57bb8a";

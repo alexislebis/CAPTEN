@@ -101,11 +101,12 @@
 
               <div class="pad">
                 <div class="primary">[[rgte.usualName]] [[rgte.nodes.length]]</div>
-                <div class="shortText">Graph of concept</div>
+                <div class="shortText">{{_computeShortText(specificity)}}</div>
                 <div class="longText">
                   <p id="launchOp" class$="item" hidden$="{{!enableUse}}">
                     <paper-icon-button icon="launch" on-click="_openOperator"></paper-icon-button>
                   </p>
+                  <p hidden$="_computeHiddenFromStep(from)"><iron-icon icon="maps:place">step</iron-icon>{{_getNameFrom(from)}} step</p>
                   <p><iron-icon icon="icons:explore">objectif</iron-icon></p>
                   <p><iron-icon icon="account-circle" class="icon">account-circle</iron-icon> {{rgte.author.authorName}}</p>
                   <p><iron-icon icon="event" class="icon">event</iron-icon> {{rgte.creationDate}}</p>
@@ -158,6 +159,22 @@ Polymer({
     {
       type: Boolean,
       value: false,
+      notify: true,
+    },
+
+    specificity:
+    {
+      type: String,
+      notify: true,
+    },
+    from:
+    {
+      type: Object,
+      notify: true,
+    },
+    fromPosition:
+    {
+      type: Number,
       notify: true,
     },
   },
@@ -225,6 +242,34 @@ Polymer({
   {
     // FIXME when selection will be managed by the operators-lister-element on the dom-repeat, use : return isSelected ? "add-circle" : "radio-button-unchecked";
     return "add-circle";
+  },
+
+  _computeShortText: function(spec)
+  {
+    switch(spec)
+    {
+      case "INITIAL_CONCEPTS_NAP":
+        return TRANSLATE_NAP_SPECIFICITY("INITIAL_CONCEPTS_NAP");
+      case "PRODUCED_IN_NAP":
+        return TRANSLATE_NAP_SPECIFICITY("PRODUCED_IN_NAP", this.fromPosition);
+      case "LAST_IN_NAP":
+        return TRANSLATE_NAP_SPECIFICITY('LAST_IN_NAP');
+      default:
+        return "Graph of concept";
+    }
+  },
+
+  _computeHiddenFromStep: function(from)
+  {
+    if(from == null || !(from instanceof Step))
+      return true;
+    return false;
+  },
+
+  _getNameFrom: function(from)
+  {
+    if(from && from.getName)
+      return from.getName();
   },
 
 });
