@@ -64,6 +64,39 @@ NarrativeBlockPool.prototype =
 
       return null;
     },
+
+    addElementFor(src, newElm, prop)//Override the from and the to of the prop
+    {
+      if(src == null || newElm == null)
+        return;
+
+      var narrativeBlock = this.getNarrativeBlockForID(src.id);
+
+      if(narrativeBlock == null)
+      {
+        console.log('Their is no narrative block registered for the element#'+src.id+' inside the narrative block pool. Registering...');
+        narrativeBlock = NARRATIVE_BLOCK_POOL.createFromElement(src);
+        console.log('done. Registered in block#'+narrativeBlock.id);
+      }
+
+      var props = PROPERTIES_POOL.getPropertiesByExtremities(src.id, newElm.id);
+
+      if(props.length <= 0)
+      {
+        console.log('the relation between the step and the name is not referenced in the pool. Referencing...');
+        var newProp = PROPERTIES_POOL.create(prop.uri, prop.label, this.id, newElm.id, prop.additionalConstraints);
+        console.log('done.');
+      }
+      else
+      {
+        //already exist
+        return;
+      }
+
+      narrativeBlock.addElement(newElm, prop);
+
+      return {block: narrativeBlock, elm: newElm, prop: prop};
+    },
 }
 
 NarrativeBlockPool.prototype.listCompilantNarrativeBlockProperties =

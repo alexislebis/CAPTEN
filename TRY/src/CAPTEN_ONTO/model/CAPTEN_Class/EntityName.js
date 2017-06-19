@@ -6,6 +6,9 @@
 {
   NarrativeElement.call(this);
   this.name = name;
+
+  this.uri = "http://xmlns.com/foaf/0.1/name"; //Imply to be a thing
+
 }
 
 EntityName.prototype = new NarrativeElement();
@@ -21,7 +24,21 @@ EntityName.prototype.isEmpty = function()
   if(this.name)
     return false;
   return true;
-},
+}
+
+EntityName.prototype.updateAttribute = function(attr, value)
+{
+  switch (attr)
+  {
+    case "name":
+      this.setName(value);
+      break;
+    default:
+      break;
+  }
+  return;
+}
+
 // === POLYMER ELEMENT
   // === NAMER ELEMENT
   EntityName.namerElement = Polymer(

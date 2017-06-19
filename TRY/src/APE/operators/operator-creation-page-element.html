@@ -742,7 +742,7 @@
             // === PRIVATE METHODS
             _onNopNameChange: function(change)
             {
-              this.nop.usualName = this.nopname;
+              this.nop.setName(this.nopname);
 
               if(!this.isNew) //if the operation is not new, then it is not concerned about pool referencing
                 return;
@@ -800,7 +800,7 @@
                 this.nopoutputrgte = this.nop.behaviors['output'];
                 this.nopinputrgte = this.nop.behaviors['input'];
 
-              this.nopname = this.nop.usualName;
+              this.nopname = this.nop.getName();
 
               //@TODO handle narrative element for NOP
               console.error("HANDLE NARRATIION FOR BLOCKS ATTRs");
@@ -949,7 +949,7 @@
             {
               var nop = new NarratedOperator();
 
-              nop.usualName = this.nopname;
+              nop.setName(this.nopname);
               nop.uri = this.nopname;
               nop.uriConceptConvoyed = this.nopconceptconvoyed1; //TODO array of uri concepts
               // nop.annotation = [];

@@ -22,6 +22,7 @@ function NarrativeBlock()
   this.observers = [];
   this.elements = [];
 
+  this.entity = null; //V2 update. direct reference to the entity
   this.propertyEntity = null; //the property linking this with the entity. Used for verif if an element share the same entity
 }
 
@@ -57,12 +58,13 @@ NarrativeBlock.prototype = {
   },
 
 // === NARRATIVE_BLOCK FUNCTION
-  configure: function(property)
+  configure: function(property, elmt)
   {
-    if(property == null)
-      return;
+    if(property && property instanceof Property)
+      this.propertyEntity = property;
 
-    this.propertyEntity = property;
+    if(elmt)
+      this.entity = elmt;
   },
 
   getLength: function()
@@ -72,7 +74,7 @@ NarrativeBlock.prototype = {
 
   getOrigin: function()
   {
-    return this.propertyEntity.from;
+    return this.entity;
   },
 
   getElementById: function(id)
@@ -148,6 +150,39 @@ NarrativeBlock.prototype = {
       return;
 
     return props[0];
+  },
+
+  getElementsFromURIProperty: function(uri)
+  {
+    var tmp = null;
+    var res = [];
+
+    for(var i in this.elements)
+    {
+      tmp = PROPERTIES_POOL.getPropertiesByExtremities(this.propertyEntity.from, this.elements[i].id);
+      if(tmp && tmp.uri == uri)
+        res.push(tmp);
+    }
+
+    return res;
+  },
+
+  updateElmtAttribute: function(elmt, attr, value)
+  {
+    if(elmt == null || attr == null)
+      return;
+
+    var res = this.getElementById(elmt.id);
+
+    if(res == null)
+      return;
+
+    if(res.updateAttribute) // In prevision of overriding function
+      res.updateAttribute(attr, value);
+    else
+      res[attr] = value;
+
+    return res;
   },
 
 };

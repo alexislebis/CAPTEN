@@ -2,16 +2,23 @@ function Step() {
     CAPTENClass.call(this);
     //this.previousStep = null;//FIXME PreviousStep est pointée par la propriété hasPrevious. Si elle existe
 
+    // === PREDEFINED NARRATIVE ELEMENT
+      // === NAME
+        var elmt = new EntityName();
+        var prop = new Property(HAS_NAME_URI, URI_TO_LABEL(HAS_NAME_URI) ,this.id, elmt.id);
+        var res = NARRATIVE_BLOCK_POOL.addElementFor(this, elmt, prop);
+        this.name = elmt; //The name of the step //WARNING potential conflict
+
     //this.annotation = null;//FIXME needed ?
     this.objective = null;
     this.settings = null; //At the difference to Indp.Op.specificSettings, it concerns all the settings needed for the step. not for the IndOp running.
+
+
     //The union of Indep.Op.specificSettings with this.settings constitute the whole --isConfiguredBy-->Setting of the ontology
     this.operator = null;
     this.inputs = null; //[RGTE]. It is actually see as a Union of the different inputs
     this.outputs = null;
     this.relationOrder = null; //Integer. Representing the place of this in the IAP.
-
-    this.name = null; //The name of the step //WARNING potential conflict
 
     this.context = null; //TODO define CONTEXT notion
     this.treatmentType = null;
@@ -554,57 +561,69 @@ Step.prototype.constructor = Step;
     if(name == null)
       return;
 
-    if(name.id == null)
-    {
-      console.error('content must have an id');
-      return null;
-    }
+    if(this.narrativeBlock == null)
+      this.narrativeBlock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
 
-    if(!(name instanceof EntityName))
-    {
-      console.error('content must be an EntityName');
-      return null;
-    }
+    if(this.name == null)
+      this.name = this.narrativeBlock.getElementsFromURIProperty(HAS_NAME_URI);
 
-    var narrativeblock = null;
-    if(this.name)//If a name already exist, it must be replaced
-    {
-      narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    if(this.name == null) //after the second if still null abort, some issue
+      return;
 
-      if(narrativeblock == null)
-      {
-        console.log('A narrative block should be present. Aborting...');
-        return;
-      }
+    this.name.updateAttribute('name', name);
 
-      narrativeblock.removeElement(this.name);
-    }
-
-    narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
-    if(narrativeblock == null)
-    {
-      console.log('Their is no narrative block registered for the element#'+this.id+' inside the narrative block pool. Registering...');
-      narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this);
-      console.log('done. Registered in block#'+narrativeblock.id);
-    }
-
-    var props = PROPERTIES_POOL.getPropertiesByExtremities(this.id, name.id);
-    var prop = null;
-
-    if(props.length <= 0)
-    {
-      console.log('the relation between the step and the name is not referenced in the pool. Referencing...');
-      prop = PROPERTIES_POOL.create(HAS_NAME_URI, URI_TO_LABEL(HAS_NAME_URI) ,this.id, name.id);
-      console.log('done.');
-    }
-    else
-      prop = props[0];
-
-    console.log(narrativeblock);
-    narrativeblock.addElement(name, prop);//Adding the new addendum inside the corresponding narrative block
-
-    this.name = name;
-    // this.label = this.name;//By default, the label name of the step is its name
+    NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    // if(name.id == null)
+    // {
+    //   console.error('content must have an id');
+    //   return null;
+    // }
+    //
+    // if(!(name instanceof EntityName))
+    // {
+    //   console.error('content must be an EntityName');
+    //   return null;
+    // }
+    //
+    // var narrativeblock = null;
+    // if(this.name)//If a name already exist, it must be replaced
+    // {
+    //   narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    //
+    //   if(narrativeblock == null)
+    //   {
+    //     console.log('A narrative block should be present. Aborting...');
+    //     return;
+    //   }
+    //
+    //   narrativeblock.removeElement(this.name);
+    // }
+    //
+    // narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    // if(narrativeblock == null)
+    // {
+    //   console.log('Their is no narrative block registered for the element#'+this.id+' inside the narrative block pool. Registering...');
+    //   narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this);
+    //   console.log('done. Registered in block#'+narrativeblock.id);
+    // }
+    //
+    // var props = PROPERTIES_POOL.getPropertiesByExtremities(this.id, name.id);
+    // var prop = null;
+    //
+    // if(props.length <= 0)
+    // {
+    //   console.log('the relation between the step and the name is not referenced in the pool. Referencing...');
+    //   prop = PROPERTIES_POOL.create(HAS_NAME_URI, URI_TO_LABEL(HAS_NAME_URI) ,this.id, name.id);
+    //   console.log('done.');
+    // }
+    // else
+    //   prop = props[0];
+    //
+    // console.log(narrativeblock);
+    // narrativeblock.addElement(name, prop);//Adding the new addendum inside the corresponding narrative block
+    //
+    // this.name = name;
+    // // this.label = this.name;//By default, the label name of the step is its name
   }
 
   Step.prototype.getName = function()

@@ -34,6 +34,9 @@ function CAPTENClass(uri, label, properties)
     // Keep a link with the instance of the same class which was used to produce this
     // copy function MUST DEFINE this.derivedFrom attribute.
       this.derivedFrom = null;
+
+  // === NARRATIVE_INFORMATION
+    this.narrativeBlock = NARRATIVE_BLOCK_POOL.createFromElement(this); //All captenclasses are by default associated with a narrative block
 }
 
 CAPTENClass.id = 0;

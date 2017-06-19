@@ -19,7 +19,7 @@
 
     <template id="repeater" is="dom-repeat" items="{{steps}}" index-as="index">
       <div class="card">
-        <step-card-element step="[[item]]" belongs-to="{{nap.name}}" is-start="_computeStartPosition(item)" position="{{index}}" to-stack="{{nap}}"></step-card-element>
+        <step-card-element step="[[item]]" belongs-to="{{_getNAPName(nap)}}" is-start="_computeStartPosition(item)" position="{{index}}" to-stack="{{nap}}"></step-card-element>
       </div>
     </template>
 
@@ -103,6 +103,13 @@
             return true;
 
         return false;
+      },
+
+      _getNAPName: function(nap)
+      {
+        if(nap == null)
+          return;
+        return this.nap.getName();
       },
 
 

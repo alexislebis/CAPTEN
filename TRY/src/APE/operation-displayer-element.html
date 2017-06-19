@@ -227,12 +227,7 @@ Polymer({
 
   _getName: function(operation)
   {
-    console.error("REDO when name become narrative");
-
-    if(operation instanceof NarratedAnalysisProcess)
-      return operation.name;
-
-    return operation.usualName;
+    return operation.getName();
   },
 
   _onSelected: function(selected)

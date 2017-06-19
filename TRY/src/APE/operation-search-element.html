@@ -185,16 +185,23 @@
             if(item == null)
               return;
 
-            var behavior = (item instanceof NarratedOperator) ? 0 : 1;
+            // var behavior = (item instanceof NarratedOperator) ? 0 : 1;
 
-            if(behavior == 0)
-            {
-              return (item.usualName.toLowerCase().includes(query));
-            }
-            else
-            {
-              return (item.name.toLowerCase().includes(query));
-            }
+            var name = item.getName();
+
+            if(name == null)
+             return false;
+
+            return name.toLowerCase().includes(query);
+            //
+            // if(behavior == 0)
+            // {
+            //   return (item.getName().toLowerCase().includes(query));
+            // }
+            // else
+            // {
+            //   return (item.getName().toLowerCase().includes(query));
+            // }
           };
         }
       },

@@ -3,7 +3,13 @@ function NarratedOperator(usualName)
 
     CAPTENClass.call(this);
 
-    this.usualName = usualName;
+    // === PREDEFINED NARRATIVE ELEMENTS
+      // === NAME
+      var elmt = new EntityName(usualName);
+      var prop = new Property(HAS_NAME_URI, URI_TO_LABEL(HAS_NAME_URI) ,this.id, elmt.id);
+      var res = NARRATIVE_BLOCK_POOL.addElementFor(this, elmt, prop);
+      this.usualName = elmt;
+
     this.uriConceptConvoyed = null; //Allow to have a dictionary of the different concept of operation. Comme *Find* et *Correlation*
 
     //UPDATE from 22/09/216 : operators[] remove from IAP & become a part of an IOP
@@ -196,4 +202,30 @@ NarratedOperator.prototype.constructor = NarratedOperator;
       }
 
       return res;
+    }
+
+    NarratedOperator.prototype.setName = function(name)
+    {
+      if(name == null)
+        return;
+
+      if(this.narrativeBlock == null)
+        this.narrativeBlock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+
+      if(this.usualName == null)
+        this.usualName = this.narrativeBlock.getElementsFromURIProperty(HAS_NAME_URI);
+
+      if(this.usualName == null) //after the second if still null abort, some issue
+        return;
+
+      this.usualName.updateAttribute('name', name);
+
+      NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    }
+
+    NarratedOperator.prototype.getName = function()
+    {
+      if(this.usualName == null || !(this.usualName instanceof EntityName) )
+        return;
+      return this.usualName.name;
     }
