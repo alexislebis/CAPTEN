@@ -5,10 +5,17 @@ function NarratedOperator(usualName)
 
     // === PREDEFINED NARRATIVE ELEMENTS
       // === NAME
-      var elmt = new EntityName(usualName);
-      var prop = new Property(HAS_NAME_URI, URI_TO_LABEL(HAS_NAME_URI) ,this.id, elmt.id);
-      var res = NARRATIVE_BLOCK_POOL.addElementFor(this, elmt, prop);
-      this.usualName = elmt;
+        var elmt = new EntityName(usualName);
+        var prop = new Property(HAS_NAME_URI, URI_TO_LABEL(HAS_NAME_URI) ,this.id, elmt.id);
+        var res = NARRATIVE_BLOCK_POOL.addElementFor(this, elmt, prop);
+        this.usualName = elmt;
+
+      // === OBJECTIVE
+        // objective is not stored directly within the nop/nap, instead, the nblck for the nop/nap stores this info
+        elmt = new Objective();
+        prop = new Property(HAS_OBJECTIVE_URI, URI_TO_LABEL(HAS_OBJECTIVE_URI), this.id, elmt.id);
+        res = NARRATIVE_BLOCK_POOL.addElementFor(this, elmt, prop);
+        // this.objective = elmt;
 
     this.uriConceptConvoyed = null; //Allow to have a dictionary of the different concept of operation. Comme *Find* et *Correlation*
 
@@ -18,8 +25,6 @@ function NarratedOperator(usualName)
 
     this.annotation = null; //Annotation regarding the IndpOp
 
-
-    this.objective = null;
 
     //Behavoural Patterns
     // this.inputPatterns = null; //Inputs RGTE pattern needed

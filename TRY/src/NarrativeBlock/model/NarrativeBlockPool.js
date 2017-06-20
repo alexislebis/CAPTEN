@@ -97,6 +97,16 @@ NarrativeBlockPool.prototype =
 
       return {block: narrativeBlock, elm: newElm, prop: prop};
     },
+
+    getElementsOfOneTypeFor(elmt, uriType)
+    {
+      var res = this.getNarrativeBlockForID(elmt);
+
+      if(res == null)
+        return;
+
+      return res.getElementsFromURIProperty(uriType);
+    },
 }
 
 NarrativeBlockPool.prototype.listCompilantNarrativeBlockProperties =

@@ -6,7 +6,16 @@
 
 function RGTE(){
 
-  this.id = CAPTEN.ID++;
+  this.id = CAPTEN.ID++; // DO NOT DELETE. IT IS NOT A CAPTEN CLASS CURRENTLY
+
+  // === PREDEFINED NARRATIVE ELEMENT
+    // === NAME
+      var elmt = new EntityName();
+      var prop = new Property(HAS_NAME_URI, URI_TO_LABEL(HAS_NAME_URI) ,this.id, elmt.id);
+      var res = NARRATIVE_BLOCK_POOL.addElementFor(this, elmt, prop);
+      this.NarrativeBlock = res.block;
+      this.name = elmt; //The name of the step //WARNING potential conflict
+
 
   this.observers = [];
 

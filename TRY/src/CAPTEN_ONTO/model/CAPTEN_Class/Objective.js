@@ -7,19 +7,33 @@ function Objective ()
     {subClasses:{}, name: 'Adaptation', uri: 'NAU'},
   ];
 
-  this.htmlify = "an objective"
+  this.content = null;
+  this.htmlify = "an objective";
   this.addendum = []; //TODO Add addendum to objective
 }
 
 Objective.prototype = new CAPTENClass();
 Objective.prototype.constructor = Objective;
 
+Objective.prototype.updateElement = function(content)
+{
+  if(content == null)
+    return;
+
+  this.content = content;
+}
+
+Objective.prototype.getContent = function()
+{
+  return this.content;
+}
+
 Objective.prototype.isEmpty = function()
 {
   if(this.addendum == null || this.addendum.length == 0)
     return true;
   return false;
-},
+}
 
 Objective.prototype.addAddendum = function(content)
 {

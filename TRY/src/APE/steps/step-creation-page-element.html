@@ -719,6 +719,24 @@
         this.output = this.step.outputs;
         this.outputSection = "outputZone";
 
+        if(this.isNew)
+        {
+          if(this.nap != null)
+          {
+            var res = this.nap.addStep(this.step); //res NULL shouldn't be
+
+            if(res == null)
+              console.error("The step already exists and couldn't be added");
+            else
+              this.$.StepRegisteredWithinNAP.open();
+          }
+          else {
+            console.error("Currently, no independent pool of steps is managed. Aborting");
+            return;
+          }
+          this.isNew = false;
+        }
+
         this._isNextable();
       },
 
@@ -796,7 +814,12 @@
         if(step)
           this.set('routeTopLevel.path', '/step/'+step.id);
         else
-          this.set('routeTopLevel.path', '/step/new');
+        {
+          if(!window.location.href.includes('/step/new'))
+            this.set('routeTopLevel.path', '/step/new');
+          else
+            this._onRouteChanged(this.route);
+        }
       },
 
 // === TOAST

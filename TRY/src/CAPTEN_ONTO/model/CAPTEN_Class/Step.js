@@ -9,6 +9,17 @@ function Step() {
         var res = NARRATIVE_BLOCK_POOL.addElementFor(this, elmt, prop);
         this.name = elmt; //The name of the step //WARNING potential conflict
 
+      // === OBJECTIVE
+        // objective is not stored directly within the step, instead, the nblck for the step stores this info
+        elmt = new Objective();
+        prop = new Property(HAS_OBJECTIVE_URI, URI_TO_LABEL(HAS_OBJECTIVE_URI), this.id, elmt.id);
+        res = NARRATIVE_BLOCK_POOL.addElementFor(this, elmt, prop);
+
+      // === CONTEXT
+        elmt = new Context();
+        prop = new Property(HAS_CONTEXT_URI, URI_TO_LABEL(HAS_CONTEXT_URI), this.id, elmt.id);
+        res = NARRATIVE_BLOCK_POOL.addElementFor(this, elmt, prop);
+        
     //this.annotation = null;//FIXME needed ?
     this.objective = null;
     this.settings = null; //At the difference to Indp.Op.specificSettings, it concerns all the settings needed for the step. not for the IndOp running.
@@ -704,57 +715,72 @@ Step.prototype.constructor = Step;
     if(objective == null)
       return;
 
-    if(objective.id == null)
-    {
-      console.error('objective must have an id');
-      return null;
-    }
+    if(this.narrativeBlock == null)
+      this.narrativeBlock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
 
-    if(!(objective instanceof Objective))
-    {
-      console.error('objective must be an Objective');
-      return null;
-    }
+    if(this.objective == null)
+      this.name = this.narrativeBlock.getElementsFromURIProperty(HAS_NAME_URI);
 
-    var narrativeblock = null;
-    if(this.objective)//If an author already exist, it must be replaced
-    {
-      narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    if(this.name == null) //after the second if still null abort, some issue
+      return;
 
-      if(narrativeblock == null)
-      {
-        console.log('A narrative block should be present. Aborting...');
-        return;
-      }
+    this.name.updateAttribute('name', name);
 
-      narrativeblock.removeElement(this.objective);
-    }
-
-    narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
-    if(narrativeblock == null)
-    {
-      console.log('Their is no narrative block registered for the element#'+this.id+' inside the narrative block pool. Registering...');
-      narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this);
-      console.log('done. Registered in block#'+narrativeblock.id);
-    }
-
-    var props = PROPERTIES_POOL.getPropertiesByExtremities(this.id, objective.id);
-    var prop = null;
-
-    if(props.length <= 0)
-    {
-      console.log('the relation between the step and the author is not referenced in the pool. Referencing...');
-      prop = PROPERTIES_POOL.create(HAS_OBJECTIVE_URI, URI_TO_LABEL(HAS_OBJECTIVE_URI),this.id, objective.id);
-      console.log('done.');
-    }
-    else
-      prop = props[0];
-
-    console.log(narrativeblock);
-    narrativeblock.addElement(objective, prop);//Adding the new addendum inside the corresponding narrative block
-
-    this.objective = objective;
-    //ADD IN NARRATIVE BLOCK AND PROPERTY POOL HAS_OBJECTIVE
+    NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    // if(objective == null)
+    //   return;
+    //
+    // if(objective.id == null)
+    // {
+    //   console.error('objective must have an id');
+    //   return null;
+    // }
+    //
+    // if(!(objective instanceof Objective))
+    // {
+    //   console.error('objective must be an Objective');
+    //   return null;
+    // }
+    //
+    // var narrativeblock = null;
+    // if(this.objective)//If an author already exist, it must be replaced
+    // {
+    //   narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    //
+    //   if(narrativeblock == null)
+    //   {
+    //     console.log('A narrative block should be present. Aborting...');
+    //     return;
+    //   }
+    //
+    //   narrativeblock.removeElement(this.objective);
+    // }
+    //
+    // narrativeblock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+    // if(narrativeblock == null)
+    // {
+    //   console.log('Their is no narrative block registered for the element#'+this.id+' inside the narrative block pool. Registering...');
+    //   narrativeblock = NARRATIVE_BLOCK_POOL.createFromElement(this);
+    //   console.log('done. Registered in block#'+narrativeblock.id);
+    // }
+    //
+    // var props = PROPERTIES_POOL.getPropertiesByExtremities(this.id, objective.id);
+    // var prop = null;
+    //
+    // if(props.length <= 0)
+    // {
+    //   console.log('the relation between the step and the author is not referenced in the pool. Referencing...');
+    //   prop = PROPERTIES_POOL.create(HAS_OBJECTIVE_URI, URI_TO_LABEL(HAS_OBJECTIVE_URI),this.id, objective.id);
+    //   console.log('done.');
+    // }
+    // else
+    //   prop = props[0];
+    //
+    // console.log(narrativeblock);
+    // narrativeblock.addElement(objective, prop);//Adding the new addendum inside the corresponding narrative block
+    //
+    // this.objective = objective;
+    // //ADD IN NARRATIVE BLOCK AND PROPERTY POOL HAS_OBJECTIVE
   }
 
   Step.prototype.setContext = function(context)
