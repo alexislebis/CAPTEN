@@ -157,8 +157,15 @@ PreviousManager.prototype = {
     this.history = [];
   },
 
-  getFirstAntichronologicalElement: function(instance)
+  getFirstAntichronologicalElement: function(instance)//If null, retrieve the first element encountered from the current position
   {
+    if(instance == null)
+    {
+      if(this.index >= 0)
+        return this.history[this.index];
+      else
+        return null;
+    }
     for(var i = this.index; i >= 0; i--)
     {
       if(this.history[i] instanceof instance)

@@ -1,0 +1,284 @@
+<dom-module id="narrative-creation-page-element">
+  <template>
+    <style include="toasty-style"></style>
+    <style>
+
+    :host{
+      --vis-element-height: 400px;
+      --rgte-common-width: 400px;
+    }
+
+    #commonInfo{
+      width: 60%;
+      margin: 0 auto;
+      background-color: DodgerBlue;
+    }
+
+    #commonInfo{
+      width: 70%;
+      margin: 0 auto;
+      background-color: DodgerBlue;
+
+    }
+
+    #commonInfo > header{
+      width: 100%;
+      text-align: center;
+      margin-bottom: 100px;
+    }
+
+    #separator{
+      width: 95%;
+      margin: 50px auto;
+      border-bottom: 1px solid black;
+    }
+
+    .miniSeparator{
+      width: 20%;
+      margin: 50px auto 0px auto;
+      border-bottom: 1px solid black;
+    }
+
+    #configurationZone{
+      width: 100%;
+    }
+
+    #configurationZone > header{
+      text-align: center;
+    }
+
+    .subConfigZone > h4{
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    #sde{
+
+      width: 60%;
+      margin: 0 auto 50px auto;
+    }
+
+    #layoutConcept{
+      background-color: green;
+      @apply(--layout-horizontal);
+      @apply(--layout-around-justified);
+    }
+
+    #concernedElements{
+      border: 1px solid black;
+    }
+
+    </style>
+
+    <app-location route="{{topLevelRoute}}" use-hash-as-path></app-location>
+
+
+    <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
+
+    <div id="divRoot">
+      <div id="commonInfo">
+        <header>
+          <h2> <span hidden$={{!isNew}}>New Narrative element</span><span hidden$="{{isNew}}">Narrative element: {{napName}}</span> for {{_getElementName(elements)}}</h2>
+          <div id="paperFabs">
+            <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
+
+          </div>
+        </header>
+
+
+        <div id="concernedElements">
+          <template is="dom-repeat" items="[[elements]]" index-as="index" on-click="_openElement">
+            [[_computeText(item)]] <paper-icon-button icon="launch"></paper-icon-button>
+          </template>
+        </div>
+
+      </div>
+
+      <paper-toast id="NAPRegistered" text='This narrated concept has been attached to {{_getElementName(elements)}}'>
+        <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
+      </paper-toast>
+
+
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: "narrative-creation-page-element",
+
+      properties:
+      {
+        narrative://this : property + elmt 'to' (not just the id) + block
+        {
+          type: Object,
+          notify: true,
+        },
+
+        elements:
+        {
+          type: Array,
+          notify: true,
+        },
+
+        route:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        isNew:
+        {
+          type: Boolean,
+          notify: true,
+          value: true,
+        },
+
+      },
+
+      observers:
+      [
+        "_onRouteChanged(route)",
+        "_onNarrativePropertyChanged(narrative.property)",
+        "_onNarrativeElementChanged(narrative.element)",
+      ],
+
+      attached: function()
+      {
+
+
+      },
+
+      // === ROUTING
+        _onRouteChanged: function(route)
+        {
+          if(route.prefix.toLowerCase() != "/narration")
+            return;
+
+          if(this.data.itemValue == null || this.data.itemValue == "" || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
+            this._generateDefaultConfig();
+          else
+          {
+            var success = this._generateSpecificConfig(this.data.itemValue);
+
+            if(!success)
+              this._generateDefaultConfig();
+          }
+
+          HISTORY_MANAGER.stack(this.item);
+          this.update();
+
+          // if(this.isNew && this.nap)
+          //   this.nap.willBeReplaced();
+          //
+          // {
+          //   var success = this._generateSpecificConfig(this.data.itemValue);
+          //
+          //   if(!success)
+          //   {
+          //     console.error("No nap found. Booting on default configuration");
+          //     this._generateDefaultConfig();
+          //   }
+          // }
+          //
+          // HISTORY_MANAGER.stack(this.nap);
+          // this.update();
+        },
+
+          _generateDefaultConfig: function()
+          {
+            this.isNew = true;
+
+            this.narrative = [{property: null, element: null, block: null}];
+
+            var from = HISTORY_MANAGER.getFirstAntichronologicalElement();
+
+            if(from == null || from.id == null)
+            {
+              alert("No built-in browsing feature. Go to the desired element, then comeback to this page");
+              console.error("ERROR; ABORTING EDITION");
+              return;
+            }
+
+            this.narrative.block = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(from.id);
+
+            if(this.narrative.block == null)
+              NARRATIVE_BLOCK_POOL.createFromElement(from.id);
+
+            this.elements = [];
+            this.set('elements', [from]);
+          },
+
+          _onNarrativePropertyChanged: function(prop)
+          {
+            console.log("oNPC to do");
+          },
+
+          _onNarrativeElementChanged: function(element)
+          {
+            console.log("oNEC to do");
+          },
+
+          _generateSpecificConfig: function(idToFind)
+          {
+            // var res = NARRATED_ANALYSIS_POOL.getByID(idToFind);
+            //
+            // if(res == null)
+            //   return false;
+            //
+            // this.isNew = false;
+            // this.nap = res;
+            // this.rgte = this.nap.expectedConcepts;
+            // return true;
+          },
+
+
+      update: function()
+      {
+
+      },
+
+      _getElementName: function(elements)
+      {
+        if(elements.length == 1)
+          return elements[0].getName();
+        else if(elements.length > 1)
+          return element.getName()+" among others";
+        else
+          return "nothing"
+      },
+
+      _openElement: function(e)
+      {
+        this.set('topLevelRoute.path', HISTORY_MANAGER._getRedirectionURL(e.model.item));
+      },
+
+      _computeText: function(item)
+      {
+        if(item == null)
+          return;
+
+        if(item.getName)
+          return item.getName();
+
+        return item.htmlify;
+      },
+
+// === TOAST
+      _goOnRelatedRWEI: function()
+      {
+        this.$.rwei._openRGTE();
+      },
+      _closeToast: function(e)
+      {
+        Polymer.dom(e).localTarget.parentElement.close();
+      },
+      _goToName: function(e)
+      {
+        window.scroll(0,0);
+        this._closeToast(e);
+        this.$.nameNAP.focus();
+      },
+
+    });
+  </script>
+</dom-module>

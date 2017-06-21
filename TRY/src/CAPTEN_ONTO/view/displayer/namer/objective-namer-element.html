@@ -8,12 +8,18 @@
     :host {
       display: block;
     }
+
+    paper-textarea{
+      width: 48vw;
+    }
     </style>
 
     <!-- {{entity.htmlify}} -->
     <div class="global">
       <div class="entity">
-        {{entity.htmlify}}
+        <paper-textarea label="Objective" value="{{content}}"></paper-textarea>
+
+        <!-- {{entity.htmlify}} -->
       </div>
       <!-- <div class="cascader">
         <narrative-block-cascader-display-element entity="{{entity}}"></narrative-block-cascader-display-element>

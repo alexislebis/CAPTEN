@@ -90,12 +90,36 @@ Objective.prototype.addAddendum = function(content)
         type: Object,
         notify: true,
       },
+
+      content:
+      {
+        type: String,
+        notify: true,
+      },
+    },
+
+    observers:
+    [
+      '_onEntityChanged(entity)',
+      '_onContentChanged(content)',
+    ],
+
+    _onEntityChanged: function(entity)
+    {
+      this.content = this.entity.getContent();
+    },
+
+    _onContentChanged: function(content)
+    {
+      this.entity.updateElement(content);
     },
 
     factoryImpl: function(item)
     {
       this.entity = item;
     },
+
+
   });
   // === END NAMER ELEMENT
   // === CONFIGURER ELEMENT

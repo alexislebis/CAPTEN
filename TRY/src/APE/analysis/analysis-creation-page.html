@@ -1,4 +1,5 @@
 <link rel="import" href="../../RTE/rgte-card-add-element.html">
+<link rel="import" href="../../NarrativeBlock/view/narrative-block-displayer-element.html">
 
 <dom-module id="analysis-creation-page">
   <template>
@@ -101,6 +102,8 @@
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius, est id ultrices lobortis, magna dolor aliquet ligula, non mollis augue turpis in nulla. Donec sit amet dui ornare, tempus nibh nec, pharetra tellus. Aliquam metus ex, convallis a tincidunt nec, tempus sit amet quam. Nullam at pellentesque tellus. Ut sollicitudin maximus lorem ac porttitor. Vivamus fringilla viverra nisl ut ultrices. Morbi aliquet sem lectus, sed malesuada velit facilisis sit amet. Donec volutpat, nunc quis ultrices aliquam, velit ante convallis purus, et malesuada mauris est accumsan magna. Vivamus nec nibh non arcu finibus posuere sed eget turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus.
             </div>
           </div>
+
+          <narrative-block-container-displayer-element item="{{nap}}" instance-to-filter="{{filter}}"></narrative-block-container-displayer-element>
 
           <div id="addNarrative">
             <paper-fab icon="add" disabled="true"></paper-fab>
@@ -244,6 +247,13 @@
           type: Object,
           notify: true,
         },
+
+        filter:
+        {
+          type: Array,
+          notify: true,
+          value: function(){return [EntityName];},
+        }
 
       },
 

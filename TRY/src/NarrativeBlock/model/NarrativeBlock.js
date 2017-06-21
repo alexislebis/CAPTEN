@@ -185,4 +185,31 @@ NarrativeBlock.prototype = {
     return res;
   },
 
+  getElementsByTag: function(tag)
+  {
+    var res = [];
+
+    for(var i in this.elements)
+    {
+      prop = PROPERTIES_POOL.getPropertiesByExtremities(this.propertyEntity.from, this.elements[i].id);
+      if(prop.length <= 0)
+        return null;
+
+      if(tag == "ALL")
+      {
+        res.push({element: this.elements[i], property: prop[0] });
+      }
+      else // tag == null or others : retrieve all untagged elements
+      {
+        if(this.elements[i].tag == null)
+        {
+          res.push({element: this.elements[i], property: prop[0]});
+        }
+      }
+
+    }
+
+    return res;
+  },
+
 };

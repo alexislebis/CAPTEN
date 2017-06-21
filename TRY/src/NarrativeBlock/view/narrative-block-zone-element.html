@@ -1,0 +1,101 @@
+<link rel="import" href="./narrative-dispatcher-element.html">
+
+<dom-module id="narrative-block-zone-element">
+  <template>
+    <style>
+    </style>
+
+<!-- Here a zone of narrative element belonging to a tag. If null : retrieve all untagged general. If All : retrieve all  -->
+    <div id="divRoot">
+      <div id="zone">
+        <template id="repeater" is="dom-repeat" items="{{arrayToDisplay}}" index-as="index" restamp>
+          <narrative-dispatcher-element element="{{item.element}}" prop="{{item.property}}"></narrative-dispatcher-element>
+        </template>
+
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: "narrative-block-zone-element",
+
+      properties:
+      {
+        item:
+        {
+          type: Object,
+          notify: true,
+        },
+        tag:
+        {
+          type: Object,
+          notify: true,
+        },
+        filtering:
+        {
+          type: Array,
+          notify: true,
+        },
+        arrayToDisplay:
+        {
+          type: Array,
+          notify: true,
+        },
+      },
+
+      observers:
+      [
+        "_onItemChanged(item)",
+      ],
+
+      _onItemChanged: function(item)
+      {
+        this.update();
+      },
+
+      update: function()
+      {
+        if(this.item == null)
+          return;
+
+        var block = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.item.id);
+
+        var res = block.getElementsByTag(this.tag);
+
+        res = this._filter(res);
+
+        this.arrayToDisplay = null;
+
+        this.set("arrayToDisplay", res);
+      },
+
+      _filter: function(array)
+      {
+        if(array == null || this.filtering == null || array.length == 0 || this.filtering.length == 0)
+          return array;
+
+        var indexToSplice = [];
+
+        for(var i in array)
+        {
+          for(var j in this.filtering)
+          {
+            if(array[i].element instanceof this.filtering[j])
+              indexToSplice.push(i);
+          }
+        }
+
+        var offset = 0;
+        for(var i in indexToSplice)
+        {
+          array.splice(i-offset,1);
+          offset++;
+        }
+
+        return array;
+      },
+
+    });
+  </script>
+</dom-module>

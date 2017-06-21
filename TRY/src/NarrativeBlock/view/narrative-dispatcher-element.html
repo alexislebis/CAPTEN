@@ -1,0 +1,186 @@
+<link rel="import" href="../../wrapper/capten-onto-namer-wrapper-element.html">
+
+<dom-module id="narrative-dispatcher-element">
+  <template>
+    <style>
+
+    #divRoot{
+      @apply(--layout-horizontal);
+      @apply(--layout-around-justified);
+    }
+    #narrativeZone{
+      @apply(--layout-horizontal);
+      @apply(--layout-around-justified);
+    }
+
+    .prop{
+      width: 20%;
+    }
+
+    .item{
+      width: 80%;
+    }
+
+    </style>
+
+    <div id="divRoot">
+      <div id="narrativeZone">
+
+      </div>
+      <div id="managingZone">
+        <paper-icon-button icon="launch" on-click="_openNarrativeElement"></paper-icon-button>
+        <div hidden$='{{!isRecursive}}'>
+          <paper-icon-button id="subNarration" on-click='_subNarrationEvent' icon="icons:speaker-notes"></paper-icon-button>
+        </div>
+        <paper-icon-button icon="delete"></paper-icon-button>
+      </div>
+    </div>
+
+  </template>
+  <script>
+  Polymer({
+    is: "narrative-dispatcher-element",
+
+    properties:
+    {
+      //the origin element. usefull for nested information. For example allow to display ORIGIN has an objective OBJECTIVE.
+      // if origin is null, then only prop + elemnt are displayed
+      origin:
+      {
+        type: Object,
+        nortify: true,
+      },
+
+      element:
+      {
+        type: Object,
+        notify: true,
+      },
+
+      prop:
+      {
+        type: Object,
+        notify: true,
+      },
+
+      isRecursive:
+      {
+        type: Boolean,
+        notify: true,
+      },
+    },
+
+    observers:
+    [
+      "_onOriginChanged(origin)",
+      "_onElementChanged(element)",
+      "_onPropChanged(prop)",
+    ],
+
+    _onOriginChanged: function(origin)
+    {
+      this.update();
+      this._attachUpdate(this.origin);
+    },
+    _onElementChanged: function(element)
+    {
+      this.update();
+      this._attachUpdate(this.element);
+    },
+
+    _onPropChanged: function(prop)
+    {
+      this.update();
+      this._attachUpdate(this.prop);
+    },
+
+    _attachUpdate: function(item)
+    {
+      if(item == null || item.registerObserverCallbackOnChange == null)
+        return;
+
+      item.registerObserverCallbackOnChange(this, this.update);
+    },
+
+    _subNarrationEvent: function()
+    {
+      // TODO
+      // this.fire()
+    },
+
+    // TODO
+    _openNarrativeElement: function()
+    {
+
+    },
+
+    update: function()
+    {
+      this._resetDisplay();
+
+      if(this.element == null || this.element.constructor == null || (this.element.constructor).namerElement == null)
+        return null;
+
+      if(this.prop == null || this.prop.constructor == null || (this.prop.constructor).namerElement == null)
+        {return null;}
+
+      var origin = null;
+      var propNamer = new (this.prop.constructor).namerElement(this.prop);
+      var elementNamer = new (this.element.constructor).namerElement(this.element);
+
+      this._elementIsRecursivelyNarrated();
+
+      // var div = document.createElement('div');
+        var subDiv0 = document.createElement('div');
+        var subDiv1 = document.createElement('div');
+        var subDiv2 = document.createElement('div');
+      subDiv1.appendChild(propNamer);
+      subDiv2.appendChild(elementNamer);
+
+      if(this.origin != null && this.origin.constructor != null && (this.origin.constructor).namerElement != null)
+      {
+        origin = new (this.origin.constructor).namerElement(this.origin);
+        subDiv0.appendChild(origin);
+        this.$$('#narrativeZone').appendChild(subDiv0);
+      }
+
+      this.$$('#narrativeZone').appendChild(subDiv1);
+      this.$$('#narrativeZone').appendChild(subDiv2);
+    },
+
+    _resetDisplay: function()
+    {
+      var root = this.$$('#narrativeZone');
+
+      if(root)
+        while(root.firstChild)
+          root.removeChild(root.firstChild);
+    },
+
+    _elementIsRecursivelyNarrated: function()
+    {
+      if(this.element == null)
+      {
+        this.set('isRecursive',false);
+        return;
+      }
+
+      var block = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.element.id);
+      if(block == null)
+      {
+        this.set('isRecursive',false);
+        return;
+      }
+
+      if(block.getLength() > 0)
+      {
+        this.set('isRecursive',true);
+        return;
+      }
+      this.set('isRecursive',false);
+    }
+
+
+  });
+  </script>
+</dom-module>

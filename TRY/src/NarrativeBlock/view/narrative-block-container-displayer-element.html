@@ -1,0 +1,79 @@
+<link rel="import" href="./narrative-block-zone-element.html">
+
+<dom-module id="narrative-block-container-displayer-element">
+  <template>
+    <style>
+
+    .center{
+      @apply(--layout-horizontal);
+      @apply(--layout-around-justified);
+    }
+
+    </style>
+
+<!-- Here a zone of narrative element belonging to a tag. If null : retrieve all untagged general. If All : retrieve all  -->
+    <div id="divRoot">
+      <div id="zone">
+        PLOP1
+        <narrative-block-zone-element id="nbzeZone" item="{{item}}" filtering="{{instanceToFilter}}"></narrative-block-zone-element>
+      </div>
+      <div class="center">
+        <p on-click="_openNewNarrativeElement">Narrate your element</p>
+      </div>
+      <div id="addNarrative" class="center">
+        <paper-fab icon="add" on-click="_openNewNarrativeElement"></paper-fab>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: "narrative-block-container-displayer-element",
+
+      properties:
+      {
+        item:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        instanceToFilter: //The type of object inside instanceToFilter will not be displayed
+        {
+          type: Array,
+          notify: true,
+        },
+      },
+
+      observers:
+      [
+        "_onItemChanged(item)",
+        "_onInstanceToFilter(instanceToFilter)",
+      ],
+
+      _onItemChanged: function(item)
+      {
+        //TODO
+        this.update();
+      },
+
+      _onInstanceToFilter: function(filter)
+      {
+        // TODO
+        this.update();
+      },
+
+      update: function()
+      {
+        this.$.nbzeZone.update();
+      },
+
+      _openNewNarrativeElement: function()
+      {
+        
+      },
+
+
+    });
+  </script>
+</dom-module>
