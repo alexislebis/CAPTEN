@@ -84,7 +84,7 @@ NarrativeBlockPool.prototype =
       if(props.length <= 0)
       {
         console.log('the relation between the step and the name is not referenced in the pool. Referencing...');
-        var newProp = PROPERTIES_POOL.create(prop.uri, prop.label, this.id, newElm.id, prop.additionalConstraints);
+        var newProp = PROPERTIES_POOL.create(prop.uri, prop.label, src.id, newElm.id, prop.additionalConstraints);
         console.log('done.');
       }
       else
