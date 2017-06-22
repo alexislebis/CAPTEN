@@ -12,6 +12,8 @@
     </style>
 
 <!-- Here a zone of narrative element belonging to a tag. If null : retrieve all untagged general. If All : retrieve all  -->
+  <app-location route="{{topLevelRoute}}" use-hash-as-path></app-location>
+
     <div id="divRoot">
       <div id="zone">
         PLOP1
@@ -70,7 +72,8 @@
 
       _openNewNarrativeElement: function()
       {
-        
+        this.fire(NEW_NARRATIVE_ELEMENT_PAGE_REQUESTED_SIGNAL_ID);
+        this.set('topLevelRoute.path', '/narration/new');
       },
 
 

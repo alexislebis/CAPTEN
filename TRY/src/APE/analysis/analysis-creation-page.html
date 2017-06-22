@@ -103,7 +103,7 @@
             </div>
           </div>
 
-          <narrative-block-container-displayer-element item="{{nap}}" instance-to-filter="{{filter}}"></narrative-block-container-displayer-element>
+          <narrative-block-container-displayer-element id="nbcde" item="{{nap}}" instance-to-filter="{{filter}}"></narrative-block-container-displayer-element>
 
           <div id="addNarrative">
             <paper-fab icon="add" disabled="true"></paper-fab>
@@ -302,6 +302,11 @@
           this._loadInputPage();
         }.bind(this));
 
+        this.$.nbcde.addEventListener(NEW_NARRATIVE_ELEMENT_PAGE_REQUESTED_SIGNAL_ID, function(e)
+        {
+          this._saveCurrent();//Must ensure that the nap is saved then
+        }.bind(this));
+
       },
 
       // === ROUTING
@@ -380,10 +385,18 @@
 
         if(name!= null && name.length >= 3)
         {
-          NARRATED_OPERATION_POOL.registerNAP(this.nap);
-          this.isNew = false;
-          this.$.NAPRegistered.open();
+          this._saveCurrent();
         }
+      },
+
+      _saveCurrent: function()
+      {
+        if(!this.isNew)
+          return;
+
+        NARRATED_OPERATION_POOL.registerNAP(this.nap);
+        this.isNew = false;
+        this.$.NAPRegistered.open();
       },
 
         _updated: function()

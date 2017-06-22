@@ -68,6 +68,30 @@
       border: 1px solid black;
     }
 
+
+
+    paper-checkbox.green {
+      align-self: center;
+      border: 1px solid var(--paper-green-200);
+      padding: 8px 16px;
+      --paper-checkbox-checked-color: var(--paper-green-500);
+      --paper-checkbox-checked-ink-color: var(--paper-green-500);
+      --paper-checkbox-unchecked-color: var(--paper-green-900);
+      --paper-checkbox-unchecked-ink-color: var(--paper-green-900);
+      --paper-checkbox-label-color: var(--paper-green-500);
+      --paper-checkbox-label-spacing: 0;
+      --paper-checkbox-margin: 8px 16px 8px 0;
+      --paper-checkbox-vertical-align: top;
+    }
+
+    paper-checkbox .subtitle {
+                display: block;
+                font-size: 0.8em;
+                margin-top: 2px;
+                max-width: 150px;
+              }
+
+
     </style>
 
     <app-location route="{{topLevelRoute}}" use-hash-as-path></app-location>
@@ -87,9 +111,27 @@
 
 
         <div id="concernedElements">
-          <template is="dom-repeat" items="[[elements]]" index-as="index" on-click="_openElement">
-            [[_computeText(item)]] <paper-icon-button icon="launch"></paper-icon-button>
+          <h4>The narration will concerned the following elements</h4>
+          <template is="dom-repeat" items="[[elements]]" index-as="index">
+            [[_computeText(item)]] <paper-icon-button on-click="_openElement" icon="launch"></paper-icon-button>
           </template>
+        </div>
+
+        <div id="narrativeElement">
+          <h4>Type of narrative element</h4>
+
+        </div>
+
+        <paper-checkbox checked>
+          Advanced configuration
+          <span class="subtitle">
+            manage the type of relation
+          </span>
+        </paper-checkbox>
+
+
+        <div id="property">
+          <h4>Kind of relation between the concerned element(s) and the narrative one</h4>
         </div>
 
       </div>
@@ -239,10 +281,18 @@
 
       _getElementName: function(elements)
       {
+        if(elements == null || elements.length < 1)
+          return "nothing";
+
+        var res = elements[0].getName();
+
+        if(res == null)
+          return "Element not named yet!";
+
         if(elements.length == 1)
-          return elements[0].getName();
+          return res;
         else if(elements.length > 1)
-          return element.getName()+" among others";
+          return res+" among others";
         else
           return "nothing"
       },
@@ -258,9 +308,10 @@
           return;
 
         if(item.getName)
-          return item.getName();
+          if(item.getName() != null)
+            return item.getName();
 
-        return item.htmlify;
+        return item.htmlify+' (this element does not have a name yet!)';
       },
 
 // === TOAST
