@@ -8,8 +8,8 @@
 <!-- Here a zone of narrative element belonging to a tag. If null : retrieve all untagged general. If All : retrieve all  -->
     <div id="divRoot">
       <div id="zone">
-        <template id="repeater" is="dom-repeat" items="{{arrayToDisplay}}" index-as="index" restamp>
-          <narrative-dispatcher-element element="{{item.element}}" prop="{{item.property}}"></narrative-dispatcher-element>
+        <template id="repeater" is="dom-repeat" items="{{arrayToDisplay}}" as="elm" index-as="index" restamp>
+          <narrative-dispatcher-element src="{{item}}" element="{{elm.element}}" prop="{{elm.property}}"></narrative-dispatcher-element>
         </template>
 
       </div>
@@ -66,6 +66,7 @@
         res = this._filter(res);
 
         this.arrayToDisplay = null;
+        this.$.repeater.render();
 
         this.set("arrayToDisplay", res);
       },

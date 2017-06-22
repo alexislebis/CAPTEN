@@ -66,7 +66,7 @@ PropertiesPool.prototype = {
   getByID: function(id)
   {
     for(var i in this.pool)
-      if(this.pool[i].id === id)
+      if(this.pool[i].id == id)
         return this.pool[i];
   },
 
@@ -75,7 +75,7 @@ PropertiesPool.prototype = {
     var index = -1;
 
     for(var i = 0; i < this.pool.length; i++)
-      if(this.pool[i] === prop)
+      if(this.pool[i] == prop)
       {
         index = i;
         this.pool[index].isRegistered = null;
@@ -93,9 +93,9 @@ PropertiesPool.prototype = {
 
     for(var i in this.pool)
     {
-      if(this.pool[i].from === extremityID)
+      if(this.pool[i].from == extremityID)
         related.push(this.pool[i]);
-      else if(this.pool[i].to === extremityID)
+      else if(this.pool[i].to == extremityID)
         related.push(this.pool[i]);
     }
 
@@ -108,7 +108,7 @@ PropertiesPool.prototype = {
 
     for(var i in this.pool)
     {
-      if(this.pool[i].from === from && this.pool[i].to === to)
+      if(this.pool[i].from == from && this.pool[i].to == to)
         related.push(this.pool[i]);
     }
 

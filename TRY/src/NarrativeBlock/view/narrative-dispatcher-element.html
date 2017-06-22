@@ -23,6 +23,9 @@
 
     </style>
 
+    <app-location route="{{topLevelRoute}}" use-hash-as-path></app-location>
+
+
     <div id="divRoot">
       <div id="narrativeZone">
 
@@ -68,6 +71,12 @@
         type: Boolean,
         notify: true,
       },
+
+      src:
+      {
+        type: Object,
+        notify: true,
+      },
     },
 
     observers:
@@ -111,7 +120,7 @@
     // TODO
     _openNarrativeElement: function()
     {
-
+      this.set('topLevelRoute.path', "/narration/"+this.src.id+"_"+this.prop.id);
     },
 
     update: function()

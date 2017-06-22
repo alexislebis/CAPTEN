@@ -72,6 +72,13 @@ NarrativeBlock.prototype = {
     return this.elements.length;
   },
 
+  getOriginID: function()
+  {
+    if(this.propertyEntity)
+      return this.propertyEntity.from;
+    return null;
+  },
+
   getOrigin: function()
   {
     return this.entity;

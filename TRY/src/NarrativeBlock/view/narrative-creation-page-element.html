@@ -1,3 +1,5 @@
+<link rel="import" href="../../../bower_components/paper-checkbox/paper-checkbox.html">
+
 <dom-module id="narrative-creation-page-element">
   <template>
     <style include="toasty-style"></style>
@@ -74,11 +76,6 @@
       align-self: center;
       border: 1px solid var(--paper-green-200);
       padding: 8px 16px;
-      --paper-checkbox-checked-color: var(--paper-green-500);
-      --paper-checkbox-checked-ink-color: var(--paper-green-500);
-      --paper-checkbox-unchecked-color: var(--paper-green-900);
-      --paper-checkbox-unchecked-ink-color: var(--paper-green-900);
-      --paper-checkbox-label-color: var(--paper-green-500);
       --paper-checkbox-label-spacing: 0;
       --paper-checkbox-margin: 8px 16px 8px 0;
       --paper-checkbox-vertical-align: top;
@@ -88,9 +85,13 @@
                 display: block;
                 font-size: 0.8em;
                 margin-top: 2px;
-                max-width: 150px;
+                max-width: 180px;
               }
 
+    #advanced{
+      @apply(--layout-horizontal);
+      @apply(--layout-around-justified);
+    }
 
     </style>
 
@@ -112,26 +113,56 @@
 
         <div id="concernedElements">
           <h4>The narration will concerned the following elements</h4>
-          <template is="dom-repeat" items="[[elements]]" index-as="index">
+          <template id="repeaterElements" is="dom-repeat" items="[[elements]]" index-as="index">
             [[_computeText(item)]] <paper-icon-button on-click="_openElement" icon="launch"></paper-icon-button>
           </template>
         </div>
 
         <div id="narrativeElement">
-          <h4>Type of narrative element</h4>
+          <h4>Type of narrative element<paper-checkbox checked="{{checkedNarrative}}" disabled>Consider existing elements</paper-checkbox></h4>
+
+          <paper-dropdown-menu label="Narrative element">
+            <paper-listbox id="listNarrativeElement" class="dropdown-content" selected="{{narrativeSelected}}">
+              <template is="dom-repeat" items="[[narrativeElements]]" index-as="index">
+                <paper-item>{{item.label}}</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
 
         </div>
 
-        <paper-checkbox checked>
-          Advanced configuration
-          <span class="subtitle">
-            manage the type of relation
-          </span>
-        </paper-checkbox>
+        <div id="advanced">
+          <paper-checkbox checked="{{checked}}">
+            Advanced configuration
+            <span class="subtitle">
+              Manage the type of the relation
+            </span>
+          </paper-checkbox>
+        </div>
 
 
-        <div id="property">
+        <div id="property" hidden$="{{!checked}}">
           <h4>Kind of relation between the concerned element(s) and the narrative one</h4>
+
+          <paper-dropdown-menu label="Narrative element">
+            <paper-listbox id="listNarrativeProperty" class="dropdown-content" selected="{{propertySelected}}">
+              <template is="dom-repeat" items="[[narrativeProperties]]" index-as="index">
+                <paper-item>{{item.label}}</paper-item>
+              </template>
+            </paper-listbox>
+          </paper-dropdown-menu>
+
+        </div>
+
+        <div id="configurerZone">
+          <h4>Configure your narrative element</h4>
+          <div id="narrativeNamer">
+
+          </div>
+        </div>
+
+        <div id="save">
+          <paper-fab icon="icons:save" disabled="{{!isSaveable}}" on-click="_save"></paper-fab>
         </div>
 
       </div>
@@ -139,6 +170,15 @@
       <paper-toast id="NAPRegistered" text='This narrated concept has been attached to {{_getElementName(elements)}}'>
         <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
       </paper-toast>
+
+      <paper-toast id="toastSaveFailed" text='Fail to save the narration'>
+        <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
+      </paper-toast>
+
+      <paper-toast id="toastSaveSuccess" text='Narration successfully created'>
+        <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
+      </paper-toast>
+
 
 
     </div>
@@ -175,6 +215,27 @@
           value: true,
         },
 
+        narrativeElements://Array of choice of narrative elements (use in the paperdown)
+        {
+          type: Array,
+          notify: true,
+        },
+        narrativeProperties:
+        {
+          type: Array,
+          notify: true,
+        },
+        narrativeSelected: //The text selected
+        {
+          type: String,
+          notify: true,
+        },
+        isSaveable:
+        {
+          type: Boolean,
+          notify: true,
+        },
+
       },
 
       observers:
@@ -182,12 +243,14 @@
         "_onRouteChanged(route)",
         "_onNarrativePropertyChanged(narrative.property)",
         "_onNarrativeElementChanged(narrative.element)",
+        "_onCheckboxNarrative(checkedNarrative)",
+        "_onNarrativeSelected(narrativeSelected)",
+        "_onPropertySelected(propertySelected)",
       ],
 
       attached: function()
       {
-
-
+        this.set('narrativeProperties', NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockProperties);
       },
 
       // === ROUTING
@@ -196,7 +259,9 @@
           if(route.prefix.toLowerCase() != "/narration")
             return;
 
-          if(this.data.itemValue == null || this.data.itemValue == "" || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
+          this._resetPage();
+
+          if(this.data.itemValue == null || this.data.itemValue == "" || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+_\D+/) != -1)
             this._generateDefaultConfig();
           else
           {
@@ -230,7 +295,10 @@
           {
             this.isNew = true;
 
-            this.narrative = [{property: null, element: null, block: null}];
+            this.narrative = [];
+            this.narrative.property = null;
+            this.narrative.element = null;
+            this.narrative.block = null;
 
             var from = HISTORY_MANAGER.getFirstAntichronologicalElement();
 
@@ -250,33 +318,211 @@
             this.set('elements', [from]);
           },
 
+          _generateSpecificConfig: function(idsToFind)//Id like: XXX_YYY . Where XXX is the entity & YYY id of prop
+          {
+            if(idsToFind == null)
+              return false;
+
+            var splitted = idsToFind.split('_');
+
+            var p = PROPERTIES_POOL.getByID(splitted[1]);
+
+            if(p == null)
+              return false;
+
+            var b = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(splitted[0]);
+
+            if(b == null)
+              return false;
+
+            if(b.getOrigin() == null)
+            {
+              alert('No entity');
+              return false;
+            }
+
+            this.narrative = [];
+            this.elements = null;
+            
+            this.$.repeaterElements.render();
+            this.set('elements', [b.getOrigin()])
+
+            this._alignDropdown(b.getElementById(p.to), p);
+
+            //
+            // this.narrative.element = b.getElementById(p.to);
+            // this.narrative.property = p;
+            // this.narrative.block = b;
+            //
+            // this.notifyPath('narrative.element');
+            // this.notifyPath('narrative.property');
+
+            this.set('narrative.element', b.getElementById(p.to));
+            this.set('narrative.property', p);
+            this.set('narrative.block', b);
+
+            this.isNew = false;
+
+            return true;
+            // this.$.
+          },
+
+          _resetPage: function()
+          {
+            this.narrative = null;
+            this.narrativeSelected = null;
+            this.propertySelected = null;
+            this.checked = false;
+            this.checkedNarrative = false;
+          },
+
           _onNarrativePropertyChanged: function(prop)
           {
-            console.log("oNPC to do");
+            this._updateSaveState();
           },
 
           _onNarrativeElementChanged: function(element)
           {
-            console.log("oNEC to do");
+            this._cleanNarrativeNamerZone();
+            this._attachElementConfigurer(element);
+            this._updateSaveState();
           },
 
-          _generateSpecificConfig: function(idToFind)
+          _updateSaveState: function()
           {
-            // var res = NARRATED_ANALYSIS_POOL.getByID(idToFind);
-            //
-            // if(res == null)
-            //   return false;
-            //
-            // this.isNew = false;
-            // this.nap = res;
-            // this.rgte = this.nap.expectedConcepts;
-            // return true;
+            if(this.narrative && this.narrative.element && this.narrative.property && this.narrative.block)
+              this.set('isSaveable', true);
+            else
+              this.set('isSaveable', false);
           },
 
+          _cleanNarrativeNamerZone : function()
+          {
+            var root = this.$$('#narrativeNamer');
+
+            if(root)
+              while(root.firstChild)
+                root.removeChild(root.firstChild);
+          },
+
+          _attachElementConfigurer: function(element)
+          {
+            if(element == null || element.constructor == null || (element.constructor).namerElement == null)
+              return null;
+
+            var elementNamer = new (element.constructor).namerElement(element);
+
+            // var div = document.createElement('div');
+              var subDiv0 = document.createElement('div');
+            subDiv0.appendChild(elementNamer);
+
+            this.$$('#narrativeNamer').appendChild(subDiv0);
+          },
+
+      _onCheckboxNarrative: function(checked)
+      {
+        if(checked)
+        {
+
+        }
+        else
+        {
+          this.narrativeElements = [];
+          this.set('narrativeElements', this._generateDefaultNarrativeElements());
+        }
+      },
+
+      _generateDefaultNarrativeElements: function()
+      {
+        return NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockEntities;
+      },
+
+      _onNarrativeSelected: function(selected) // update the configurer of the selected narrative element
+      {
+        //TODO
+          // When the possibilty to choose exisiting element, check if selected belongs to generateDefaultNarrativeElements. No need to load configurer otherwise
+        // END TODO
+        if(selected == null)
+          return;
+
+        var res = NARRATIVE_BLOCK_POOL.newInstanceDispatcher(NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockEntities[selected].label);
+
+        if(res == null)
+          return;
+
+        this.narrative.element = null;
+        this.set('narrative.element', res);
+
+        if(!this.checked || this.narrative.property == null) //If advanced configuration is not opened or that prop is null in narrative we have to record the prop
+        {
+          res = NARRATIVE_BLOCK_POOL.getDefaultPropertyFor(res);
+          // res = this._wrapperPropertyBuilder(res.uri, res.label, this.elements[0], this.narrative.element)
+          this.narrative.property = null;
+          this.set('narrative.property', res);
+          this._selectDropdownProp(res);
+        }
+      },
+
+      _onPropertySelected: function(selected)
+      {
+        if(selected == null)
+          return;
+
+        this.narrative.property = null;
+        this.set('narrative.property', new Property(NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockProperties[selected].uri, NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockProperties[selected].label));
+      },
+
+      _wrapperPropertyBuilder: function(uri, label, from, to, c)
+      {
+        return new Property(uri, label, from, to, c);
+      },
+
+      _selectDropdownProp: function(res)
+      {
+        if(res == null)
+          return;
+
+        for(var i in NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockProperties)
+        {
+          if(this.narrative.property && NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockProperties[i].uri == this.narrative.property.uri)
+          {
+            this.set('propertySelected', i);
+            return;
+          }
+        }
+      },
 
       update: function()
       {
+        this._onCheckboxNarrative(this.checkedNarrative);//use the method to update the narrativeElements array
+      },
 
+      _alignDropdown: function(elmt, prop)
+      {
+        var val = -1;
+        if(elmt)
+        {
+          console.error("WARNING, POTENTIAL DESYNCHRO WHEN BROWSING EXISTING");
+
+          for(var i in this.narrativeElements)
+          {
+            if(this.narrativeElements[i].label == elmt.constructor.name)
+            {
+              val = i;
+              break;
+            }
+          }
+
+          if(val >= 0)
+            this.$.listNarrativeElement.selected = val;
+        }
+
+        if(prop)
+        {
+          for(var i in this.narrativeProperties)
+            if(this.narrativeProperties[i].label == prop.label)
+              this.set('propertySelected', i);
+        }
       },
 
       _getElementName: function(elements)
@@ -312,6 +558,24 @@
             return item.getName();
 
         return item.htmlify+' (this element does not have a name yet!)';
+      },
+
+      _save: function()
+      {
+        if(this.narrative == null || this.narrative.property == null || this.narrative.element == null || this.narrative.block == null)
+        {
+          this.$.toastSaveFailed.open();
+          return;
+        }
+
+        if(this.elements == null || this.elements < 1)
+        {
+          console.error("ELEMENTS error! Should rework the array in a standard elements!!");
+        }
+
+        NARRATIVE_BLOCK_POOL.addElementFor(this.elements[0], this.narrative.element, this.narrative.property);
+
+        this.$.toastSaveSuccess.open();
       },
 
 // === TOAST

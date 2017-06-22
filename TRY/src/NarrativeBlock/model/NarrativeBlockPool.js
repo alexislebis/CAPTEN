@@ -31,12 +31,26 @@ NarrativeBlockPool.prototype =
       var block = new NarrativeBlock();
       var prop = PROPERTIES_POOL.create(NARRATIVE_BLOCK_URI,"hasNarrativeBlock",elem.id, block.id);
 
-      block.configure(prop);
+      block.configure(prop, elem);
 
       this.pool.push(block);
       this.pool[this.pool.length-1].position = NarrativeBlock.POSITION++;
 
       return block;
+    },
+
+    createFull: function(prop, elem)
+    {
+      if(elem == null || elem.id == null)
+        return null;
+
+        var block = new NarrativeBlock();
+        block.configure(prop, elem);
+
+        this.pool.push(block);
+        this.pool[this.pool.length-1].position = NarrativeBlock.POSITION++;
+
+        return block;
     },
 
 
@@ -113,12 +127,42 @@ NarrativeBlockPool.prototype.listCompilantNarrativeBlockProperties =
          [
             {uri: 'isJustifiedBy', label: 'isJustifiedBy'},
             {uri: 'sctfStmt', label: "ScientificHaecceity"},
+            {uri: HAS_OBJECTIVE_URI, label: URI_TO_LABEL(HAS_OBJECTIVE_URI)},
+            {uri: HAS_HYPOTHESIS_URI, label: URI_TO_LABEL(HAS_HYPOTHESIS_URI)},
+            {uri: HAS_DESCRIPTION_URI, label: URI_TO_LABEL(HAS_DESCRIPTION_URI)},
          ];
 
 NarrativeBlockPool.prototype.listCompilantNarrativeBlockEntities =
         [
           {uri: '#hypothesis', label:'Hypothesis'},
           {uri: '#description', label: 'Description'},
+          {uri: '#objective', label: 'Objective'},
         ];
+
+NarrativeBlockPool.prototype.newInstanceDispatcher = function(instanceName)
+{
+  switch(instanceName)
+  {
+    case "Hypothesis":
+      return new Hypothesis();
+    case "Description":
+      return new Description();
+    case "Objective":
+      return new Objective();
+    default:
+      return null;
+  }
+}
+
+NarrativeBlockPool.prototype.getDefaultPropertyFor= function(item)//Not register property in the pool here
+{
+
+  if(item instanceof Hypothesis)
+    return new Property(HAS_HYPOTHESIS_URI, URI_TO_LABEL(HAS_HYPOTHESIS_URI));
+  if(item instanceof Description)
+    return new Property(HAS_DESCRIPTION_URI, URI_TO_LABEL(HAS_DESCRIPTION_URI));
+  if(item instanceof Objective)
+    return new Property(HAS_OBJECTIVE_URI, URI_TO_LABEL(HAS_OBJECTIVE_URI));
+}
 
  var NARRATIVE_BLOCK_POOL = new NarrativeBlockPool();
