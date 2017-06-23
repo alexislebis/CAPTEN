@@ -169,32 +169,49 @@
 
             addNodesAndEdges: function(n, e, colors)
             {
-              this.nodes = n;
+              // this.nodes = n;
               this.edges = e;
 
               console.log(this.edges);
               console.log(this.network);
-              this.dataSet = new vis.DataSet();
+              // this.dataSet = new vis.DataSet();
 
-              for(var i in this.nodes)
-                this.dataSet.add(this.nodes[i]);
-
-              if(colors != null)
+              // for(var i in this.nodes)
+              //   this.dataSet.add(this.nodes[i]);
+              this.nodes = []; var color = null;
+              for(var i in n)
               {
-                for(var i in colors)
+                this.nodes.push({id: n[i].id, label: n[i].label});
+              }
+
+              for(var j in colors)
+              {
+                for(var i in this.nodes)
                 {
-                  var node = this.dataSet.get(colors[i].id);
-                  if(node != null)
+                  if(this.nodes[i].id == colors[j].id)
                   {
-                    node.color = colors[i].color;
-                    this.dataSet.update(node);
+                    this.nodes[i].color = colors[j].color;
+                    break;
                   }
                 }
               }
 
+              // if(colors != null)
+              // {
+              //   for(var i in colors)
+              //   {
+              //     var node = this.dataSet.get(colors[i].id);
+              //     if(node != null)
+              //     {
+              //       node.color = colors[i].color;
+              //       this.dataSet.update(node);
+              //     }
+              //   }
+              // }
+
               this.network.setData(
                 {
-                  nodes: this.dataSet,
+                  nodes: this.nodes,
                   edges: this.edges,
                 }
               );

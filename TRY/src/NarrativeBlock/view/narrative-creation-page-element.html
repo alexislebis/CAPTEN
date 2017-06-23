@@ -261,15 +261,21 @@
 
           this._resetPage();
 
-          if(this.data.itemValue == null || this.data.itemValue == "" || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+_\D+/) != -1)
+          if(this.data.itemValue == null || this.data.itemValue == "" || this.data.itemValue.toLowerCase() == 'new')
             this._generateDefaultConfig();
-          else
+          else if( this.data.itemValue.search(/\d+_\d+/) != -1)
           {
             var success = this._generateSpecificConfig(this.data.itemValue);
 
             if(!success)
               this._generateDefaultConfig();
           }
+          else if(this.data.itemValue.search(/\d+/) != -1 && this.data.itemValue.search(/\D+/) == -1)
+          {
+            this._generateDefaultSourceConfig(NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.data.itemValue));
+          }
+          else
+            this._generateDefaultConfig();
 
           HISTORY_MANAGER.stack(this.item);
           this.update();
@@ -291,6 +297,22 @@
           // this.update();
         },
 
+        _generateDefaultSourceConfig: function(block)
+        {
+          if(block == null)
+            return;
+
+          this.isNew = true;
+
+          this.narrative = [];
+          this.narrative.property = null;
+          this.narrative.element = null;
+          this.narrative.block = null;
+
+          this.narrative.block = block;
+          this.elements = [];
+          this.set('elements', [block.getOrigin()]);
+        },
           _generateDefaultConfig: function()
           {
             this.isNew = true;
@@ -312,7 +334,7 @@
             this.narrative.block = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(from.id);
 
             if(this.narrative.block == null)
-              NARRATIVE_BLOCK_POOL.createFromElement(from.id);
+              NARRATIVE_BLOCK_POOL.createFromElement(from);
 
             this.elements = [];
             this.set('elements', [from]);
@@ -343,7 +365,7 @@
 
             this.narrative = [];
             this.elements = null;
-            
+
             this.$.repeaterElements.render();
             this.set('elements', [b.getOrigin()])
 
@@ -530,7 +552,12 @@
         if(elements == null || elements.length < 1)
           return "nothing";
 
-        var res = elements[0].getName();
+        var res = null;
+
+        if(elements[0].getName)
+          res = elements[0].getName();
+        else if(elements[0].getContent)
+          res = elements[0].getContent();
 
         if(res == null)
           return "Element not named yet!";
@@ -556,6 +583,9 @@
         if(item.getName)
           if(item.getName() != null)
             return item.getName();
+        if(item.getContent)
+          if(item.getContent() != null)
+            return item.getContent()+" ("+item.htmlify+")";
 
         return item.htmlify+' (this element does not have a name yet!)';
       },

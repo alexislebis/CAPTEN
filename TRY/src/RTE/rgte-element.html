@@ -339,6 +339,7 @@
             },
 
             observers: [
+              "_onRGTEChanged(rgte)",
               "_onColorChange(colorization.*)",
             ],
 
@@ -367,10 +368,18 @@
                 this._behaviorSelector(p.detail, EDGE);
               }.bind(this));
 
-              this.propAsyncBuild.setFirstObject(this.rgte);
-              this.propAsyncBuild.setSecondObject(this.rgte);
-              this.propAsyncBuild.setArray(1);
-              this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackPropertyBindingComplete)
+              // this.propAsyncBuild.setFirstObject(this.rgte);
+              // this.propAsyncBuild.setSecondObject(this.rgte);
+              // this.propAsyncBuild.setArray(1);
+              // this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackPropertyBindingComplete)
+            },
+
+            _onRGTEChanged: function(rgte)
+            {
+              if(rgte == null)
+                return;
+
+              rgte.registerObserverCallbackInnerBinding(this, this._bindingComplete);
             },
 
 // DISAPTCHER SUR ADD
@@ -583,24 +592,31 @@
               }
             },
 
-                _callbackPropertyBindingComplete: function()
+                // _callbackPropertyBindingComplete: function()
+                // {
+                //   var prop;
+                //   var arr = this.propAsyncBuild.getArrayFilled();
+                //
+                //   for(var i in arr)
+                //     prop = arr[i];
+                //
+                //   prop.from = prop.from;
+                //   prop.to = prop.to;
+                //   var propriID = this.rgte.addVisProperty(prop, "to");
+                //
+                //   this.propAsyncBuild.reset();
+                //
+                //   this.isWaitingPropertyBinding = false;
+                //
+                //   this.previousRGTEEdge = this.rgte.getEdgeById(propriID);
+                //   this.$.toastPropertyAdded.open();
+                // },
+
+                _bindingComplete: function()
                 {
-                  var prop;
-                  var arr = this.propAsyncBuild.getArrayFilled();
-
-                  for(var i in arr)
-                    prop = arr[i];
-
-                  prop.from = prop.from;
-                  prop.to = prop.to;
-                  var propriID = this.rgte.addVisProperty(prop, "to");
-
-                  this.propAsyncBuild.reset();
-
-                  this.isWaitingPropertyBinding = false;
-
-                  this.previousRGTEEdge = this.rgte.getEdgeById(propriID);
                   this.$.toastPropertyAdded.open();
+                  this.$.rgteview.update();
+                  this.isWaitingPropertyBinding = false;
                 },
 
             //Define the behavior of the RGTE on click
@@ -653,7 +669,8 @@
             {
                 if (type === NODE) //il y a au moins un noeud de sélectionné
                 {
-                    this.propAsyncBuild.bind(this.rgte.getNodeById(params.id), this.propertyToBind.uri, this.propertyToBind.label);
+                    // this.propAsyncBuild.bind(this.rgte.getNodeById(params.id), this.propertyToBind.uri, this.propertyToBind.label);
+                    this.rgte.bind(params, this.propertyToBind);
                 }
             },
 

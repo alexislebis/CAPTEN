@@ -53,7 +53,7 @@ function doNotProceedBack(e)
 function PreviousManager()//Object to rename
 {
   this.history = [];
-  this.index = -1;
+  this.index = 0;
 
   this.redirectState = false; //Boolean indicating that the redirection has been made and therefore the next stack invok should not be takeninto account
 
@@ -126,7 +126,7 @@ PreviousManager.prototype = {
   // },
   back: function()
   {
-    if(this.history.length <= 1 || this.index <= 0)
+    if(this.history.length < 1 || this.index < 0)
       return null;
 
     this.index--;

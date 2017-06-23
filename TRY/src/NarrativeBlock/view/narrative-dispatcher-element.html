@@ -21,6 +21,10 @@
       width: 80%;
     }
 
+    .item2{
+      width: 20vw;
+    }
+
     </style>
 
     <app-location route="{{topLevelRoute}}" use-hash-as-path></app-location>
@@ -31,13 +35,19 @@
 
       </div>
       <div id="managingZone">
-        <paper-icon-button icon="launch" on-click="_openNarrativeElement"></paper-icon-button>
+        <paper-icon-button id="launch" icon="launch" on-click="_openNarrativeElement"></paper-icon-button>
+        <paper-icon-button id="newNarrative" icon="communication:textsms" on-click="_openNewNarrative"></paper-icon-button>
         <div hidden$='{{!isRecursive}}'>
           <paper-icon-button id="subNarration" on-click='_subNarrationEvent' icon="icons:speaker-notes"></paper-icon-button>
         </div>
-        <paper-icon-button icon="delete"></paper-icon-button>
+        <paper-icon-button id="delete" icon="delete"></paper-icon-button>
       </div>
     </div>
+
+    <paper-tooltip for="launch">Open this narrative element</paper-tooltip>
+    <paper-tooltip for="newNarrative">Create a new narrative element associated to this {{_getType(element)}}</paper-tooltip>
+    <paper-tooltip for="subNarration">Open the narrative elements of this {{_getType(element)}}</paper-tooltip>
+    <paper-tooltip for="delete">Delete this narrative element</paper-tooltip>
 
   </template>
   <script>
@@ -113,14 +123,17 @@
 
     _subNarrationEvent: function()
     {
-      // TODO
-      // this.fire()
+      this.fire(NARRATIVE_SUB_NARRATION_REQUESTED_SIGNAL_ID, {element: this.element});
     },
 
-    // TODO
     _openNarrativeElement: function()
     {
       this.set('topLevelRoute.path', "/narration/"+this.src.id+"_"+this.prop.id);
+    },
+
+    _openNewNarrative: function()
+    {
+      this.set('topLevelRoute.path', "/narration/"+this.element.id);
     },
 
     update: function()
@@ -141,8 +154,20 @@
 
       // var div = document.createElement('div');
         var subDiv0 = document.createElement('div');
-        var subDiv1 = document.createElement('div');
+        var subDiv1 = document.createElement('div'); subDiv1.classList.add('prop');
         var subDiv2 = document.createElement('div');
+
+      if(this.origin)
+      {
+        subDiv0.classList.add('item2');
+        subDiv2.classList.add('item2');
+      }
+      else
+      {
+        subDiv0.classList.add('item');
+        subDiv2.classList.add('item');
+      }
+
       subDiv1.appendChild(propNamer);
       subDiv2.appendChild(elementNamer);
 
@@ -187,9 +212,12 @@
         return;
       }
       this.set('isRecursive',false);
-    }
+    },
 
-
+    _getType: function(element)
+    {
+      return element.constructor.name;
+    },
   });
   </script>
 </dom-module>

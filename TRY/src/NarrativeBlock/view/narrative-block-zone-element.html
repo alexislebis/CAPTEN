@@ -9,8 +9,11 @@
     <div id="divRoot">
       <div id="zone">
         <template id="repeater" is="dom-repeat" items="{{arrayToDisplay}}" as="elm" index-as="index" restamp>
-          <narrative-dispatcher-element src="{{item}}" element="{{elm.element}}" prop="{{elm.property}}"></narrative-dispatcher-element>
+          <narrative-dispatcher-element src="{{item}}" origin="{{_computeOrigin(isOriginMustBeDisplayed)}}" element="{{elm.element}}" prop="{{elm.property}}"></narrative-dispatcher-element>
         </template>
+
+      </div>
+      <div id="subZone">
 
       </div>
     </div>
@@ -42,12 +45,24 @@
           type: Array,
           notify: true,
         },
+        isOriginMustBeDisplayed:
+        {
+          type: Boolean,
+          notify: true,
+        },
       },
 
       observers:
       [
         "_onItemChanged(item)",
       ],
+
+      attached: function()
+      {
+        this.$.zone.addEventListener(NARRATIVE_SUB_NARRATION_REQUESTED_SIGNAL_ID, function(e){
+          this._attachNewZoneFor(e.detail.element);
+        }.bind(this));
+      },
 
       _onItemChanged: function(item)
       {
@@ -62,6 +77,8 @@
         var block = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.item.id);
 
         var res = block.getElementsByTag(this.tag);
+
+        this._resetDisplay();
 
         res = this._filter(res);
 
@@ -95,6 +112,36 @@
         }
 
         return array;
+      },
+
+      _attachNewZoneFor: function(element)
+      {
+        if(element == null)
+          return null;
+
+        var nbze = document.createElement("narrative-block-zone-element");
+        nbze.set("item", element);
+        nbze.set("isOriginMustBeDisplayed", true);
+
+        this._resetDisplay();
+
+        this.$$('#subZone').appendChild(nbze);
+      },
+
+      _computeOrigin: function(displayOrigin)
+      {
+        if(displayOrigin)
+          return this.item;
+        return null;
+      },
+
+      _resetDisplay: function()
+      {
+        var root = this.$$('#subZone');
+
+        if(root)
+          while(root.firstChild)
+            root.removeChild(root.firstChild);
       },
 
     });

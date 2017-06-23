@@ -20,6 +20,7 @@ function RGTE(){
   this.observers = [];
 
     // === Specialized observers
+      this.innerBindingObservers = [];//For the linking inside a graph
       this.removedElmtObservers= []; //for listening elm removed (ie node or edge)
       this.addedElmtObservers= [];
       this.updatedElmtObservers= [];
@@ -40,6 +41,12 @@ function RGTE(){
   // Keep a link with the instance of the same class which was used to produce this
   // copy function MUST DEFINE this.derivedFrom attribute.
   this.derivedFrom = null;
+
+  // === BINDING BEHAVIORS
+  this.propAsyncBuild = new PropertyAsyncrhonousBuilder(this, this);
+    this.propAsyncBuild.setValidationFunction(this._propertyAsyncValidationFunction);
+    this.propAsyncBuild.registerObserverCallbackOnCompletion(this, this._callbackInnerBindingComplete);
+    this.propAsyncBuild.registerObserverCallbackOnUncompletion(this, this._callbackInnerBindingUncomplete);
 
     // ROLLBACK ATTRIBUTES
     this.lastAction = null;
@@ -351,6 +358,11 @@ RGTE.prototype = {
 
     // === SPECIALIZED OBSERVATIONS
       // === REGISTER
+        registerObserverCallbackInnerBinding: function(objCallback, callback)
+        {
+          if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.innerBindingObservers))
+            this.innerBindingObservers.push
+        },
         registerObserverCallbackElementRemoved: function(objCallback, callback)
         {
           if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.removedElmtObservers))
@@ -384,6 +396,15 @@ RGTE.prototype = {
             this.KdeidentifiedObservers.push([objCallback,callback]);
         },
       // === NOTIFIER
+        notifyInnerBinding: function()
+        {
+          this.innerBindingObservers.forEach(function(e){
+            if(typeof e[1] === "function")
+            {
+              e[1].call(e[0], this);
+            }
+          }.bind(this));
+        },
         notifyRemove: function(elmtRemoved)
         {
           this.removedElmtObservers.forEach(function(e)
@@ -1174,6 +1195,77 @@ _rollbackRemove: function()
     }
 
     return counter > 0 ? false : true;
+  },
+
+
+  // === PROPERTY ASYNC BUILDER
+  bind: function(a, prop, b)
+  {
+    if(a == null) //b can be null, but not a
+      return;
+
+
+    var id = null;
+
+    if(a.id)
+      id = a.id;
+    else if(!isNaN(a))
+      id = a;
+
+    if(id == null)
+      return null;
+
+    this.propAsyncBuild.bind(this.getNodeById(id), prop.uri, prop.label);
+
+    if(b != null)
+      this.propAsyncBuild(this.getNodeById(id), prop.uri, prop.label);
+  },
+
+  _propertyAsyncValidationFunction: function(A, B, arrayToFill)
+  {
+    var isFromOk = false; var isToOk = false;
+
+    for(var i in arrayToFill)
+    {
+      for(var j in A.getNodes())
+      {
+        if(arrayToFill[i].from == A.getNodes()[j].id)
+        {
+          isFromOk = true;
+        }
+        if(arrayToFill[i].to == A.getNodes()[j].id)
+        {
+          isToOk = true;
+        }
+
+        if(isFromOk && isToOk)
+          return true;
+      }
+    }
+
+    return false;
+  },
+
+  _callbackInnerBindingComplete: function()
+  {
+    var prop;
+    var arr = this.propAsyncBuild.getArrayFilled();
+
+    for(var i in arr)
+      prop = arr[i];
+
+    prop.from = prop.from;
+    prop.to = prop.to;
+    this.addVisProperty(prop, "to");
+
+    this.propAsyncBuild.reset();
+
+    this.notifyInnerBinding();
+  },
+
+  _callbackInnerBindingUncomplete: function()
+  {
+
   },
 
   /**
