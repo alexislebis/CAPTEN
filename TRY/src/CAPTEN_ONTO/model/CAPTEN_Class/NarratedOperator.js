@@ -234,3 +234,8 @@ NarratedOperator.prototype.constructor = NarratedOperator;
         return;
       return this.usualName.name;
     }
+
+    NarratedOperator.prototype.toString= function()
+    {
+      return this.getName();
+    }

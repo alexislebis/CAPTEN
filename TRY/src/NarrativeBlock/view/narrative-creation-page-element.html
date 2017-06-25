@@ -236,6 +236,22 @@
           notify: true,
         },
 
+        vocab:
+        {
+          type: Object,
+          notify: true,
+        },
+        customcls:
+        {
+          type: Object,
+          notify: true,
+        },
+        customprops:
+        {
+          type: Object,
+          notify: true,
+        },
+
       },
 
       observers:
@@ -433,6 +449,9 @@
               return null;
 
             var elementNamer = new (element.constructor).namerElement(element);
+            elementNamer.set('vocab', this.vocab);
+            elementNamer.set('customcls', this.customcls);
+            elementNamer.set('customprops', this.customprops);
 
             // var div = document.createElement('div');
               var subDiv0 = document.createElement('div');

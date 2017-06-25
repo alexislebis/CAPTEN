@@ -273,6 +273,11 @@ CAPTENClass.prototype = {
         return cls;
     },
 
+    toString: function()
+    {
+      return this.label;
+    },
+
     // The JSON stringify does not work since it depends on recusive call
     serializeToJSON: function()
     {

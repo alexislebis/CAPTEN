@@ -473,6 +473,12 @@
                 },
                 //=== END OF POLY FILTER
 
+                disableBrowsing:
+                {
+                  type: Boolean,
+                  value: false,
+                },
+
                 customcls:
                 {
                     type: Array,
@@ -936,12 +942,20 @@
 
             _openTerminology: function(evt)
             {
-              this.set('routeTopLevel.path', '/terminology/'+evt.model.item.id);
+              this._openTerminologyWId(evt.model.item.id);
+              // this.set('routeTopLevel.path', '/terminology/'+evt.model.item.id);
             },
 
             _openTerminologyWId: function(id)
             {
-              this.set('routeTopLevel.path', '/terminology/'+id);
+              if(!this.disableBrowsing)
+                this.set('routeTopLevel.path', '/terminology/'+id);
+
+              var elmt = this.selectedcls;
+              if(elmt == null)
+                elmt = this.selectedprop;
+
+              this.fire(VOCABULARY_ELEMENT_SELECTED_SIGNAL_ID, {element: elmt});
             },
 
             _computeLabelorURI: function(item)

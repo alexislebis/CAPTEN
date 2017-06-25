@@ -1,5 +1,6 @@
 <link rel="import" href="../../RTE/rgte-card-add-element.html">
 <link rel="import" href="../../NarrativeBlock/view/narrative-block-displayer-element.html">
+<link rel="import" href="../../ExtendedPaperInput/extended-paper-input-element.html">
 
 <dom-module id="analysis-creation-page">
   <template>
@@ -82,7 +83,7 @@
             <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
 
           </div>
-          <paper-input id="nameNAP" label="Analysis name" value="{{napName}}" char-counter required maxlength="100"></paper-input>
+          <extended-paper-input-element id="nameNAP" label="Analysis name" value="{{napName}}" char-counter required maxlength="100"></extended-paper-input-element>
         </header>
 
         <div id="narrativeInfo">
@@ -252,7 +253,23 @@
           type: Array,
           notify: true,
           value: function(){return [EntityName];},
-        }
+        },
+
+        vocab:
+        {
+          type: Object,
+          notify: true,
+        },
+        customcls:
+        {
+          type: Object,
+          notify: true,
+        },
+        customprops:
+        {
+          type: Object,
+          notify: true,
+        },
 
       },
 
