@@ -196,6 +196,7 @@
       attached: function()
       {
         HISTORY_MANAGER.registerObserverCallbackOnFail(this, this._openToastFailure);
+        HISTORY_MANAGER.setVocabulary(this.vocab, this.customcls, this.customprops);
         // HISTORY_MANAGER.stack(new Step());
 
         this.$.rteElem.addEventListener("-RGTEAddedToTheBag", function(e)

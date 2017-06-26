@@ -6,20 +6,46 @@
     <style>
     </style>
 
-    <paper-input id="input" label="{{label}}" value="{{typedText}}">
-      <paper-icon-button suffix id="linker" icon="editor:insert-link" on-click="_linking"></paper-icon-button>
-    </paper-input>
+    <app-location route="{{routeTopLevel}}" use-hash-as-path></app-location>
+
+    <paper-textarea id="input" label="{{label}}" value="{{typedText}}">
+    </paper-textarea>
+    <paper-icon-button suffix id="linker" icon="editor:insert-link" on-click="_linking"></paper-icon-button>
 
 
     <paper-tooltip for="linker">Highlight the element you want to identify then click here.</paper-tooltip>
 
-    <paper-dialog on-iron-overlay-closed="_selectVoc" id="selectVoc" modal>
+    <paper-dialog on-iron-overlay-closed="_selectVoc" on-iron-overlay-opened="patchOverlay" id="selectVoc" modal>
         <h2>Choose an element to link</h2>
         <vocabulary-lister-element id="vle" disable-browsing vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></vocabulary-lister-element>
         <div class="buttons">
             <paper-button dialog-dismiss>Close</paper-button>
             <!-- <paper-button dialog-confirm autofocus>Add</paper-button> -->
         </div>
+    </paper-dialog>
+
+    <paper-dialog on-iron-overlay-closed="_checkDeletion" on-iron-overlay-opened="patchOverlay" id="askConfirmationForDelete" modal>
+      <h2>Warning</h2>
+      <p>
+        You are trying to modify an element which came from the vocabulary: {{_computeElementAltered}}. You could not proceed that way.
+        You can proceed and delete it or leave it as it is.
+      </p>
+      <div class="buttons">
+        <paper-button dialog-dismiss autofocus>Leave it</paper-button>
+        <paper-button dialog-confirm>Delete this element</paper-button>
+      </div>
+    </paper-dialog>
+
+    <paper-dialog on-iron-overlay-closed="_leave" on-iron-overlay-opened="patchOverlay" id="goingToLeave" modal>
+      <h2>You are about to leave</h2>
+      <p>
+        You will leave the current page and go to the selected element page. Do you
+        really want to proceed? All the unsaved modifications may not be saved.
+      </p>
+      <div class="buttons">
+        <paper-button dialog-dismiss autofocus>Cancel</paper-button>
+        <paper-button dialog-confirm>Go!</paper-button>
+      </div>
     </paper-dialog>
 
   </template>
@@ -35,10 +61,11 @@
           notify: true,
         },
 
-        value:
+        value: //ExtendedString
         {
-          type: String,
+          type: Object,
           notify: true,
+          value: function(){return new ExtendedString();},
         },
 
         typedText:
@@ -81,8 +108,18 @@
         "_onLinkedElementChanged(linkedElement)",
       ],
 
+      //@HACK
+      patchOverlay: function (e) {
+        if (e.target.withBackdrop) {
+          e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
+        }
+      },
+
       attached: function()
       {
+        this.$.input.addEventListener('mouseup', function(e){
+          this._canBeOpened(this.$.input.$.input.$.textarea.selectionStart);//Dépression[Author: R. Casado]
+        }.bind(this));
         this.$.vle.addEventListener(VOCABULARY_ELEMENT_SELECTED_SIGNAL_ID, function(e){
           // this.isNewElement = true;
           this.linkedElement = e.detail.element;
@@ -92,7 +129,13 @@
 
       _onTypedText: function(text)
       {
-        console.log(text);
+        if(this.value == null || text == this.value.getString())
+          return;
+
+        var res = this.value.update(text);
+
+        if(res == -1)
+          this.$.askConfirmationForDelete.open();
       },
 
       _onLinkedElementChanged: function(element)
@@ -100,16 +143,40 @@
         if(element == null)
           return;
 
-        this.tmpExtendedString.add(element);
+        this.value.add(element);
+        this.typedText = this.value.getString();
 
         this.linkedElement = null;
-
-        console.log(this.tmpExtendedString.getString());
       },
 
       _linking: function()
       {
         this.$.selectVoc.open();
+      },
+
+      _canBeOpened: function(textIndex)
+      {
+        var res = this.value.getObjectWithStringIndex(textIndex);
+
+        if( !(typeof res === 'object') )
+        {
+          return;
+        }
+
+        this.redirectionElement = res;
+        this.$.goingToLeave.open();
+      },
+
+      _leave: function(e)
+      {
+        if(e.detail.confirmed)
+        {
+          if(this.redirectionElement == null)
+            return;
+
+          // console.log(HISTORY_MANAGER.getURL(this.redirectionElement));
+          this.set('routeTopLevel.path' HISTORY_MANAGER.getURL(this.redirectionElement));
+        }
       },
 
       _selectVoc: function(e)//NTD on close
@@ -122,6 +189,28 @@
         // { //Otherwise the user don't want to bind prop, thus it has to be reset
         //
         // }
+      },
+
+      _checkDeletion: function(e)
+      {
+        if (e.detail.confirmed)//IF want to delete
+        {
+            this.value.deleteFlagged();
+            this.typedText = this.value.getString();
+        }
+        else
+        { //Otherwise the user don't want to delete the element, just reupdate the typedtext
+          this.value.abortReset();
+          this.typedText =this.value.getString();
+        }
+      },
+
+      _computeElementAltered: function()
+      {
+        if(this.value == null)
+          return;
+
+        return this.value.array[this.value.indexToRemove].toString();
       },
 
     });

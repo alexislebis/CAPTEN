@@ -60,6 +60,11 @@ function PreviousManager()//Object to rename
   this.route = (window.location.href).split("#")[0]+'#';
 
   this.observers = []; // For notification of failure
+
+
+  this.vocab = [];
+  this.customcls = [];
+  this.customprops = [];
 }
 
 PreviousManager.prototype = {
@@ -197,6 +202,72 @@ PreviousManager.prototype = {
     else if(item.includes && item.includes("terminology") )
       return item;
   },
+
+  setVocabulary: function(vocab, cls, props)
+  {
+    this.vocab = vocab;
+    this.customcls = cls;
+    this.customprops = props;
+  },
+  getURL: function(item)
+  {
+    if(item == null)
+      return;
+    else if(item instanceof NarratedAnalysisProcess)
+      return "/analysis/"+item.id;
+    else if(item instanceof NarratedOperator)
+      return "/nop/"+item.id;
+    else if(item instanceof Step)
+      return "/step/"+item.id;
+    else if(item instanceof RGTE)
+      return '/rgte/'+item.id;
+    else if(this._belongsToVocabulary(item))
+    {
+      if(item.idVoc)
+        return '/terminology/'+item.idVoc.id;
+      else
+        return '/terminology/'+item.id;
+    }
+  },
+    _belongsToVocabulary: function(item)
+    {
+      if(item == null || this.vocab == null)
+        return;
+
+      rdfclasses = this.vocab.getClasses();
+      rdfprops = this.vocab.getProperties();
+
+      if(item.idVoc)
+      {
+        for(var i in rdfclasses)
+          if(rdfclasses[i].id == item.idVoc.id)
+            return true;
+        for(var i in this.customcls)
+          if(this.customcls[i].id == item.idVoc.id)
+            return true;
+        for(var i in this.customprops)
+          if(this.customprops[i].id == item.idVoc.id)
+            return true;
+        for(var i in rdfprops)
+          if(rdfprops[i].id == item.idVoc.id)
+            return true;
+        return false;
+      }
+
+      for(var i in rdfclasses)
+        if(rdfclasses[i].id == item.id)
+          return true;
+      for(var i in this.customcls)
+        if(this.customcls[i].id == item.id)
+          return true;
+      for(var i in this.customprops)
+        if(this.customprops[i].id == item.id)
+          return true;
+      for(var i in rdfprops)
+        if(rdfprops[i].id == item.id)
+          return true;
+      return false;
+    },
 };
 
 var HISTORY_MANAGER = new PreviousManager();
