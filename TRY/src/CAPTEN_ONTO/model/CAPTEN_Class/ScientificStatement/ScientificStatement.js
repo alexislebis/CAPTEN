@@ -21,7 +21,18 @@ function ScientificStatement()
 ScientificStatement.prototype = new Statement();//Object.create(CAPTENClass.prototype);
 ScientificStatement.prototype.constructor = ScientificStatement;
 
+ScientificStatement.prototype.updateElement = function(content)
+{
+  if(content == null)
+    return;
 
+  this.content = content;
+}
+
+ScientificStatement.prototype.getContent = function()
+{
+  return this.content;
+}
 
 
 // ==============
@@ -50,6 +61,27 @@ Hypothesis.prototype.constructor = Hypothesis;
           type: Object,
           notify: true,
         }
+      },
+
+      observers:
+      [
+        '_onEntityChanged(entity)',
+        '_onContentChanged(content)',
+      ],
+
+      _onEntityChanged: function(entity)
+      {
+        var c = this.entity.getContent();
+        if(c != null)
+          this.content = c;
+      },
+
+      _onContentChanged: function(content)
+      {
+        if(this.entity == null)
+          return;
+
+        this.entity.updateElement(content);
       },
 
       factoryImpl: function(item)

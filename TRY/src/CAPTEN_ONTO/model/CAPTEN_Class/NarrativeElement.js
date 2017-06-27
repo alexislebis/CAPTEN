@@ -9,13 +9,26 @@ function NarrativeElement()
 
   this.uri = "NAU#NarrativeElement";
 
-  this.content = "null";
+  this.content = null;
   this.htmlify = " a narrative element";
   this.narrativeCategory = NARRATIVE_CATEGORY_UNKNOWN;
 }
 
 NarrativeElement.prototype = new CAPTENClass();
 NarrativeElement.prototype.constructor = NarrativeElement;
+
+NarrativeElement.prototype.updateElement = function(content)
+{
+  if(content == null)
+    return;
+
+  this.content = content;
+}
+
+NarrativeElement.prototype.getContent = function()
+{
+  return this.content;
+}
 
 
 var NARRATIVE_CATEGORY_UNKNOWN = "unkwon";

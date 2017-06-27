@@ -19,7 +19,7 @@ function Step() {
         elmt = new Context();
         prop = new Property(HAS_CONTEXT_URI, URI_TO_LABEL(HAS_CONTEXT_URI), this.id, elmt.id);
         res = NARRATIVE_BLOCK_POOL.addElementFor(this, elmt, prop);
-        
+
     //this.annotation = null;//FIXME needed ?
     this.objective = null;
     this.settings = null; //At the difference to Indp.Op.specificSettings, it concerns all the settings needed for the step. not for the IndOp running.
@@ -641,7 +641,7 @@ Step.prototype.constructor = Step;
   {
     if(this.name == null)
       return;
-    return this.name.name;
+    return this.name.getName();
   }
 
   Step.prototype.getInputs = function()

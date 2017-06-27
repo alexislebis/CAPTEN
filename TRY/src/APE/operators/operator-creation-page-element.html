@@ -185,7 +185,8 @@
       <!-- <paper-fab id="visibilityOn" icon="icons:visibility" on-click="_makeVisible"></paper-fab>
       <paper-fab id="visibilityOff" class="isHiddenWAnim" icon="icons:visibility-off" on-click="_makeUnvisible"></paper-fab> -->
     </div>
-    <paper-input id="nameNOP" label="Narrated operator name" value="{{nopname}}" char-counter required maxlength="100"></paper-input>
+    <!-- <paper-input id="nameNOP" label="Narrated operator name" value="{{nopname}}" char-counter required maxlength="100"></paper-input> -->
+    <extended-paper-input-element id="nameNOP" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Narrated operator name" value="{{nopname}}" char-counter required maxlength="100"></extended-paper-input-element>
   </header>
 
   <div id="narrativeInfo">
@@ -455,10 +456,8 @@
               // FIXME TODO : remplacer les différents éléments 1 par des tableaux et permettre de récupérer plus d'une chaine de car dans le form via utilisation du multi input à dev !
                 nopname:
                 {
-                    type: String,
-                    value: "",
+                    type: Object,
                     notify: true,
-                    observer: "_onNopNameChange",
                 },
 
                 noptag1:
@@ -644,6 +643,7 @@
             },
 
             observers: [
+              "_onNopNameChange(nopname)",
               "_onDataRouteChanged(route)",
             ],
 
@@ -742,12 +742,13 @@
             // === PRIVATE METHODS
             _onNopNameChange: function(change)
             {
-              this.nop.setName(this.nopname);
+              // this.nop.setName(this.nopname);
+              this.nop.setName(change);
 
               if(!this.isNew) //if the operation is not new, then it is not concerned about pool referencing
                 return;
 
-              if( (this.nopname == null || this.nopname.length < 3) )
+              if( (change == null || change.getString().length < 3) )
               {
                 if(this.isPoolRegistered) //If the NOP is registered inside the pool, it can't be kept
                 {
@@ -800,7 +801,7 @@
                 this.nopoutputrgte = this.nop.behaviors['output'];
                 this.nopinputrgte = this.nop.behaviors['input'];
 
-              this.nopname = this.nop.getName();
+              this.nopname = this.nop.getNameObject();
 
               //@TODO handle narrative element for NOP
               console.error("HANDLE NARRATIION FOR BLOCKS ATTRs");

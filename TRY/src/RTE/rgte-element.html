@@ -769,6 +769,13 @@
               }
             },
 
+            _reset: function()
+            {
+              this.isWaitingPropertyBinding = false;
+              if(this.rgte)
+                this.rgte.resetBinding();
+            },
+
             _isNothingSelectedModif: function(nodeSelected, edgeSelected)
             {
               if(!nodeSelected && !edgeSelected)

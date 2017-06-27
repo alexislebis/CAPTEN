@@ -21,6 +21,7 @@ var HAS_OBJECTIVE_URI = "http://www.CAPTEN.org/SEED/ontologies/hasObjective";
 
 var HAS_HYPOTHESIS_URI = "http://www.CAPTEN.org/SEED/ontologies/hasHypothesis";
 var HAS_DESCRIPTION_URI = "http://www.CAPTEN.org/SEED/ontologies/description";
+var HAS_TARGET_USER_URI = "http://www.CAPTEN.org/SEED/ontologies/targetUser";
 
 var NARRATIVE_BLOCK_URI = "http://www.CAPTEN.org/SEED/ontologies/hasNarrativeBlock";//NOTE Outside the CAPTEN ontology
 
@@ -65,6 +66,9 @@ var URI_TO_LABEL = function(uri)
       break;
     case HAS_DESCRIPTION_URI:
       label = "has for description";
+      break;
+    case HAS_TARGET_USER_URI:
+      label = "has for target user";
       break;
     default:
       label = null;

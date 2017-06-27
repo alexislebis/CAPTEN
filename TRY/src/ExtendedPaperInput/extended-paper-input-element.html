@@ -8,9 +8,9 @@
 
     <app-location route="{{routeTopLevel}}" use-hash-as-path></app-location>
 
-    <paper-textarea id="input" label="{{label}}" value="{{typedText}}">
+    <paper-textarea disabled="{{displayOnly}}" id="input" label="{{label}}" value="{{typedText}}">
     </paper-textarea>
-    <paper-icon-button suffix id="linker" icon="editor:insert-link" on-click="_linking"></paper-icon-button>
+    <span hidden$="{{_computeVisibility(displayOnly, simpleEdition)}}"><paper-icon-button suffix id="linker" icon="editor:insert-link" on-click="_linking"></paper-icon-button></span>
 
 
     <paper-tooltip for="linker">Highlight the element you want to identify then click here.</paper-tooltip>
@@ -55,6 +55,18 @@
 
       properties:
       {
+        displayOnly:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        simpleEdition:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
         label:
         {
           type: String,
@@ -106,6 +118,7 @@
       [
         "_onTypedText(typedText.*)",
         "_onLinkedElementChanged(linkedElement)",
+        "_onValueChanged(value)",
       ],
 
       //@HACK
@@ -136,6 +149,16 @@
 
         if(res == -1)
           this.$.askConfirmationForDelete.open();
+        else {//Notification of change
+          this._notifyChangeOfExString();
+        }
+      },
+
+      _notifyChangeOfExString: function()
+      {
+        var val = this.value;
+        this.value = null;
+        this.value = val;
       },
 
       _onLinkedElementChanged: function(element)
@@ -147,6 +170,14 @@
         this.typedText = this.value.getString();
 
         this.linkedElement = null;
+      },
+
+      _onValueChanged: function(value)
+      {
+        if(value == null)
+          return;
+
+        this.typedText = this.value.getString();
       },
 
       _linking: function()
@@ -175,7 +206,7 @@
             return;
 
           // console.log(HISTORY_MANAGER.getURL(this.redirectionElement));
-          this.set('routeTopLevel.path' HISTORY_MANAGER.getURL(this.redirectionElement));
+          this.set('routeTopLevel.path', HISTORY_MANAGER.getURL(this.redirectionElement));
         }
       },
 
@@ -197,6 +228,7 @@
         {
             this.value.deleteFlagged();
             this.typedText = this.value.getString();
+            this._notifyChangeOfExString();
         }
         else
         { //Otherwise the user don't want to delete the element, just reupdate the typedtext
@@ -211,6 +243,11 @@
           return;
 
         return this.value.array[this.value.indexToRemove].toString();
+      },
+
+      _computeVisibility: function(display, edition)
+      {
+        return display || edition ? true : false;
       },
 
     });

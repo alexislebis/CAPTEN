@@ -8,8 +8,13 @@
     }
     </style>
 
+    <div class="global">
+      <div class="entity">
+        <extended-paper-input-element id="Hypothesis" simple-edition="{{simpleEdition}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Hypothesis" value="{{content}}" char-counter required maxlength="100"></extended-paper-input-element>
+      </div>
+    </div>
     <!-- STATEMENT NAMER ELEMENT - BACKTRACK INHERITANCE -->
-    {{entity.htmlify}}
+    <!-- {{entity.htmlify}} -->
 
     <!-- <narrative-block-cascader-display-element entity="{{entity}}"></narrative-block-cascader-display-element> -->
     <!-- <template is="dom-if" if="{{item::hasNarrativeBlock}}" restamp="true">

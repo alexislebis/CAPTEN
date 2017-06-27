@@ -1,0 +1,59 @@
+<dom-module id="history-displayer-element">
+  <template>
+    <style>
+
+    p:hover{
+      cursor:pointer;
+    }
+
+    </style>
+
+    <app-location route="{{routeTopLevel}}" use-hash-as-path></app-location>
+
+    <p on-click="goTo">{{text}}</p>
+
+  </template>
+  <script>
+    Polymer({
+      is: "history-displayer-element",
+
+      properties:
+      {
+        element:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        text:
+        {
+          type: String,
+          notify: true,
+        }
+      },
+
+      observers:
+      [
+        "_onElementChanged(element)",
+      ],
+
+      _onElementChanged: function(element)
+      {
+        if(element == null)
+          return;
+
+        if(element.getName)
+          this.text = element.getName();
+        else if(element.label)
+          this.text = element.label;
+        else
+          this.text = element.constructor.name;
+      },
+
+      goTo: function()
+      {
+        this.set("routeTopLevel.path", HISTORY_MANAGER.getURL(this.element));
+      },
+    });
+  </script>
+</dom-module>

@@ -87,6 +87,22 @@
         type: Object,
         notify: true,
       },
+
+      vocab:
+      {
+        type: Object,
+        notify: true,
+      },
+      customcls:
+      {
+        type: Object,
+        notify: true,
+      },
+      customprops:
+      {
+        type: Object,
+        notify: true,
+      },
     },
 
     observers:
@@ -149,6 +165,10 @@
       var origin = null;
       var propNamer = new (this.prop.constructor).namerElement(this.prop);
       var elementNamer = new (this.element.constructor).namerElement(this.element);
+      elementNamer.set('vocab', this.vocab);
+      elementNamer.set('customcls', this.customcls);
+      elementNamer.set('customprops', this.customprops);
+      elementNamer.set('simpleEdition', true);
 
       this._elementIsRecursivelyNarrated();
 
@@ -174,6 +194,10 @@
       if(this.origin != null && this.origin.constructor != null && (this.origin.constructor).namerElement != null)
       {
         origin = new (this.origin.constructor).namerElement(this.origin);
+        origin.set('vocab', this.vocab);
+        origin.set('customcls', this.customcls);
+        origin.set('customprops', this.customprops);
+        origin.set('simpleEdition', true);
         subDiv0.appendChild(origin);
         this.$$('#narrativeZone').appendChild(subDiv0);
       }

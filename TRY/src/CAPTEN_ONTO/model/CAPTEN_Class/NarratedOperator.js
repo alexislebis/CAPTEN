@@ -232,8 +232,15 @@ NarratedOperator.prototype.constructor = NarratedOperator;
     {
       if(this.usualName == null || !(this.usualName instanceof EntityName) )
         return;
-      return this.usualName.name;
+      return this.usualName.getName();
     }
+
+    NarratedOperator.prototype.getNameObject = function()
+    {
+      if(this.usualName == null || !(this.usualName instanceof EntityName) )
+        return;
+      return this.usualName.getNameObject();
+    },
 
     NarratedOperator.prototype.toString= function()
     {

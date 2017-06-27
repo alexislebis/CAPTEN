@@ -78,32 +78,34 @@
     <div id="divRoot">
       <div id="commonInfo">
         <header>
-          <h2> <span hidden$={{!isNew}}>New Analysis</span><span hidden$="{{isNew}}">Analysis: {{napName}} </span></h2>
+          <h2> <span hidden$={{!isNew}}>New Analysis</span><span hidden$="{{isNew}}">Analysis: {{_computeNAPName(napName)}} </span></h2>
           <div id="paperFabs">
             <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
 
           </div>
-          <extended-paper-input-element id="nameNAP" label="Analysis name" value="{{napName}}" char-counter required maxlength="100"></extended-paper-input-element>
+          <!-- <paper-input id="nameNAP" label="Analysis name" value="{{napName}}" char-counter required maxlength="100"></paper-input> -->
+
+          <extended-paper-input-element id="nameNAP" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Analysis name" value="{{napName}}" char-counter required maxlength="100"></extended-paper-input-element>
         </header>
 
         <div id="narrativeInfo">
-          <div id="generalInformation">
+          <!-- <div id="generalInformation">
             <header>
               <h4>General Information</h4>
             </header>
             <div id="gIContent" class="narrativeContent">
               <paper-input id="objectif1NAP" label="The analysis's objective (#1)" value="{{napobjectif1}}" char-counter maxlength="100"></paper-input>
             </div>
-          </div>
+          </div> -->
           <div id="otherNarrative">
             <header>
-              <h4>Other Narrative Information</h4>
+              <h4>Narrative Information</h4>
             </header>
             <div id="oNIContent" class="narrativeContent">
             </div>
           </div>
 
-          <narrative-block-container-displayer-element id="nbcde" item="{{nap}}" instance-to-filter="{{filter}}"></narrative-block-container-displayer-element>
+          <narrative-block-container-displayer-element id="nbcde" item="{{nap}}" instance-to-filter="{{filter}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></narrative-block-container-displayer-element>
 
           <div id="addNarrative">
             <paper-fab icon="add" disabled="true"></paper-fab>
@@ -399,7 +401,7 @@
         if(!this.isNew)//If the nap isn't new, then don't need to try to register it
           return;
 
-        if(name!= null && name.length >= 3)
+        if(name!= null && name.getString().length >= 3)
         {
           this._saveCurrent();
         }
@@ -483,6 +485,11 @@
       _computeRewindAuthorized: function(operation)
       {
         return operation == null ? false : true;
+      },
+
+      _computeNAPName: function(name)
+      {
+        return name == null? '' : name.getString();
       },
 
 

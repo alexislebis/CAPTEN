@@ -23,6 +23,19 @@ Addendum.prototype.setContent = function(content)
   this.htmlify = this.content;
 };
 
+Addendum.prototype.updateElement = function(content)
+{
+  if(content == null)
+    return;
+
+  this.content = content;
+}
+
+Addendum.prototype.getContent = function()
+{
+  return this.content;
+}
+
 function Annotation()
 {
   CAPTENClass.call(this);
@@ -42,7 +55,8 @@ function Description(){
 Description.prototype = new Addendum();
 Description.prototype.constructor = Description;
 Description.prototype.updateHTML = function(){
-  this.htmlify = this.content;
+  if(this.content)
+    this.htmlify = this.content.getString();
 };
   // === POLYMER ELEMENT
     // === NAMER ELEMENT
@@ -57,6 +71,27 @@ Description.prototype.updateHTML = function(){
           type: Object,
           notify: true,
         }
+      },
+
+      observers:
+      [
+        '_onEntityChanged(entity)',
+        '_onContentChanged(content)',
+      ],
+
+      _onEntityChanged: function(entity)
+      {
+        var c = this.entity.getContent();
+        if(c != null)
+          this.content = c;
+      },
+
+      _onContentChanged: function(content)
+      {
+        if(this.entity == null)
+          return;
+
+        this.entity.updateElement(content);
       },
 
       factoryImpl: function(item)

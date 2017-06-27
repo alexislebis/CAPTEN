@@ -53,13 +53,15 @@ function doNotProceedBack(e)
 function PreviousManager()//Object to rename
 {
   this.history = [];
-  this.index = 0;
+  this.index = -1;
 
   this.redirectState = false; //Boolean indicating that the redirection has been made and therefore the next stack invok should not be takeninto account
 
   this.route = (window.location.href).split("#")[0]+'#';
 
   this.observers = []; // For notification of failure
+
+  this.observersChange = [];
 
 
   this.vocab = [];
@@ -80,6 +82,23 @@ PreviousManager.prototype = {
     notifyFailure: function()
     {
       this.observers.forEach(function(e)
+      {
+          if (typeof e[1] === "function") {
+            e[1].call(e[0]);//e[0] define the `this` context for e[1]
+          }
+      });
+    },
+
+  registerObserverCallbackOnChange: function(objCallback, callback)
+  {
+    if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersChange))
+      this.observersChange.push([objCallback,callback]);
+  },
+
+    // === NOTIFICATION
+    notifyChange: function()
+    {
+      this.observersChange.forEach(function(e)
       {
           if (typeof e[1] === "function") {
             e[1].call(e[0]);//e[0] define the `this` context for e[1]
@@ -123,6 +142,8 @@ PreviousManager.prototype = {
       // this.history.push(item); // The item is supposed to be from where the new history is built
       // this.index++;
     }
+
+    this.notifyChange();
   },
 
   // consume: function()
@@ -143,7 +164,7 @@ PreviousManager.prototype = {
 
   forward: function()
   {
-    if(this.history.length <= 1)
+    if(this.history.length < 1)
       return null;
 
     if(this.index >= this.history.length -1 )
@@ -160,6 +181,7 @@ PreviousManager.prototype = {
   reset: function()
   {
     this.history = [];
+    this.notifyChange();
   },
 
   getFirstAntichronologicalElement: function(instance)//If null, retrieve the first element encountered from the current position
@@ -197,6 +219,8 @@ PreviousManager.prototype = {
       return "/step/"+item.id;
     else if(item instanceof RGTE)
       return '/rgte/'+item.id;
+    else if(item instanceof NarrativeBlock)
+      return '/narration/pathtodo';
     else if(item == "VOCABULARY")
       return "/vocabulary";
     else if(item.includes && item.includes("terminology") )

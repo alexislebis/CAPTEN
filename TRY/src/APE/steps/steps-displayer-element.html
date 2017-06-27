@@ -96,7 +96,7 @@
           console.log(step);
           if(step.name == null)
             return {'id': step.id, 'label': numero+'#Step'};
-          return {'id': step.id, 'label': step.name.name};
+          return {'id': step.id, 'label': step.getName()};
         },
         _edgesDependencies: function()
         {

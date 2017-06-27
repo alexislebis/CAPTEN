@@ -2,7 +2,7 @@
 <link rel="import" href="../../theme/namer/namer-style.html">
 <link rel="import" href="../../../../ExtendedPaperInput/extended-paper-input-element.html">
 
-<dom-module id="objective-namer-element">
+<dom-module id="target-user-namer-element">
   <template>
     <style include="namer-style"></style>
     <style>
@@ -13,13 +13,30 @@
     paper-textarea{
       /*width: 48vw;*/
     }
+
+    #infoIcon{
+      @apply(--layout-horizontal);
+      @apply(--layout-around-justified);
+      margin-bottom: -32px;
+    }
     </style>
 
     <!-- {{entity.htmlify}} -->
     <div class="global">
       <div class="entity">
         <!-- <paper-textarea label="Objective" value="{{content}}"></paper-textarea> -->
-        <extended-paper-input-element id="Objective" simple-edition="{{simpleEdition}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Objective" value="{{content}}" char-counter required maxlength="100"></extended-paper-input-element>
+        <div id="infoIcon">
+          <iron-icon id="info" icon="icons:announcement"></iron-icon>
+          <div></div>
+          <div></div>
+        </div>
+        <extended-paper-input-element id="Target" simple-edition="{{simpleEdition}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Target user" value="{{content}}" char-counter required maxlength="100"></extended-paper-input-element>
+
+        <paper-tooltip for="info">
+          It is recommended to use only one term, coming from the vocabulary.<br/>
+          By doing so, you can obtain unambigous narration.<br/>
+          You can create as much Target User relation that you want by the same method.
+        </paper-tooltip>
 
         <!-- {{entity.htmlify}} -->
       </div>

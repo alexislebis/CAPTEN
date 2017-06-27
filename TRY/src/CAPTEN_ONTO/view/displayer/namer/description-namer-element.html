@@ -9,15 +9,20 @@
     }
     </style>
 
-    <!-- {{entity.htmlify}} -->
     <div class="global">
       <div class="entity">
-        <paper-textarea label="Description addendum" value="{{entity.htmlify}}" readonly max-rows="3"></paper-textarea>
+        <extended-paper-input-element id="Description" simple-edition="{{simpleEdition}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Description" value="{{content}}" char-counter required maxlength="100"></extended-paper-input-element>
       </div>
+    </div>
+    <!-- {{entity.htmlify}} -->
+    <!-- <div class="global">
+      <div class="entity">
+        <paper-textarea label="Description addendum" value="{{entity.htmlify}}" readonly max-rows="3"></paper-textarea>
+      </div> -->
       <!-- <div class="cascader">
         <narrative-block-cascader-display-element entity="{{entity}}"></narrative-block-cascader-display-element>
       </div> -->
-    </div>
+    <!-- </div> -->
     <!-- <template is="dom-if" if="{{item::hasNarrativeBlock}}" restamp="true">
       <iron-icon icon="icons:arrow-drop-down-circle"></iron-icon>
     </template> -->

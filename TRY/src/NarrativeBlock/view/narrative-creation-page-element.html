@@ -293,7 +293,7 @@
           else
             this._generateDefaultConfig();
 
-          HISTORY_MANAGER.stack(this.item);
+          HISTORY_MANAGER.stack(this.narrative.block);
           this.update();
 
           // if(this.isNew && this.nap)
@@ -338,7 +338,8 @@
             this.narrative.element = null;
             this.narrative.block = null;
 
-            var from = HISTORY_MANAGER.getFirstAntichronologicalElement();
+            // var from = HISTORY_MANAGER.getFirstAntichronologicalElement();//Since it is not stored, desynchro
+            var from = HISTORY_MANAGER.getCurrentItem();
 
             if(from == null || from.id == null)
             {

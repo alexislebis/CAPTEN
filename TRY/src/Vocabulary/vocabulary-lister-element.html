@@ -708,9 +708,11 @@
             _onCustomClsChanged: function(change)
             {
 
-                if (Object.keys(this.customcls).length === 0 && this.customcls.constructor === Object)
-                    return;
+                // if (Object.keys(this.customcls).length === 0 && this.customcls.constructor === Object)
+                //     return;
 
+                if(this.customcls == null)
+                  return;
                 if (!change)
                     return;
 

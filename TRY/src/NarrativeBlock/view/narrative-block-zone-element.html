@@ -9,7 +9,7 @@
     <div id="divRoot">
       <div id="zone">
         <template id="repeater" is="dom-repeat" items="{{arrayToDisplay}}" as="elm" index-as="index" restamp>
-          <narrative-dispatcher-element src="{{item}}" origin="{{_computeOrigin(isOriginMustBeDisplayed)}}" element="{{elm.element}}" prop="{{elm.property}}"></narrative-dispatcher-element>
+          <narrative-dispatcher-element vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" src="{{item}}" origin="{{_computeOrigin(isOriginMustBeDisplayed)}}" element="{{elm.element}}" prop="{{elm.property}}"></narrative-dispatcher-element>
         </template>
 
       </div>
@@ -48,6 +48,22 @@
         isOriginMustBeDisplayed:
         {
           type: Boolean,
+          notify: true,
+        },
+
+        vocab:
+        {
+          type: Object,
+          notify: true,
+        },
+        customcls:
+        {
+          type: Object,
+          notify: true,
+        },
+        customprops:
+        {
+          type: Object,
           notify: true,
         },
       },

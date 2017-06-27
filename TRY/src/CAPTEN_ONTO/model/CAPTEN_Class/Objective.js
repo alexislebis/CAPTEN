@@ -91,11 +91,11 @@ Objective.prototype.addAddendum = function(content)
         notify: true,
       },
 
-      content:
-      {
-        type: String,
-        notify: true,
-      },
+      // content://ExString
+      // {
+      //   type: Object,
+      //   notify: true,
+      // },
     },
 
     observers:
@@ -106,11 +106,16 @@ Objective.prototype.addAddendum = function(content)
 
     _onEntityChanged: function(entity)
     {
-      this.content = this.entity.getContent();
+      var c = this.entity.getContent();
+      if(c != null)
+        this.content = c;
     },
 
     _onContentChanged: function(content)
     {
+      if(this.entity == null)
+        return;
+
       this.entity.updateElement(content);
     },
 

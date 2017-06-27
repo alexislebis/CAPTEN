@@ -97,11 +97,14 @@
    {
      this.resetVerification();
 
-     if(text == null)
+     if(text == null || typeof text == 'undefined')
       return;
 
       console.log("basic update. Don't handle suppression");
-      text = text.value;
+      if(text.value != null)
+        text = text.value;
+      else
+        text = text;
       var current = this.getString();
       var maxText = text.length
       var i = 0;
@@ -236,6 +239,8 @@
       if(pos > index)
         return -1;
      }
+
+     return -1;
    },
 
    _alignIndex: function(index, charac)

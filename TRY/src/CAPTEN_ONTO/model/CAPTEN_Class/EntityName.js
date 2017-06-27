@@ -5,7 +5,8 @@
  function EntityName(name)
 {
   NarrativeElement.call(this);
-  this.name = name;
+  this.name = new ExtendedString();
+  this.name.update(name);
 
   this.uri = "http://xmlns.com/foaf/0.1/name"; //Imply to be a thing
 
@@ -16,7 +17,23 @@ EntityName.prototype.constructor = EntityName;
 
 EntityName.prototype.setName = function(name)
 {
-  this.name = name;
+  if(name instanceof ExtendedString)
+    this.name = name;
+  else
+  {
+    this.name = new ExtendedString();
+    this.name.update(name);
+  }
+}
+
+EntityName.prototype.getName = function()
+{
+  return this.name.getString();
+}
+
+EntityName.prototype.getNameObject = function()
+{
+  return this.name;
 }
 
 EntityName.prototype.isEmpty = function()

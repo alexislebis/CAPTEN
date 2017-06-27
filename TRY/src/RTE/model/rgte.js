@@ -361,7 +361,7 @@ RGTE.prototype = {
         registerObserverCallbackInnerBinding: function(objCallback, callback)
         {
           if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.innerBindingObservers))
-            this.innerBindingObservers.push
+            this.innerBindingObservers.push([objCallback, callback]);
         },
         registerObserverCallbackElementRemoved: function(objCallback, callback)
         {
@@ -1199,6 +1199,11 @@ _rollbackRemove: function()
 
 
   // === PROPERTY ASYNC BUILDER
+  resetBinding: function()
+  {
+    this.propAsyncBuild.reset();
+  },
+
   bind: function(a, prop, b)
   {
     if(a == null) //b can be null, but not a

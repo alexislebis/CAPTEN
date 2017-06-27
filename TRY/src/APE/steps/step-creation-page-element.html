@@ -92,7 +92,8 @@
         <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
 
       </div>
-      <paper-input id="nameNOP" label="Narrated operator name" value="{{stepName}}" char-counter required maxlength="100"></paper-input>
+      <!-- <paper-input id="nameNOP" label="Narrated operator name" value="{{stepName}}" char-counter required maxlength="100"></paper-input> -->
+      <extended-paper-input-element id="nameStep" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Step name" value="{{stepName}}" char-counter required maxlength="100"></extended-paper-input-element>
     </header>
 
     <div id="narrativeInfo">
@@ -573,7 +574,7 @@
         this.inputSection = "searchInput";
         this.operationSection = "searchOperation";
 
-        this.stepName = "";
+        // this.stepName = "";
       },
 
       update: function()
@@ -633,7 +634,7 @@
           console.log("STEP CHANGED!");
           this._attachListenersStep();
 
-          this.stepName = this.step.getName();
+          this.stepName = this.step.name.getNameObject();
 
           if(this.step.inputs == null)
             this._loadSearchInputPage();
@@ -678,7 +679,7 @@
         if(!this.isNew)//If the nap isn't new, then don't need to try to register it
           return;
 
-        if(name!= null && name.length >= 3)
+        if(name!= null && name.getString().length >= 3)
         {
           // TODO SAVE step in the current NAP
           if(this.nap != null)

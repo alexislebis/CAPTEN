@@ -1,0 +1,42 @@
+<link rel="import" href="./history-displayer-element.html">
+
+<dom-module id="history-displayer">
+  <template>
+    <style>
+    </style>
+
+    <template id="repeater" is="dom-repeat" items="[[historyElement]]">
+      <history-displayer-element element="{{item}}"></history-displayer-element>
+    </template>
+
+  </template>
+  <script>
+    Polymer({
+      is: "history-displayer",
+
+      properties:
+      {
+        historyElement:
+        {
+          type: Object,
+          notify: true,
+        },
+      },
+
+      attached: function()
+      {
+        HISTORY_MANAGER.registerObserverCallbackOnChange(this, this._update);
+      },
+
+      _update: function()
+      {
+        this.historyElement = null
+        this.$.repeater.render();
+
+        this.historyElement = HISTORY_MANAGER.history;
+      },
+
+
+    });
+  </script>
+</dom-module>

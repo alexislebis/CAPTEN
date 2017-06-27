@@ -16,7 +16,7 @@
 
     <div id="divRoot">
       <div id="zone">
-        <narrative-block-zone-element id="nbzeZone" item="{{item}}" filtering="{{instanceToFilter}}"></narrative-block-zone-element>
+        <narrative-block-zone-element id="nbzeZone" item="{{item}}" filtering="{{instanceToFilter}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></narrative-block-zone-element>
       </div>
       <div class="center">
         <p on-click="_openNewNarrativeElement">Narrate your element</p>
@@ -42,6 +42,22 @@
         instanceToFilter: //The type of object inside instanceToFilter will not be displayed
         {
           type: Array,
+          notify: true,
+        },
+
+        vocab:
+        {
+          type: Object,
+          notify: true,
+        },
+        customcls:
+        {
+          type: Object,
+          notify: true,
+        },
+        customprops:
+        {
+          type: Object,
           notify: true,
         },
       },
