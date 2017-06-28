@@ -85,7 +85,7 @@
 
           <!-- <span hidden$="{{!enableModification}}"><paper-icon-button icon="add" ></paper-icon-button></span> -->
           <span hidden$="{{disableEdit}}"><paper-icon-button icon="create" toggles active="{{enableModification}}"></paper-icon-button></span>
-          <paper-icon-button class="strikediag" icon="icons:speaker-notes"></paper-icon-button>
+          <paper-icon-button class="strikediag" icon="icons:speaker-notes" on-click="toggleNarration"></paper-icon-button>
           <div hidden$="{{disableKnowledge}}"><paper-icon-button icon="image:brush" toggles active="{{enableKnowledge}}"></paper-icon-button></div>
           <div hidden$="{{disableReplace}}"> <paper-icon-button id="replace" icon="icons:find-replace" on-click="_replaceRGTE"></paper-icon-button></div>
           <div hidden$="{{disableLaunch}}"> <paper-icon-button id="expand" icon="icons:launch" on-click="_openRGTE"></paper-icon-button> </div>
@@ -128,6 +128,10 @@
                   <paper-button dialog-confirm autofocus>Replace :'(</paper-button>
               </div>
           </paper-dialog>
+        </div>
+
+        <div hidden$="{{hideNarration}}" id="narration">
+          <narrative-block-container-displayer-element id="nbcde" item="{{rgte}}" instance-to-filter="{{filter}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></narrative-block-container-displayer-element>
         </div>
 </div> <!-- divRoot -->
 
@@ -287,6 +291,12 @@
           type: String,
           notify: true,
         },
+        hideNarration:
+        {
+          type: Boolean,
+          value: true,
+          notify: true,
+        },
 
       },
 
@@ -348,6 +358,7 @@
       // === On Use
         _openRGTE: function()
         {
+          console.log(NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.rgte.id));
           this.set('route.path', '/rgte/'+this.rgte.id);
         },
 
@@ -424,6 +435,11 @@
       _actvateEdition: function(e)
       {
         this.$.enableModification = !this.enableModification;
+      },
+
+      toggleNarration: function()
+      {
+        this.hideNarration = ! this.hideNarration;
       },
 
     });

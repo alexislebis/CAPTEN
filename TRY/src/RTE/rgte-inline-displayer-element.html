@@ -100,7 +100,7 @@
               </div>
 
               <div class="pad">
-                <div class="primary">[[rgte.usualName]] [[rgte.nodes.length]]</div>
+                <div class="primary">{{_getName(rgte)}} ([[rgte.nodes.length]] nodes)</div>
                 <div class="shortText">{{_computeShortText(specificity)}}</div>
                 <div class="longText">
                   <p id="launchOp" class$="item" hidden$="{{!enableUse}}">
@@ -270,6 +270,12 @@ Polymer({
   {
     if(from && from.getName)
       return from.getName();
+  },
+
+  _getName: function(rgte)
+  {
+    console.log(rgte.getName());
+    return rgte.getName();
   },
 
 });

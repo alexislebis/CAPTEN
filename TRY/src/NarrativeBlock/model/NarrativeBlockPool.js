@@ -131,6 +131,7 @@ NarrativeBlockPool.prototype.listCompilantNarrativeBlockProperties =
             {uri: HAS_HYPOTHESIS_URI, label: URI_TO_LABEL(HAS_HYPOTHESIS_URI)},
             {uri: HAS_DESCRIPTION_URI, label: URI_TO_LABEL(HAS_DESCRIPTION_URI)},
             {uri: HAS_TARGET_USER_URI, label: URI_TO_LABEL(HAS_TARGET_USER_URI)},
+            {uri: COMES_FROM_URI, label: URI_TO_LABEL(COMES_FROM_URI)},
          ];
 
 NarrativeBlockPool.prototype.listCompilantNarrativeBlockEntities =
@@ -139,6 +140,7 @@ NarrativeBlockPool.prototype.listCompilantNarrativeBlockEntities =
           {uri: '#description', label: 'Description'},
           {uri: '#objective', label: 'Objective'},
           {uri: '#targetUser', label: 'Target User'},
+          {uri: USE_CASE_URI, label: "Use Case"},
         ];
 
 NarrativeBlockPool.prototype.newInstanceDispatcher = function(instanceName)
@@ -153,6 +155,8 @@ NarrativeBlockPool.prototype.newInstanceDispatcher = function(instanceName)
       return new Objective();
     case "Target User":
       return new TargetUser();
+    case "Use Case":
+      return new UseCase();
     default:
       return null;
   }
@@ -169,6 +173,8 @@ NarrativeBlockPool.prototype.getDefaultPropertyFor= function(item)//Not register
     return new Property(HAS_OBJECTIVE_URI, URI_TO_LABEL(HAS_OBJECTIVE_URI));
   if(item instanceof TargetUser)
     return new Property(HAS_TARGET_USER_URI, URI_TO_LABEL(HAS_TARGET_USER_URI));
+  if(item instanceof UseCase)
+    return new Property(COMES_FROM_URI, URI_TO_LABEL(COMES_FROM_URI));
 }
 
  var NARRATIVE_BLOCK_POOL = new NarrativeBlockPool();

@@ -18,10 +18,13 @@ var IS_DESCRIBED_BY_URI = "http://www.CAPTEN.org/SEED/ontologies/isDescribedBy";
 var HAS_NAME_URI = "http://www.CAPTEN.org/SEED/ontologies/hasName";
 var HAS_CONTEXT_URI = "http://www.CAPTEN.org/SEED/ontologies/hasContext";
 var HAS_OBJECTIVE_URI = "http://www.CAPTEN.org/SEED/ontologies/hasObjective";
-
 var HAS_HYPOTHESIS_URI = "http://www.CAPTEN.org/SEED/ontologies/hasHypothesis";
 var HAS_DESCRIPTION_URI = "http://www.CAPTEN.org/SEED/ontologies/description";
 var HAS_TARGET_USER_URI = "http://www.CAPTEN.org/SEED/ontologies/targetUser";
+var COMES_FROM_URI = "http://www.CAPTEN.org/SEED/ontologies/comesFrom";//TODO Subclass of "http://www.w3.or/ns/prov#wasGeneratedBy";
+
+// === CUSTOM NODE
+var USE_CASE_URI = "http://www.CAPTEN.org/SEED/ontologies/useCase";
 
 var NARRATIVE_BLOCK_URI = "http://www.CAPTEN.org/SEED/ontologies/hasNarrativeBlock";//NOTE Outside the CAPTEN ontology
 
@@ -69,6 +72,9 @@ var URI_TO_LABEL = function(uri)
       break;
     case HAS_TARGET_USER_URI:
       label = "has for target user";
+      break;
+    case COMES_FROM_URI:
+      label = "comes from";
       break;
     default:
       label = null;

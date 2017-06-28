@@ -1335,4 +1335,24 @@ _rollbackRemove: function()
       return this.id;
     },
 
+    getName: function()
+    {
+      return this.name.getName();
+    },
+
+    setName: function(exString)
+    {
+      if(exString == null || this.name == null)
+        return;
+
+      if(!exString instanceof ExtendedString)
+      {
+        var e = new ExtendedString();
+        e.update(exString);
+        exString = e;
+      }
+
+      this.name.updateElement(exString);
+    },
+
 };

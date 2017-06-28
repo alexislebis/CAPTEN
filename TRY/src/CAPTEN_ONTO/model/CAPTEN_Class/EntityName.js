@@ -36,6 +36,14 @@ EntityName.prototype.getNameObject = function()
   return this.name;
 }
 
+EntityName.prototype.updateElement = function(content)
+{
+  if(content == null)
+    return;
+
+  this.name = content;
+}
+
 EntityName.prototype.isEmpty = function()
 {
   if(this.name)
@@ -69,6 +77,27 @@ EntityName.prototype.updateAttribute = function(attr, value)
         type: Object,
         notify: true,
       },
+    },
+
+    observers:
+    [
+      '_onEntityChanged(entity)',
+      '_onContentChanged(content)',
+    ],
+
+    _onEntityChanged: function(entity)
+    {
+      var c = this.entity.getContent();
+      if(c != null)
+        this.content = c;
+    },
+
+    _onContentChanged: function(content)
+    {
+      if(this.entity == null)
+        return;
+
+      this.entity.updateElement(content);
     },
 
     factoryImpl: function(item)

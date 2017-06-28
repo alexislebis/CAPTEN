@@ -1,9 +1,11 @@
+<link rel="import" href="../../../bower_components/brainy-table/brainy-table.html">
+<!-- <link rel="import" href="../../../bower_components/iron-data-table/iron-data-table.html"> -->
 <dom-module id="step-relation-tab-element">
   <template>
     <style>
-      #divRoot{
-        /*min-height: 200px;*/
-      }
+      /*#divRoot{
+        min-height: 200px;
+      }*/
     </style>
 
 
@@ -11,6 +13,23 @@
 
     </template> -->
 <div id="divRoot">
+  <template id="bTable" is="dom-bind" composites="{{composites}}" organized-array="{{organizedArray}}">
+  <!-- <iron-data-table items="[[organizedArray]]">
+    <data-table-column name="From (Graph of concept)">
+      <template>[[item.from.label]]</template>
+    </data-table-column>
+    <data-table-column name="Relation">
+      <template>[[item.rel.label]]</template>
+    </data-table-column>
+    <data-table-column name="To (Operator input concept)">
+      <template>[[item.to.label]]</template>
+    </data-table-column> -->
+    <!-- <data-table-column name="Relation color">
+      <template><paper-swatch-picker id="[[item.id]]" color="{{item.color}}" on-color-changed="_colorChanged"><paper-swatch-picker></template>
+    </data-table-column> -->
+  <!-- </iron-data-table>
+</template> -->
+
     <brainy-table id="a" items="[[organizedArray]]" page-size="5" details-enabled>
       <brainy-table-column name="From (Graph of concept)" filter-by="from.label" sort-by="from.label">
         <template>[[item.from.label]]</template>
@@ -22,13 +41,15 @@
         <template>[[item.to.label]]</template>
       </brainy-table-column>
       <brainy-table-column name="Relation color">
-        <template><paper-swatch-picker id="[[item.id]]" color="{{item.color}}" on-color-changed="_colorChanged"><paper-swatch-picker></template>
+        <template><paper-swatch-picker id="[[item.id]]" color="{{item.color}}" on-color-changed="colorization"><paper-swatch-picker></template>
       </brainy-table-column>
       <div no-results>No relations found</div>
     </brainy-table>
+  </template>
 </div>
   </template>
   <script>
+
     Polymer({
       is : "step-relation-tab-element",
 
@@ -57,7 +78,26 @@
       observers:
       [
         "_onCompositesChange(composites)",
+        "_onOrgaArrayChanged(organizedArray)",
       ],
+
+      attached: function()
+      {
+        var template = this.$.bTable;
+        template.colorization = function(e)
+        {
+          var id = e.path[0].id;
+
+          for(var i in this.composites)
+          {
+            if(this.composites[i].id == id)
+            {
+              this.composites[i].addOption({color: e.detail.value});
+              return;
+            }
+          }
+        };
+      },
 
       _onCompositesChange: function(composites)
       {
@@ -78,6 +118,11 @@
 
           this.organizedArray = [];
           this.set('organizedArray',  array);
+      },
+
+      _onOrgaArrayChanged: function(array)
+      {
+        console.log("ORGANIZED ARRAY CHANGED");
       },
 
       _colorChanged: function(e)

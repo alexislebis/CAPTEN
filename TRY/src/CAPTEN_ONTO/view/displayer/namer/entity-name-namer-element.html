@@ -12,7 +12,8 @@
     <!-- {{entity.htmlify}} -->
     <div class="global">
       <div class="entity">
-        <paper-input label="Name" value="{{entity.name}}" readonly></paper-textarea>
+        <!-- <paper-input label="Name" value="{{entity.name}}" readonly></paper-textarea> -->
+        <extended-paper-input-element id="Name" simple-edition="{{simpleEdition}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Name" value="{{content}}" char-counter required maxlength="100"></extended-paper-input-element>
       </div>
     </div>
 

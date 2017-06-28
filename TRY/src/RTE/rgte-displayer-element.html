@@ -168,7 +168,13 @@
           for (var j in n)
           {
             if (n[j].id == this.rgte.getKnowledges()[i].derivedFrom.id)
-              n[j].color = KNOWLEDGE_COLOR;
+            {
+              if(this.colorization == null)
+                this.colorization = [];
+
+              this.colorization.push({id: n[j].id, color: KNOWLEDGE_COLOR});
+            }
+              // n[j].color = KNOWLEDGE_COLOR;
           }
         }
 

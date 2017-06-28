@@ -235,6 +235,12 @@ Step.prototype.constructor = Step;
       }
     }
 
+    var exString = new ExtendedString();
+    exString.update("Graph computed during the step ");
+    exString.add(this);
+    exString.add('.');
+
+    outputs.setName(exString);
     RGTE_POOL.register(outputs);
 
     return outputs;
@@ -262,6 +268,22 @@ Step.prototype.constructor = Step;
     }
     this.notifyOutputsComputation();
   }
+
+  Step.prototype.toString= function()
+  {
+    var res = this.name.getName();
+
+    if(res == null)
+      res = this.label;
+
+    if(res == null)
+      res = this.uri;
+
+    if(res == null)
+      res = this.id;
+
+    return res;
+  },
 
   Step.prototype._callbackUCIUncompletion = function()
   {

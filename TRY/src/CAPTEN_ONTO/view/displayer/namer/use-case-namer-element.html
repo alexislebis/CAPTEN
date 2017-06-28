@@ -1,0 +1,29 @@
+<!-- <link rel="import" href="../../../../NarrativeBlock/view/narrative-block-cascader-display-element.html"> -->
+<link rel="import" href="../../theme/namer/namer-style.html">
+<link rel="import" href="../../../../ExtendedPaperInput/extended-paper-input-element.html">
+
+<dom-module id="use-case-namer-element">
+  <template>
+    <style include="namer-style"></style>
+    <style>
+    :host {
+      display: block;
+    }
+
+    paper-textarea{
+      /*width: 48vw;*/
+    }
+    </style>
+
+    <div class="global">
+      <div class="entity">
+        <extended-paper-input-element id="UseCase" simple-edition="{{simpleEdition}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Use Case" value="{{content}}" char-counter required maxlength="100"></extended-paper-input-element>
+      </div>
+    </div>
+
+
+  </template>
+  <script>
+
+    </script>
+  </dom-module>

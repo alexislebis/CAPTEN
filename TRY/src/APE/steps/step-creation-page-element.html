@@ -1,6 +1,5 @@
 <link rel="import" href="../operation-step-display-element.html">
 <link rel="import" href="./step-status-displayer-element.html">
-<link rel="import" href="./step-relation-tab-element.html">
 <link rel="import" href="../analysis/localisation-in-analysis-element.html">
 
 <dom-module id="step-creation-page-element">
@@ -97,22 +96,24 @@
     </header>
 
     <div id="narrativeInfo">
-      <div id="generalInformation">
+      <!-- <div id="generalInformation">
         <header>
           <h4>General Information</h4>
         </header>
         <div id="gIContent" class="narrativeContent">
           <paper-input id="objectif1Step" label="The step's objective (#1)" value="{{stepobjectif1}}" char-counter maxlength="100"></paper-input>
         </div>
-      </div>
+      </div> -->
       <div id="otherNarrative">
         <header>
-          <h4>Other Narrative Information</h4>
+          <h4> Narrative Information</h4>
         </header>
-        <div id="oNIContent" class="narrativeContent">
+        <!-- <div id="oNIContent" class="narrativeContent">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius, est id ultrices lobortis, magna dolor aliquet ligula, non mollis augue turpis in nulla. Donec sit amet dui ornare, tempus nibh nec, pharetra tellus. Aliquam metus ex, convallis a tincidunt nec, tempus sit amet quam. Nullam at pellentesque tellus. Ut sollicitudin maximus lorem ac porttitor. Vivamus fringilla viverra nisl ut ultrices. Morbi aliquet sem lectus, sed malesuada velit facilisis sit amet. Donec volutpat, nunc quis ultrices aliquam, velit ante convallis purus, et malesuada mauris est accumsan magna. Vivamus nec nibh non arcu finibus posuere sed eget turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus.
-        </div>
+        </div> -->
       </div>
+
+      <narrative-block-container-displayer-element id="nbcde" item="{{step}}" instance-to-filter="{{filter}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></narrative-block-container-displayer-element>
 
       <div id="addNarrative">
         <paper-fab icon="add" disabled="true"></paper-fab>
@@ -257,7 +258,12 @@
           type: Object,
           notify: true,
         },
-
+        filter:
+        {
+          type: Array,
+          notify: true,
+          value: function(){return [EntityName];},
+        },
         _inputsFromNext://used as a tmp variable when changing step from isNextable
         {
           type: Object,
