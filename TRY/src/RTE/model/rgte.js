@@ -13,7 +13,7 @@ function RGTE(){
       var elmt = new EntityName();
       var prop = new Property(HAS_NAME_URI, URI_TO_LABEL(HAS_NAME_URI) ,this.id, elmt.id);
       var res = NARRATIVE_BLOCK_POOL.addElementFor(this, elmt, prop);
-      this.NarrativeBlock = res.block;
+      this.narrativeBlock = res.block;
       this.name = elmt; //The name of the step //WARNING potential conflict
 
 
@@ -938,6 +938,8 @@ _rollbackRemove: function()
     //Usefull for function such as _findDerivationCorrespondance@Step.js
       cls.derivedFrom = initialNode;
 
+    res = this._cleanUnrelevantProperties(res);
+
     for(var i in res)
     {
       if(res[i].from === nodeToUpdateID)
@@ -961,6 +963,27 @@ _rollbackRemove: function()
     this.prevSubstituteElement = cls;
 
     return cls;
+  },
+
+  _cleanUnrelevantProperties: function(res)
+  {
+    var indexes = [];
+    for(var i in res)
+    {
+      if(res[i].uri == "http://www.CAPTEN.org/SEED/ontologies/hasNarrativeBlock")
+      {
+        indexes.push(res[i]);
+      }
+    }
+
+    var offset = 0;
+
+    for(var i in indexes)
+    {
+      res.splice(i-offset, 1);
+    }
+
+    return res;
   },
 
   _delete: function()

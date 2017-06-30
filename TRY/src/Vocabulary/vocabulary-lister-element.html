@@ -655,14 +655,19 @@
                 if (cClass == undefined && Object.keys(cClass).length === 0 && cClass.constructor === Object)
                     return;
 
-                this.push('customcls', new CAPTENClass(cClass, cClass));
+                var c = new CAPTENClass(cClass, cClass);
+                this.push('customcls', c);
+
+                AUTHOR_SET(c, DEFAULT_AUTHOR);
             },
             addCustomProperty: function(cProp)
             {
                 if (cProp == undefined && Object.keys(cProp).length === 0 && cProp.constructor === Object)
                     return;
 
-                this.push('customprops', PROPERTIES_POOL.create(cProp, cProp));
+                var p = PROPERTIES_POOL.create(cProp, cProp);
+                this.push('customprops', p);
+                AUTHOR_SET(p, DEFAULT_AUTHOR);
                 // this.customprops.push(PROPERTIES_POOL.create(cProp, cProp));
                 // var tmp4Notif = this.customprops;
                 // // this.customprops = null;

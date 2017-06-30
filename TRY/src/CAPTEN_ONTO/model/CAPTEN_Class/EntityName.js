@@ -26,6 +26,11 @@ EntityName.prototype.setName = function(name)
   }
 }
 
+EntityName.prototype.getContent = function()
+{
+  return this.name;
+},
+
 EntityName.prototype.getName = function()
 {
   return this.name.getString();

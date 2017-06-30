@@ -114,6 +114,34 @@ NarrativeBlock.prototype = {
     return element;
   },
 
+  replaceElement: function(old, newElmt)
+  {
+    if(old == null || newElmt == null)
+      return;
+
+    var indexToRemove = null;
+    var prop = null;
+    for(var i in this.elements)
+    {
+      if(this.elements[i].id == old.id)
+      {
+        prop = PROPERTIES_POOL.getPropertiesByExtremities(this.propertyEntity.from, old.id);
+        indexToRemove = i;
+
+        this.elements.push(newElmt);
+        PROPERTIES_POOL.create(prop.uri, prop.label, this.propertyEntity.from, newElmt.id);
+      }
+    }
+
+    if(indexToRemove == null)
+      return;
+
+    this.elements.splice(i,1); //replace dry prog with removeElement
+    PROPERTIES_POOL.remove(prop);
+
+    return true;
+  },
+
   isElementAlreadyInBlock: function(element)
   {
     for(var i in this.elements)

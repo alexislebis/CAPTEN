@@ -413,6 +413,8 @@
           return;
 
         NARRATED_OPERATION_POOL.registerNAP(this.nap);
+        AUTHOR_SET(this.nap, DEFAULT_AUTHOR);
+        
         this.isNew = false;
         this.$.NAPRegistered.open();
       },

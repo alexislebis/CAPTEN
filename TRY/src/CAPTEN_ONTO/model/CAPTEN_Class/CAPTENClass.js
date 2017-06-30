@@ -37,6 +37,8 @@ function CAPTENClass(uri, label, properties)
 
   // === NARRATIVE_INFORMATION
     this.narrativeBlock = NARRATIVE_BLOCK_POOL.createFromElement(this); //All captenclasses are by default associated with a narrative block
+    // === PREDEFINED NARRATIVE ELEMENTS
+      this.author == null;
 }
 
 CAPTENClass.id = 0;

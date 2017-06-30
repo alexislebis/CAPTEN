@@ -695,7 +695,10 @@
             if(res == null)
               console.error("The step already exists and couldn't be added");
             else
+            {
+              AUTHOR_SET(this.step, DEFAULT_AUTHOR);
               this.$.StepRegisteredWithinNAP.open();
+            }
           }
           else {
             console.error("Currently, no independent pool of steps is managed. Aborting");

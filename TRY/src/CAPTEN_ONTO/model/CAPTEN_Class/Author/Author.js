@@ -2,11 +2,12 @@
 * It is the implementation of the FOAF Agent class. An author is an agent creating something. Here in CAPTEN,
 * it concerns AP, step, IndepOp, etc...
  */
-function Author(authorName)
+function Author(authorName, email)
   {
     CAPTENClass.call(this);
-    this.uri = "http://xmlns.com/foaf/0.1/Agent";
-    this.authorName = null;
+    this.uri = AUTHOR_URI;
+    this.authorName = authorName;
+    this.email = email;
 }
 
 Author.prototype = new CAPTENClass();
@@ -91,3 +92,28 @@ Author.prototype.isEmpty = function()
         },
     });
   // === END CONFIGURER ELEMENT
+
+// === GLOBAL AUTHOR ASSIGNEMENT
+  var AUTHOR_SET = function(item, author) //replace the author element
+  {
+    if(author == null)
+      return;
+
+    var block = item.narrativeBlock;
+    if(block == null)
+    {
+      console.error("RETRIEVE POOL HERE");
+    }
+
+
+    var res = block.replaceElement(item.author, author);
+
+    if(res == null)
+    {
+      block.addElement(author, new Property(IS_AUTHORED_BY, URI_TO_LABEL(IS_AUTHORED_BY), block.getOriginID(), author.id));
+    }
+    item.author = author;
+  };
+
+// === BOOTSTRAP INFO
+var DEFAULT_AUTHOR = new Author("Default user", "user@capten.org");

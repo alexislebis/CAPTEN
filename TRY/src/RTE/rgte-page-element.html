@@ -248,6 +248,8 @@
 
           this.isNew = false;
 
+          this.$.rteElem.update();
+
           HISTORY_MANAGER.stack(this.rgte);
         },
 
@@ -293,6 +295,7 @@
           return;
 
         var res = RGTE_POOL.register(this.rgte);
+        AUTHOR_SET(this.rgte, DEFAULT_AUTHOR);
 
         if(res)
           this.$.toastNotifyNowRgteCreated.open();
