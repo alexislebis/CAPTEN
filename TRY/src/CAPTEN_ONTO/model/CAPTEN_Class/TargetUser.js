@@ -5,7 +5,8 @@ function TargetUser()
 {
   NarrativeElement.call(this);
 
-  this.uri = "http://www.CAPTEN.org/SEED/ontologies/targetUser";
+  this.uri = TARGER_USER_URI;
+  
   this.htmlify = "an target user";
 
   this.subClasses = [ //OLD

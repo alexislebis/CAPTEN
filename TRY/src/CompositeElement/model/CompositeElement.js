@@ -197,6 +197,24 @@ CompositeElement.prototype =
       }
 
       return res;
-    }
+    },
   // === END GETTER
+
+  serializeToJSON: function()
+  {
+    var tab=[];
+
+    for(var i in this.elements)
+    {
+      if(this.elements[i].serializeToJSON)
+        tab.push(this.elements[i].serializeToJSON());
+      else
+        tab.push(this.elements[i]);
+    }
+
+    var res = {elements: tab, options: this.options};
+    var final = {composite: res};
+
+    return final;
+  },
 };

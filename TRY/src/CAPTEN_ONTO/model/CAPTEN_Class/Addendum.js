@@ -47,7 +47,7 @@ Annotation.prototype = Object.create(CAPTENClass.prototype);
 
 function Description(){
   Annotation.call(this);
-  this.uri = "NAU";
+  this.uri = DESCRIPTION_URI;
 
   this.htmlify = this.content;//CARE DESYNCHROI
 }

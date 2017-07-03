@@ -2,6 +2,8 @@ function NarratedAnalysisProcess() {
 
   NarratedOperator.call(this);
 
+  this.uri = ANALYSIS_URI;
+
   this.expectedConcepts = null;
 
   //UPDATE 22/09/2016

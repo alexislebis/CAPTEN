@@ -28,7 +28,7 @@ function NarrativeBlock()
 
 NarrativeBlock.isPropertyHandled = function(propToCheck)
 {
-  console.error("WARNING: no verification regarding the type of property used between entity & element");
+  console.log("WARNING: no verification regarding the type of property used between entity & element");
   return true;
 };
 
@@ -244,6 +244,38 @@ NarrativeBlock.prototype = {
 
     }
 
+    return res;
+  },
+
+  blobIt: function()
+  {
+    var res2 = '';
+
+    for(var i in this)
+    {
+      if(typeof this[i] !== 'function')
+        res2 += i;
+    }
+
+    console.log(res2);
+    var res = JSON.stringify(JSON.decycle(this));
+    return new Blob([new String(JSON.stringify(JSON.decycle(this)))], {type: "application/json"});
+  },
+
+  serializeToJSON: function()
+  {
+    var res = {elements: [], propertyEntity: null, entity: null};
+
+    for(var i in this.elements)
+      {res.elements.push(this.elements[i].serializeToJSON());
+      }
+
+    res.propertyEntity = this.propertyEntity;
+
+    if(this.entity)
+      res.entity = this.entity.id;
+
+    // var res = JSON.stringify(res);
     return res;
   },
 

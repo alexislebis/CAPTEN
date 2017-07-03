@@ -2,6 +2,8 @@ function Objective ()
 {
   CAPTENClass.call(this);
 
+  this.uri = OBJECTIVE_URI;
+
   this.subClasses= [
     {subClasses:{}, name: 'Monitoring', uri: 'NAU'},
     {subClasses:{}, name: 'Adaptation', uri: 'NAU'},

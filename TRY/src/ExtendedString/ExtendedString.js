@@ -276,4 +276,19 @@
     this.array.splice(quantity, pos);
    },
 
+   serializeToJSON: function()
+   {
+     var res = {array: [], mustBeReseted : this.mustBeReseted};
+
+     for(var i in this.array)
+      {
+          if(this.array[i].serializeToJSON)
+            res.array.push(this.array[i].serializeToJSON());
+          else
+            res.array.push(this.array[i]);
+      }
+
+      return {extString: res};
+   },
+
  };

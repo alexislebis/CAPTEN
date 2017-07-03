@@ -110,7 +110,7 @@ Author.prototype.isEmpty = function()
 
     if(res == null)
     {
-      block.addElement(author, new Property(IS_AUTHORED_BY, URI_TO_LABEL(IS_AUTHORED_BY), block.getOriginID(), author.id));
+      block.addElement(author, PROPERTIES_POOL.create(IS_AUTHORED_BY, URI_TO_LABEL(IS_AUTHORED_BY), block.getOriginID(), author.id));
     }
     item.author = author;
   };

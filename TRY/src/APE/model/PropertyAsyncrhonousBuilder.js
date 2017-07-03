@@ -343,7 +343,81 @@ PropertyAsyncrhonousBuilder.prototype = {
   {
     if (typeof func === "function")
       this.validationFunction = func;
-  }
+  },
 
+
+  serializeToJSON: function()
+  {
+      var ser = {}
+
+      for (var i in this)
+      {
+        if(i !== "subClassOf" && i !== "subClasses" && i != "properties" && (typeof this[i] !== 'function') && this._isNotObserver(i))
+        {
+          ser[i] = this._serializationHandlingArray(i, this[i])[i];
+        }
+        // if(typeof this[i] !== 'function')
+        // {
+        //     if(this[i] && this[i].serializeToJSON)
+        //       ser[i] = this[i].serializeToJSON();
+        //     else if (i !== "subClassOf" && i != "subClasses" && i != "properties")
+        //       ser[i] = this[i];
+        // }
+      }
+
+      return ser;
+  },
+  _serializationHandlingArray: function(index, item)
+  {
+    var ser = {};
+
+    if(item == null)
+      return ser[index] = {index: null};
+
+    if(typeof item === "function")
+    {
+      //NTD
+    }
+    else if(Array.isArray(item))
+    {
+      var tmp = {};
+      for(var i in item)
+      {
+        tmp[i] = this._serializationHandlingArray(i, item[i])[i];
+      }
+      ser[index] = tmp;
+    }
+    else {
+      if(item.serializeToJSON)
+        ser[index] = item.serializeToJSON();
+      else
+        ser[index] = item;
+    }
+
+    return ser;
+  },
+
+  _isNotObserver: function(i)
+  {
+    if(i &&
+       (i.includes('observers') ||
+        i.includes('observersComputed') ||
+        i.includes('observersUnc') ||
+        i.includes('observersReset') ||
+        i.includes('observersInputs') ||
+        i.includes('observersIOPCompositeRelations') ||
+        i.includes('observersIOPCompositeOptions')) ||
+        i.includes('innerBindingObservers') ||
+        i.includes('removedElmtObservers') ||
+        i.includes('addedElmtObservers') ||
+        i.includes('updatedElmtObservers') ||
+        i.includes('thisDeletedObservers') ||
+        i.includes('KidentifiedObservers') ||
+        i.includes('KdeidentifiedObservers')
+      )
+      return false;
+
+    return true;
+  },
 
 };

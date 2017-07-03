@@ -3,6 +3,8 @@ function NarratedOperator(usualName)
 
     CAPTENClass.call(this);
 
+    this.uri = OPERATOR_URI;
+
     // === PREDEFINED NARRATIVE ELEMENTS
       // === NAME
         var elmt = new EntityName(usualName);

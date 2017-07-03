@@ -76,6 +76,16 @@
      return this.pool;
    },
 
+   serializeToJSON: function()
+   {
+     var array = [];
+     
+     for(var i in this.pool)
+      array.push(this.pool[i].serializeToJSON());
+
+     return array;
+   },
+
  }
 
 

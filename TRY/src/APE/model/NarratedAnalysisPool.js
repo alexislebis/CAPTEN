@@ -97,6 +97,15 @@
     }
    },
 
+   serializeToJSON: function()
+   {
+     var array = [];
+     for(var i in this.pool)
+      array.push(this.pool[i].serializeToJSON());
+
+    return array;
+   },
+
  }
 
  var NARRATED_ANALYSIS_POOL = new NarratedAnalysisPool();

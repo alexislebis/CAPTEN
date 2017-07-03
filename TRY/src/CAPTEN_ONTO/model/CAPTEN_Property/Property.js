@@ -179,48 +179,157 @@ Property.prototype = {
     return false;
   },
 
+  // serializeToJSON: function()
+  // {
+  //   var ser = {}
+  //
+  //   for(var i in this)
+  //   {
+  //     if(i !== 'from' && i !== 'to' && i !== 'constraints' && i !== 'inheritanceArray')
+  //       ser[i] = this[i];
+  //   }
+  //
+  //   ser['from'] = {};
+  //   ser['to'] = {};
+  //
+  //
+  //   //TODO faire le reste des tableaux
+  //   if(this.from.constructor === Array) //If it's an array, then elements are CaptenClass
+  //   {
+  //     for(var i in this.from)
+  //     {
+  //       ser['from'][i] = {};
+  //       ser['from'][i].id = this.from[i].id;
+  //       ser['from'][i].uri = this.from[i].uri;
+  //     }
+  //   }
+  //   else { //else it's just a simple number
+  //     ser['from'] = this.from;
+  //   }
+  //
+  //   if(this.to.constructor === Array)
+  //   {
+  //     for(var i in this.to)
+  //     {
+  //       ser['to'][i] = {};
+  //       ser['to'][i].id = this.to[i].id;
+  //       ser['to'][i].uri = this.to[i].uri;
+  //     }
+  //   }
+  //   else { //else it's just a simple number
+  //     ser['to'] = this.to;
+  //   }
+  //
+  //   return ser;
+  // },
   serializeToJSON: function()
   {
-    var ser = {}
+      var ser = {}
 
-    for(var i in this)
-    {
-      if(i !== 'from' && i !== 'to' && i !== 'constraints' && i !== 'inheritanceArray')
-        ser[i] = this[i];
-    }
-
-    ser['from'] = {};
-    ser['to'] = {};
-
-
-    //TODO faire le reste des tableaux
-    if(this.from.constructor === Array) //If it's an array, then elements are CaptenClass
-    {
-      for(var i in this.from)
+      for (var i in this)
       {
-        ser['from'][i] = {};
-        ser['from'][i].id = this.from[i].id;
-        ser['from'][i].uri = this.from[i].uri;
+        if(i !== "subClassOf" && i !== "subClasses" && i != "properties" && (typeof this[i] !== 'function') && this._isNotObserver(i))
+        {
+          ser[i] = this._serializationHandlingArray(i, this[i])[i];
+        }
+        // if(typeof this[i] !== 'function')
+        // {
+        //     if(this[i] && this[i].serializeToJSON)
+        //       ser[i] = this[i].serializeToJSON();
+        //     else if (i !== "subClassOf" && i != "subClasses" && i != "properties")
+        //       ser[i] = this[i];
+        // }
       }
-    }
-    else { //else it's just a simple number
-      ser['from'] = this.from;
-    }
 
-    if(this.to.constructor === Array)
-    {
-      for(var i in this.to)
+      console.log(this);
+
+      ser['subClassOf'] = {};
+      ser['subClasses'] = {};
+      ser['properties'] = {};
+
+      for (var i in this.subClassOf)
       {
-        ser['to'][i] = {};
-        ser['to'][i].id = this.to[i].id;
-        ser['to'][i].uri = this.to[i].uri;
+        if(this.subClassOf[i])
+        {
+          ser['subClassOf'][i] = {};
+          ser['subClassOf'][i].id = this.subClassOf[i].id;
+          ser['subClassOf'][i].uri = this.subClassOf[i].uri;
+        }
       }
+
+      for (var i in this.subClasses)
+      {
+        if(this.subClasses[i])
+        {
+          ser['subClasses'][i] = {};
+          ser['subClasses'][i].id = this.subClasses[i].id;
+          ser['subClasses'][i].uri = this.subClasses[i].uri;
+        }
+      }
+
+      for (var i in this.properties)
+      {
+        if(this.properties[i])
+        {
+          ser['properties'][i] = {};
+          set['properties'][i].id = this.properties[i].id;
+          set['properties'][i].uri = this.properties[i].uri;
+        }
+      }
+
+      return ser;
+  },
+  _serializationHandlingArray: function(index, item)
+  {
+    var ser = {};
+
+    if(item == null)
+      return ser[index] = {index: null};
+
+    if(typeof item === "function")
+    {
+      //NTD
     }
-    else { //else it's just a simple number
-      ser['to'] = this.to;
+    else if(Array.isArray(item))
+    {
+      var tmp = {};
+      for(var i in item)
+      {
+        tmp[i] = this._serializationHandlingArray(i, item[i])[i];
+      }
+      ser[index] = tmp;
+    }
+    else {
+      if(item.serializeToJSON)
+        ser[index] = item.serializeToJSON();
+      else
+        ser[index] = item;
     }
 
     return ser;
+  },
+
+  _isNotObserver: function(i)
+  {
+    if(i &&
+       (i.includes('observers') ||
+        i.includes('observersComputed') ||
+        i.includes('observersUnc') ||
+        i.includes('observersReset') ||
+        i.includes('observersInputs') ||
+        i.includes('observersIOPCompositeRelations') ||
+        i.includes('observersIOPCompositeOptions')) ||
+        i.includes('innerBindingObservers') ||
+        i.includes('removedElmtObservers') ||
+        i.includes('addedElmtObservers') ||
+        i.includes('updatedElmtObservers') ||
+        i.includes('thisDeletedObservers') ||
+        i.includes('KidentifiedObservers') ||
+        i.includes('KdeidentifiedObservers')
+      )
+      return false;
+
+    return true;
   },
 
   updateFromTo: function(from, to)

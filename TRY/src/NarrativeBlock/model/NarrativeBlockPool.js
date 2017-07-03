@@ -121,6 +121,16 @@ NarrativeBlockPool.prototype =
 
       return res.getElementsFromURIProperty(uriType);
     },
+
+    serializeToJSON: function()
+    {
+      var array = [];
+      for(var i in this.pool)
+      {  array.push(this.pool[i].serializeToJSON());
+      }
+
+      return array;
+    },
 }
 
 NarrativeBlockPool.prototype.listCompilantNarrativeBlockProperties =

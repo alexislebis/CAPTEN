@@ -89,6 +89,17 @@
 
      return res != null ? res : this.nopPool.findStepByID(stepID);
    },
+
+   serializeToJSON: function()
+   {
+     var ser = {};
+     var tmp1 = [];
+
+    ser.analyses = this.napPool.serializeToJSON();
+    ser.operators = this.nopPool.serializeToJSON();
+
+    return ser;
+   },
  }
 
  var NARRATED_OPERATION_POOL = new NarratedOperationPool(NARRATED_OPERATOR_POOL, NARRATED_ANALYSIS_POOL);
