@@ -304,7 +304,7 @@ CONTROLLED_VOCABULARY.prototype = {
                 turtleResult += "\t# " + this.versions[i].username + " - " + this.versions[i].email + " - " + this.versions[i].comment;
             }
 
-              turtleResult += "######################\n#\tPREFIXES\n######################\n\n"+ "@prefix : <"+CUSTOM_PREFIX_URI +this.pname+"#> .\n\n\n";
+              turtleResult += "######################\n#\tPREFIXES\n######################\n\n"+ "@prefix : <"+CUSTOM_PREFIX_URI /*+this.pname*/+"#> .\n\n\n";
 
             turtleResult += "\n######################\n#\tCLASSES\n######################\n\n";
 

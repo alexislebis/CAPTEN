@@ -300,7 +300,9 @@ Property.prototype = {
       ser[index] = tmp;
     }
     else {
-      if(item.serializeToJSON)
+      if(index == "narrativeBlock") //cuting the narrative block here
+        ser[index] = item.id;
+      else if(item.serializeToJSON)
         ser[index] = item.serializeToJSON();
       else
         ser[index] = item;

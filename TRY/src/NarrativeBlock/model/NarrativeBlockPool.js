@@ -148,10 +148,10 @@ NarrativeBlockPool.prototype.listCompilantNarrativeBlockProperties =
 
 NarrativeBlockPool.prototype.listCompilantNarrativeBlockEntities =
         [
-          {uri: '#hypothesis', label:'Hypothesis'},
-          {uri: '#description', label: 'Description'},
-          {uri: '#objective', label: 'Objective'},
-          {uri: '#targetUser', label: 'Target User'},
+          {uri: HYPOTHESIS_URI, label:'Hypothesis'},
+          {uri: DESCRIPTION_URI, label: 'Description'},
+          {uri: OBJECTIVE_URI, label: 'Objective'},
+          {uri: AUTHOR_URI, label: 'Target User'},
           {uri: USE_CASE_URI, label: "Use Case"},
           {uri: HAS_NAME_URI, label: "Name"},
           {uri: AUTHOR_URI, label: "Author"},

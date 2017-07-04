@@ -264,7 +264,9 @@ NarrativeBlock.prototype = {
 
   serializeToJSON: function()
   {
-    var res = {elements: [], propertyEntity: null, entity: null};
+    var res = {id: null, elements: [], propertyEntity: null, entity: null};
+
+    res.id = this.id;
 
     for(var i in this.elements)
       {res.elements.push(this.elements[i].serializeToJSON());
@@ -273,7 +275,7 @@ NarrativeBlock.prototype = {
     res.propertyEntity = this.propertyEntity;
 
     if(this.entity)
-      res.entity = this.entity.id;
+      res.entity = this.entity.serializeToJSON();
 
     // var res = JSON.stringify(res);
     return res;

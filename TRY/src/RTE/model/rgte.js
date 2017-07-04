@@ -315,6 +315,8 @@ RGTE.prototype = {
       seri[RGTE.CARDI][i] = this.edgesCardinality[i];
     }
 
+    seri['narrativeBlock'] = this.narrativeBlock.id;
+
     console.log(seri);
     return seri;
   },

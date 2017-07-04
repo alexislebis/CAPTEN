@@ -1,0 +1,126 @@
+<link rel="import" href="../../../bower_components/file-reader/file-reader.html">
+<link rel="import" href="../../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="capten-loader-element">
+    <template>
+      <style include="toasty-style"></style>
+        <style>
+            :host {
+                display: block;
+            }
+            h2 {
+                text-align: center;
+            }
+        </style>
+
+        <div>
+          <h3>Load an entire CAPTEN configuration</h3>
+          <file-reader id="fileReaderElement">CAPTEN_EXPORT.json</file-reader>
+        </div>
+
+        <paper-toast id="toastBeingLoaded" text="The CAPTEN confiugarion is being imported; Please wait">
+          <paper-button on-click="_closeToast" class="toastButton">UNDO</paper-button>
+        </paper-toast>
+
+        <paper-toast id="toastLoadOk" text="CAPTEN configuration successfully imported">
+          <paper-button on-click="_closeToast" class="toastButton">UNDO</paper-button>
+        </paper-toast>
+
+
+    </template>
+    <script>
+        Polymer(
+        {
+            is: 'capten-loader-element',
+            properties:
+            {
+              vocab:
+              {
+                type: Object,
+                notify: true,
+              },
+
+              customcls:
+              {
+                type: Object,
+                notify: true,
+              },
+
+              customprops:
+              {
+                type: Object,
+                notify: true,
+              },
+
+            },
+            // Used for two-ways binding debug
+              // observers: [
+              //   '_onGraphChanged(graphuri)'
+              // ],
+
+              _closeToast: function(e)
+              {
+                Polymer.dom(e).localTarget.parentElement.close();
+              },
+
+            ready: function()
+            {
+                var that = this;
+                this.$.fileReaderElement.returnFunction = function()
+                {
+                    var body;
+                    var callback = {
+                        onload: function(e)
+                        {
+                            that.loadCAPTEN(e.target.result);
+                        },
+                        onprogress: function() {},
+                        onerror: function() {}
+                    }
+                    this.getSlice(0, 1, callback);
+                };
+            },
+            // _onGraphChanged: function(n,o)
+            // {
+            //   // if(Object.keys(this.rdfStore).length === 0 && this.rdfStore.constructor === Object)
+            //   //   return;
+            //
+            //   console.log("CALL:_onGraphChanged("+n+","+o+")");
+            // },
+            loadCAPTEN: function(fileContent)
+            {
+              this.$.toastBeingLoaded.open();
+              var parsedJSON = JSON.parse(fileContent);
+
+              CAPTEN_LOADER.import(parsedJSON, this.vocab, this.customcls, this.customprops, this, this._resultImport);
+              // // console.log(jO.nodes[0].subClassOf[0].uri);
+              //
+              // this.rgte.parseJSON(jO, this.vocab);
+              // var dispArray = this.rgte.vocabularyDispersion(this.vocab);
+              //
+              // var cust = this.customcls;
+              // for(var i in dispArray['classes'])
+              //   cust.push(dispArray['classes'][i]);
+              //
+              // var pro = this.customprops;
+              // for(var i in dispArray['properties'])
+              //   pro.push(dispArray['properties'][i]);
+              //
+              // this.customcls = [];
+              // this.customprops = [];
+              //
+              // this.customcls = cust;
+              // this.customprops = pro;
+              //
+              // this.$.toastLoadOk.open();
+            },
+
+            _resultImport: function(vocab, customcls, customprops)
+            {
+              
+              this.$.toastBeingLoaded.close();
+              this.$.toastLoadOk.open();
+            },
+        });
+    </script>
+</dom-module>

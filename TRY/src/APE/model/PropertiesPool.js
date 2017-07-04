@@ -115,6 +115,28 @@ PropertiesPool.prototype = {
     return related;
   },
 
+  serializeToJSON: function()
+  {
+    var res = [];
+
+    for(var i in this.pool)
+      res.push(this.pool[i].serializeToJSON());
+
+    return res;
+  },
+
+  register: function(prop)
+  {
+    if(prop == null)
+      return;
+
+    for(var i in this.pool)
+      if(this.pool[i].id == prop.id)
+        return;
+
+    this._addingToPool(prop);
+  },
+
 }
 
 var PROPERTIES_POOL = new PropertiesPool();

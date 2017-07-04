@@ -19,6 +19,8 @@ function CompositeElement()
 {
   this.id = CAPTEN.ID++;
 
+  this.uri = COMPOSITE_URI;
+
   // === Observers
     this.observers = [];
     this.observersDelete = [];

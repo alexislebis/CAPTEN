@@ -655,7 +655,7 @@
                 if (cClass == undefined && Object.keys(cClass).length === 0 && cClass.constructor === Object)
                     return;
 
-                var c = new CAPTENClass(cClass, cClass);
+                var c = new CAPTENClass(CUSTOM_PREFIX_URI+""+cClass, cClass);
                 this.push('customcls', c);
 
                 AUTHOR_SET(c, DEFAULT_AUTHOR);
@@ -665,7 +665,7 @@
                 if (cProp == undefined && Object.keys(cProp).length === 0 && cProp.constructor === Object)
                     return;
 
-                var p = PROPERTIES_POOL.create(cProp, cProp);
+                var p = PROPERTIES_POOL.create(CUSTOM_PREFIX_URI+""+cProp, cProp);
                 this.push('customprops', p);
                 AUTHOR_SET(p, DEFAULT_AUTHOR);
                 // this.customprops.push(PROPERTIES_POOL.create(cProp, cProp));

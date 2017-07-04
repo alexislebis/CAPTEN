@@ -39,6 +39,10 @@ var DESCRIPTION_URI = "http://www.CAPTEN.org/SEED/ontologies/Description";
 var NARRATIVE_BLOCK_URI = "http://www.CAPTEN.org/SEED/ontologies/hasNarrativeBlock";//NOTE Outside the CAPTEN ontology
 
 
+// === NON INCLUDED
+var COMPOSITE_URI = "http://www.CAPTEN.org/SEED/ontologies/compositeElement";
+var EXTENDED_STRING_URI = "http://www.CAPTEN.org/SEED/ontologies/extendedString";
+
 
 
 var URI_TO_LABEL = function(uri)
