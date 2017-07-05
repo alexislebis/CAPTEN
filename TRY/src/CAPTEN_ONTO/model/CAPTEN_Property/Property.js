@@ -10,6 +10,8 @@ function Property(uri, label, From, to, additionalConstraints){
     this.iName = "Property";//Memorize the root level for inheritance
     this.name = this.iName;
 
+    this.arrows = "to";
+
     if(label == null)
       this.label = this.iName;
     else

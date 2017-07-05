@@ -70,6 +70,7 @@ RGTE.ACTIONS = [];
 RGTE.NODES = "nodes";
 RGTE.EDGES = "edges";
 RGTE.CARDI = "edgesCardinality";
+RGTE.KNOWLEDGES = "knowledges";
 
 RGTE.delete = function(object, rgteRef)
 {
@@ -296,6 +297,7 @@ RGTE.prototype = {
     seri[RGTE.NODES] = {};
     seri[RGTE.EDGES] = {};
     seri[RGTE.CARDI] = {};
+    seri[RGTE.KNOWLEDGES] = {};
 
     for(var i in this.nodes)
     {
@@ -316,6 +318,12 @@ RGTE.prototype = {
     }
 
     seri['narrativeBlock'] = this.narrativeBlock.id;
+
+    for(var i in this.knowledges)
+    {
+      seri[RGTE.KNOWLEDGES][i] = {};
+      seri[RGTE.KNOWLEDGES][i] = this.knowledges[i].serializeToJSON();
+    }
 
     console.log(seri);
     return seri;

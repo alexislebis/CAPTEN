@@ -8,7 +8,7 @@
   this.name = new ExtendedString();
   this.name.update(name);
 
-  this.uri = "http://xmlns.com/foaf/0.1/name"; //Imply to be a thing
+  this.uri = NAME_URI; //Imply to be a thing
 
 }
 

@@ -1,6 +1,6 @@
 function Objective ()
 {
-  CAPTENClass.call(this);
+  NarrativeElement.call(this);
 
   this.uri = OBJECTIVE_URI;
 
@@ -14,7 +14,7 @@ function Objective ()
   this.addendum = []; //TODO Add addendum to objective
 }
 
-Objective.prototype = new CAPTENClass();
+Objective.prototype = new NarrativeElement();
 Objective.prototype.constructor = Objective;
 
 Objective.prototype.updateElement = function(content)

@@ -5,8 +5,8 @@ function TargetUser()
 {
   NarrativeElement.call(this);
 
-  this.uri = TARGER_USER_URI;
-  
+  this.uri = TARGET_USER_URI;
+
   this.htmlify = "an target user";
 
   this.subClasses = [ //OLD

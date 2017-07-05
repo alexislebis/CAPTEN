@@ -30,6 +30,81 @@ NarrativeElement.prototype.getContent = function()
   return this.content;
 }
 
+NarrativeElement.prototype.selfBuildingWithJson = function(thisjson, alignements) // alignements is an array keeping the correspondance old.id new.id. Check CAPTENLoader
+{
+  if(thisjson == null)
+    return;
+
+  for(var i in thisjson)
+  {
+    if(typeof thisjson === 'function')
+    {
+      // NTD
+    }
+    else if(i == "extString")
+    {
+      var exSt = new ExtendedString();
+
+      exSt.selfBuildingWithJson(thisjson[i], alignements);
+
+      CAPTEN_LOADER_ALIGNMENTS_NEW_ROW(alignements, thisjson[i].id, exSt, null);
+
+      this[i] = exSt;
+    }
+    else if(typeof thisjson[i] === 'object')
+    {
+      if(i == "name" || i == "content")
+      {
+        if(thisjson[i]['extString'])
+        {
+          var exSt = new ExtendedString();
+
+          exSt.selfBuildingWithJson(thisjson[i]['extString'], alignements);
+
+          if(thisjson[i]['extString'].id)
+            CAPTEN_LOADER_ALIGNMENTS_NEW_ROW(alignements, thisjson[i]['extString'].id, exSt, null);
+
+          this[i] = exSt;
+        }
+      }
+      else
+      {
+        console.log("doing nothing but it's subclasses information and others");
+      }
+    }
+    else
+    {
+      if(i != "id")
+        this[i] = thisjson[i];
+    }
+  }
+  // if(thisjson.uri)
+  //   this.uri = thisjson.uri;
+  //
+  // if(thisjson.htmlify)
+  //   this.htmlify = thisjson.htmlify;
+  //
+  // if(thisjson.narrativeCategory)
+  //   this.narrativeCategory = thisjson.narrativeCategory;
+  //
+  // if(thisjson.content)
+  // {
+  //   if(thisjson.content.uri == EXTENDED_STRING_URI)
+  //   {
+  //     var exSt = new ExtendedString();
+  //
+  //     exSt.selfBuildingWithJson(thisjson.content, alignements);
+  //     this.content = exSt;
+  //   }
+  //   else
+  //   {
+  //     console.log("default behavior");
+  //     this.content = thisjson.content;
+  //   }
+  //
+  // }
+}
+
 
 var NARRATIVE_CATEGORY_UNKNOWN = "unkwon";
 var NARRATIVE_CATEGORY_WHAT = "what";

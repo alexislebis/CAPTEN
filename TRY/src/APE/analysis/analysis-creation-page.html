@@ -371,6 +371,7 @@
             this.isNew = false;
             this.nap = res;
             this.rgte = this.nap.expectedConcepts;
+            this.stateRGTE = this.displayState;
             return true;
           },
 
@@ -381,6 +382,7 @@
 
         this._attachListenersNAP();
         this.steps = nap.steps;
+        this.napName = nap.getNameObject();
       },
 
       _attachListenersNAP: function()
@@ -414,7 +416,7 @@
 
         NARRATED_OPERATION_POOL.registerNAP(this.nap);
         AUTHOR_SET(this.nap, DEFAULT_AUTHOR);
-        
+
         this.isNew = false;
         this.$.NAPRegistered.open();
       },

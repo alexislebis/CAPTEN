@@ -26,14 +26,14 @@ var IS_AUTHORED_BY = "http://www.CAPTEN.org/SEED/ontologies/isAuthoredBy";
 
 // === CUSTOM NODE
 var USE_CASE_URI = "http://www.CAPTEN.org/SEED/ontologies/useCase";
-var NAME_URI = "http://www.CAPTEN.org/SEED/ontologies/Name";
+var NAME_URI = "http://xmlns.com/foaf/0.1/name";
 var AUTHOR_URI = "http://www.CAPTEN.org/SEED/ontologies/Author";
 var ANALYSIS_URI = "http://www.CAPTEN.org/SEED/ontologies/NarratedAnalysisProcess";
 var OPERATOR_URI = "http://www.CAPTEN.org/SEED/ontologies/NarratedOperator";
 var OBJECTIVE_URI = "http://www.CAPTEN.org/SEED/ontologies/Objective";
 var HYPOTHESIS_URI = "http://www.CAPTEN.org/SEED/ontologies/Hypothesis";
 var STEP_URI = "http://www.CAPTEN.org/SEED/ontologies/Step";
-var TARGER_USER_URI = "http://www.CAPTEN.org/SEED/ontologies/TargetUser";
+var TARGET_USER_URI = "http://www.CAPTEN.org/SEED/ontologies/TargetUser";
 var DESCRIPTION_URI = "http://www.CAPTEN.org/SEED/ontologies/Description";
 
 var NARRATIVE_BLOCK_URI = "http://www.CAPTEN.org/SEED/ontologies/hasNarrativeBlock";//NOTE Outside the CAPTEN ontology

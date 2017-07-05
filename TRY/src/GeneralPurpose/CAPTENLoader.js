@@ -48,7 +48,7 @@ CAPTENLoader.prototype = {
     this._deserializeProperties(json);
     this._deserializeGraphs(json);
     this._deserializeNarrativeOperations(json);
-    this._deserializeNarrativeBlocks(json);
+    this._deserializeNarrativeBlocks(json); // MUST BE IN LAST POSITION
 
     this._solve();
   },
@@ -63,7 +63,10 @@ CAPTENLoader.prototype = {
       {
         for(var j in this.alignements[i].subjects)
         {
-          this.alignements[i].subjects[j].obj[this.alignements[i].subjects[j].attr] = this.alignements[i].newObject;
+          if(this.alignements[i].subjects[j].obj instanceof Property && ( this.alignements[i].subjects[j].attr == 'from' || this.alignements[i].subjects[j].attr == 'to') )
+            this.alignements[i].subjects[j].obj[this.alignements[i].subjects[j].attr] = this.alignements[i].newObject.id;
+          else
+            this.alignements[i].subjects[j].obj[this.alignements[i].subjects[j].attr] = this.alignements[i].newObject;
         }
       }
       else
@@ -104,25 +107,26 @@ CAPTENLoader.prototype = {
     var analyses = json.operations.analyses;
     var a;
 
+    var operators = json.operations.operators;
+    var o;
+
+    for(var i in operators)
+    {
+      o = this._createOperatorFromJSON(operators[i]);
+      NARRATED_OPERATION_POOL.registerNOP(o);
+    }
+
     for(var i in analyses)
     {
       a = this._createAnalysisFromJSON(analyses[i]);
       NARRATED_OPERATION_POOL.registerNAP(a);
     }
 
-    var operators = json.operations.operators;
-    var o;
-
-    for(var i in operators)
-    {
-      console.error("DESERIALIZATION of OPERATOR TODO");
-    }
-
   },
 
-  _createAnalysisFromJSON: function(analysisjson)
+  _createOperatorFromJSON: function(analysisjson)
   {
-    var a = new NarratedAnalysisProcess();
+    var a = new NarratedOperator();
 
     // this._addNewAlignmentRow(analysisjson.id, a, null);
 
@@ -131,8 +135,8 @@ CAPTENLoader.prototype = {
     this._addNewAlignmentRow(analysisjson.behaviors.input.id, null, {obj: a.behaviors, attr: "input" });
     this._addNewAlignmentRow(analysisjson.behaviors.output.id, null, {obj: a.behaviors, attr: "output"});
 
-    if(analysisjson.expectedConcept)
-      this._addNewAlignmentRow(analysisjson.expectedConcept.id, null, {obj: a, attr: "expectedConcept"});
+    if(analysisjson.expectedConcepts)
+      this._addNewAlignmentRow(analysisjson.expectedConcepts.id, null, {obj: a, attr: "expectedConcepts"});
 
 
     console.log("inheritanceArray currently ignored");
@@ -146,6 +150,42 @@ CAPTENLoader.prototype = {
       s = this._createStepFromJSON(analysisjson.steps[i]);
       a.addStep(s);
     }
+
+    if(analysisjson.uriConceptConvoyed)
+      a.uriConceptConvoyed = analysisjson.uriConceptConvoyed;
+
+    return a;
+  },
+
+  _createAnalysisFromJSON: function(analysisjson)
+  {
+    var a = new NarratedAnalysisProcess();
+
+    // this._addNewAlignmentRow(analysisjson.id, a, null);
+
+    a = this._captenClassBuider(a, analysisjson);
+
+    this._addNewAlignmentRow(analysisjson.behaviors.input.id, null, {obj: a.behaviors, attr: "input" });
+    this._addNewAlignmentRow(analysisjson.behaviors.output.id, null, {obj: a.behaviors, attr: "output"});
+
+    if(analysisjson.expectedConcepts)
+      this._addNewAlignmentRow(analysisjson.expectedConcepts.id, null, {obj: a, attr: "expectedConcepts"});
+
+
+    console.log("inheritanceArray currently ignored");
+
+
+    console.log("properties currently ignored");
+
+    var s;
+    for(var i in analysisjson.steps)
+    {
+      s = this._createStepFromJSON(analysisjson.steps[i]);
+      a.addStep(s);
+    }
+
+    if(analysisjson.uriConceptConvoyed)
+      a.uriConceptConvoyed = analysisjson.uriConceptConvoyed;
 
     return a;
   },
@@ -186,7 +226,7 @@ CAPTENLoader.prototype = {
 
     for(var i in narratives)
     {
-      if(this.alignements[narratives[i].id] == null || this.alignements[narratives[i]].newObject == null)
+      if(this.alignements[narratives[i].id] == null || this.alignements[narratives[i].id].newObject == null)
         n = this._createNarrativeBlockFromJSON(narratives[i]);
       // NARRATIVE_BLOCK_POOL.register(n);
     }
@@ -195,78 +235,52 @@ CAPTENLoader.prototype = {
 
   _createNarrativeBlockFromJSON: function(nbjson)
   {
-    var n = NARRATIVE_BLOCK_POOL.create();
+    if(this.alignements[nbjson.id].newObject == null)//If the narrative block does not exist yet; i.e. not created inside a captenclass
+    {
+      var n = NARRATIVE_BLOCK_POOL.create();
 
-    this._addNewAlignmentRow(nbjson.id, n, null);
+      this._addNewAlignmentRow(nbjson.id, n, null);
+    }
 
     if(nbjson.propertyEntity)
       this._addNewAlignmentRow(nbjson.propertyEntity.id, null, {obj: n, attr: "propertyEntity"});
 
     if(nbjson.entity)
     {
-      this._addNewAlignmentRow(nbjson.entity, null, {obj: n, attr: "entity"});//entity is already an id
+      this._addNewAlignmentRow(nbjson.entity.id, null, {obj: n, attr: "entity"});//entity is already an id
     }
 
     for(var i in nbjson.elements)
     {
       this._addNewAlignmentRow(nbjson.elements[i].id, null, {obj: n.elements, attr: i});
-    }
 
-    return n;
-  },
+      var obj = this.alignements[nbjson.elements[i].id].newObject; // SHOULD NOT BE NULL. IF IT IS, item must be created
 
-  _enrichNarrativeBlockFromJSON: function(nb, nbjson)
-  {
-    if(nbjson.propertyEntity)
-      this._addNewAlignmentRow(nbjson.propertyEntity.id, null, {obj: n, attr: "propertyEntity"});
-
-    if(nbjson.entity)
-      this._addNewAlignmentRow(nbjson.entity, null, {obj: n, attr: "entity"});
-
-    var elm;
-    for(var i in nbjson.elements)
-    {
-      elm = NARRATIVE_BLOCK_POOL.newInstanceDispatcher(NARRATIVE_BLOCK_POOL.listCompilantNarrativeBlockEntities(nbjson.uri));
-      if(elm == null)//Unrecognized element
+      if(obj == null)
       {
-        if(nbjson.uri == COMPOSITE_URI)
-        {
+        elm = NARRATIVE_BLOCK_POOL.newInstanceDispatcher(nbjson.elements[i].uri);
 
-        }
-        else if(nbjson.uri == EXTENDED_STRING_URI)
-        {
+        if(elm instanceof CAPTENClass)
+          this._captenClassBuider(elm, nbjson.elements[i]);
 
+        if(elm instanceof NarrativeElement)
+          elm.selfBuildingWithJson(nbjson.elements[i], this.alignements);
+        else if(elm instanceof CompositeElement)
+          elm.selfBuildingWithJson(nbjson.elements[i], this.alignements);
+        else if (elm instanceof ExtendedString)
+        {
+          console.error("ExtendedString");
         }
         else
         {
-
+          console.error("Unrecognized elm");
         }
-      }
-      else
-      {
-        elm = this._captenClassBuider(elm, nbjson.elements[i]);
 
-        // if(elm instanceof Hypothesis)
-        //   elm = ;
-        // if(elm instanceof Description)
-        //   elm = ;
-        // if(elm instanceof Objective)
-        //   elm = ;
-        // if(elm instanceof TargetUser)
-        //   elm = ;
-        // if(elm instanceof UseCase)
-        //   elm = ;
-        // if(elm instanceof EntityName)
-        //   elm = ;
-        // if(elm instanceof Author)
-        //   elm = ;
+        this._addNewAlignmentRow(nbjson.elements[i].id, elm, null);
       }
     }
-  },
 
-  _createNarrativeElement: function(elm, elmjson)
-  {
-
+    return n;
   },
 
   _addNewAlignmentRow: function(key, newObject, subj)
@@ -328,6 +342,14 @@ CAPTENLoader.prototype = {
         g.edges.push(p);
       }
 
+      var k;
+      for(var i in json.knowledges)
+      {
+        k = new ExploitableOutput();
+
+        k = this._captenClassBuider(k, json.knowledges[i]);
+      }
+
       console.error('TODO : Edge cardinality');
 
       return g;
@@ -358,61 +380,14 @@ CAPTENLoader.prototype = {
 
     this._continueImport(json);
 
-    // rdfstore.create(function(err, stor)
-    // {
-    //     var store = stor;
-    //     //this.store.registerParser("application/rdf+xml", TabulatorRDFXMLParser);
-    //     var graphuri = "DEFAULT_GRAPH_URI";//@TODO: Dynamic Graph URI
-    //
-    //     store.load('text/turtle', json.vocab.n3, function(s,d){
-    //       store.graph(function(err, graph)
-    //       {
-    //         if(this.alreadyDone)
-    //           return;
-    //         if(!this.alreadyDone)
-    //           this.alreadyDone = true;
-    //
-    //         vocTMP.setRDFStore(store);
-    //
-    //         graph = graph;
-    //
-    //         //addind the new elements to the vocab
-    //         // var nds = vocTMP.getClasses();
-    //         // var prp = vocTMP.getPropertiesArrayed();
-    //         // for(var i in nds)
-    //         //   this.vocab.addClass(nds[i]);
-    //         // for(var i in prp)
-    //         //   this.vocab.addProperty(prp[i]);
-    //
-    //         var p;
-    //         for(var i in json.vocab.vocabProps)
-    //         {
-    //           p = PROPERTIES_POOL.create(json.vocab.vocabProps[i].uri, json.vocab.vocabProps[i].label);
-    //           this._addNewAlignmentRow(json.vocab.vocabProps[i].id, p, null) ;
-    //           this.customprops.push(p);
-    //         }
-    //
-    //         //Alignment detection
-    //         var c;
-    //         for(var i in json.vocab.vocabClasses)
-    //         {
-    //           c = this._captenClassBuider(json.vocab.vocabClasses[i]);
-    //           this._addNewAlignmentRow(json.vocab.vocabClasses[i].id, c, null);
-    //           this.customcls.push(c);
-    //         }
-    //
-    //         this._continueImport(json);
-    //       }.bind(this));
-    //
-    //     }.bind(this));
-    //
-    // }.bind(this));
   },
 
   _captenClassBuider: function(c, classJson)
   {
 
     this._addNewAlignmentRow(classJson.id, c, null);
+
+    NARRATIVE_BLOCK_POOL.unregister(c.narrativeBlock);
 
     //Planar Attributes
     if(classJson.label)
@@ -432,10 +407,7 @@ CAPTENLoader.prototype = {
     if(classJson.author)
       this._addNewAlignmentRow(classJson.author.id, null, {obj: c, attr: "author"});
     if(classJson.narrativeBlock)
-    {
-      this._addNewAlignmentRow(classJson.narrativeBlock.id, c.narrativeBlock, {obj: c, attr: "narrativeBlock"});
-      this._createNarrativeBlockFromJSON
-    }
+      this._addNewAlignmentRow(classJson.narrativeBlock, null, {obj: c, attr: "narrativeBlock"});
     if(classJson.idVoc)
       this._addNewAlignmentRow(classJson.idVoc.id, null, {obj: c, attr: "idVoc"});
     if(classJson.derivedFrom)
@@ -459,6 +431,9 @@ CAPTENLoader.prototype = {
     if(propJson.to)
       this._addNewAlignmentRow(propJson.to, null, {obj: p, attr: "to"});
 
+    if(propJson.arrows)
+      this.arrows = propJson.arrows;
+
     p.uri = propJson.uri;
     p.label = propJson.label;
     p.iName = propJson.iName;
@@ -468,3 +443,15 @@ CAPTENLoader.prototype = {
 };
 
 var CAPTEN_LOADER = new CAPTENLoader();
+
+var CAPTEN_LOADER_ALIGNMENTS_NEW_ROW = function(alignements, key, newObject, subj)
+{
+  if(alignements[key] == null)
+    alignements[key] = {newObject: newObject, subjects: []};
+
+  if(subj != null)
+    alignements[key].subjects.push({obj: subj.obj, attr: subj.attr});
+
+  if(newObject != null)
+    alignements[key].newObject = newObject;
+};

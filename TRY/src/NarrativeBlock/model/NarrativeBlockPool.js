@@ -23,6 +23,29 @@ NarrativeBlockPool.prototype =
       return block;
     },
 
+    unregister: function(narrative)
+    {
+      if(narrative == null)
+        return;
+
+      var index = null;
+      for(var i in this.pool)
+      {
+        if(this.pool[i].id == narrative.id)
+        {
+          index = i;
+          break;
+        }
+      }
+
+      if(index == null)
+        return;
+
+      PROPERTIES_POOL.remove(this.pool[i].propertyEntity);
+
+      this.pool.splice(index, 1);
+    },
+
     createFromElement: function(elem)
     {
       if(elem == null || elem.id == null)
@@ -163,17 +186,31 @@ NarrativeBlockPool.prototype.newInstanceDispatcher = function(instanceName)
   {
     case "Hypothesis":
       return new Hypothesis();
+    case HYPOTHESIS_URI:
+      return new Hypothesis();
     case "Description":
+      return new Description();
+    case DESCRIPTION_URI:
       return new Description();
     case "Objective":
       return new Objective();
+    case OBJECTIVE_URI:
+      return new Objective();
     case "Target User":
+      return new TargetUser();
+    case TARGET_USER_URI:
       return new TargetUser();
     case "Use Case":
       return new UseCase();
+    case USE_CASE_URI:
+      return new UseCase();
     case "Name":
       return new EntityName();
+    case NAME_URI:
+      return new EntityName();
     case "Author":
+      return new Author();
+    case AUTHOR_URI:
       return new Author();
     default:
       return null;

@@ -4,6 +4,8 @@
 
  function ExtendedString()
  {
+   this.uri = EXTENDED_STRING_URI;
+
    this.array = [];
 
    this.mustBeReseted = false;
@@ -289,6 +291,23 @@
       }
 
       return {extString: res};
+   },
+
+   selfBuildingWithJson: function(json, alignements)
+   {
+     this.reset();
+
+     this.mustBeReseted = json.mustBeReseted;
+
+     for(var i in json.array)
+     {
+       this.array.push(json.array[i]);
+
+       if(typeof json.array[i] === 'object' && typeof json.array[i] !== null && json.array[i].id)
+       {
+         CAPTEN_LOADER_ALIGNMENTS_NEW_ROW(alignements, json.array[i].id, null, {obj: this.array, attr: this.array.length-1});
+       }
+     }
    },
 
  };
