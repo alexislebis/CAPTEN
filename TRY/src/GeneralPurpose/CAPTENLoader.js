@@ -51,6 +51,8 @@ CAPTENLoader.prototype = {
     this._deserializeNarrativeBlocks(json); // MUST BE IN LAST POSITION
 
     this._solve();
+
+    return {vocab: vocab, customcls: customcls, customprops: customprops};
   },
 
   _solve: function()
@@ -348,6 +350,7 @@ CAPTENLoader.prototype = {
         k = new ExploitableOutput();
 
         k = this._captenClassBuider(k, json.knowledges[i]);
+        this._addNewAlignmentRow(json.knowledges[i].id, null, {obj: g.knowledges, attr: i});
       }
 
       console.error('TODO : Edge cardinality');
@@ -437,6 +440,10 @@ CAPTENLoader.prototype = {
     p.uri = propJson.uri;
     p.label = propJson.label;
     p.iName = propJson.iName;
+    p.htmlify = propJson.htmlify;
+
+    if(propJson.name)
+      p.name = propJson.name;
 
     return p;
   },

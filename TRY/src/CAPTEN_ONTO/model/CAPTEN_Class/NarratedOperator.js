@@ -35,6 +35,7 @@ function NarratedOperator(usualName)
     this.behaviors = []; //BehavioralPattern. The behaviors of a specific NarratedOperator.
       this.behaviors['output'] = new RGTE();//this RGTE is not register in the RGTE POOL
       this.behaviors['input'] = new RGTE;//this RGTE is not register in the RGTE POOL
+      this.behaviors['parameters'] = [];
 
     //Analysis tools links
     this.implementedByOperation = null; //For each tool : [T1:[OperatorList], T2:[OperatorList], ...]
@@ -108,6 +109,37 @@ NarratedOperator.prototype.constructor = NarratedOperator;
     NarratedOperator.prototype.isEqual = function(nop)
     {
 
+    }
+
+    NarratedOperator.prototype.addParameterPattern = function(param)
+    {
+      if(param == null || !(param instanceof ParameterPattern) )
+        return;
+
+      for(var i = 0; i < this.behaviors['parameters'].length; i++)
+        if(this.behaviors['parameters'][i].id == param.id)
+          return;
+          
+      this.behaviors['parameters'].push(param);
+
+      this.notifyChange();
+    }
+
+    NarratedOperator.prototype.removeParameterPattern = function(param)
+    {
+      var index;
+
+      for(var i in this.behaviors['parameters'])
+      {
+          if(param.id == this.behaviors['parameters'].id)
+        {
+          index = i;
+          break;
+        }
+      }
+
+      if(index)
+        this.behaviors.splice(i, 1);
     }
 
     NarratedOperator.prototype.addStep= function(step)

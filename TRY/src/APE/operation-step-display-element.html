@@ -261,13 +261,20 @@
 
           <div id="parameterBehavior">
             <header class="headerSubSection">
-              <div><span>Parameter behavior</span></div>
+              <div><span>Parameter configuration</span></div>
             </header>
-            <div class="center">
+            <!-- <div class="center">
               <paper-fab id="fabParameter" disabled icon="add"></paper-fab>
-            </div>
+            </div> -->
 
-            <paper-input id="p1" label="Parameter concept #1 (e.g. Type of correlation measure)" value="{{nopparameter1}}"></paper-input>
+            <div id="paramRepeater">
+
+            </div>
+            <!-- <template id="repeaterParam" is="dom-repeat" items="{{stepParams}}" index-as="index" restamp>
+              <parameter-configuration-namer-element entity="{{item}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></parameter-configuration-namer-element>
+            </template> -->
+
+            <!-- <paper-input id="p1" label="Parameter concept #1 (e.g. Type of correlation measure)" value="{{nopparameter1}}"></paper-input> -->
           </div>
 
 
@@ -306,6 +313,11 @@
               step:
               {
                 type: Object,
+                notify: true,
+              },
+              stepParams:
+              {
+                type: Array,
                 notify: true,
               },
               operation:
@@ -598,6 +610,24 @@
                 this.operationName = this.operation.getName();
                 this.inputBehavior = this.operation.behaviors['input'];
                 this.outputBehavior = this.operation.behaviors['output'];
+
+                this.stepParams = []; //reset of the parameters of the steps;
+                // this.$.repeaterParam.render();
+                for(var i in this.operation.behaviors['parameters'])
+                  this.push('stepParams', new ParameterConfiguration(this.operation.behaviors['parameters'][i]));
+
+                this._generateParams();
+                this.fire(STEP_OPERATION_PARAMETER_TO_WORK_WITH_SIGNAL_ID, this.stepParams);
+              },
+
+              useParams: function(params)
+              {
+                this.stepParams = [];
+
+                for(var i in params)
+                  this.stepParams.push(params[i]);
+
+                this._generateParams();
               },
 
               _analysisChange: function()
@@ -776,6 +806,40 @@
               //@TODO handle narrative element for NOP
               console.error("HANDLE NARRATIION FOR BLOCKS ATTRs");
             },
+
+            _generateParams: function()
+            {
+              this._resetDisplay();
+
+              var arrayOfElms = [];
+              for(var i in this.stepParams)
+              {
+                if(this.stepParams[i] == null || this.stepParams[i].constructor == null || (this.stepParams[i].constructor).namerElement == null)
+                  return null;
+
+                var elementNamer = new (this.stepParams[i].constructor).namerElement(this.stepParams[i]);
+                elementNamer.set('vocab', this.vocab);
+                elementNamer.set('customcls', this.customcls);
+                elementNamer.set('customprops', this.customprops);
+
+                arrayOfElms.push(elementNamer);
+              }
+
+              var div = this.$$('#paramRepeater');
+
+              for(var i in arrayOfElms)
+                div.appendChild(arrayOfElms[i]);
+            },
+
+            _resetDisplay: function()
+            {
+              var root = this.$$('#paramRepeater');
+
+              if(root)
+                while(root.firstChild)
+                  root.removeChild(root.firstChild);
+            },
+
 // === OLD
             _behaviorSelectorIOClicked: function(params)
             {

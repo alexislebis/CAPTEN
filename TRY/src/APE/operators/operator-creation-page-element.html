@@ -247,14 +247,17 @@
           <div><span>Parameter behavior</span></div>
         </header>
         <div class="center">
-          <paper-fab id="fabParameter" disabled icon="add"></paper-fab>
+          <paper-fab id="fabParameter" icon="add" on-click="_addParamsPattern"></paper-fab>
         </div>
 
-        <paper-input id="p1" label="Parameter concept #1 (e.g. Type of correlation measure)" value="{{nopparameter1}}"></paper-input>
+        <div id="paramRepeater">
+
+        </div>
+
       </div>
 
       <div id="relationBetweenElements">
-        Array of narrative elements to do
+        Array of narrative elements to do.
       </div>
 
     </div>
@@ -414,6 +417,11 @@
 
             properties:
             {
+              paramPatterns:
+              {
+                type: Array,
+                notify: true,
+              },
               filter:
               {
                 type: Array,
@@ -810,6 +818,11 @@
             {
                 this.nopoutputrgte = this.nop.behaviors['output'];
                 this.nopinputrgte = this.nop.behaviors['input'];
+                this.paramPatterns = [];
+
+                this.paramPatterns = this.nop.behaviors['parameters'];
+
+                this._generateParams();//Display of params
 
               this.nopname = this.nop.getNameObject();
 
@@ -1032,6 +1045,48 @@
                 this.$.pibCollapse3.setAttribute('icon', 'icons:expand-less');
               else
                 this.$.pibCollapse3.setAttribute('icon', 'icons:expand-more');
+            },
+
+            _addParamsPattern: function()
+            {
+              var p = new ParameterPattern();
+              this.nop.addParameterPattern(p);
+              this.paramPatterns = [];
+              this.paramPatterns = this.nop.behaviors['parameters'];
+              this._generateParams();//Display of params
+            },
+
+            _generateParams: function()
+            {
+              this._resetDisplay();
+
+              var arrayOfElms = [];
+              for(var i in this.paramPatterns)
+              {
+                if(this.paramPatterns[i] == null || this.paramPatterns[i].constructor == null || (this.paramPatterns[i].constructor).namerElement == null)
+                  return null;
+
+                var elementNamer = new (this.paramPatterns[i].constructor).namerElement(this.paramPatterns[i]);
+                elementNamer.set('vocab', this.vocab);
+                elementNamer.set('customcls', this.customcls);
+                elementNamer.set('customprops', this.customprops);
+
+                arrayOfElms.push(elementNamer);
+              }
+
+              var div = this.$$('#paramRepeater');
+
+              for(var i in arrayOfElms)
+                div.appendChild(arrayOfElms[i]);
+            },
+
+            _resetDisplay: function()
+            {
+              var root = this.$$('#paramRepeater');
+
+              if(root)
+                while(root.firstChild)
+                  root.removeChild(root.firstChild);
             },
 
 

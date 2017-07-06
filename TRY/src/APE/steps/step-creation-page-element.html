@@ -362,6 +362,13 @@
         },
         // === EndPage
 
+        firstTimeStep: //Prevent override of the step when loaded up the first time
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+
         placeboOutput: //A placebo output used to reset the display and for prevent the useless creation of new tmp RGTE.
         { // DO NOT MODIFY ITS CONTENT
           type: Object,
@@ -458,6 +465,10 @@
           this._behaviorManager(e.detail);
         }.bind(this));
 
+        this.$.osde.addEventListener(STEP_OPERATION_PARAMETER_TO_WORK_WITH_SIGNAL_ID, function(e){
+          this._updateStepParams(e.detail);
+        }.bind(this));
+
 
         // === OUTPUT
         this.step.registerObserverCallbackOnOutputsComputation(this, this._outputComputed);
@@ -529,6 +540,8 @@
           return;
 
         this.reset();
+
+        this.operation = null;
 
         if(this.data.itemValue == null || this.data.itemValue == "" || this.data.itemValue.toLowerCase() == 'new' || this.data.itemValue.search(/\D+/) != -1)
         {
@@ -621,6 +634,7 @@
             if(res == null)
               return false;
 
+            this.firstTimeStep = true;
             this.step = res.step;
 
             this.set('compositeIOP', this.step.getCompositeRelations());
@@ -673,6 +687,21 @@
 
         // === LINKING FAB
         this.$.linkingFab.disabled = this._isLinkingDisabled(this.input, this.operation);
+      },
+
+      _updateStepParams: function(params)
+      {
+        if(this.step.parameters.length > 0 && this.firstTimeStep)//prevent the override the first time that step is loaded;
+        {
+          this.firstTimeStep = false;
+          this.$.osde.useParams(this.step.parameters);
+          return;
+        }
+
+        this.step.parameters = [];
+
+        for(var i in params)
+          this.step.addParameter(params[i]);
       },
 
       _onNameChanged: function(name)

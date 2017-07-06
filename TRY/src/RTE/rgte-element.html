@@ -420,7 +420,7 @@
 
             addClass: function(cls) //From rte-lister-element redirected by rgte-workzone-element
             {
-              var nodeID = this.rgte.addVisNode(cls);
+              var nodeID = this.rgte.addVisNode(cls, cls.label);
 
               this.previousRGTENode = this.rgte.getNodeById(nodeID);
               this.$.toastClassAdded.open();

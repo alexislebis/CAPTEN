@@ -1,0 +1,38 @@
+<!-- <link rel="import" href="../../../../NarrativeBlock/view/narrative-block-cascader-display-element.html"> -->
+<link rel="import" href="../../theme/namer/namer-style.html">
+<link rel="import" href="../../../../ExtendedPaperInput/extended-paper-input-element.html">
+
+<dom-module id="parameter-pattern-namer-element">
+  <template>
+    <style include="namer-style"></style>
+    <style>
+    :host {
+      display: block;
+    }
+
+    paper-textarea{
+      /*width: 48vw;*/
+    }
+    </style>
+
+    <!-- {{entity.htmlify}} -->
+    <div class="global">
+      <div class="entity">
+        <!-- <paper-textarea label="Objective" value="{{content}}"></paper-textarea> -->
+        <extended-paper-input-element id="ParameterPattern" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Parameter Pattern" value="{{content}}" char-counter required maxlength="100"></extended-paper-input-element>
+
+        <!-- {{entity.htmlify}} -->
+      </div>
+      <!-- <div class="cascader">
+        <narrative-block-cascader-display-element entity="{{entity}}"></narrative-block-cascader-display-element>
+      </div> -->
+    </div>
+    <!-- <template is="dom-if" if="{{item::hasNarrativeBlock}}" restamp="true">
+      <iron-icon icon="icons:arrow-drop-down-circle"></iron-icon>
+    </template> -->
+
+  </template>
+  <script>
+
+    </script>
+  </dom-module>

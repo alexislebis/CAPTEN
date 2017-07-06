@@ -32,6 +32,7 @@ function Step() {
     this.inputs = null; //[RGTE]. It is actually see as a Union of the different inputs
     this.outputs = null;
     this.relationOrder = null; //Integer. Representing the place of this in the IAP.
+    this.parameters = [];
 
     this.context = null; //TODO define CONTEXT notion
     this.treatmentType = null;
@@ -269,6 +270,14 @@ Step.prototype.constructor = Step;
 
     }
     this.notifyOutputsComputation();
+  }
+
+  Step.prototype.addParameter = function(param)
+  {
+    if(param == null)
+      return;
+
+    this.parameters.push(param);
   }
 
   Step.prototype.toString= function()

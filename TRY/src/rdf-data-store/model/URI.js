@@ -42,6 +42,8 @@ var NARRATIVE_BLOCK_URI = "http://www.CAPTEN.org/SEED/ontologies/hasNarrativeBlo
 // === NON INCLUDED
 var COMPOSITE_URI = "http://www.CAPTEN.org/SEED/ontologies/compositeElement";
 var EXTENDED_STRING_URI = "http://www.CAPTEN.org/SEED/ontologies/extendedString";
+var PARAMETER_PATTERN_URI = "http://www.CAPTEN.org/SEED/ontologies/parameterPattern";
+var PARAMETER_CONFIGURATION_URI = "http://www.CAPTEN.org/SEED/ontologies/parameterConfiguration";
 
 
 

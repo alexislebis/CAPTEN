@@ -302,10 +302,10 @@
 
             <div class="elementBlock">
             <!-- <ul id="rdfClasses"></ul> -->
-            <template is="dom-repeat" items="{{customcls}}" filter="{{computeFilter(query)}}" index-as="index">
+            <template is="dom-repeat" id="repeatercls" items="{{customcls}}" filter="{{computeFilter(query)}}" index-as="index">
               <!-- <div> -->
                   <div class$="[[_computeClass(index)]]" on-tap="_custcTapped">
-                      <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >[[item.uri]] <paper-ripple></paper-ripple> </div>
+                      <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >[[item.label]] <paper-ripple></paper-ripple> </div>
                       <span class="useButton hideUseButton selectedItem">
                           <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
                           <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
@@ -340,10 +340,10 @@
             <h4>Custom Properties</h4>
 
             <div class="elementBlock" >
-            <template is="dom-repeat" items="{{customprops}}" filter="{{computeFilter(query)}}" index-as="index">
+            <template is="dom-repeat" id="repeaterprops" items="{{customprops}}" filter="{{computeFilter(query)}}" index-as="index">
               <!-- <div> -->
                   <div class$="[[_computeClass(index)]]" on-tap="_custpTapped">
-                      <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]] <paper-ripple></paper-ripple></div>
+                      <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.label]] <paper-ripple></paper-ripple></div>
                       <span class="useButton hideUseButton selectedItem">
                           <!-- <paper-iron-button icon$="[[iconForItem(selected)]]" class="star"></iron-icon> -->
                           <paper-icon-button class="removeElmt" icon="{{icon}}" on-tap="_addPropToRGTE"></paper-icon-button>
@@ -611,7 +611,7 @@
                 if (cClass == undefined && Object.keys(cClass).length === 0 && cClass.constructor === Object)
                     return;
 
-                var c = new CAPTENClass(cClass, cClass);
+                var c = new CAPTENClass(CUSTOM_PREFIX_URI+""+cClass, cClass);
                 this.push('customcls', c);
 
                 AUTHOR_SET(c, DEFAULT_AUTHOR);
@@ -622,7 +622,7 @@
                 if (cProp == undefined && Object.keys(cProp).length === 0 && cProp.constructor === Object)
                     return;
 
-                var p = PROPERTIES_POOL.create(cProp, cProp);
+                var p = PROPERTIES_POOL.create(CUSTOM_PREFIX_URI+""+cProp, cProp);
                 this.push('customprops', p);
                 AUTHOR_SET(p, DEFAULT_AUTHOR);
                 // this.push('customprops', PROPERTIES_POOL.create(cProp, cProp));
@@ -765,6 +765,22 @@
 
 
             //===V2
+            update: function()
+            {
+              var not = this.customcls;
+              this.customcls = [];
+              // this.$.repeatercls.render();
+
+              for(var i in not) //Polymer fuck up. Had to redo the entire tab, otherwise wont work. Same issue as here https://stackoverflow.com/questions/36000724/polymer-render-for-template-repeat-not-updating-correctly-missing-array-val
+                this.push('customcls', not[i]);
+
+              not = this.customprops;
+              this.customprops = [];
+
+              for(var i in not)
+                this.push('customprops', not[i]);
+            },
+
             _onQueryChanged: function(e)
             {
                 if(this.query != null && this.query.length == 0)
