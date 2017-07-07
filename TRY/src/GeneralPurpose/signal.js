@@ -20,6 +20,7 @@
       var RGTE_USE_FROM_SEARCH_SIGNAL_ID = "-98evzevveMpkkezjgnsNJrhgep23.";
       var RGTE_REWIND_REQUESTED_SIGNAL_ID = "-92KhrgerkgKuyzegnN,nNncqlqc";
       var RGTE_REPLACEMENT_REQUESTED_SIGNAL_ID = "-5fze4Ebr2gf f3ns6qzFEfzg4r54v";
+      var GRAPH_ELEMENT_AS_VOCABULARY_SELECTED_SIGNAL_ID = "-848E46zg48ez64g6zeazOOLE?Borb,er";
 
     // === VOCABULARY
       var VOCABULARY_ELEMENT_SELECTED_SIGNAL_ID = "-UZDNcd ef mEU38290Dzc°92RR";

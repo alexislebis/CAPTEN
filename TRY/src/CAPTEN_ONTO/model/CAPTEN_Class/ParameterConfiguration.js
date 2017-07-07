@@ -44,6 +44,12 @@ ParameterConfiguration.prototype.getContent = function()
         notify: true,
       },
 
+      rgtes: //Used for the multi link to pick up voc in it
+      {
+        type: Array,
+        notify: true,
+      },
+
       // content://ExString
       // {
       //   type: Object,
@@ -55,7 +61,13 @@ ParameterConfiguration.prototype.getContent = function()
     [
       '_onEntityChanged(entity)',
       '_onContentChanged(content)',
+      '_onRGTESChanged(rgtes.*)',
     ],
+
+    _onRGTESChanged(e)
+    {
+      console.log(this.rgtes);
+    },
 
     _onEntityChanged: function(entity)
     {

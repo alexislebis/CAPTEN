@@ -197,7 +197,7 @@
                <operation-search-element id="ose" enable-rewind="{{_computeRewindAuthorized(operation)}}" unproposed="{{operationToUnproposed}}" enable-use="true" to-stack="{{step}}"></operation-search-element>
              </neon-animatable>
              <neon-animatable name='operationZone'>
-               <operation-step-display-element id="osde" colorization="{{operationInputsColor}}" step="{{step}}" operation="{{operation}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operation-step-display-element>
+               <operation-step-display-element id="osde" colorization="{{operationInputsColor}}" step="{{step}}" rgtes="{{rgtes}}" operation="{{operation}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operation-step-display-element>
              </neon-animatable>
 
           </neon-animated-pages>
@@ -256,6 +256,11 @@
         route:
         {
           type: Object,
+          notify: true,
+        },
+        rgtes:
+        {
+          type:Array,
           notify: true,
         },
         filter:
@@ -413,7 +418,7 @@
         "_onColorChange(operationInputsColor.*)",
         "_onStepChanged(step)",
         "_onNameChanged(stepName)",
-        // "_onInputChanged(input)",
+        "_onInputChanged(input)",
         "_onCompositeElementChanged(compositeIOP)",
       ],
 
@@ -842,11 +847,12 @@
         return (input == null || operation == null) ? true : false;
       },
 
-      // _onInputChanged: function(input)
-      // {
-      //   console.log("New function. Potential board effect with input. Check if there is no input modified whithout updating step");
-      //   this.step.changeRGTE(input);
-      // },
+      _onInputChanged: function(input)
+      {
+        console.log("only planar RGTE atm");
+        this.rgtes = [];
+        this.rgtes.push(input);
+      },
 
       _openNewStep: function(step)
       {

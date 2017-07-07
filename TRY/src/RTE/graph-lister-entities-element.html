@@ -1,0 +1,107 @@
+<dom-module id="graph-lister-entities-element">
+  <template>
+    <style>
+
+    </style>
+
+
+    <div class="subBlock leftSubBlock">
+        <h4>Custom Classes</h4>
+
+        <div class="elementBlock">
+        <!-- <ul id="rdfClasses"></ul> -->
+        <template id="repeater" is="dom-repeat" items="{{items}}" index-as="index">
+          <!-- <div> -->
+              <div class$="[[_computeClass(index)]]" on-tap="_nodeTapped">
+                  <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >[[_computeLabelorURI(item)]] <paper-ripple></paper-ripple> </div>
+                  <span class="useButton hideUseButton selectedItem">
+                      <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
+                      <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
+                      <paper-icon-button class="removeElmt" icon="icons:launch" on-click="_openTerminology"></paper-icon-button>
+                  </span>
+              </div>
+        </template>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: "graph-lister-entities-element",
+
+      properties:
+      {
+        rgte:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        items:
+        {
+          type: Array,
+          notify: true,
+        },
+        current:
+        {
+          type: Object,
+          notify: true,
+        },
+      },
+
+      observers:
+      [
+        "_onRGTEChange(rgte)",
+      ],
+
+      _onRGTEChange: function(rgte)
+      {
+        if(rgte == null)
+          return;
+
+        this.items = [];
+        var nodes = rgte.getNodes();
+        for(var i in nodes)
+        {
+          this.push('items', nodes[i]);
+        }
+      },
+
+      _computeClass: function(index)
+      {
+          return (index % 2 == 0) ? 'item evenRow' : 'item oddRow';
+
+          // return isSelected ? 'item selected '+style : 'item'+style;
+      },
+
+      _nodeTapped: function(e)
+      {
+          // this.$.lister.clearClsSelection();
+
+          if(!e.model.selected)
+            this.current = e.model.item;
+          else
+            this.current = null;
+      },
+
+      _computeLabelorURI: function(item)
+      {
+        return item.label != null ? item.label : item.uri;
+      },
+
+      _openTerminology: function(evt)
+      {
+        this._openTerminologyWId(evt.model.item.id);
+        // this.set('routeTopLevel.path', '/terminology/'+evt.model.item.id);
+      },
+
+      _openTerminologyWId: function(id)
+      {
+        var elmt = this.current;
+
+        this.fire(GRAPH_ELEMENT_AS_VOCABULARY_SELECTED_SIGNAL_ID, {element: elmt});
+      },
+
+    });
+  </script>
+</dom-module>

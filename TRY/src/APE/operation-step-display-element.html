@@ -238,7 +238,7 @@
         <div id="center">
 
           <div id="narrativeInfo">
-            <div id="generalInformation">
+            <!-- <div id="generalInformation">
               <header>
                 <h4>General Information</h4>
               </header>
@@ -248,14 +248,15 @@
                 <paper-textarea label="TODODescription of the narrated operator" value="{{nopdescription}}"></paper-textarea>
                 <paper-input id="creatorName" label="TODOTool handling the narrated operator (version). Example : KTBS (v0.2.5)" value="{{noptool1}}"></paper-input>
               </div>
-            </div>
+            </div> -->
             <div id="otherNarrative">
               <header>
-                <h4>Other Narrative Information</h4>
+                <h4>Narrative Information</h4>
               </header>
-              <div id="oNIContent" class="narrativeContent">
+              <narrative-block-container-displayer-element id="nbcde" item="{{operation}}" instance-to-filter="{{filter}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></narrative-block-container-displayer-element>
+              <!-- <div id="oNIContent" class="narrativeContent">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris varius, est id ultrices lobortis, magna dolor aliquet ligula, non mollis augue turpis in nulla. Donec sit amet dui ornare, tempus nibh nec, pharetra tellus. Aliquam metus ex, convallis a tincidunt nec, tempus sit amet quam. Nullam at pellentesque tellus. Ut sollicitudin maximus lorem ac porttitor. Vivamus fringilla viverra nisl ut ultrices. Morbi aliquet sem lectus, sed malesuada velit facilisis sit amet. Donec volutpat, nunc quis ultrices aliquam, velit ante convallis purus, et malesuada mauris est accumsan magna. Vivamus nec nibh non arcu finibus posuere sed eget turpis. Interdum et malesuada fames ac ante ipsum primis in faucibus.
-              </div>
+              </div> -->
             </div>
           </div>
 
@@ -821,6 +822,7 @@
                 elementNamer.set('vocab', this.vocab);
                 elementNamer.set('customcls', this.customcls);
                 elementNamer.set('customprops', this.customprops);
+                elementNamer.set('rgtes', this.rgtes);
 
                 arrayOfElms.push(elementNamer);
               }

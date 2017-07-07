@@ -1,6 +1,8 @@
 <!-- <link rel="import" href="../../../../NarrativeBlock/view/narrative-block-cascader-display-element.html"> -->
 <link rel="import" href="../../theme/namer/namer-style.html">
 <link rel="import" href="../../../../ExtendedPaperInput/extended-paper-input-element.html">
+<link rel="import" href="../../../../ExtendedPaperInput/multi-link-extended-paper-input-element.html">
+
 
 <dom-module id="parameter-configuration-namer-element">
   <template>
@@ -19,7 +21,7 @@
     <div class="global">
       <div class="entity">
         <!-- <paper-textarea label="Objective" value="{{content}}"></paper-textarea> -->
-        <extended-paper-input-element id="ParameterConfiguration" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="{{entity.htmlify}}" value="{{content}}" char-counter required maxlength="100"></extended-paper-input-element>
+        <multi-link-extended-paper-input-element id="ParameterConfiguration" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="{{entity.htmlify}}" value="{{content}}" char-counter required maxlength="100"></multi-link-extended-paper-input-element>
 
         <!-- {{entity.htmlify}} -->
       </div>

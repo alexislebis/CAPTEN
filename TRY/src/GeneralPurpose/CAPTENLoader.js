@@ -137,6 +137,16 @@ CAPTENLoader.prototype = {
     this._addNewAlignmentRow(analysisjson.behaviors.input.id, null, {obj: a.behaviors, attr: "input" });
     this._addNewAlignmentRow(analysisjson.behaviors.output.id, null, {obj: a.behaviors, attr: "output"});
 
+    for(var i in analysisjson.behaviors.parameters)
+    {
+      var p = new ParameterPattern();
+      p = this._captenClassBuider(p, analysisjson.behaviors.parameters[i]);
+
+      p.selfBuildingWithJson(analysisjson.behaviors.parameters[i], this.alignements);
+
+      this._addNewAlignmentRow(analysisjson.behaviors.parameters[i].id, null, {obj: a.behaviors.parameters, attr: i});//the creation of the param pattern is delegated to the narrative block section
+    }
+
     if(analysisjson.expectedConcepts)
       this._addNewAlignmentRow(analysisjson.expectedConcepts.id, null, {obj: a, attr: "expectedConcepts"});
 
@@ -179,6 +189,8 @@ CAPTENLoader.prototype = {
 
     console.log("properties currently ignored");
 
+    console.log("param currently ignored for analysis");
+
     var s;
     for(var i in analysisjson.steps)
     {
@@ -216,6 +228,15 @@ CAPTENLoader.prototype = {
     if(stepjson.relationOrder)
       s.relationOrder = stepjson.relationOrder;
 
+    for(var i in stepjson.parameters)
+    {
+      var p = new ParameterConfiguration();
+      p = this._captenClassBuider(p, stepjson.parameters[i]);
+
+      p.selfBuildingWithJson(stepjson.parameters[i], this.alignements);
+      this._addNewAlignmentRow(stepjson.parameters[i].id, null, {obj: s.parameters, attr:i});
+      this._addNewAlignmentRow(stepjson.parameters[i].pattern.id, null, {obj: p, attr: 'pattern'});
+    }
     console.error("TODO: Composite Relation");
 
     return s;
