@@ -8,6 +8,8 @@ function RGTE(){
 
   this.id = CAPTEN.ID++; // DO NOT DELETE. IT IS NOT A CAPTEN CLASS CURRENTLY
 
+  this.uri = RGTE_URI;
+
   // === PREDEFINED NARRATIVE ELEMENT
     // === NAME
       var elmt = new EntityName();
@@ -293,6 +295,7 @@ RGTE.prototype = {
 
     seri['id'] = this.id;
     seri['type'] = 'RGTE';
+    seri['uri'] = RGTE_URI;
 
     seri[RGTE.NODES] = {};
     seri[RGTE.EDGES] = {};

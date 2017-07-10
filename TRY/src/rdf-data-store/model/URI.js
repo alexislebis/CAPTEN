@@ -44,6 +44,8 @@ var COMPOSITE_URI = "http://www.CAPTEN.org/SEED/ontologies/compositeElement";
 var EXTENDED_STRING_URI = "http://www.CAPTEN.org/SEED/ontologies/extendedString";
 var PARAMETER_PATTERN_URI = "http://www.CAPTEN.org/SEED/ontologies/parameterPattern";
 var PARAMETER_CONFIGURATION_URI = "http://www.CAPTEN.org/SEED/ontologies/parameterConfiguration";
+var RGTE_URI = "http://www.CAPTEN.org/SEED/ontologies/RGTE";
+var SuperRGTE_URI = "http://www.CAPTEN.org/SEED/ontologies/SUPERRGTE";
 
 
 

@@ -15,7 +15,7 @@
 
         <div>
           <h3>Load an entire CAPTEN configuration</h3>
-          <file-reader id="fileReaderElement">CAPTEN_EXPORT.json</file-reader>
+          <file-reader file-slice-size="1000000000" id="fileReaderElement">CAPTEN_EXPORT.json</file-reader>
         </div>
 
         <paper-toast id="toastBeingLoaded" text="The CAPTEN confiugarion is being imported; Please wait">
@@ -72,6 +72,7 @@
                     var callback = {
                         onload: function(e)
                         {
+                          console.log(e.target.result);
                             that.loadCAPTEN(e.target.result);
                         },
                         onprogress: function() {},
@@ -117,7 +118,7 @@
 
             _resultImport: function(vocab, customcls, customprops)
             {
-              
+
               this.$.toastBeingLoaded.close();
               this.$.toastLoadOk.open();
             },

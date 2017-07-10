@@ -218,13 +218,13 @@ Polymer({
 
   _dispatcherBehavior: function(enableUse)
   {
-    enableUse ? this._onUse() : this._openOperator();
+    enableUse ? this._onUse(enableUse) : this._openOperator();
   },
 
-  _onUse: function()
+  _onUse: function(enableUse)
   {
     // console.log("FIRING ON USE");
-    this.fire(RGTE_USE_FROM_SEARCH_SIGNAL_ID, {rgte: this.rgte});
+    this.fire(RGTE_USE_FROM_SEARCH_SIGNAL_ID, {rgte: this.rgte, stacking: enableUse.ctrlKey});
   },
 
 

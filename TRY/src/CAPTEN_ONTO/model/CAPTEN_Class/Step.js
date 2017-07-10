@@ -590,11 +590,28 @@ Step.prototype.constructor = Step;
     for(var i in steps)
     {
       if(steps[i].outputs)
-        if(steps[i].outputs.id == this.inputs.id)
+      {
+        if(this.inputs instanceof SuperRGTE)
+        {
+          for(var j in this.inputs.sources)
+          {
+            if(this.inputs.sources[j].id == steps[i].outputs.id)
+            {
+              prop = new Property(FOLLOWED_BY_URI, "followed by", steps[i].id, this.id);
+              prop.arrows = arrows;
+              props.push(prop);
+            }
+          }
+        }
+        else
+        {
+          if(steps[i].outputs.id == this.inputs.id)
           { prop = new Property(FOLLOWED_BY_URI, "followed by", steps[i].id, this.id);
             prop.arrows = arrows;
             props.push(prop);
           }
+        }
+      }
     }
 
     return props;

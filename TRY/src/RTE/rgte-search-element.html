@@ -1,5 +1,7 @@
 <link rel="import" href="./rgte-inline-displayer-element.html">
 
+<link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+
 <dom-module id="rgte-search-element">
   <template>
     <style>
@@ -38,6 +40,11 @@
 
   <div id="new">
     <paper-button raised on-click="_openNew">Create a new relational graph of concepts</paper-button>
+  </div>
+
+  <div id="accumulate" hidden$="{{!_isAccumulate(stackingArrayRGTE)}}">
+    <paper-icon-button icon="editor:merge-type" id="mergeButton" on-click="_generateRGTE"></paper-icon-button>
+    <paper-badge label="{{_computeNumber(stackingArrayRGTE)}}"></paper-badge>
   </div>
 
     <div id="searchZone" hidden="{{_computeHiddenAssumption(itemElmt)}}">
@@ -126,11 +133,19 @@
           type: Boolean,
           value: false,
           notify: true,
-        }
+        },
+
+        stackingArrayRGTE:
+        {
+          type: Array,
+          notify: true,
+          value: function(){return [];},
+        },
       },
 
       observers: [
         "_onNAPChanged(nap)",
+        "_onStackedArrayChange(stackingArrayRGTE.*)",
       ],
 
       _openNew: function()
@@ -148,6 +163,60 @@
         this.rgteArray = RGTE_POOL.getPool();
 
         this.$.repeater.render();
+
+        this.$.result.addEventListener(RGTE_USE_FROM_SEARCH_SIGNAL_ID, function(e){
+          this.RGTECreationAndDispatcher(e.detail.rgte, e.detail.stacking);
+        }.bind(this));
+      },
+
+      RGTECreationAndDispatcher: function(rgte, isIntentedStack)
+      {
+        if(isIntentedStack)
+        {
+          this.stackingArrayRGTE.push(rgte);
+          var tmp = this.stackingArrayRGTE;
+          this.stackingArrayRGTE = [];
+          this.set('stackingArrayRGTE', tmp);
+        }
+        else
+        {
+          this.stackingArrayRGTE = [];
+
+          this.fire(STEP_USE_FOLLOWING_RGTE_SIGNAL_ID, {rgte:rgte});
+        }
+      },
+
+      _isAccumulate: function(stackArray)
+      {
+        return stackArray.length != 0 ? true: false;
+      },
+
+      _generateRGTE: function()
+      {
+        var srgte = new SuperRGTE();
+
+        for(var i in this.stackingArrayRGTE)
+        {
+          srgte.addSource(this.stackingArrayRGTE[i]);
+        }
+
+        srgte._regenerate();
+
+        RGTE_POOL.register(srgte);
+
+        this.fire(STEP_USE_FOLLOWING_RGTE_SIGNAL_ID, {rgte: srgte});
+
+        this.stackingArrayRGTE = [];
+      },
+
+      _computeNumber: function(stackArray)
+      {
+        return stackArray.length;
+      },
+
+      _onStackedArrayChange: function(stackingArrayRGTE)
+      {
+        console.log(stackingArrayRGTE);
       },
 
       update: function()

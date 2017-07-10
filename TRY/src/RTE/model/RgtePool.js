@@ -47,7 +47,7 @@
 
    register: function(rgte)
    {
-     if( rgte == null || !(rgte instanceof RGTE) )
+     if( rgte == null)
        return null;
 
      for(var i = 0; i < this.pool.length; i++) //Prevent duplicata
@@ -61,7 +61,7 @@
 
    unregister: function(rgte)
    {
-     if(rgte == null || !(rgte instanceof RGTE))
+     if(rgte == null)
        return null;
 
      for(var i = 0; i < this.pool.length; i++) //Prevent duplicata
@@ -79,7 +79,7 @@
    serializeToJSON: function()
    {
      var array = [];
-     
+
      for(var i in this.pool)
       array.push(this.pool[i].serializeToJSON());
 

@@ -77,6 +77,12 @@ CAPTENLoader.prototype = {
       }
     }
 
+    for(var i in RGTE_POOL.pool)
+    {
+      if(RGTE_POOL.pool[i] instanceof SuperRGTE)
+        RGTE_POOL.pool[i]._regenerate();
+    }
+
     console.log("UNRESOLVED ALIGNEMENTS");
     console.log(unresolved);
     console.log("======================");
@@ -332,6 +338,21 @@ CAPTENLoader.prototype = {
 
     _createGraphFromJSON: function(json)
     {
+      if(json.uri == SuperRGTE_URI)
+      {
+        var sg = new SuperRGTE();
+
+        this._addNewAlignmentRow(json.id, sg, null);
+
+        for(var i in json.sources)
+        {
+          this._addNewAlignmentRow(json.sources[i], null, {obj: sg.sources, attr: i});
+        }
+
+        return sg;
+      }
+
+      //ELSE
       var g = new RGTE();
 
       this._addNewAlignmentRow(json.id, g, null);
