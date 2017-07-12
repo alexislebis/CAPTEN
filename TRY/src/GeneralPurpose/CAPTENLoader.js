@@ -57,6 +57,7 @@ CAPTENLoader.prototype = {
 
   _solve: function()
   {
+    console.error("WARNING. PROP ASYNC HAVE TO BE SAVED TO. + HANDLE _GENERATE on SEVERAL ITEM SUCH AS NAP TO ENSURE REBUILD OF THE BEHAVIORAL PATTERNS");
     var unresolved = [];
 
     for(var i in this.alignements)

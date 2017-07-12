@@ -119,7 +119,7 @@ NarratedOperator.prototype.constructor = NarratedOperator;
       for(var i = 0; i < this.behaviors['parameters'].length; i++)
         if(this.behaviors['parameters'][i].id == param.id)
           return;
-          
+
       this.behaviors['parameters'].push(param);
 
       this.notifyChange();
@@ -152,12 +152,19 @@ NarratedOperator.prototype.constructor = NarratedOperator;
         step.isRegistered = true;
         step.registerObserverCallbackOnOutputsComputation(this, this.notifyChange);
         step.registerObserverCallbackOnUncompletion(this, this.notifyChange);
+        step.registerObserverCallbackOnKChange(this, this._callbackKChange);
         this.steps.push(step);
 
         this.notifyChange();
 
         return this.steps[this.steps.length-1];
       }
+    }
+
+    NarratedOperator.prototype._callbackKChange = function()
+    {
+      // N T D because it's a NOP, therefore its input & output pattern are already defined
+      // It's the NAP which will overwrite this func.
     }
 
     NarratedOperator.prototype._stepComputed= function(step)

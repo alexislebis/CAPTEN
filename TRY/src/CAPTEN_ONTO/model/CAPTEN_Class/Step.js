@@ -47,6 +47,7 @@ function Step() {
     this.observersInputs = []; //Any modification on inputs are notified
     this.observersIOPCompositeRelations = []; //Any modification of the relations between A -> B from Input and NOP
     this.observersIOPCompositeOptions = []; //Any modif in the composite elements' option will be forwarded by the step
+    this.observersKChange = []; //Any modification when embedded K is changed (i.e. from inputs or outputs);
 
     this.isStateComputed = false; //If the output has been computed. MUST BE @ true when all the node expected are aligned with the input node
     this.usedComputationInput = []; //State of the computation. Associative array. All the op.beh.inpu node must be aligned with one this.input.node
@@ -185,6 +186,24 @@ Step.prototype.constructor = Step;
                   }
               }.bind(this));
             }
+
+          // === CHANGEMENT OF A KNOWLEDGE / EXPLOITABLE OUTPUT EMBEDDED IN THIS
+          Step.prototype.registerObserverCallbackOnKChange = function(objCallback, callback)
+          {
+            if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersKChange))
+              this.observersKChange.push([objCallback, callback]);
+          }
+
+            // === NOTIFICATION
+            Step.prototype.notifyKEmbeddedChange = function()
+            {
+                this.observersKChange.forEach(function(e){
+                  if(typeof e[1] === "function")
+                  {
+                    e[1].call(e[0], this);
+                  }
+                }.bind(this));
+            }
     // ===
 
   // === CALLBACK BEHAVIORS FROM PROPASYNC
@@ -268,6 +287,8 @@ Step.prototype.constructor = Step;
       this.outputs.registerObserverCallbackElementUpdated(this, this._callbackRGTEReceiveUpdate);
       this.outputs.registerObserverCallbackGraphDeleted(this, this._callbackRGTEDeleted);
 
+      this.outputs.registerObserverCallbackOnKnowledgeIdentified(this, this._callbackAddedK);
+      this.outputs.registerObserverCallbackOnKnowledgeDeidentified(this, this._callbackRemovedK);
     }
     this.notifyOutputsComputation();
   }
@@ -427,6 +448,16 @@ Step.prototype.constructor = Step;
           */
         }
     }
+
+    Step.prototype._callbackAddedK= function(graphID)
+    {
+      this.notifyKEmbeddedChange();
+    }
+
+    Step.prototype._callbackRemovedK= function(graphID)
+    {
+      this.notifyKEmbeddedChange();
+    }
   // === END CALLBACK BEHAVIORS FROM INPUTS & OUTPUTS
 
   // === PROPASYNC VALIDATION FUNCTION
@@ -459,6 +490,24 @@ Step.prototype.constructor = Step;
   Step.prototype.isComplete = function()
   {
     return this.isStateComputed;
+  }
+
+  Step.prototype.getRelations= function()
+  {
+    var from; var opNode;
+    var res = [];
+
+    for(var i in this.propAsyncBuild.arrayToFill)
+    {
+      if(this.inputs)
+        from = this.inputs.getNodeById(this.propAsyncBuild.arrayToFill[i].from);
+      if(this.operator && this.operator.input)
+        opNode = this.operator.input.getNodeById(this.propAsyncBuild.arrayToFill[i].to);
+
+      res.push({from: from, to: opNode });
+    }
+
+    return res;
   }
 
   Step.prototype.removeInputs = function()
@@ -504,6 +553,9 @@ Step.prototype.constructor = Step;
       this.inputs.registerObserverCallbackElementRemoved(this, this._callbackRGTEReceiveRemove);
       this.inputs.registerObserverCallbackElementUpdated(this, this._callbackRGTEReceiveUpdate);
       this.inputs.registerObserverCallbackGraphDeleted(this, this._callbackRGTEDeleted);
+
+      this.inputs.registerObserverCallbackOnKnowledgeIdentified(this, this._callbackAddedK);
+      this.inputs.registerObserverCallbackOnKnowledgeDeidentified(this, this._callbackRemovedK);
 
       this.propAsyncBuild.setFirstObject(this.inputs);
       this._updateUsedConcepts();

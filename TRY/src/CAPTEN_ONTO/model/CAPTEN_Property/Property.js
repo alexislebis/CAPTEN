@@ -122,6 +122,8 @@ Property.prototype = {
 
     cls.to = this.to;
 
+    cls.arrows = this.arrows;
+
     cls.constraints = this.constraints;
 
     cls.description = this.description;
