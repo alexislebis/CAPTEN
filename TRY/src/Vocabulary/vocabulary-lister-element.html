@@ -617,14 +617,17 @@
               this.customcls = [];
               this.customprops = [];
 
-              this.$.customCLSRepeater.render();
-              this.$.customPropsRepeater.render();
+              // this.$.customCLSRepeater.render();
+              // this.$.customPropsRepeater.render();
 
-              this.customcls = tmp1;
-              this.customprops = tmp2;
+              for(var i in tmp1) //Polymer fuck up. Had to redo the entire tab, otherwise wont work. Same issue as here https://stackoverflow.com/questions/36000724/polymer-render-for-template-repeat-not-updating-correctly-missing-array-val
+                this.push('customcls', tmp1[i]);
 
-              this.$.customCLSRepeater.render();
-              this.$.customPropsRepeater.render();
+              for(var j in tmp2) //Polymer fuck up. Had to redo the entire tab, otherwise wont work. Same issue as here https://stackoverflow.com/questions/36000724/polymer-render-for-template-repeat-not-updating-correctly-missing-array-val
+                this.push('customprops', tmp2[j]);
+
+              // this.$.customCLSRepeater.render();
+              // this.$.customPropsRepeater.render();
 
               this.$.lister.update();
             },
