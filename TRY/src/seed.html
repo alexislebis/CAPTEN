@@ -216,6 +216,7 @@
 
         ser.operations = NARRATED_OPERATION_POOL.serializeToJSON();
 
+        CUSTOM_ENTITIES_HANDLER.setCustoms(this.customcls, this.customprops);
         ser.vocab = CUSTOM_ENTITIES_HANDLER.serializeToJSONN3WithVocabularyIntegration(this.vocab);
 
         ser.properties = PROPERTIES_POOL.serializeToJSON();
