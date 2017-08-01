@@ -85,12 +85,13 @@
     <!-- <history-displayer></history-displayer> -->
 
     <paper-icon-button icon="save" on-click="export"></paper-icon-button>
-    <capten-loader-element vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></capten-loader-element>
+    <capten-loader-element id="loader" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></capten-loader-element>
 
     <neon-animated-pages selected='{{routeData.topLevel}}'
                      attr-for-selected='name'
                      entry-animation='scale-up-animation'
                      exit-animation='slide-right-animation'>
+      <neon-animatable name="index"><operation-search-page-element id="index" route="{{route}}"></operation-search-page-element></neon-animatable>
       <neon-animatable name='rgte'><div name="rte" ><rgte-page-element id="rteElem" route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-page-element></div></neon-animatable>
       <neon-animatable name='voog'><div name="voog"><main-voog></main-voog></div></neon-animatable>
       <neon-animatable name='ape'><div name="ape"><ape-element id="apeElem" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></ape-element></div></neon-animatable>
@@ -99,7 +100,7 @@
       <neon-animatable name='rgte_search'><rgte-search-element></rgte-search-element></neon-animatable>
       <neon-animatable name='rgte_similar'><rgte-find-similar-element></rgte-find-similar-element></neon-animatable>
       <neon-animatable name="nop"><operator-creation-page-element route-top-level="{{route}}" route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operator-creation-page-element></neon-animatable>
-      <neon-animatable name="operation_search"><operation-search-page-element route="{{route}}"></operation-search-page-element></neon-animatable>
+      <neon-animatable name="operation_search"><operation-search-page-element id="operation_search" route="{{route}}"></operation-search-page-element></neon-animatable>
       <neon-animatable name="step"><step-creation-page-element route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-creation-page-element></neon-animatable>
       <neon-animatable name="analysis"><analysis-creation-page route="{{tailTopLevel}}" nap="{{nap}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></analysis-creation-page></neon-animatable>
       <neon-animatable name="narration"><narrative-creation-page-element route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"><narrative-creation-page-element></neon-animatable>
@@ -197,9 +198,22 @@
 
       },
 
-      _routeChanged: function(changeRecord) {
-        if (changeRecord.path === 'path') {
-          console.log('Path changed!');
+      observers:
+      [
+        '_onRouteChanged(route)',
+      ],
+
+      _onRouteChanged: function(route) {
+        // if (changeRecord.path === 'path') {
+        //   console.log('Path changed!');
+        // }
+
+        if(this.previousName == null)
+        {
+          this.$.loader.addEventListener(LOADING_DONE_SIGNAL_ID, function(){
+            this._dispatchRefreshInstruction();
+          }.bind(this));
+          this.previousName = route;
         }
       },
 
@@ -328,6 +342,14 @@
         this.$.toastNewFocus.close();
         this.narrativeentity = this.previousNarrativeEntity;
         Polymer.dom(this.root).querySelector('#rootNarrativeBlockDisplayer').setEntity(this.narrativeentity);
+      },
+
+      _dispatchRefreshInstruction: function()
+      {
+        if(this.route.path == "/index")
+          this.$.index.update();
+        else if(this.route.path == "/operation_search")
+          this.$.operation_search.update();
       },
 
       _rollbackBagAdd: function()

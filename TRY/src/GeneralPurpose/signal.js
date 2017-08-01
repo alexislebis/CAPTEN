@@ -47,3 +47,6 @@
 
     // === HISTORY_MANAGER
       var HISTORY_PREVIOUS_REQUESTED_SIGNAL_ID = "-5EGE464688EO?,,,K,kve,gzgeapapozretsw";
+
+    // === LOADING
+      var LOADING_DONE_SIGNAL_ID = "-PIO3RH_U83hnfejfeuIU83àIJe";

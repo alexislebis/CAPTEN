@@ -246,9 +246,9 @@ Polymer({
     this.selected = !this.selected;
   },
 
-  _dispatcherBehavior: function(enableUse)
+  _dispatcherBehavior: function(e)
   {
-    enableUse ? this._onUse() : this._openOperator();
+    this.enableUse ? this._onUse() : this._openOperator();
   },
 
   _onUse: function()

@@ -87,6 +87,11 @@ CAPTENLoader.prototype = {
     console.log("UNRESOLVED ALIGNEMENTS");
     console.log(unresolved);
     console.log("======================");
+
+    console.log("CLEANING ALIGNEMENTS...");
+    this.alignements = [];
+    console.log("DONE");
+    this.recallFunction.func.call(this.recallFunction.src);
   },
 
   _deserializeProperties: function(json)

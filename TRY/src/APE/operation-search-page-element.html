@@ -1,12 +1,40 @@
 <dom-module id="operation-search-page-element">
   <template>
     <style>
+
+    #header{
+      text-align: center;
+    }
+
+    #subtitle{
+      text-align: center;
+    }
+
+    #separator{
+      width: 100%;
+      margin: 50px 0px;
+      border-bottom: 1px solid black;
+    }
+
+    #new{
+      @apply(--layout-vertical);
+      @apply(--layout-center);
+      margin-bottom: 50px;
+    }
+
     </style>
 
     <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
 
 <div id="divRoot">
-
+  <div hidden$="{{!index}}">
+    <h1 id="header"> CAPTEN </h1>
+    <p id="subtitle">Prototype for the capitalisation of analysis processes</p>
+    <div id="separator"></div>
+  </div>
+  <div id="new">
+    <paper-button raised on-click="_openNew">Create a new narrated analysis process</paper-button>
+  </div>
   <operation-search-element id="ose" unproposed="{{unproposed}}" to-stack="{{toStack}}" enable-use="{{enableUse}}" ></operation-search-element>
 
 </div>
@@ -37,6 +65,8 @@
           notify: true,
         },
 
+        index: Boolean,
+
         query : String,
       },
 
@@ -46,12 +76,29 @@
 
       _onRouteChanged: function(route)
       {
-        if(route.path != "/operation_search")
+        if(route.path != "/operation_search" && route.path != "/index")
           return null;
 
+        if(route.path == "/index")
+          this.index = true;
+        else
+          this.index = false;
 
         this.$.ose.update();
+
+        //Cleaning of the history manager to prevent any bad looping to it
+        HISTORY_MANAGER.reset();
       },
+
+      update: function()
+      {
+        this.$.ose.update();
+      },
+
+      _openNew: function(e)
+      {
+        this.set('route.path', '/analysis');
+      }
 
     });
   </script>

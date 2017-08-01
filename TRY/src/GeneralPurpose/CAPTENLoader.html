@@ -121,6 +121,7 @@
 
               this.$.toastBeingLoaded.close();
               this.$.toastLoadOk.open();
+              this.fire(LOADING_DONE_SIGNAL_ID);
             },
         });
     </script>
