@@ -39,7 +39,7 @@ ScientificStatement.prototype.getContent = function()
 function Hypothesis()
 {
   ScientificStatement.call(this);
-  this.uri = "NAU";
+  this.uri = HYPOTHESIS_URI;
   this.iName = "Hypothesis";
   this.label = this.iName;
   this.name = "Hypothesis";

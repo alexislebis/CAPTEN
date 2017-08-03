@@ -361,13 +361,15 @@ CAPTENLoader.prototype = {
       //ELSE
       var g = new RGTE();
 
+      NARRATIVE_BLOCK_POOL.unregister(g.narrativeBlock);
+
       this._addNewAlignmentRow(json.id, g, null);
 
       // g.narrativeBlock = json.narrativeBlock;//WARNING: It is just an id. Need to be dereferenced with the new value
       g.type = json.type;
 
 
-      this._addNewAlignmentRow(json.narrativeBlock, g.narrativeBlock, {obj: g, attr: "narrativeBlock"})
+      this._addNewAlignmentRow(json.narrativeBlock, null, {obj: g, attr: "narrativeBlock"})
 
       console.error("UNCOMPLETE DESERIALIZATION");
       console.error("CHECK ARRAY subClassOf subClasses properties and inheritanceArray");
