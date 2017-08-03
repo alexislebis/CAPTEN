@@ -114,7 +114,7 @@ PreviousManager.prototype = {
 
     if(this.redirectState)
     {
-      if(item && item.id != this.history[this.index].id)
+      if(this.history[this.index].id != null && item && item.id != this.history[this.index].id)
         this.history[this.index] = item; //update of the item because the pool created new element
       this.redirectState = false;
       return;
@@ -182,6 +182,7 @@ PreviousManager.prototype = {
   {
     this.history = [];
     this.notifyChange();
+    this.redirectState = false;
   },
 
   getFirstAntichronologicalElement: function(instance)//If null, retrieve the first element encountered from the current position
