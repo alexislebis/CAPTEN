@@ -180,6 +180,7 @@ PreviousManager.prototype = {
 
   reset: function()
   {
+    this.index = 0;
     this.history = [];
     this.notifyChange();
     this.redirectState = false;
