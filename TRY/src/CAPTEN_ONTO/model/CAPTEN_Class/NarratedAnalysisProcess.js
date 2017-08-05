@@ -34,7 +34,175 @@ NarratedAnalysisProcess.prototype.getStartingSteps = function()
       sSteps.push(this.steps[i]);
   }
 
+  if(sSteps.length == 0)
+    sSteps = this._fallbackStartingStepIdentification();
+
+  if(sSteps.length == 0)
+    sSteps = this._lastFallbackStartingStepIdentification();
+
   return sSteps;
+}
+
+NarratedAnalysisProcess.prototype._fallbackStartingStepIdentification = function()
+{
+  var startingSteps = [];
+  var tmp = [];
+
+  var result = [];
+  var cleanedResult = [];
+
+  for(var i in this.steps)
+  {
+    if(this.steps[i].getOutputs())
+    {
+      tmp = this.steps[i].getOutputs().getKnowledges();
+      if(tmp != null && tmp.length > 0)
+        startingSteps.push(this.steps[i]);
+    }
+  }
+
+  for(var i in startingSteps)
+  {
+    tmp = this._backtrackFallBack(startingSteps[i]);
+    for(var j in tmp)
+      result.push(tmp[j]);
+  }
+
+  //Cleaning duplicata
+  var alreadyExists = false;
+  for(var i in result)
+  {
+    for(var j in cleanedResult)
+    {
+      if(cleanedResult[j].id == result[i].id)
+      {
+        alreadyExists = true;
+      }
+    }
+    if(alreadyExists == false)
+      cleanedResult.push(result[i]);
+    alreadyExists = false;
+  }
+
+  return cleanedResult;
+}
+
+NarratedAnalysisProcess.prototype._backtrackFallBack = function(stepToBacktrack)
+{
+  var rel = stepToBacktrack.getRelations();
+  var res = [];
+  var tmp = [];
+  var initSteps = [];
+  var oneFound = false;
+
+  for(var j in rel)
+  {
+    if(rel[j].from)
+      res.push(rel[j].from);
+  }
+
+  for(var i in res)
+  {
+    for(var j in this.steps)
+    {
+      node = this.steps[i].outputs.getNodeById(res[i].id);
+      if(node != null)
+      {
+        oneFound = true;
+        tmp = this._backtrackFallBack(this.steps[i]);
+        for(var k in tmp)
+        {
+          initSteps.push(tmp[k]);
+        }
+      }
+    }
+    if(!oneFound)
+    {
+      initSteps.push(stepToBacktrack);
+    }
+    oneFound = false;
+  }
+
+  return initSteps;
+}
+
+NarratedAnalysisProcess.prototype._lastFallbackStartingStepIdentification = function()//A function which reparse the entire steps chain to find which node are to be used
+{
+  var startingNodes = [];
+  var tmp; var resNodes = []; var stepsResult = [];
+
+  for(var i in this.steps)
+  {
+    if(this.steps[i].getOutputs())
+    {
+      tmp = this.steps[i].getOutputs().getKnowledges();
+      for(var j in tmp)
+        startingNodes.push(tmp[j]);
+    }
+  }
+
+  tmp = null;
+
+  for(var i in startingNodes)
+  {
+    tmp = this._backtrackOriginFor(startingNodes[i].derivedFrom);
+    for(var j in tmp)
+    {
+      resNodes.push(tmp[j]);
+    }
+  }
+
+  for(var i in resNodes)
+  {
+    for(var j in this.steps)
+    {
+      if(this.steps[j].inputs.getNodeById(resNodes[i].id) != null)
+      {
+        stepsResult.push(this.steps[j]);
+      }
+    }
+
+  }
+  // PURGE NEEDED
+
+  return stepsResult;
+
+}
+
+NarratedAnalysisProcess.prototype._backtrackOriginFor = function(nodeToBacktrack)
+{
+  var res = [];
+
+  if(nodeToBacktrack.derivedFrom == null)
+  {
+    res.push(nodeToBacktrack);
+    return res;
+  }
+
+  var nodes;
+  var tmp = [];
+  var tmpres = [];
+
+
+  for(var i in this.steps)
+  {
+    nodes = this.steps[i].inputs.getNodes();
+    for(var j in nodes)
+    {
+      if(nodes[j].id == nodeToBacktrack.derivedFrom.id)
+        tmp.push(nodes[j]);
+    }
+  }
+
+  for(var i in tmp)
+  {
+    tmpres = this._backtrackOriginFor(tmp[i]);
+
+    for(var j in tmpres)
+      res.push(tmpres[j]);
+  }
+
+  return res;
 }
 
 NarratedAnalysisProcess.prototype.getExpectedConcepts = function()

@@ -84,6 +84,11 @@ CAPTENLoader.prototype = {
         RGTE_POOL.pool[i]._regenerate();
     }
 
+    // for(var i in NARRATED_ANALYSIS_POOL.pool)
+    // {
+    //   NARRATED_ANALYSIS_POOL.pool[i]._updateBehavioralPatterns();
+    // }
+
     console.log("UNRESOLVED ALIGNEMENTS");
     console.log(unresolved);
     console.log("======================");
