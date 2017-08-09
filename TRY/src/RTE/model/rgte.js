@@ -1373,7 +1373,15 @@ _rollbackRemove: function()
 
     getName: function()
     {
-      return this.name.getName();
+      var name = this.name.getName();
+      if(name == null || name == "")
+      {
+        var tabs = this.narrativeBlock.getElementsFromURIProperty(HAS_NAME_URI);
+        if(tabs.length > 0)
+          name = tabs[0].getName();
+      }
+
+      return name;
     },
 
     setName: function(exString)

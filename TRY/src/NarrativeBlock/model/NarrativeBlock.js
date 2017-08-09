@@ -195,8 +195,11 @@ NarrativeBlock.prototype = {
     for(var i in this.elements)
     {
       tmp = PROPERTIES_POOL.getPropertiesByExtremities(this.propertyEntity.from, this.elements[i].id);
-      if(tmp && tmp.uri == uri)
-        res.push(tmp);
+      for(var j in tmp)
+      {
+        if(tmp[j] && tmp[j].uri == uri)
+          res.push(this.elements[i]);
+      }
     }
 
     return res;

@@ -81,6 +81,9 @@
     <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
   </paper-toast>
 
+  <paper-toast id="toastNotifyNameImportant" duration="Infinity" text="You MUST name this graph for further reuse">
+  </paper-toast>
+
 </template>
   <script>
     Polymer(
@@ -314,7 +317,7 @@
         // this.rgte = RGTE_POOL.create();
         this.rgte = new RGTE();
         this.isNew = true;
-
+        this.$.toastNotifyNameImportant.open();
       },
 
       _test: function()

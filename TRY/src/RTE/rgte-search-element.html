@@ -235,9 +235,25 @@
 
         //@HACK force consideration of new rgte elements. Very intensive
         var a = RGTE_POOL.getPool();
+        var op = NARRATED_OPERATOR_POOL.pool;
+        var rgteDisplayed = [];
 
-        for(var i = 0; i < a.length; i++)
-          this.push("rgteArray", a[i]);
+        //Reduce complexity of displaying by removing unsefull graphs
+        for(var i in a)
+        {
+          for(var j in op)
+          {
+            if(op[j].behaviors['input'] != null && op[j].behaviors['input'].id != a[i].id)
+              rgteDisplayed[a[i].id] = a[i];
+            else if(op[j].behaviors['output'] != null && op[j].behaviors['output'].id != a[j].id)
+              rgteDisplayed[a[i].id] = a[i];
+          }
+        }
+        var tmp = [];
+        for(var i in rgteDisplayed)
+          if( rgteDisplayed[i].getName() != "")
+            this.push("rgteArray", rgteDisplayed[i]);
+            // tmp.push(rgteDisplayed[i]);
 
 
         this._updatedRelatedArray();

@@ -110,8 +110,8 @@
                   <p><iron-icon icon="icons:explore">objectif</iron-icon></p>
                   <p><iron-icon icon="account-circle" class="icon">account-circle</iron-icon> {{rgte.author.authorName}}</p>
                   <p><iron-icon icon="event" class="icon">event</iron-icon> {{rgte.creationDate}}</p>
-                  <p>
-                    <rgte-displayer-element rgte="{{rgte}}"></rgte-displayer-element>
+                  <p id="rgteAnchor">
+                    <!-- <rgte-displayer-element rgte="{{rgte}}"></rgte-displayer-element> -->
                   </p>
                 </div>
               </div>
@@ -202,9 +202,23 @@ Polymer({
 
   _onSelected: function(selected)
   {
+    var g = document.createElement('rgte-displayer-element');
+    g.rgte = this.rgte;
+    this._resetDisplay();
+    Polymer.dom(this.root).querySelector('#rgteAnchor').appendChild(g);
     // if(this.selected)
     //   this.fire(RGTE_SELECTED_SIGNAL_ID, {rgte : this.rgte});
   },
+
+  _resetDisplay: function()
+  {
+    var root = this.$$('#rgteAnchor');
+
+    if(root)
+      while(root.firstChild)
+        root.removeChild(root.firstChild);
+  },
+
 
   computeSelection: function(selected)
   {
