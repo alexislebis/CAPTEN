@@ -1399,4 +1399,23 @@ _rollbackRemove: function()
       this.name.updateElement(exString);
     },
 
+    // Retrieve all narrative blocks concerning all the elements of the graphs (nodes & props & others)
+    // map: The map to enrich
+    mapNarrativeBlock: function(map)
+    {
+      this.narrativeBlock.mapNarrativeBlock(map);
+
+      for(var i in this.nodes)
+        if(this.nodes[i] != null)
+          this.nodes[i].mapNarrativeBlock(map);
+      for(var i in this.properties)
+        if(this.properties[i] != null)
+          this.properties[i].mapNarrativeBlock(map);
+      for(var i in this.knowledges)
+        if(this.knowledges[i] != null)
+          this.knowledges[i].mapNarrativeBlock(map);
+
+      if(this.derivedFrom != null)
+        this.derivedFrom.mapNarrativeBlock(map);
+    },
 };

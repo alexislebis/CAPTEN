@@ -304,7 +304,7 @@ CAPTENClass.prototype = {
           // }
         }
 
-        console.log(this);
+        // console.log(this);
 
         ser['subClassOf'] = {};
         ser['subClasses'] = {};
@@ -443,4 +443,14 @@ CAPTENClass.prototype = {
         this.subClasses[i].becomesSubClassOf(this);
     },
 
+    // Retrieve all narrative blocks concerning the elements of the CPT CLasses
+    // map: The map to enrich
+    mapNarrativeBlock: function(map)
+    {
+      if(this.narrativeBlock != null)
+        this.narrativeBlock.mapNarrativeBlock(map);
+
+      if(this.derivedFrom != null)
+        this.derivedFrom.mapNarrativeBlock(map);
+    },
 };

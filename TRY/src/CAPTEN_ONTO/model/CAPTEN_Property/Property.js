@@ -387,6 +387,17 @@ Property.prototype = {
     },
   // ===
 
+  // Retrieve all narrative blocks concerning all the elements of the property
+  // map: The map to enrich
+  mapNarrativeBlock: function(map)
+  {
+    if(this.NarrativeBlock != null)
+      this.NarrativeBlock.mapNarrativeBlock(map);
+
+    if(this.derivedFrom != null)
+      this.derivedFrom.mapNarrativeBlock(map);
+  },
+
 };
 
 Property.prototype.constructor = Property;

@@ -287,3 +287,22 @@ NarratedOperator.prototype.constructor = NarratedOperator;
     {
       return this.getName();
     }
+
+    NarratedOperator.prototype.mapNarrativeBlock= function(map)
+    {
+      if(this.narrativeBlock != null)
+        this.narrativeBlock.mapNarrativeBlock(map);
+
+      for(var i in this.steps)
+        this.steps[i].mapNarrativeBlock(map);
+
+      if(this.behaviors)
+      {
+        if(this.behaviors['input'])
+          this.behaviors['input'].mapNarrativeBlock(map);
+        if(this.behaviors['output'])
+          this.behaviors['output'].mapNarrativeBlock(map);
+        for(var i in this.behaviors['parameters'])
+          this.behaviors['parameters'][i].mapNarrativeBlock(map);
+      }
+    }

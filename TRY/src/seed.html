@@ -239,6 +239,19 @@
 
         ser.properties = PROPERTIES_POOL.serializeToJSON();
 
+        var searchedArray = [NARRATED_OPERATION_POOL.napPool.pool, NARRATED_OPERATION_POOL.nopPool.pool, this.vocab, this.customcls, this.customprops, PROPERTIES_POOL.pool];
+        var map = [];
+        NARRATIVE_BLOCK_POOL.mapNarrativeBlockIn(searchedArray, map);
+
+        ser.narratives = NARRATIVE_BLOCK_POOL.serializeNBArrayToJSON(map);
+
+        // COUNTER OF NARRATIVE BLOCK EXPORTED
+        var counter = 0;
+        for(var i in map)
+          counter++;
+
+        alert(counter);
+
         var res = JSON.stringify(ser);
 
         var blob = new Blob([res], {type: "application/json"});

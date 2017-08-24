@@ -284,4 +284,17 @@ NarrativeBlock.prototype = {
     return res;
   },
 
+  mapNarrativeBlock: function(map)
+  {
+    map[this.id] = this;
+
+    for(var i in this.elements)
+    {
+      this.elements[i].mapNarrativeBlock(map);
+    }
+
+    if(this.propertyEntity)
+      this.propertyEntity.mapNarrativeBlock(map);
+  },
+
 };

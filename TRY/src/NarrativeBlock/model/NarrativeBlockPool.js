@@ -95,7 +95,7 @@ NarrativeBlockPool.prototype =
       var props = [];
       for(var i in this.pool)
       {
-        if(this.pool[i].propertyEntity.from == idElement)
+        if(this.pool[i].propertyEntity && this.pool[i].propertyEntity.from == idElement)
           return this.pool[i];
       }
 
@@ -153,6 +153,26 @@ NarrativeBlockPool.prototype =
       }
 
       return array;
+    },
+
+    serializeNBArrayToJSON: function(NBArray)
+    {
+      var array = [];
+
+      for(var i in NBArray)
+        array.push(NBArray[i].serializeToJSON());
+
+      return array;
+    },
+
+    mapNarrativeBlockIn: function(searchedArray, map)
+    {
+      for(var i in searchedArray)
+        if(searchedArray[i] instanceof Array)
+          this.mapNarrativeBlockIn(searchedArray[i], map);
+        else
+          if(searchedArray[i].mapNarrativeBlock)
+            searchedArray[i].mapNarrativeBlock(map);
     },
 }
 

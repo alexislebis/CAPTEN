@@ -1002,6 +1002,24 @@ Step.prototype.constructor = Step;
     return res;
   }
 
+  Step.prototype.mapNarrativeBlock = function(map)
+  {
+    if(this.narrativeBlock != null)
+      this.narrativeBlock.mapNarrativeBlock(map);
+
+    if(this.derivedFrom != null)
+      this.derivedFrom.mapNarrativeBlock(map);
+
+    if(this.inputs)
+      this.inputs.mapNarrativeBlock(map);
+
+    if(this.operator)
+      this.operator.mapNarrativeBlock(map);
+
+    if(this.outputs)
+      this.outputs.mapNarrativeBlock(map);
+  }
+
   Step.prototype.isArrayFullyCompleted = function(array) //Check only the 1st level
       {
           if (array == null)
