@@ -219,4 +219,33 @@ CompositeElement.prototype =
 
     return final;
   },
+
+  serializeToJSONv2: function()
+  {
+    var tab=[];
+
+    for(var i in this.elements)
+    {
+      if(this.elements[i].id)
+        tab.push(this.elements[i].id);
+      else
+        tab.push(this.elements[i]);
+    }
+
+    var res = {id: this.id, elements: tab, options: this.options};
+    var final = {composite: res};
+
+    return final;
+  },
+
+  mapElementsUsed: function(map)
+  {
+    map[this.id] = this;
+
+    for(var i in this.elements)
+    {
+      if(this.elements[i].mapElementsUsed && !IF_MAP_CONTAINS(map, this.elements[i]))
+        this.elements[i].mapElementsUsed(map);
+    }
+  },
 };

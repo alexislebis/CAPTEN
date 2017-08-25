@@ -86,6 +86,16 @@
      return array;
    },
 
+   serializeToJSONv2: function()
+   {
+     var array = [];
+
+     for(var i in this.pool)
+      array.push(this.pool[i].serializeToJSONv2());
+
+     return array;
+   },
+
  }
 
 

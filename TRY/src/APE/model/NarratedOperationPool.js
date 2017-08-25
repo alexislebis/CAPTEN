@@ -100,6 +100,17 @@
 
     return ser;
    },
+
+   serializeToJSONv2: function()
+   {
+     var ser = {};
+     var tmp1 = [];
+
+    ser.analyses = this.napPool.serializeToJSONv2();
+    ser.operators = this.nopPool.serializeToJSONv2();
+
+    return ser;
+   },
  }
 
  var NARRATED_OPERATION_POOL = new NarratedOperationPool(NARRATED_OPERATOR_POOL, NARRATED_ANALYSIS_POOL);

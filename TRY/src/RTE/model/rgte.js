@@ -328,8 +328,51 @@ RGTE.prototype = {
       seri[RGTE.KNOWLEDGES][i] = this.knowledges[i].serializeToJSON();
     }
 
-    console.log(seri);
+    // console.log(seri);
     return seri;
+  },
+
+  serializeToJSONv2: function()
+  {
+    var seri = {};
+
+    seri['id'] = this.id;
+    seri['type'] = 'RGTE';
+    seri['uri'] = RGTE_URI;
+
+    seri[RGTE.NODES] = {};
+    seri[RGTE.EDGES] = {};
+    seri[RGTE.CARDI] = {};
+    seri[RGTE.KNOWLEDGES] = {};
+
+    for(var i in this.nodes)
+    {
+      seri[RGTE.NODES][i] = {};
+      seri[RGTE.NODES][i] = this.nodes[i].id;
+    }
+
+    for(var i in this.edges)
+    {
+      seri[RGTE.EDGES][i] = {};
+      seri[RGTE.EDGES][i] = this.edges[i].id;
+    }
+
+    for(var i in this.edgesCardinality)
+    {
+      seri[RGTE.CARDI][i] = {};
+      seri[RGTE.CARDI][i] = this.edgesCardinality[i];
+    }
+
+    seri['narrativeBlock'] = this.narrativeBlock.id;
+
+    for(var i in this.knowledges)
+    {
+      seri[RGTE.KNOWLEDGES][i] = {};
+      seri[RGTE.KNOWLEDGES][i] = this.knowledges[i].id;
+    }
+
+    // console.log(seri);
+    return {rgte: seri};
   },
 
 
@@ -1417,5 +1460,53 @@ _rollbackRemove: function()
 
       if(this.derivedFrom != null)
         this.derivedFrom.mapNarrativeBlock(map);
+    },
+
+    mapIdElementsUsed: function(map)
+    {
+      if(this.x) //x reprensent the state of the function. If True, somehow the propagation is cyclic and thus it is stopped
+        return;
+      this.x = true;
+
+      map[this.id] = this.id;
+
+      for(var i in this.nodes)
+        if(this.nodes[i] && this.nodes[i].mapIdElementsUsed && !IF_MAP_CONTAINS(map, this.nodes[i].id))
+          this.nodes[i].mapIdElementsUsed(map);
+      // for(var i in this.properties)
+      //   if(this.properties[i] && this.properties[i].mapIdElementsUsed)
+      //     this.properties[i].mapIdElementsUsed(map);
+      for(var i in this.knowledges)
+        if(this.knowledges[i] && !IF_MAP_CONTAINS(map, this.knowledges[i].id))
+          this.knowledges[i].mapIdElementsUsed(map);
+
+      if(this.derivedFrom && !IF_MAP_CONTAINS(map, this.derivedFrom.id))
+        this.derivedFrom.mapIdElementsUsed(map);
+
+      this.x = false;
+    },
+
+    mapElementsUsed: function(map)
+    {
+      if(this.x) //x reprensent the state of the function. If True, somehow the propagation is cyclic and thus it is stopped
+        return;
+      this.x = true;
+
+      map[this.id] = this;
+
+      for(var i in this.nodes)
+        if(this.nodes[i] && this.nodes[i].mapElementsUsed && !IF_MAP_CONTAINS(map, this.nodes[i].id))
+          this.nodes[i].mapElementsUsed(map);
+      // for(var i in this.properties)
+      //   if(this.properties[i] && this.properties[i].mapIdElementsUsed)
+      //     this.properties[i].mapIdElementsUsed(map);
+      for(var i in this.knowledges)
+        if(this.knowledges[i] && !IF_MAP_CONTAINS(map, this.knowledges[i].id))
+          this.knowledges[i].mapElementsUsed(map);
+
+      if(this.derivedFrom && !IF_MAP_CONTAINS(map, this.derivedFrom.id))
+        this.derivedFrom.mapElementsUsed(map);
+
+      this.x = false;
     },
 };

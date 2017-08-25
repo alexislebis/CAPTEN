@@ -23,6 +23,8 @@ CAPTENLoader.prototype = {
     if(json == null)
       return;
 
+    json = this.rebuildIntoHOGNVPStructure(json);
+
     if(vocab == null)
       this.vocab = new CONTROLLED_VOCABULARY();
     else
@@ -42,6 +44,198 @@ CAPTENLoader.prototype = {
 
     this._deserializeVocab(json, this.vocab, this.customcls, this.customprops);
   },
+
+  rebuildIntoHOGNVPStructure: function(json)//Old structure Header, NOP, NAP, Graphs, Vocab, Narratives, Properties
+  {
+    var narratives = [];
+    var graphs = [];
+    var vocab = [];
+      vocab.vocabClasses = [];
+      vocab.vocabProps = [];
+    var composites = [];
+    var properties = [];
+    var extStrings = [];
+    var captenClasses = [];
+    var unrecognized = [];
+
+    console.log("Storing elements and mapping...");
+    for(var i in json)
+    {
+      if(this._isNarrativeBlock(json[i]))
+        narratives[json[i].narr.id] = json[i].narr;
+      else if(this._isCompositeBlock(json[i]))
+        composites[json[i].composite.id] = json[i].composite;
+      else if(this._isExtString(json[i]))
+        extStrings[json[i].extString.id] = json[i].extString;
+      else if(this._isGraph(json[i]))
+        graphs[this._retrieveGraphID(json[i])] = this._retrieveGraph(json[i]);
+      else if(this._isVocabularyClass(json[i]))
+        vocab.vocabClasses[json[i].vcls.id] = json[i].vcls;
+      else if(this._isVocabularyProperty(json[i]))
+        vocab.vocabProps[json[i].vprp.id] = json[i].vprp;
+      else if(this._isCAPTENClass(json[i]))
+        captenClasses[json[i].cpt.id] = json[i].cpt;
+      else if(this._isProperty(json[i]))
+        properties[json[i].prop.id] = json[i].prop;
+      else
+        unrecognized.push(json[i]);
+    }
+    console.log("Done.");
+
+    // var cG = 0; var cn = 0; var cc = 0; var ce = 0; var cvc = 0; var cvp = 0; var ccpt = 0; var cgrp = 0; var cpr = 0; var cu = 0;
+    // for(var i in json)
+    //   cG++;
+    // for(var i in narratives)
+    //   cn++;
+    // for(var i in composites)
+    //   cc++;
+    // for(var i in extStrings)
+    //   ce++;
+    // for(var i in graphs)
+    //   cgrp++;
+    // for(var i in vocab.vocabClasses)
+    //   cvc++;
+    // for(var i in vocab.vocabProps)
+    //   cvp++;
+    // for(var i in captenClasses)
+    //   ccpt++;
+    // for(var i in properties)
+    //   cpr++;
+    // for(var i in unrecognized)
+    //   cu++;
+    //
+    // console.log("Total: "+cG);
+    // console.log("Narratives: "+cn);
+    // console.log("Composites: "+cc);
+    // console.log("Strings: "+ce);
+    // console.log("Graphs: "+cgrp);
+    // console.log("VCls: "+cvc);
+    // console.log("VPrps:"+cvp);
+    // console.log("CAPTEN: "+ccpt);
+    // console.log("Props: "+cpr);
+    // console.log("Unrecognized: "+cu);
+    // console.log("SUM: "+(cn+cc+ce+cgrp+cvc+ccpt+cpr+cu));
+
+    var tStart = (new Date()).getTime();
+    console.log("Rebuilding elements");
+    this._rebuild([narratives, graphs, vocab.vocabClasses, vocab.vocabProps, composites, properties, extStrings, captenClasses], [narratives, graphs, vocab.vocabClasses, vocab.vocabProps, composites, properties, extStrings, captenClasses]);
+    var tStop = (new Date()).getTime();
+    console.log("Done in "+(tStop - tStart)+" ms");
+
+    return {narratives: narratives, graphs: graphs, operations: this._retrieveOperations(captenClasses), vocab: vocab, properties: properties};
+  },
+
+    _rebuild: function(origin, rebuild)
+    {
+      for(var i in rebuild)
+      {
+        if(rebuild[i] instanceof Array || rebuild[i] === Object(rebuild[i]) )
+          this._rebuild(origin, rebuild[i]);
+        else if( i != "id" && (
+                                (rebuild[i] instanceof String && rebuild[i].indexOf(/\d+/)) || (!isNaN(parseFloat(rebuild[i])) && isFinite(rebuild[i]))
+                              ))
+        {
+          var mapped = this._retrieveConcernedObj(origin, rebuild[i]);
+          if(mapped)
+            rebuild[i] = mapped;
+        }
+      }
+    },
+
+    _retrieveConcernedObj: function(origin, index)
+    {
+      for(var i in origin)
+      {
+        if(origin[i][index])
+          return origin[i][index];
+      }
+    },
+
+  // === NARRATIVE BLOCK
+    _isNarrativeBlock: function(o)
+    {
+      if(o && o.narr)
+        return true;
+    },
+
+  // === COMPOSITE BLOCK
+    _isCompositeBlock: function(o)
+    {
+      if(o && o.composite)
+        return true;
+    },
+
+  // === EXT STRING
+    _isExtString: function(o)
+    {
+      if(o && o.extString)
+        return true;
+    },
+
+  // === PROPERTIES
+    _isProperty: function(o)
+    {
+      if(o && o.prop)
+        return true;
+    },
+
+  // === GRAPHS
+    _isGraph: function(o)
+    {
+      if(o && (o.rgte || o.srgte))
+        return true;
+    },
+      _retrieveGraphID: function(o)
+      {
+        if(o && o.rgte)
+          return o.rgte.id;
+        else if(o && o.srgte)
+          return o.srgte.id;
+      },
+      _retrieveGraph: function(o)
+      {
+        if(o && o.rgte)
+          return o.rgte;
+        else if(o && o.srgte)
+          return o.srgte;
+      },
+
+  // === CAPTEN CLASSES
+    _isCAPTENClass: function(o)
+    {
+      if(o && o.cpt)
+        return true;
+    },
+      // === OPERATIONS
+      _retrieveOperations: function(classes)
+      {
+        var res = {};
+        res.analyses = [];
+        res.operators = [];
+
+        for(var i in classes)
+        {
+          if(classes[i].uri == OPERATOR_URI)
+            res.operators.push(classes[i]);
+          else if(classes[i].uri == ANALYSIS_URI)
+            res.analyses.push(classes[i]);
+        }
+
+        return res;
+      },
+  // === VOCABULARY
+    // === CLASSES
+      _isVocabularyClass: function(o)
+      {
+        if(o && o.vcls)
+          return true;
+      },
+    // === PROPERTIES
+      _isVocabularyProperty: function(o)
+      {
+          if(o && o.vprp)
+            return true;
+      },
 
   _continueImport: function(json, vocab, customcls, customprops)
   {
@@ -275,7 +469,7 @@ CAPTENLoader.prototype = {
 
   _createNarrativeBlockFromJSON: function(nbjson)
   {
-    if(this.alignements[nbjson.id].newObject == null)//If the narrative block does not exist yet; i.e. not created inside a captenclass
+    if(!this.alignements[nbjson.id] || this.alignements[nbjson.id].newObject == null)//If the narrative block does not exist yet; i.e. not created inside a captenclass
     {
       var n = NARRATIVE_BLOCK_POOL.create();
 

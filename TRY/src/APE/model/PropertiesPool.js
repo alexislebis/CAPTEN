@@ -102,6 +102,34 @@ PropertiesPool.prototype = {
     return related;
   },
 
+  relatedPropertiesOfArray: function(extremitiesArray, resMap)
+  {
+    console.log("Estimated complexity: "+this.pool.length*extremitiesArray.length/5);
+
+    var counter = 0;
+    var poolLength = this.pool.length;
+
+    for(var i in extremitiesArray)
+    {
+      this.mapRelatedProperties(extremitiesArray[i], resMap, counter);
+
+      counter++;
+      if(counter%1000 == 0)
+        console.log(counter*poolLength+" occurences performed.");
+    }
+  },
+
+  mapRelatedProperties: function(extremityID, map)
+  {
+    for(var i in this.pool)
+    {
+      if(this.pool[i].from == extremityID)
+        map[this.pool[i].id] = this.pool[i];
+      else if(this.pool[i].to == extremityID)
+        map[this.pool[i].id] = this.pool[i];
+    }
+  },
+
   getPropertiesByExtremities: function(from, to)
   {
     var related = [];
@@ -121,6 +149,16 @@ PropertiesPool.prototype = {
 
     for(var i in this.pool)
       res.push(this.pool[i].serializeToJSON());
+
+    return res;
+  },
+
+  serializeArrayToJSON: function(arrayToSerialized)
+  {
+    var res = [];
+
+    for(var i in arrayToSerialized)
+      res.push(arrayToSerialized[i].serializeToJSON());
 
     return res;
   },

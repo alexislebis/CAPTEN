@@ -106,6 +106,23 @@ var TRANSLATE_NAP_SPECIFICITY = function(spec, position)
       return;
   }
 }
+var DEL_COUNT_CALL = 0;
+var DEL_COUNT_EXISTS = 0;
+var DEL_COUNT_ABORT = 0;
+// === Check if the given map contains the element
+var IF_MAP_CONTAINS = function(map, element)
+{
+  DEL_COUNT_CALL++;
+
+  if(map == null || element == null)
+    {DEL_COUNT_ABORT++;return false;}
+
+  for(var i in map)
+    if(map[i] && (map[i] == element || map[i].id == element))
+      {DEL_COUNT_EXISTS++; return true;}
+
+  return false;
+}
 
 
 // === COLORS

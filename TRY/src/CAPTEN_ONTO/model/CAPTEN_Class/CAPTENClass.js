@@ -374,6 +374,87 @@ CAPTENClass.prototype = {
       return ser;
     },
 
+    serializeToJSONv2: function()
+    {
+        var ser = {}
+
+        for (var i in this)
+        {
+          if(i !== "subClassOf" && i !== "subClasses" && i != "properties" && i != "htmlify" && (typeof this[i] !== 'function') && this._isNotObserver(i))
+          {
+            ser[i] = this._serializationHandlingArrayv2(i, this[i])[i];
+          }
+        }
+
+        ser['subClassOf'] = {};
+        ser['subClasses'] = {};
+        ser['properties'] = {};
+
+        for (var i in this.subClassOf)
+        {
+          if(this.subClassOf[i])
+          {
+            ser['subClassOf'][i] = {};
+            ser['subClassOf'][i].id = this.subClassOf[i].id;
+            ser['subClassOf'][i].uri = this.subClassOf[i].uri;
+          }
+        }
+
+        for (var i in this.subClasses)
+        {
+          if(this.subClasses[i])
+          {
+            ser['subClasses'][i] = {};
+            ser['subClasses'][i].id = this.subClasses[i].id;
+            ser['subClasses'][i].uri = this.subClasses[i].uri;
+          }
+        }
+
+        for (var i in this.properties)
+        {
+          if(this.properties[i])
+          {
+            ser['properties'][i] = {};
+            set['properties'][i].id = this.properties[i].id;
+            set['properties'][i].uri = this.properties[i].uri;
+          }
+        }
+
+        return {cpt:ser};
+    },
+
+    _serializationHandlingArrayv2: function(index, item)
+    {
+      var ser = {};
+
+      if(item == null)
+        return ser[index] = {index: null};
+
+      if(typeof item === "function")
+      {
+        //NTD
+      }
+      else if(Array.isArray(item))
+      {
+        var tmp = {};
+        for(var i in item)
+        {
+          tmp[i] = this._serializationHandlingArrayv2(i, item[i])[i];
+        }
+        ser[index] = tmp;
+      }
+      else {
+        if(index == "narrativeBlock") //cuting the narrative block here
+          ser[index] = item.id;
+        else if(item.id)
+          ser[index] = item.id;
+        else
+          ser[index] = item;
+      }
+
+      return ser;
+    },
+
     _isNotObserver: function(i)
     {
       if(i &&
@@ -452,5 +533,53 @@ CAPTENClass.prototype = {
 
       if(this.derivedFrom != null)
         this.derivedFrom.mapNarrativeBlock(map);
+    },
+
+    mapIdElementsUsed: function(map)
+    {
+      if(this.x) //x reprensent the state of the function. If True, somehow the propagation is cyclic and thus it is stopped
+        return;
+      this.x = true;
+
+      map[this.id] = this.id;
+
+      for(var i in this)
+        this._browseThisForMapID(this[i], map);
+
+      this.x = false;
+    },
+    mapElementsUsed: function(map)
+    {
+      if(this.x) //x reprensent the state of the function. If True, somehow the propagation is cyclic and thus it is stopped
+        return;
+      this.x = true;
+
+      map[this.id] = this;
+
+      for(var i in this)
+        this._browseThisForMapObj(this[i], map);
+
+      this.x = false;
+    },
+
+    _browseThisForMapID: function(obj, map)
+    {
+      if(obj == null)
+        return;
+      if(obj instanceof Array)
+        for(var i in obj)
+          this._browseThisForMapID(obj[i], map);
+      else if(obj.mapIdElementsUsed && !IF_MAP_CONTAINS(map, obj.id))
+        obj.mapIdElementsUsed(map);
+    },
+    _browseThisForMapObj: function(obj, map)
+    {
+      if(obj == null)
+        return;
+      if(obj instanceof Array)
+        for(var i in obj)
+          this._browseThisForMapObj(obj[i], map);
+      else if(obj.mapElementsUsed && !IF_MAP_CONTAINS(map, obj.id))
+        obj.mapElementsUsed(map);
     },
 };

@@ -399,6 +399,59 @@ PropertyAsyncrhonousBuilder.prototype = {
     return ser;
   },
 
+  serializeToJSONv2: function()
+  {
+      var ser = {}
+
+      for (var i in this)
+      {
+        if(i !== "subClassOf" && i !== "subClasses" && i != "properties" && (typeof this[i] !== 'function') && this._isNotObserver(i))
+        {
+          ser[i] = this._serializationHandlingArrayv2(i, this[i])[i];
+        }
+        // if(typeof this[i] !== 'function')
+        // {
+        //     if(this[i] && this[i].serializeToJSON)
+        //       ser[i] = this[i].serializeToJSON();
+        //     else if (i !== "subClassOf" && i != "subClasses" && i != "properties")
+        //       ser[i] = this[i];
+        // }
+      }
+
+      return ser;
+  },
+  _serializationHandlingArrayv2: function(index, item)
+  {
+    var ser = {};
+
+    if(item == null)
+      return ser[index] = {index: null};
+
+    if(typeof item === "function")
+    {
+      //NTD
+    }
+    else if(Array.isArray(item))
+    {
+      var tmp = {};
+      for(var i in item)
+      {
+        tmp[i] = this._serializationHandlingArrayv2(i, item[i])[i];
+      }
+      ser[index] = tmp;
+    }
+    else {
+      if(index == "narrativeBlock") //cuting the narrative block here
+        ser[index] = item.id;
+      else if(item.id)
+        ser[index] = item.id;
+      else
+        ser[index] = item;
+    }
+
+    return ser;
+  },
+
   _isNotObserver: function(i)
   {
     if(i &&

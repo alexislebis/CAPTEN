@@ -284,6 +284,26 @@ NarrativeBlock.prototype = {
     return res;
   },
 
+  serializeToJSONv2: function()
+  {
+    var res = {id: null, elements: [], propertyEntity: null, entity: null};
+
+    res.id = this.id;
+
+    for(var i in this.elements)
+    {
+      res.elements.push(this.elements[i].id);
+    }
+
+    res.propertyEntity = this.propertyEntity.id;
+
+    if(this.entity)
+      res.entity = this.entity.id;
+
+    // var res = JSON.stringify(res);
+    return {narr: res};
+  },
+
   mapNarrativeBlock: function(map)
   {
     map[this.id] = this;
@@ -296,5 +316,47 @@ NarrativeBlock.prototype = {
     if(this.propertyEntity)
       this.propertyEntity.mapNarrativeBlock(map);
   },
+
+  mapIdElementsUsed: function(map)
+  {
+    if(this.x) //x reprensent the state of the function. If True, somehow the propagation is cyclic and thus it is stopped
+      return;
+    this.x = true;
+
+    map[this.id] = this.id;
+
+    for(var i in this.elements)
+      if(!IF_MAP_CONTAINS(map, this.elements[i].id))
+        this.elements[i].mapIdElementsUsed(map);
+
+    if(this.entity && this.entity.mapIdElementsUsed && !IF_MAP_CONTAINS(map, this.entity.id))
+      this.entity.mapIdElementsUsed(map);
+
+    if(this.propertyEntity && this.propertyEntity.mapIdElementsUsed && !IF_MAP_CONTAINS(map, this.propertyEntity.id))
+      this.propertyEntity.mapIdElementsUsed(map);
+
+    this.x = false;
+  },
+
+  mapElementsUsed: function(map)
+  {
+    if(this.x) //x reprensent the state of the function. If True, somehow the propagation is cyclic and thus it is stopped
+      return;
+    this.x = true;
+
+    map[this.id] = this;
+
+    for(var i in this.elements)
+      if(!IF_MAP_CONTAINS(map, this.elements[i].id))
+        this.elements[i].mapElementsUsed(map);
+
+    if(this.entity && this.entity.mapElementsUsed && !IF_MAP_CONTAINS(map, this.entity.id))
+      this.entity.mapElementsUsed(map);
+
+    if(this.propertyEntity && this.propertyEntity.mapElementsUsed && !IF_MAP_CONTAINS(map, this.propertyEntity.id))
+      this.propertyEntity.mapElementsUsed(map);
+
+    this.x = false;
+  }
 
 };

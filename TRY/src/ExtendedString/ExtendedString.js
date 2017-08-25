@@ -4,6 +4,8 @@
 
  function ExtendedString()
  {
+   this.id = CAPTEN.ID++;
+
    this.uri = EXTENDED_STRING_URI;
 
    this.array = [];
@@ -292,6 +294,20 @@
 
       return {extString: res};
    },
+   serializeToJSONv2: function()
+   {
+     var res = {id: this.id, array: [], mustBeReseted : this.mustBeReseted};
+
+     for(var i in this.array)
+      {
+          if(this.array[i].id)
+            res.array.push(this.array[i].id);
+          else
+            res.array.push(this.array[i]);
+      }
+
+      return {extString: res};
+   },
 
    selfBuildingWithJson: function(json, alignements)
    {
@@ -308,6 +324,11 @@
          CAPTEN_LOADER_ALIGNMENTS_NEW_ROW(alignements, json.array[i].id, null, {obj: this.array, attr: this.array.length-1});
        }
      }
+   },
+
+   mapElementsUsed: function(map)
+   {
+     map[this.id] = this;
    },
 
  };
