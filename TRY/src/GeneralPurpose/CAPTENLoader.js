@@ -47,6 +47,8 @@ CAPTENLoader.prototype = {
 
   rebuildIntoHOGNVPStructure: function(json)//Old structure Header, NOP, NAP, Graphs, Vocab, Narratives, Properties
   {
+    var tStart = (new Date()).getTime();
+
     var narratives = [];
     var graphs = [];
     var vocab = [];
@@ -66,7 +68,7 @@ CAPTENLoader.prototype = {
       else if(this._isCompositeBlock(json[i]))
         composites[json[i].composite.id] = json[i].composite;
       else if(this._isExtString(json[i]))
-        extStrings[json[i].extString.id] = json[i].extString;
+        extStrings[json[i].extString.id] = {extString: json[i].extString};
       else if(this._isGraph(json[i]))
         graphs[this._retrieveGraphID(json[i])] = this._retrieveGraph(json[i]);
       else if(this._isVocabularyClass(json[i]))
@@ -116,9 +118,12 @@ CAPTENLoader.prototype = {
     // console.log("Unrecognized: "+cu);
     // console.log("SUM: "+(cn+cc+ce+cgrp+cvc+ccpt+cpr+cu));
 
-    var tStart = (new Date()).getTime();
     console.log("Rebuilding elements");
     this._rebuild([narratives, graphs, vocab.vocabClasses, vocab.vocabProps, composites, properties, extStrings, captenClasses], [narratives, graphs, vocab.vocabClasses, vocab.vocabProps, composites, properties, extStrings, captenClasses]);
+
+    console.log("Transforming narrative block references into pointers");//Because old loader requires plannar references
+    this._plannarReferenceNBlock([narratives, graphs, vocab.vocabClasses, vocab.vocabProps, composites, properties, extStrings, captenClasses],[]);
+
     var tStop = (new Date()).getTime();
     console.log("Done in "+(tStop - tStart)+" ms");
 
@@ -157,6 +162,22 @@ CAPTENLoader.prototype = {
       if(o && o.narr)
         return true;
     },
+      _plannarReferenceNBlock: function(array, visitedID)
+      {
+        for(var i in array)
+        {
+          if(array[i] instanceof Array)
+            this._plannarReferenceNBlock(array[i], visitedID)
+          else if(array[i] === Object(array[i]) && array[i].id && !IF_MAP_CONTAINS(visitedID, array[i].id))
+          {
+            visitedID[array[i].id] = array[i].id;
+            if(array[i].narrativeBlock)
+              array[i].narrativeBlock = array[i].narrativeBlock.id;
+
+            this._plannarReferenceNBlock(array[i], visitedID);
+          }
+        }
+      },
 
   // === COMPOSITE BLOCK
     _isCompositeBlock: function(o)
@@ -469,7 +490,7 @@ CAPTENLoader.prototype = {
 
   _createNarrativeBlockFromJSON: function(nbjson)
   {
-    if(!this.alignements[nbjson.id] || this.alignements[nbjson.id].newObject == null)//If the narrative block does not exist yet; i.e. not created inside a captenclass
+    if(this.alignements[nbjson.id].newObject == null)//If the narrative block does not exist yet; i.e. not created inside a captenclass
     {
       var n = NARRATIVE_BLOCK_POOL.create();
 
