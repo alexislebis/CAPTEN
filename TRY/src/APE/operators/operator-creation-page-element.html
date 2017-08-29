@@ -689,9 +689,10 @@
                 return;
               }
 
-              this.$.nbcde.update();
+
 
               this.nop = resItem;
+              this.$.nbcde.update();
               HISTORY_MANAGER.stack(this.nop);
               this.isNew = false;
               this.isPoolRegistered = true;

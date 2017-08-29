@@ -1451,9 +1451,9 @@ _rollbackRemove: function()
       for(var i in this.nodes)
         if(this.nodes[i] != null)
           this.nodes[i].mapNarrativeBlock(map);
-      for(var i in this.properties)
-        if(this.properties[i] != null)
-          this.properties[i].mapNarrativeBlock(map);
+      for(var i in this.edges)
+        if(this.edges[i] != null)
+          this.edges[i].mapNarrativeBlock(map);
       for(var i in this.knowledges)
         if(this.knowledges[i] != null)
           this.knowledges[i].mapNarrativeBlock(map);
@@ -1473,9 +1473,9 @@ _rollbackRemove: function()
       for(var i in this.nodes)
         if(this.nodes[i] && this.nodes[i].mapIdElementsUsed && !IF_MAP_CONTAINS(map, this.nodes[i].id))
           this.nodes[i].mapIdElementsUsed(map);
-      // for(var i in this.properties)
-      //   if(this.properties[i] && this.properties[i].mapIdElementsUsed)
-      //     this.properties[i].mapIdElementsUsed(map);
+      // for(var i in this.edges)
+      //   if(this.edges[i] && this.edges[i].mapIdElementsUsed)
+      //     this.edges[i].mapIdElementsUsed(map);
       for(var i in this.knowledges)
         if(this.knowledges[i] && !IF_MAP_CONTAINS(map, this.knowledges[i].id))
           this.knowledges[i].mapIdElementsUsed(map);
@@ -1497,9 +1497,9 @@ _rollbackRemove: function()
       for(var i in this.nodes)
         if(this.nodes[i] && this.nodes[i].mapElementsUsed && !IF_MAP_CONTAINS(map, this.nodes[i].id))
           this.nodes[i].mapElementsUsed(map);
-      // for(var i in this.properties)
-      //   if(this.properties[i] && this.properties[i].mapIdElementsUsed)
-      //     this.properties[i].mapIdElementsUsed(map);
+      for(var i in this.edges)
+        if(this.edges[i] && this.edges[i].mapIdElementsUsed)
+          this.edges[i].mapElementsUsed(map);
       for(var i in this.knowledges)
         if(this.knowledges[i] && !IF_MAP_CONTAINS(map, this.knowledges[i].id))
           this.knowledges[i].mapElementsUsed(map);

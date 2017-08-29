@@ -55,14 +55,14 @@ NarrativeElement.prototype.selfBuildingWithJson = function(thisjson, alignements
     {
       if(i == "name" || i == "content")
       {
-        if(thisjson[i]['extString'])
+        if(thisjson[i])
         {
           var exSt = new ExtendedString();
 
-          exSt.selfBuildingWithJson(thisjson[i]['extString'], alignements);
+          exSt.selfBuildingWithJson(thisjson[i], alignements);
 
-          if(thisjson[i]['extString'].id)
-            CAPTEN_LOADER_ALIGNMENTS_NEW_ROW(alignements, thisjson[i]['extString'].id, exSt, null);
+          if(thisjson[i].id)
+            CAPTEN_LOADER_ALIGNMENTS_NEW_ROW(alignements, thisjson[i].id, exSt, null);
 
           this[i] = exSt;
         }

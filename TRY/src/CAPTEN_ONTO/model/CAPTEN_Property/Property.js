@@ -480,6 +480,11 @@ Property.prototype = {
       this.derivedFrom.mapNarrativeBlock(map);
   },
 
+  mapIdElementsUsed: function(map)
+  {
+    map[this.id] = this.id;
+  },
+
 
   mapElementsUsed: function(map)
   {

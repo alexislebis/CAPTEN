@@ -42,7 +42,20 @@ PropertiesPool.prototype = {
   //   }
   // },
 
-  _addingToPool(prop)
+  add: function(prop)
+  {
+    if(prop == null)
+      return;
+
+    for(var i in this.pool)
+      if(this.pool[i].id == prop.id)
+        return;
+
+    this.pool.push(prop);
+
+  },
+
+  _addingToPool: function(prop)
   {
     if(prop == null)
       return null;
@@ -104,7 +117,7 @@ PropertiesPool.prototype = {
 
   relatedPropertiesOfArray: function(extremitiesArray, resMap)
   {
-    console.log("Estimated complexity: "+this.pool.length*extremitiesArray.length/5);
+    // console.log("Estimated complexity: "+this.pool.length*extremitiesArray.length/5);
 
     var counter = 0;
     var poolLength = this.pool.length;
@@ -118,6 +131,13 @@ PropertiesPool.prototype = {
         console.log(counter*poolLength+" occurences performed.");
     }
   },
+
+  mapAllPropertiesUsed: function(mapchecked, map)
+  {
+    for(var i in mapchecked)
+      this.mapRelatedProperties(i, map);
+  },
+
 
   mapRelatedProperties: function(extremityID, map)
   {
@@ -158,7 +178,7 @@ PropertiesPool.prototype = {
     var res = [];
 
     for(var i in arrayToSerialized)
-      res.push(arrayToSerialized[i].serializeToJSON());
+      res.push(arrayToSerialized[i].serializeToJSONv2());
 
     return res;
   },
@@ -173,6 +193,14 @@ PropertiesPool.prototype = {
         return;
 
     this._addingToPool(prop);
+  },
+
+  mapAll: function(map)
+  {
+    for(var i in this.pool)
+    {
+      map[this.pool[i].id] = this.pool[i];
+    }
   },
 
 }

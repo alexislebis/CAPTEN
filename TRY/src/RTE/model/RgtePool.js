@@ -96,6 +96,28 @@
      return array;
    },
 
+   persistAllEdges: function()
+   {
+     for(var i in this.pool)
+     {
+       for(var j in this.pool[i].edges)
+       {
+         PROPERTIES_POOL.add(this.pool[i].edges[j]);
+       }
+     }
+   },
+
+   mapAllEdges: function(map)
+   {
+     for(var i in this.pool)
+     {
+       for(var j in this.pool[i].edges)
+       {
+         map[this.pool[i].edges[j].id] = this.pool[i].edges[j];
+       }
+     }
+   }
+
  }
 
 

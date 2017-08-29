@@ -68,7 +68,7 @@ CAPTENLoader.prototype = {
       else if(this._isCompositeBlock(json[i]))
         composites[json[i].composite.id] = json[i].composite;
       else if(this._isExtString(json[i]))
-        extStrings[json[i].extString.id] = {extString: json[i].extString};
+        extStrings[json[i].extString.id] = json[i].extString;
       else if(this._isGraph(json[i]))
         graphs[this._retrieveGraphID(json[i])] = this._retrieveGraph(json[i]);
       else if(this._isVocabularyClass(json[i]))
@@ -123,6 +123,9 @@ CAPTENLoader.prototype = {
 
     console.log("Transforming narrative block references into pointers");//Because old loader requires plannar references
     this._plannarReferenceNBlock([narratives, graphs, vocab.vocabClasses, vocab.vocabProps, composites, properties, extStrings, captenClasses],[]);
+
+    console.log("Transforming properties references into pointers");
+    this._plannarReferenceProperties(properties);
 
     var tStop = (new Date()).getTime();
     console.log("Done in "+(tStop - tStart)+" ms");
@@ -199,6 +202,16 @@ CAPTENLoader.prototype = {
       if(o && o.prop)
         return true;
     },
+      _plannarReferenceProperties: function(prop)
+      {
+        for(var i in prop)
+        {
+          if(prop[i].from)
+            prop[i].from = prop[i].from.id;
+          if(prop[i].to)
+            prop[i].to = prop[i].to.id;
+        }
+      },
 
   // === GRAPHS
     _isGraph: function(o)
@@ -490,6 +503,11 @@ CAPTENLoader.prototype = {
 
   _createNarrativeBlockFromJSON: function(nbjson)
   {
+    if(this.alignements[nbjson.id] == null)
+    {
+      this._addNewAlignmentRow(nbjson.id);
+    }
+
     if(this.alignements[nbjson.id].newObject == null)//If the narrative block does not exist yet; i.e. not created inside a captenclass
     {
       var n = NARRATIVE_BLOCK_POOL.create();
@@ -696,6 +714,28 @@ CAPTENLoader.prototype = {
   },
 
   _captenPropertyBuilder: function(p, propJson)
+  {
+    this._addNewAlignmentRow(propJson.id, p, null);
+
+    if(propJson.from)
+      this._addNewAlignmentRow(propJson.from, null, {obj: p, attr: "from"});
+    if(propJson.to)
+      this._addNewAlignmentRow(propJson.to, null, {obj: p, attr: "to"});
+
+    if(propJson.arrows)
+      this.arrows = propJson.arrows;
+
+    p.uri = propJson.uri;
+    p.label = propJson.label;
+    p.iName = propJson.iName;
+    p.htmlify = propJson.htmlify;
+
+    if(propJson.name)
+      p.name = propJson.name;
+
+    return p;
+  },
+  _OLDcaptenPropertyBuilder: function(p, propJson)
   {
     this._addNewAlignmentRow(propJson.id, p, null);
 

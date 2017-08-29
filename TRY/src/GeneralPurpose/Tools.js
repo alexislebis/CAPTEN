@@ -112,14 +112,31 @@ var DEL_COUNT_ABORT = 0;
 // === Check if the given map contains the element
 var IF_MAP_CONTAINS = function(map, element)
 {
-  DEL_COUNT_CALL++;
+  // DEL_COUNT_CALL++;
 
   if(map == null || element == null)
-    {DEL_COUNT_ABORT++;return false;}
+    {return false;}
 
-  for(var i in map)
-    if(map[i] && (map[i] == element || map[i].id == element))
-      {DEL_COUNT_EXISTS++; return true;}
+  if(element.id)
+  {
+    if(map[element.id] && (map[element.id] == element || map[element.id].id == element))
+      return true;
+  }
+  else if((!isNaN(parseFloat(element)) && isFinite(element)))
+  {
+      if(map[element] && (map[element] == element || map[element].id == element))
+      return true;
+  }
+  else
+  {
+    for(var i in map)
+      if(map[i] && (map[i] == element || map[i].id == element))
+        return true;
+  }
+
+  // for(var i in map)
+  //   if(map[i] && (map[i] == element || map[i].id == element))
+  //     {return true;}
 
   return false;
 }
