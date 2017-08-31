@@ -300,9 +300,9 @@
 
     <div id="rtelister">
 
-        <div hidden="{{hideClassRelationForm}}">
+        <!-- <div hidden="{{hideClassRelationForm}}">
           <rgte-custom-class-relation-element id="customRel" vocab="{{vocab}}" customcls="{{customcls}}" customproprs="{{customprops}}" rgte="{{rgte}}" selectedcls="{{selectedcls}}"></rgte-custom-class-relation-element>
-        </div>
+        </div> -->
 
         <!-- <div hidden$="{{disableClassesLister}}">
           <div class$="[[_isCLSSelected(selectedcls)]]">
@@ -483,19 +483,11 @@
                 {
                     type: Array,
                     notify: true,
-                    value: function()
-                    {
-                        return [];
-                    },
                 },
                 customprops:
                 {
                     type: Array,
                     notify: true,
-                    value: function()
-                    {
-                        return [];
-                    },
                     // observer: "_onCustomPropsChanged",
                 },
                 selectedcls://Class selected

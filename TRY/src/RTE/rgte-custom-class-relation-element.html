@@ -27,6 +27,8 @@
           </paper-dropdown-menu>
           <paper-dropdown-menu label="a Concept" name="type">
             <paper-menu class="dropdown-content" id="menu{{item}}">
+              <div id="classes">
+              </div>
               <template is="dom-repeat" items="[[classes]]" as="cls">
                 <paper-item value$="[[cls.id]]">[[cls.label]]</paper-item>
               </template>
@@ -103,11 +105,17 @@
             },
 
             observers: [
-                "_onCustomClsChanged(customcls.splices)",
+                "_onCustomClsChanged(customcls.*)",
                 "_onCustomPropsChanged(customprops.splices)",
                 "_onNbOfFormsChanged(nbOfForms.splices)",
                 "_onRGTEChanged(rgte)",
+                "_onClassesChanged(classes.*)",
             ],
+
+            _onClassesChanged: function(c)
+            {
+              console.log(this.classes);
+            },
 
             attached: function()
             {
@@ -126,7 +134,7 @@
             // === OBSERVERs
             _onVocabularyChange: function()
             {
-                this._updateClassesToDisplay();
+                this._updateClassesToDisplayV2();
             },
 
             _onRGTEChange: function() {
@@ -139,7 +147,7 @@
                     return; //NTD on boostrap
 
                 console.log('onchange');
-                this._updateClassesToDisplay();
+                this._updateClassesToDisplayV2();
             },
 
             _onCustomPropsChanged: function(c) {
@@ -271,11 +279,13 @@
 
             _updateClassesToDisplay: function()
             {
-                this.classes = [];
+               var tmp = [];
+                //this.classes = [];
 
                 if (this.vocab != null)
                 {
-                    this.classes = this.vocab.getClasses();
+                    // this.classes = this.vocab.getClasses();
+                    tmp = this.vocab.getClasses();
 
                     // console.log(this.vocab.getClasses());
                     // console.log(this.customcls);
@@ -284,13 +294,57 @@
                 for (var p = 0; p < this.customcls.length; p++)
                 {
 
-                    this.push('classes', this.customcls[p]);
-                    // }
+                    // this.push('classes', this.customcls[p]);
+                    tmp.push(this.customcls[p]);
 
 
-                    this._autoSelectRelation();
+                    // this._autoSelectRelation();
                 }
+
+                this.set('classes', []);
+                this.set('classes', tmp);
+
                 return this.classes;
+            },
+
+            _updateClassesToDisplayV2: function()
+            {
+              var tmp = [];
+
+              var vSize = 0; if(this.vocab){vSize=this.vocab.getClasses().length;}
+
+              if(this.oldSize === this.customcls.length + vSize); //Same size, no modif, abort
+                return;
+
+              if (this.vocab != null)
+              {
+                tmp = this.vocab.getClasses();
+              }
+
+              for (var p = 0; p < this.customcls.length; p++)
+              {
+                tmp.push(this.customcls[p]);
+              }
+
+              var list;
+              for(var i in tmp)
+              {
+                list = document.createElement('paper-item');
+                list.setAttribute('value', tmp[i].id);
+                list.textContent = tmp[i].label;
+                this.$$('#classes').appendChild(list);
+              }
+
+              this.oldSize = this.customcls.length + vSize;
+            },
+
+            _resetClassesDisplay: function()
+            {
+              var root = this.$$('#classes');
+
+              if(root)
+                while(root.firstChild)
+                  root.removeChild(root.firstChild);
             },
 
             /**

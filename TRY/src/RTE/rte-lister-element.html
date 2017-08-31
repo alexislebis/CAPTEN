@@ -253,9 +253,9 @@
 
     <div id="rtelister">
 
-        <div hidden="{{hideClassRelationForm}}">
+        <!-- <div hidden="{{hideClassRelationForm}}">
           <rgte-custom-class-relation-element id="customRel" vocab="{{vocab}}" customcls="{{customcls}}" customproprs="{{customprops}}" rgte="{{rgte}}" selectedcls="{{selectedcls}}"></rgte-custom-class-relation-element>
-        </div>
+        </div> -->
 
         <!-- <div hidden$="{{disableClassesLister}}">
           <div class$="[[_isCLSSelected(selectedcls)]]">
@@ -301,23 +301,25 @@
             <h4>Custom Classes</h4>
 
             <div class="elementBlock">
+              <div id="repeatercls2">
+              </div>
             <!-- <ul id="rdfClasses"></ul> -->
-            <template is="dom-repeat" id="repeatercls" items="{{customcls}}" filter="{{computeFilter(query)}}" index-as="index">
+            <!-- <template is="dom-repeat" id="repeatercls" items="{{customcls}}" filter="{{computeFilter(query)}}" index-as="index"> -->
               <!-- <div> -->
-                  <div class$="[[_computeClass(index)]]" on-tap="_custcTapped">
+                  <!-- <div class$="[[_computeClass(index)]]" on-tap="_custcTapped">
                       <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >[[item.label]] <paper-ripple></paper-ripple> </div>
-                      <span class="useButton hideUseButton selectedItem">
+                      <span class="useButton hideUseButton selectedItem"> -->
                           <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
                           <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
-                          <paper-icon-button class="removeElmt" icon="{{icon}}" on-tap="_addClassToRGTE"></paper-icon-button>
+                          <!-- <paper-icon-button class="removeElmt" icon="{{icon}}" on-tap="_addClassToRGTE"></paper-icon-button>
                       </span>
 
-                  </div>
+                  </div> -->
 
                   <!-- <iron-icon class="removeElmt" icon="clear" on-tap="_removeCustomCLS"></iron-icon>
                   <div class="border"></div>
               </div> -->
-            </template>
+            <!-- </template> -->
           </div>
             <!-- <iron-list id="ilCUSTCLS" items="{{customclsToDisplay}}" as="item" class="flex" selection-enabled>
                 <template>
@@ -340,20 +342,22 @@
             <h4>Custom Properties</h4>
 
             <div class="elementBlock" >
-            <template is="dom-repeat" id="repeaterprops" items="{{customprops}}" filter="{{computeFilter(query)}}" index-as="index">
+              <div id="repeaterprops2">
+              </div>
+            <!-- <template is="dom-repeat" id="repeaterprops" items="{{customprops}}" filter="{{computeFilter(query)}}" index-as="index"> -->
               <!-- <div> -->
-                  <div class$="[[_computeClass(index)]]" on-tap="_custpTapped">
+                  <!-- <div class$="[[_computeClass(index)]]" on-tap="_custpTapped">
                       <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.label]] <paper-ripple></paper-ripple></div>
-                      <span class="useButton hideUseButton selectedItem">
+                      <span class="useButton hideUseButton selectedItem"> -->
                           <!-- <paper-iron-button icon$="[[iconForItem(selected)]]" class="star"></iron-icon> -->
-                          <paper-icon-button class="removeElmt" icon="{{icon}}" on-tap="_addPropToRGTE"></paper-icon-button>
+                          <!-- <paper-icon-button class="removeElmt" icon="{{icon}}" on-tap="_addPropToRGTE"></paper-icon-button>
                       </span>
-                  </div>
+                  </div> -->
 
                   <!-- <div class="border"></div> -->
                   <!--  icons:settings-backup-restore -->
                 <!-- </div> -->
-            </template>
+            <!-- </template> -->
           </div>
             <!-- <iron-list id="ilCUSTPROPS" items="[[custompropsToDisplay]]" as="item" class="flex" selection-enabled>
                 <template>
@@ -452,19 +456,11 @@
                 {
                     type: Array,
                     notify: true,
-                    value: function()
-                    {
-                        return [];
-                    },
                 },
                 customprops:
                 {
                     type: Array,
                     notify: true,
-                    value: function()
-                    {
-                        return [];
-                    },
                     // observer: "_onCustomPropsChanged",
                 },
                 selectedcls://Class selected
@@ -527,6 +523,17 @@
                   value: 'icons:system-update-alt',
                   notify: true,
                 },
+
+
+                oldCustomClsSize:
+                {
+                  type: Number,
+                },
+
+                oldCustomePropsSize:
+                {
+                  type: Number,
+                }
             },
 
             observers: [
@@ -647,11 +654,17 @@
             _custcTapped: function(e)
             {
                 // this.$.lister.clearClsSelection();
-
                 if(!e.model.selected)
                   this.selectedcls = e.model.item;
                 else
                   this.selectedcls = null;
+
+                this.hideClassRelationForm = true;
+            },
+
+            _custcTappedV2: function(cls)
+            {
+               this.selectedcls = cls;
 
                 this.hideClassRelationForm = true;
             },
@@ -767,24 +780,157 @@
             //===V2
             update: function()
             {
-              var not = this.customcls;
-              this.customcls = [];
-              // this.$.repeatercls.render();
+              if(this.oldCustomClsSize != this.customcls.length)
+                this._displayCustomCLS();
 
-              for(var i in not) //Polymer fuck up. Had to redo the entire tab, otherwise wont work. Same issue as here https://stackoverflow.com/questions/36000724/polymer-render-for-template-repeat-not-updating-correctly-missing-array-val
-                this.push('customcls', not[i]);
+              // var not = this.customcls;
+              // this.set('customcls', []);
+              // this.set('customcls', not);
+              // this.customcls = [];
+              // // this.$.repeatercls.render();
+              //
+              // for(var i in not) //Polymer fuck up. Had to redo the entire tab, otherwise wont work. Same issue as here https://stackoverflow.com/questions/36000724/polymer-render-for-template-repeat-not-updating-correctly-missing-array-val
+              //   this.push('customcls', not[i]);
 
-              not = this.customprops;
-              this.customprops = [];
+              if(this.oldCustomePropsSize != this.customprops.length)
+                this._displayCustomProps();
 
-              for(var i in not)
-                this.push('customprops', not[i]);
+              // not = this.customprops;
+              // this.customprops = [];
+              //
+              // for(var i in not)
+              //   this.push('customprops', not[i]);
             },
+              _displayCustomCLS: function()
+              {
+                var item; var div1; var div2; var span;
+                this._resetDisplayCls();
+                for(var i in this.customcls)
+                {
+                  (function(cls)
+                  {
+                    var labelLwr = cls.label.toLowerCase(); var queryLwr = null;
+                    if(this.query != null && this.query.length > 1)
+                      queryLwr = this.query.toLowerCase();
+
+                    if(queryLwr == null || labelLwr.includes(queryLwr))
+                    {
+                      div1 = document.createElement('div');
+                      div1.setAttribute('class', this._computeClass(i));
+                      // div1.addEventListener('click', function(e){
+                      //   this._custcTappedV2(cls);
+                      // }.bind(this));
+
+                      div2 = document.createElement('div');
+                      div2.setAttribute('class', 'primary pad');
+                      div2.setAttribute('tabindex', i);
+                      div2.addEventListener('click', function(e){
+                        this._selectItemV2(e, cls);
+                      }.bind(this));
+                      div2.textContent = this.customcls[i].label;
+
+                      span = document.createElement('span');
+                      span.setAttribute('class', 'useButton hideUseButton selectedItem');
+
+                      item = document.createElement('paper-icon-button');
+                      item.setAttribute('class', "removeElmt");
+                      item.setAttribute('icon', this.icon);
+                      item.addEventListener('click', function(e){
+                        this._addClassToRGTE(e);
+                      }.bind(this));
+
+                      span.appendChild(item);
+                      div1.appendChild(div2);
+                      div1.appendChild(span);
+
+                      this.$$('#repeatercls2').appendChild(div1);
+                    }
+                  }.bind(this))(this.customcls[i]);
+                }
+
+                this.oldCustomClsSize = this.customcls.length;
+              },
+
+              _displayCustomProps: function()
+              {
+                var item; var div1; var div2; var span;
+                this._resetDisplayProps();
+                for(var i in this.customprops)
+                {
+                  (function(cls)
+                  {
+                    var labelLwr = cls.label.toLowerCase(); var queryLwr = null;
+                    if(this.query != null && this.query.length > 1)
+                      queryLwr = this.query.toLowerCase();
+
+                    if(queryLwr == null || labelLwr.includes(queryLwr))
+                    {
+                      div1 = document.createElement('div');
+                      div1.setAttribute('class', this._computeClass(i));
+                      // div1.addEventListener('click', function(e){
+                      //   this._custcTappedV2(cls);
+                      // }.bind(this));
+
+                      div2 = document.createElement('div');
+                      div2.setAttribute('class', 'primary pad');
+                      div2.setAttribute('tabindex', i);
+                      div2.addEventListener('click', function(e){
+                        this._selectItemV2(e, cls);
+                      }.bind(this));
+                      div2.textContent = this.customprops[i].label;
+
+                      span = document.createElement('span');
+                      span.setAttribute('class', 'useButton hideUseButton selectedItem');
+
+                      item = document.createElement('paper-icon-button');
+                      item.setAttribute('class', "removeElmt");
+                      item.setAttribute('icon', this.icon);
+                      item.addEventListener('click', function(e){
+                        this._addPropToRGTE(e);
+                      }.bind(this));
+
+                      span.appendChild(item);
+                      div1.appendChild(div2);
+                      div1.appendChild(span);
+
+                      this.$$('#repeaterprops2').appendChild(div1);
+                    }
+                  }.bind(this))(this.customprops[i]);
+                }
+
+                this.oldCustomClsSize = this.customprops.length;
+              },
+
+              _resetDisplayCls: function()
+              {
+                var root = this.$$('#repeatercls2');
+
+                if(root)
+                  while(root.firstChild)
+                    root.removeChild(root.firstChild);
+              },
+
+              _resetDisplayProps: function()
+              {
+                var root = this.$$('#repeaterprops2');
+
+                if(root)
+                  while(root.firstChild)
+                    root.removeChild(root.firstChild);
+              },
 
             _onQueryChanged: function(e)
             {
                 if(this.query != null && this.query.length == 0)
+                {
                   this.query = null;
+                  return;
+                }
+
+                this.update();
+
+
+
             },
 
             //Simple string verification
@@ -814,6 +960,26 @@
               this._hideLastSelectedSpan();
 
               this.lastSelectedSpan = event.target.nextSibling.nextSibling;
+
+              if(this.lastSelectedSpan != null)
+                this.lastSelectedSpan.className = "useButton selectedItem";
+            },
+
+            _selectItemV2: function(event, cls)
+            {
+              if(cls instanceof CAPTENClass)
+                this.selectedcls = cls;
+              else if(cls instanceof Property)
+                this.selectedprop = cls;
+
+              this.hideClassRelationForm = true;
+
+              if(this.$.lister != null)
+                this.$.lister._hideLastSelectedSpan();
+
+              this._hideLastSelectedSpan();
+
+              this.lastSelectedSpan = event.currentTarget.nextSibling;
 
               if(this.lastSelectedSpan != null)
                 this.lastSelectedSpan.className = "useButton selectedItem";

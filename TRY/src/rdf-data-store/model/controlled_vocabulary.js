@@ -15,7 +15,7 @@ function CONTROLLED_VOCABULARY()
     this.isRecomputeBlankNodesNeeded = true;
 
     this.classes = null;
-    this.nonBlankNodes = null;
+    this.nonBlankNodes = [];
     this.blankNodes = null; // blankNodes = this.classes \ this.nonBlankNodes
     this.properties = null;
     this.unionOf = null;
@@ -56,14 +56,14 @@ CONTROLLED_VOCABULARY.prototype = {
 
     getClasses: function()
     {
-        if (this.isRecomputeNonBlankNodesNeeded)
-        {
-            this._recomputeNodes();
-        }
-
-
-        console.log(this.classes);
-        console.log(this.nonBlankNodes);
+        // if (this.isRecomputeNonBlankNodesNeeded)
+        // {
+        //     this._recomputeNodes();
+        // }
+        //
+        //
+        // console.log(this.classes);
+        // console.log(this.nonBlankNodes);
         return this.nonBlankNodes.slice();//cp of the array
     },
 
