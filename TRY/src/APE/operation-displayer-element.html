@@ -227,6 +227,8 @@ Polymer({
 
   _getName: function(operation)
   {
+    if(operation == null || !operation.getName)
+      return;
     return operation.getName();
   },
 

@@ -1421,7 +1421,10 @@ _rollbackRemove: function()
       {
         var tabs = this.narrativeBlock.getElementsFromURIProperty(HAS_NAME_URI);
         if(tabs.length > 0)
+        {
           name = tabs[0].getName();
+          this.name = tabs[0];
+        }
       }
 
       return name;

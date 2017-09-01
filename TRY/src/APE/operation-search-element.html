@@ -51,9 +51,33 @@
         <div><span><h3>{{_computeHeaderName(query)}}</h3></span></div>
       </header>
   <!--  -->
-    <template id="repeater" is="dom-repeat" items="{{operationsArray}}" filter="{{computeFilter(query, unproposed)}}" index-as="index" restamp>
+      <div>
+        <header class="headerSubSection">
+          <div on-click="_toggleCollapseNOP">
+            <span><h3>Narrated Operators</h3></span>
+            <paper-icon-button id="NOPpib" icon="expand-more"></paper-icon-button>
+          </div>
+        </header>
+        <iron-collapse id="collapseNOP">
+          <div id="repeaterNOP">
+          </div>
+        </iron-collapse>
+      </div>
+      <div>
+        <header class="headerSubSection">
+          <div on-click="_toggleCollapseNAP">
+            <span><h3>Narrated Analyses</h3></span>
+            <paper-icon-button id="NAPpib" icon="expand-more"></paper-icon-button>
+          </div>
+        </header>
+        <iron-collapse id="collapseNAP">
+          <div id="repeaterNAP">
+          </div>
+        </iron-collapse>
+      </div>
+    <!-- <template id="repeater" is="dom-repeat" items="{{operationsArray}}" filter="{{computeFilter(query, unproposed)}}" index-as="index" restamp>
       <operation-displayer-element enable-use="{{enableUse}}" operator="{{item}}"></operation-displayer-element>
-    </template>
+    </template> -->
     </div>
     <div id="previous">
       <header class="headerSubSection">
@@ -104,7 +128,13 @@
         {
           type: Array,
           notify: true,
-        }
+        },
+
+        enableUse:
+        {
+          type: Boolean,
+          notify: true,
+        },
       },
 
       observers: [
@@ -137,11 +167,11 @@
       attached: function()
       {
         //@HACK force dom repeat redraw
-        this.operationsArray = [];
+        // this.operationsArray = [];
         // this.$.repeater.render();
         //===
 
-        this.operationsArray = NARRATED_OPERATION_POOL.getAvailableOperations();
+        // this.operationsArray = NARRATED_OPERATION_POOL.getAvailableOperations();
 
         // this.$.repeater.render();
       },
@@ -149,20 +179,24 @@
       _onUnproposedChanged: function(e)
       {
         // this.$.repeater.render();
+        this.$.collapseNOP.opened = false;
+        this.$.collapseNAP.opened = false;
       },
 
       update: function()
       {
+        this.$.collapseNOP.opened = false;
+        this.$.collapseNAP.opened = false;
         //@HACK force dom repeat redraw
-        this.operationsArray = [];
-        this.$.repeater.render();
-        //===
-
-        var unp = this.unproposed;
-        this.unproposed = [];
-        this.unproposed = unp;
-
-        this.set('operationsArray',NARRATED_OPERATION_POOL.getAvailableOperations());
+        // this.operationsArray = [];
+        // // this.$.repeater.render();
+        // //===
+        //
+        // var unp = this.unproposed;
+        // this.unproposed = [];
+        // this.unproposed = unp;
+        //
+        // this.set('operationsArray',NARRATED_OPERATION_POOL.getAvailableOperations());
 
         // this.$.repeater.render();
       },
@@ -222,6 +256,117 @@
         this.fire(OPERATION_REWIND_REQUESTED_SIGNAL_ID);
       },
 
+      // === COLLAPSER
+      _toggleCollapseNOP: function()
+      {
+        this.$.collapseNOP.toggle();
+        if(this.$.collapseNOP.opened)
+        {
+          this.$.NOPpib.setAttribute('icon', 'icons:expand-less');
+
+          this._displayNOP();
+        }
+        else
+          this.$.NOPpib.setAttribute('icon', 'icons:expand-more');
+      },
+
+      _toggleCollapseNAP: function()
+      {
+        this.$.collapseNAP.toggle();
+        if(this.$.collapseNAP.opened)
+        {
+          this.$.NAPpib.setAttribute('icon', 'icons:expand-less');
+
+          this._displayNAP();
+        }
+        else
+          this.$.NAPpib.setAttribute('icon', 'icons:expand-more');
+      },
+
+      _displayNOP: function()
+      {
+        var elm;
+
+        // this.$.toastRepeater2Loading.open();
+
+        this._resetDisplay('repeaterNOP');
+
+        var tmpArr = NARRATED_OPERATOR_POOL.pool;
+        var found = false;
+
+        for(var i in tmpArr)
+        {
+          for(var j in this.unproposed)
+          {
+            if(this.unproposed[j] && this.unproposed[j].id == tmpArr[i].id)
+            {
+              found = true;
+              break;
+            }
+          }
+
+          if(!found)
+          {
+            elm = document.createElement('operation-displayer-element');
+            elm.operator = tmpArr[i];
+            elm.enableUse = this.enableUse;
+
+            this.$$('#repeaterNOP').appendChild(elm);
+          }
+          found = false;
+        }
+
+        // this.$.toastRepeater2Loading.close();
+        // this.$.toastRepeater2Ok.open();
+      },
+
+      _displayNAP: function()
+      {
+        var elm;
+
+        // this.$.toastRepeater2Loading.open();
+
+        this._resetDisplay('repeaterNAP');
+
+        var tmpArr = NARRATED_ANALYSIS_POOL.pool;
+        var found = false;
+
+        for(var i in tmpArr)
+        {
+          for(var j in this.unproposed)
+          {
+            if(this.unproposed[j] && this.unproposed[j].id == tmpArr[i].id)
+            {
+              found = true;
+              break;
+            }
+          }
+
+          if(!found)
+          {
+            elm = document.createElement('operation-displayer-element');
+            elm.operator = tmpArr[i];
+            elm.enableUse = this.enableUse;
+
+            this.$$('#repeaterNAP').appendChild(elm);
+          }
+          found = false;
+        }
+
+        // this.$.toastRepeater2Loading.close();
+        // this.$.toastRepeater2Ok.open();
+      },
+
+      _resetDisplay: function(url)
+      {
+        var url = "#"+url;
+
+        var root = this.$$(url);
+
+        if(root)
+          while(root.firstChild)
+            root.removeChild(root.firstChild);
+      },
     });
   </script>
 </dom-module>

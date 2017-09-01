@@ -61,9 +61,11 @@
         </div>
       </header>
       <iron-collapse id="collapseRG">
-        <template id="repeaterRelated" is="dom-repeat" items="{{rgteRelated}}" index-as="index" restamp>
+        <div id="repeaterRelated2">
+        </div>
+        <!-- <template id="repeaterRelated" is="dom-repeat" items="{{rgteRelated}}" index-as="index" restamp>
             <rgte-inline-displayer-element enable-use="{{enableUse}}" rgte="{{item.rgte}}" specificity="{{item.specificity}}" from="{{item.producedIn}}" from-position="{{item.position}}"><rgte-inline-displayer-element>
-        </template>
+        </template> -->
       </iron-collapse>
     </div>
 
@@ -76,9 +78,12 @@
       </header>
   <!--  -->
       <iron-collapse id="collapseAR">
-        <template id="repeater" is="dom-repeat" items="{{rgteArray}}" filter="{{computeFilter(query)}}" index-as="index" restamp>
+        <div id="repeater2">
+
+        </div>
+        <!-- <template id="repeater" is="dom-repeat" items="{{rgteArray}}" filter="{{computeFilter(query)}}" index-as="index" restamp>
             <rgte-inline-displayer-element enable-use="{{enableUse}}" rgte="{{item}}"><rgte-inline-displayer-element>
-        </template>
+        </template> -->
       </iron-collapse>
 
     </div>
@@ -94,6 +99,14 @@
     </div>
   </div>
 </div>
+
+<paper-toast id="toastRepeater2Loading" text="Loading all available graphs" duration="Infinity">
+  <paper-button on-click="_closeToast" class="toastButton">OK</paper-button>
+</paper-toast>
+
+<paper-toast id="toastRepeater2Ok" text="Graphs loaded">
+  <paper-button on-click="_closeToast" class="toastButton">CLOSE</paper-button>
+</paper-toast>
 
   </template>
   <script>
@@ -157,12 +170,12 @@
       {
         //@HACK force dom repeat redraw
         this.rgteArray = [];
-        this.$.repeater.render();
+        // this.$.repeater.render();
         //===
 
         this.rgteArray = RGTE_POOL.getPool();
 
-        this.$.repeater.render();
+        // this.$.repeater.render();
 
         this.$.result.addEventListener(RGTE_USE_FROM_SEARCH_SIGNAL_ID, function(e){
           this.RGTECreationAndDispatcher(e.detail.rgte, e.detail.stacking);
@@ -223,7 +236,7 @@
       {
         //@HACK force dom repeat redraw
         this.rgteArray = [];
-        this.$.repeater.render();
+        // this.$.repeater.render();
         //===
 
         if(this.nap != null && (this.nap instanceof NarratedAnalysisProcess))//Find associated rgte
@@ -255,8 +268,9 @@
             this.push("rgteArray", rgteDisplayed[i]);
             // tmp.push(rgteDisplayed[i]);
 
-
-        this._updatedRelatedArray();
+            this.$.collapseAR.opened = false;
+            this.$.collapseRG.opened = false;
+        // this._updatedRelatedArray();
 
       },
 
@@ -294,22 +308,94 @@
       {
         this.$.collapseAR.toggle();
         if(this.$.collapseAR.opened)
+        {
           this.$.allRGTEpib.setAttribute('icon', 'icons:expand-less');
+
+          this._displayRGTEArray();
+        }
         else
           this.$.allRGTEpib.setAttribute('icon', 'icons:expand-more');
       },
+
+        _displayRGTEArray: function()
+        {
+          var elm;
+
+          if(this.$$('#repeater2').childNodes.length == this.rgteArray.length )
+            return;
+
+          this.$.toastRepeater2Loading.open();
+
+          this._resetDisplay('repeater2');
+
+          for(var i in this.rgteArray)
+          {
+            elm = document.createElement('rgte-inline-displayer-element');
+            elm.rgte = this.rgteArray[i];
+            elm.enableUse = this.enableUse;
+
+            this.$$('#repeater2').appendChild(elm);
+          }
+
+          this.$.toastRepeater2Loading.close();
+          this.$.toastRepeater2Ok.open();
+        },
+
+        _resetDisplay: function(url)
+        {
+          var url = "#"+url;
+
+          var root = this.$$(url);
+
+          if(root)
+            while(root.firstChild)
+              root.removeChild(root.firstChild);
+        },
+
       _toggleCollapseStepRGTE: function()
       {
         this.$.collapseRG.toggle();
         if(this.$.collapseRG.opened)
+        {
           this.$.stepRGTEpib.setAttribute('icon', 'icons:expand-less');
+          this._updatedRelatedArray();
+        }
         else
           this.$.stepRGTEpib.setAttribute('icon', 'icons:expand-more');
       },
 
+      _displayStepRGTE: function()
+      {
+        var elm;
+
+        if(this.$$('#repeaterRelated2').childNodes.length == this.rgteRelated.length )
+          return;
+
+        this.$.toastRepeater2Loading.open();
+
+        this._resetDisplay('repeaterRelated2');
+
+        for(var i in this.rgteRelated)
+        {
+          elm = document.createElement('rgte-inline-displayer-element');
+          elm.rgte = this.rgteRelated[i].rgte;
+          elm.enableUse = this.enableUse;
+          elm.specificity = this.rgteRelated[i].specificity;
+          elm.from = this.rgteRelated[i].producedIn;
+          elm.fromPosition = this.rgteRelated[i].position;
+
+          this.$$('#repeaterRelated2').appendChild(elm);
+        }
+
+        this.$.toastRepeater2Loading.close();
+        this.$.toastRepeater2Ok.open();
+      },
+
       _onNAPChanged: function(nap)
       {
-        this._updatedRelatedArray();
+        // this._updatedRelatedArray();
+        this.$.collapseAR.opened = false;
+        this.$.collapseRG.opened = false;
       },
 
       _updatedRelatedArray: function()
@@ -347,8 +433,16 @@
         if(lastProduction)
           res.push({rgte: lastProduction.getOutputs(), producedIn: lastProduction, position: this.nap.getPositionOfStep(lastProduction), specificity: "LAST_IN_NAP"});
 
-        this.rgteRelated = null;
-        this.set('rgteRelated', res);
+        // this.rgteRelated = null;
+        // this.set('rgteRelated', res);
+        this.rgteRelated = res;
+
+        this._displayStepRGTE();
+      },
+
+      _closeToast: function(e)
+      {
+        Polymer.dom(e).localTarget.parentElement.close();
       },
 
     });
