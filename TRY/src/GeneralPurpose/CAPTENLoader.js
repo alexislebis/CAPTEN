@@ -590,7 +590,7 @@ CAPTENLoader.prototype = {
 
         for(var i in json.sources)
         {
-          this._addNewAlignmentRow(json.sources[i], null, {obj: sg.sources, attr: i});
+          this._addNewAlignmentRow(json.sources[i].id, null, {obj: sg.sources, attr: i});
         }
 
         return sg;
