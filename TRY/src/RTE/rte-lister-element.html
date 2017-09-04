@@ -298,11 +298,19 @@
 
       <div id="custom">
         <div class="subBlock leftSubBlock" hidden$="{{disableClassesLister}}">
-            <h4>Custom Classes</h4>
+            <!-- <h4>Custom Classes</h4> -->
 
             <div class="elementBlock">
-              <div id="repeatercls2">
-              </div>
+              <header class="headerSubSection">
+                <div on-click="_toggleCollapseCLS">
+                  <span><h4>Custom Classes</h4></span>
+                  <paper-icon-button id="CLSpib" icon="expand-more"></paper-icon-button>
+                </div>
+              </header>
+              <iron-collapse id="collapseCLS">
+                <div id="repeatercls2">
+                </div>
+              </iron-collapse>
             <!-- <ul id="rdfClasses"></ul> -->
             <!-- <template is="dom-repeat" id="repeatercls" items="{{customcls}}" filter="{{computeFilter(query)}}" index-as="index"> -->
               <!-- <div> -->
@@ -339,11 +347,19 @@
         </div>
 
         <div class="subBlock" hidden$="{{disablePropertiesLister}}">
-            <h4>Custom Properties</h4>
+            <!-- <h4>Custom Properties</h4> -->
 
             <div class="elementBlock" >
-              <div id="repeaterprops2">
-              </div>
+              <header class="headerSubSection">
+                <div on-click="_toggleCollapseProp">
+                  <span><h4>Custom Properties</h4></span>
+                  <paper-icon-button id="Proppib" icon="expand-more"></paper-icon-button>
+                </div>
+              </header>
+              <iron-collapse id="collapseProp">
+                <div id="repeaterprops2">
+                </div>
+              </iron-collapse>
             <!-- <template is="dom-repeat" id="repeaterprops" items="{{customprops}}" filter="{{computeFilter(query)}}" index-as="index"> -->
               <!-- <div> -->
                   <!-- <div class$="[[_computeClass(index)]]" on-tap="_custpTapped">
@@ -780,8 +796,8 @@
             //===V2
             update: function()
             {
-              if(this.oldCustomClsSize != this.customcls.length)
-                this._displayCustomCLS();
+
+                this.$.collapseCLS.opened = false;
 
               // var not = this.customcls;
               // this.set('customcls', []);
@@ -792,8 +808,9 @@
               // for(var i in not) //Polymer fuck up. Had to redo the entire tab, otherwise wont work. Same issue as here https://stackoverflow.com/questions/36000724/polymer-render-for-template-repeat-not-updating-correctly-missing-array-val
               //   this.push('customcls', not[i]);
 
-              if(this.oldCustomePropsSize != this.customprops.length)
-                this._displayCustomProps();
+
+              this.$.collapseProp.opened = false;
+                // this._displayCustomProps();
 
               // not = this.customprops;
               // this.customprops = [];
@@ -803,9 +820,12 @@
             },
               _displayCustomCLS: function()
               {
+                if(this.oldCustomClsSize == this.customcls.length)
+                  return;
+
                 var item; var div1; var div2; var span;
                 this._resetDisplayCls();
-                for(var i in this.customcls)
+                for(var i = 0, k = this.customcls.length; i < k; i++)//in this.customcls)
                 {
                   (function(cls)
                   {
@@ -853,6 +873,9 @@
 
               _displayCustomProps: function()
               {
+                if(this.oldCustomePropsSize == this.customprops.length)
+                  return;
+
                 var item; var div1; var div2; var span;
                 this._resetDisplayProps();
                 for(var i in this.customprops)
@@ -1022,7 +1045,33 @@
             {
               this.set('route.path', '/terminology/new');
               window.scrollTo(0,0);
-            }
+            },
+
+            _toggleCollapseCLS: function()
+            {
+              this.$.collapseCLS.toggle();
+              if(this.$.collapseCLS.opened)
+              {
+                this.$.CLSpib.setAttribute('icon', 'icons:expand-less');
+
+                this._displayCustomCLS();
+              }
+              else
+                this.$.CLSpib.setAttribute('icon', 'icons:expand-more');
+            },
+
+            _toggleCollapseProp: function()
+            {
+              this.$.collapseProp.toggle();
+              if(this.$.collapseProp.opened)
+              {
+                this.$.Proppib.setAttribute('icon', 'icons:expand-less');
+
+                this._displayCustomProps();
+              }
+              else
+                this.$.Proppib.setAttribute('icon', 'icons:expand-more');
+            },
         });
     </script>
 </dom-module>
