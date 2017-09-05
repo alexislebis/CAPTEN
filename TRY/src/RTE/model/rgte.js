@@ -827,7 +827,7 @@ _rollbackRemove: function()
        var tmpSubstituates = this.prevSubstituteElement;
        var tmpAltered = this.prevAlteredElement;
 
-       var newNode = this._addVisNode(this.prevAlteredElement);
+       var newNode = this._addVisNode(this.prevAlteredElement, this.prevAlteredElement.label);
        newNode.derivedFrom = tmpDerived;
 
        for(var i in tmpSubstituates)//All prop altered previously by the deletion
@@ -987,7 +987,7 @@ _rollbackRemove: function()
     var initialNode = this.getNodeById(nodeToUpdateID);
     var res = this._removeNode(nodeToUpdateID, true);
 
-    var cls = this._addVisNode(newNode);
+    var cls = this._addVisNode(newNode, newNode.label);
 
     //Trick for update. Since newNode is anonymous and unuseful for trackback,
     //we set derivedFrom on the nodeToUpdateID, saying that cls come from the updatedNode
