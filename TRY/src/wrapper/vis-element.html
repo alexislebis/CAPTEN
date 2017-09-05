@@ -1,3 +1,4 @@
+<link rel="import" href="../import/tools-import.html">
 <link rel="import" href="../import/vis-import.html">
 
 <dom-module id="vis-element">
@@ -230,7 +231,7 @@
             {
               // this.network.setOptions(this.options);
 
-              this.network.redraw();
+              VIS_REDRAWER_ENGINE.redraw(this.network);
 
               console.log(this.network);
             },
@@ -240,7 +241,7 @@
             addNodeWithRedraw: function(nodeID, nodeLabel) {
                 this.addNode(nodeID, nodeLabel);
 
-                this.network.redraw();
+                VIS_REDRAWER_ENGINE.redraw(this.network);
             },
 
             /**
@@ -278,7 +279,7 @@
             createEdgeBetweenWithRedraw: function(node1, node2, edgeLabel) {
                 this.createEdgeBetween(node1, node2, edgeLabel);
 
-                this.network.redraw();
+                VIS_REDRAWER_ENGINE.redraw(this.network);
             },
 
             resetGraphStructure: function() {
@@ -310,7 +311,7 @@
 
                 this.network.setOptions(this.options);
 
-                this.network.redraw();
+                VIS_REDRAWER_ENGINE.redraw(this.network);
                 //this.network = new vis.Network(container, data, this.options);
 
                 //this.createEdgeBetween(1,2,'testdeloeuf');
@@ -380,7 +381,7 @@
                             edges: this.edges
                         });
 
-                        this.network.redraw();
+                        VIS_REDRAWER_ENGINE.redraw(this.network);
 
                         return;
                     }
@@ -400,7 +401,7 @@
                 this.options.configure = enabled;
 
                 this.network.setOptions(this.options);
-                this.network.redraw();
+                VIS_REDRAWER_ENGINE.redraw(this.network);
             },
 
 

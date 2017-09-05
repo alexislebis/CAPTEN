@@ -357,38 +357,51 @@
 
       <div id="custom">
         <div class="subBlock leftSubBlock" hidden$="{{disableClassesLister}}">
-            <h4>Custom Classes</h4>
-
             <div class="elementBlock">
+              <header class="headerSubSection">
+                <div on-click="_toggleCollapseCLS">
+                  <span><h4>Custom Classes</h4></span>
+                  <paper-icon-button id="CLSpib" icon="expand-more"></paper-icon-button>
+                </div>
+              </header>
+              <iron-collapse id="collapseCLS">
+                <div id="repeatercls2">
+                </div>
+              </iron-collapse>
             <!-- <ul id="rdfClasses"></ul> -->
-            <template id="customCLSRepeater" is="dom-repeat" items="{{customcls}}" filter="{{computeFilter(query)}}" index-as="index">
-              <!-- <div> -->
+            <!-- <template id="customCLSRepeater" is="dom-repeat" items="{{customcls}}" filter="{{computeFilter(query)}}" index-as="index">
                   <div class$="[[_computeClass(index)]]" on-tap="_custcTapped">
                       <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem" >[[_computeLabelorURI(item)]] <paper-ripple></paper-ripple> </div>
                       <span class="useButton hideUseButton selectedItem">
-                          <!-- <paper-icon-button icon$="[[iconForItem(selected)]]" class="star"></paper-icon-button> -->
-                          <!-- @MOVE déplacer la gestion dans le composant dédié au vocab--><!-- <paper-icon-button class="makeRelation" icon="swap-vert" on-tap="_makeRel"></paper-icon-button> -->
                           <paper-icon-button class="removeElmt" icon="icons:launch" on-click="_openTerminology"></paper-icon-button>
                       </span>
                   </div>
-            </template>
+            </template> -->
           </div>
         </div>
 
         <div class="subBlock" hidden$="{{disablePropertiesLister}}">
-            <h4>Custom Properties</h4>
+            <!-- <h4>Custom Properties</h4> -->
 
             <div class="elementBlock" >
-            <template id="customPropsRepeater" is="dom-repeat" items="{{customprops}}" filter="{{computeFilter(query)}}" index-as="index">
-              <!-- <div> -->
+              <header class="headerSubSection">
+                <div on-click="_toggleCollapseProp">
+                  <span><h4>Custom Properties</h4></span>
+                  <paper-icon-button id="Proppib" icon="expand-more"></paper-icon-button>
+                </div>
+              </header>
+              <iron-collapse id="collapseProp">
+                <div id="repeaterprops2">
+                </div>
+              </iron-collapse>
+            <!-- <template id="customPropsRepeater" is="dom-repeat" items="{{customprops}}" filter="{{computeFilter(query)}}" index-as="index">
                   <div class$="[[_computeClass(index)]]" on-tap="_custpTapped">
                       <div class="primary pad" tabindex$="[[tabIndex]]" on-click="_selectItem">[[item.uri]] <paper-ripple></paper-ripple></div>
                       <span class="useButton hideUseButton selectedItem">
-                          <!-- <paper-iron-button icon$="[[iconForItem(selected)]]" class="star"></iron-icon> -->
                           <paper-icon-button class="removeElmt" icon="icons:launch" on-click="_openTerminology"></paper-icon-button>
                       </span>
                   </div>
-            </template>
+            </template> -->
           </div>
         </div>
       </div>
@@ -511,7 +524,7 @@
                 rgte:
                 {
                   type: Object,
-                  value: function(){ return new RGTE();},
+                  // value: function(){ return new RGTE();},
                 },
 
                 hideClassRelationForm:
@@ -530,7 +543,7 @@
                   type: Boolean,
                   value: false,
                   notify: true,
-                  observer: '_test',
+                  // observer: '_test',
                 },
                 disablePropertiesLister:
                 {
@@ -603,20 +616,22 @@
 
             update: function()
             {
-              var tmp1 = this.customcls;
-              var tmp2 = this.customprops;
+              // var tmp1 = this.customcls;
+              // var tmp2 = this.customprops;
 
-              this.customcls = [];
-              this.customprops = [];
+              // this.customcls = [];
+              // this.customprops = [];
 
               // this.$.customCLSRepeater.render();
               // this.$.customPropsRepeater.render();
 
-              for(var i in tmp1) //Polymer fuck up. Had to redo the entire tab, otherwise wont work. Same issue as here https://stackoverflow.com/questions/36000724/polymer-render-for-template-repeat-not-updating-correctly-missing-array-val
-                this.push('customcls', tmp1[i]);
+              // for(var i in tmp1) //Polymer fuck up. Had to redo the entire tab, otherwise wont work. Same issue as here https://stackoverflow.com/questions/36000724/polymer-render-for-template-repeat-not-updating-correctly-missing-array-val
+              //   this.push('customcls', tmp1[i]);
 
-              for(var j in tmp2) //Polymer fuck up. Had to redo the entire tab, otherwise wont work. Same issue as here https://stackoverflow.com/questions/36000724/polymer-render-for-template-repeat-not-updating-correctly-missing-array-val
-                this.push('customprops', tmp2[j]);
+              this.$.collapseCLS.opened = false;
+              this.$.collapseProp.opened = false;
+              // for(var j in tmp2) //Polymer fuck up. Had to redo the entire tab, otherwise wont work. Same issue as here https://stackoverflow.com/questions/36000724/polymer-render-for-template-repeat-not-updating-correctly-missing-array-val
+              //   this.push('customprops', tmp2[j]);
 
               // this.$.customCLSRepeater.render();
               // this.$.customPropsRepeater.render();
@@ -965,6 +980,178 @@
             {
               return item.label != null ? item.label : item.uri;
             },
+
+            _toggleCollapseCLS: function()
+            {
+              this.$.collapseCLS.toggle();
+              if(this.$.collapseCLS.opened)
+              {
+                this.$.CLSpib.setAttribute('icon', 'icons:expand-less');
+
+                this._displayCustomCLS();
+              }
+              else
+                this.$.CLSpib.setAttribute('icon', 'icons:expand-more');
+            },
+
+            _displayCustomCLS: function()
+            {
+              if(this.oldCustomClsSize == this.customcls.length)
+                return;
+
+              var item; var div1; var div2; var span;
+              this._resetDisplayCls();
+              for(var i = 0, k = this.customcls.length; i < k; i++)//in this.customcls)
+              {
+                (function(cls)
+                {
+                  var labelLwr = cls.label.toLowerCase(); var queryLwr = null;
+                  if(this.query != null && this.query.length > 1)
+                    queryLwr = this.query.toLowerCase();
+
+                  if(queryLwr == null || labelLwr.includes(queryLwr))
+                  {
+                    div1 = document.createElement('div');
+                    div1.setAttribute('class', this._computeClass(i));
+                    // div1.addEventListener('click', function(e){
+                    //   this._custcTappedV2(cls);
+                    // }.bind(this));
+
+                    div2 = document.createElement('div');
+                    div2.setAttribute('class', 'primary pad');
+                    div2.setAttribute('tabindex', i);
+                    div2.addEventListener('click', function(e){
+                      this._selectItemV2(e, cls);
+                    }.bind(this));
+                    div2.textContent = this.customcls[i].label;
+
+                    span = document.createElement('span');
+                    span.setAttribute('class', 'useButton hideUseButton selectedItem');
+
+                    item = document.createElement('paper-icon-button');
+                    item.setAttribute('class', "removeElmt");
+                    item.setAttribute('icon', "icons:launch");
+                    item.addEventListener('click', function(e){
+                      this._openTerminologyWId(cls.id);
+                    }.bind(this));
+
+                    span.appendChild(item);
+                    div1.appendChild(div2);
+                    div1.appendChild(span);
+
+                    this.$$('#repeatercls2').appendChild(div1);
+                  }
+                }.bind(this))(this.customcls[i]);
+              }
+
+              this.oldCustomClsSize = this.customcls.length;
+            },
+
+            _resetDisplayCls: function()
+            {
+              var root = this.$$('#repeatercls2');
+
+              if(root)
+                while(root.firstChild)
+                  root.removeChild(root.firstChild);
+            },
+
+            _resetDisplayProps: function()
+            {
+              var root = this.$$('#repeaterprops2');
+
+              if(root)
+                while(root.firstChild)
+                  root.removeChild(root.firstChild);
+            },
+
+            _displayCustomProps: function()
+            {
+              if(this.oldCustomePropsSize == this.customprops.length)
+                return;
+
+              var item; var div1; var div2; var span;
+              this._resetDisplayProps();
+              for(var i in this.customprops)
+              {
+                (function(cls)
+                {
+                  var labelLwr = cls.label.toLowerCase(); var queryLwr = null;
+                  if(this.query != null && this.query.length > 1)
+                    queryLwr = this.query.toLowerCase();
+
+                  if(queryLwr == null || labelLwr.includes(queryLwr))
+                  {
+                    div1 = document.createElement('div');
+                    div1.setAttribute('class', this._computeClass(i));
+                    // div1.addEventListener('click', function(e){
+                    //   this._custcTappedV2(cls);
+                    // }.bind(this));
+
+                    div2 = document.createElement('div');
+                    div2.setAttribute('class', 'primary pad');
+                    div2.setAttribute('tabindex', i);
+                    div2.addEventListener('click', function(e){
+                      this._selectItemV2(e, cls);
+                    }.bind(this));
+                    div2.textContent = this.customprops[i].label;
+
+                    span = document.createElement('span');
+                    span.setAttribute('class', 'useButton hideUseButton selectedItem');
+
+                    item = document.createElement('paper-icon-button');
+                    item.setAttribute('class', "removeElmt");
+                    item.setAttribute('icon', "icons:launch");
+                    item.addEventListener('click', function(e){
+                      this._openTerminologyWId(cls.id);
+                    }.bind(this));
+
+                    span.appendChild(item);
+                    div1.appendChild(div2);
+                    div1.appendChild(span);
+
+                    this.$$('#repeaterprops2').appendChild(div1);
+                  }
+                }.bind(this))(this.customprops[i]);
+              }
+
+              this.oldCustomClsSize = this.customprops.length;
+            },
+
+            _toggleCollapseProp: function()
+            {
+              this.$.collapseProp.toggle();
+              if(this.$.collapseProp.opened)
+              {
+                this.$.Proppib.setAttribute('icon', 'icons:expand-less');
+
+                this._displayCustomProps();
+              }
+              else
+                this.$.Proppib.setAttribute('icon', 'icons:expand-more');
+            },
+
+            _selectItemV2: function(event, cls)
+            {
+              if(cls instanceof CAPTENClass)
+                this.selectedcls = cls;
+              else if(cls instanceof Property)
+                this.selectedprop = cls;
+
+              this.hideClassRelationForm = true;
+
+              if(this.$.lister != null)
+                this.$.lister._hideLastSelectedSpan();
+
+              this._hideLastSelectedSpan();
+
+              this.lastSelectedSpan = event.currentTarget.nextSibling;
+
+              if(this.lastSelectedSpan != null)
+                this.lastSelectedSpan.className = "useButton selectedItem";
+            },
+
+
         });
     </script>
 </dom-module>
