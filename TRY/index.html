@@ -14,7 +14,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
 
-  <title>My App</title>
+  <title>CAPTEN</title>
 
   <link rel="shortcut icon" sizes="32x32" href="/images/app-icon-32.png">
 
@@ -67,6 +67,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <link rel="import" href="/bower_components/iron-pages/iron-pages.html">
   <link rel="import" href="/bower_components/app-route/app-route.html">
   <link rel="import" href="/bower_components/app-route/app-location.html">
+  <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+  <link rel="import" href="../../../bower_components/paper-tooltip/paper-tooltip.html">
+  <link rel="import" href="./bower_components/paper-progress/paper-progress.html">
+
 
   <style>
 
@@ -78,20 +82,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       background-color: #eee;
     }
 
-    app-header {
+    /*app-header {
       background-color: red;
       --app-header-background-rear-layer: {
         background-color: blue;
       };
+    }*/
+
+    app-header{
+      background-color: white;
+      border-bottom: 1px solid white;
+      /*--app-header-background-front-layer:{
+        @apply(--layout-horizontal);
+        @apply(--layout-flex);
+        @apply(--layout-around-justified);
+      };*/
     }
 
+    #headTlt{
+      width: 90%;
+      /*background-color: red;*/
+      text-align: center;
+    }
+/*
     paper-tabs, core-toolbar {
       background-color: #00bcd4;
       color: #fff;
       box-shadow: 0px 3px 2px rgba(0, 0, 0, 0.2);
-    }
+    }*/
 
-    core-toolbar paper-tabs {
+    /*core-toolbar paper-tabs {
      box-shadow: none;
    }
    paper-tabs[noink][nobar] paper-tab.core-selected {
@@ -114,6 +134,27 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     .menu-content{
       padding-left: 16px;
+    }*/
+
+    #fabs{
+      position: static;
+      right: 0;
+      width: 100px;
+      /*background-color: yellow;*/
+      z-index: 10;
+    }
+
+    .fab{
+      position: static;
+      /*float: left;*/
+    }
+
+    #save{
+      background-color: #57bb8a;
+    }
+
+    #load{
+      background-color: #7baaf7;
     }
   </style>
 
@@ -126,7 +167,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <!-- HEADER SECTION -->
         <!-- ////////////// -->
 
-<app-drawer-layout force-narrow="true">
+<!-- <app-drawer-layout force-narrow="true">
   <app-drawer align="end">
     <paper-menu selected="{{page}}">
       <paper-item><paper-icon-button icon="home"></paper-icon-button>Home</paper-item>
@@ -141,14 +182,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       </paper-submenu>
       <paper-item>Creditential</paper-item>
     </paper-menu>
-  </app-drawer>
+  </app-drawer> -->
 
 
   <app-header-layout>
-    <app-header reveals>
+    <app-header reveals condenses effects="material">
       <app-toolbar>
-        <div spacer title>CAPTEN - SEED</div>
-        <paper-icon-button icon="menu" drawer-toggle></paper-icon-button>
+        <paper-fab class="fab" id="save" mini icon="save"></paper-fab>
+        <div spacer title id="headTlt">CAPTEN</div>
+        <paper-fab class="fab" id="load" mini icon="file-upload"></paper-fab>
       </app-toolbar>
     </app-header>
 
@@ -165,7 +207,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <app-header-layout>
 </app-drawer-layout>
 
-<main-seed></main-seed>
+<paper-tooltip for="headTlt">Capitalization of Analysis Processes for Technology Enhanced learNing</paper-tooltip>
+
+<main-seed id="seed"></main-seed>
 
 <!--<iron-pages selected="{{data}}">
   <div><main-rte></main-rte></div>
@@ -186,14 +230,27 @@ var tabs = document.querySelector('paper-tabs');
 var menu = document.querySelector('paper-menu');
 var submenu1 = document.getElementById('submenu1');//this.$.submenu1
 
+var seed = document.getElementById('seed');
+
+document.getElementById('headTlt').addEventListener('click', function(){
+  window.scrollTo(0,0);
+});
+
+
+document.getElementById('save').addEventListener('click', function(){
+  seed.export();
+});
+
+document.getElementById('load').addEventListener('click', function(){
+  seed.load();
+});
 /*tabs.addEventListener('iron-select', function() {
     pages.selected = tabs.selected;
   });*/
-
-
-menu.addEventListener('iron-select', function(){
-
-});
+//
+// menu.addEventListener('iron-select', function(){
+//
+// });
 </script>
 
 </html>

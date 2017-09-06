@@ -60,6 +60,34 @@
         display: block;
         position: relative;
       }
+
+      paper-tabs {
+        background-color: #FBFBFB;
+
+        --paper-tabs-selection-bar-color: var(--paper-red-500);
+        /*color: #fff;*/
+      }
+
+      paper-tab{
+        --paper-tab-ink: var(--paper-grey-300);
+      }
+
+      #progress{
+        position: fixed;
+        width: 100%;
+        bottom: 0px;
+      }
+
+      .iconsNavig{
+        width: 32px;
+
+        --paper-icon-button:
+        {
+
+        };
+      }
+
+
     </style>
 
 <div id="rootDiv">
@@ -76,16 +104,33 @@
 
 
 
-    <paper-tabs selected='{{routeData.topLevel}}'  fit-container attr-for-selected="name">
+    <!-- <paper-tabs selected='{{routeData.topLevel}}'  fit-container attr-for-selected="name">
             <paper-tab name="rgte">RTE</paper-tab>
             <paper-tab name="voog">VOOG</paper-tab>
             <paper-tab name="ape">APE</paper-tab>
-    </paper-tabs>
+    </paper-tabs> -->
+
+
+      <paper-tabs id="tabs" selected="{{routeData.topLevel}}" attr-for-selected="name">
+        <!-- <iron-icon icon="arrow-back"></iron-icon> -->
+        <paper-icon-button disabled id="navigBack" class="iconsNavig" icon="arrow-back"></paper-icon-button>
+
+        <paper-tab name="index">Index</paper-tab>
+        <paper-tab name="operation_search">Operations</paper-tab>
+        <paper-tab name="vocabulary">Vocabulary</paper-tab>
+        <paper-tab name="rgte_search">Graphs</paper-tab>
+
+        <!-- <iron-icon icon="arrow-forward"></iron-icon> -->
+        <paper-icon-button disabled id="navigForward" class="iconsNavig" icon="arrow-forward"></paper-icon-button>
+      </paper-tabs>
+
+      <paper-tooltip for="navigBack">Go to the previous page</paper-tooltip>
+      <paper-tooltip for="navigForward">Return to the ancient page</paper-tooltip>
 
     <!-- <history-displayer></history-displayer> -->
 
     <paper-icon-button icon="save" on-click="export"></paper-icon-button>
-    <capten-loader-element id="loader" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></capten-loader-element>
+    <capten-loader-element id="loader" hidden vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></capten-loader-element>
 
     <neon-animated-pages selected='{{routeData.topLevel}}'
                      attr-for-selected='name'
@@ -105,6 +150,8 @@
       <neon-animatable name="analysis"><analysis-creation-page route="{{tailTopLevel}}" nap="{{nap}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></analysis-creation-page></neon-animatable>
       <neon-animatable name="narration"><narrative-creation-page-element route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"><narrative-creation-page-element></neon-animatable>
     </neon-animated-pages>
+
+    <paper-progress id="progress" disabled="{{progressState}}" indeterminate class="slow blue"></paper-progress>
 
 
     <!-- <narrative-block-cascader-display-element id="rootNarrativeBlockDisplayer" entity="{{narrativeentity}}"></narrative-block-cascader-display-element> -->
@@ -199,6 +246,13 @@
             type: Object,
             notify: true,
           },
+
+        progressState:
+        {
+          type: Boolean,
+          notify: true,
+          value: true,
+        },
 
       },
 
@@ -365,6 +419,11 @@
         // element.click();
         //
         // document.body.removeChild(element);
+      },
+
+      load: function()
+      {
+        this.$.loader.forcedLoad();
       },
 
       mapIdElementUsedIn: function(searchedArray, map)

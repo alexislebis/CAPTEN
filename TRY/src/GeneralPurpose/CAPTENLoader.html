@@ -13,14 +13,16 @@
             }
         </style>
 
+    <div hidden="{{hidden}}">
         <div>
           <h3>Load an entire CAPTEN configuration</h3>
           <file-reader file-slice-size="1000000000" id="fileReaderElement">CAPTEN_EXPORT.json</file-reader>
         </div>
+    </div>
 
-        <input id="inp" type="file">
+        <!-- <input id="inp" type="file">
         <button id="myBtn">Try it</button>
-        <pre id="file"></pre>
+        <pre id="file"></pre> -->
 
         <paper-toast id="toastBeingLoaded" text="The CAPTEN confiugarion is being imported; Please wait">
           <paper-button on-click="_closeToast" class="toastButton">UNDO</paper-button>
@@ -56,6 +58,12 @@
                 notify: true,
               },
 
+              hidden:
+              {
+                type: Boolean,
+                notify: true,
+              },
+
             },
             // Used for two-ways binding debug
               // observers: [
@@ -64,14 +72,14 @@
 
             attached: function()
             {
-              this.$.myBtn.addEventListener("click", function() {
-                var reader = new FileReader();
-                reader.addEventListener('load', function()
-                {
-                  this.$.file.innerText = reader.result;
-                }.bind(this));
-                reader.readAsArrayBuffer(this.$.inp.files[0]);
-              }.bind(this));
+              // this.$.myBtn.addEventListener("click", function() {
+              //   var reader = new FileReader();
+              //   reader.addEventListener('load', function()
+              //   {
+              //     this.$.file.innerText = reader.result;
+              //   }.bind(this));
+              //   reader.readAsArrayBuffer(this.$.inp.files[0]);
+              // }.bind(this));
             },
 
               _closeToast: function(e)
@@ -96,6 +104,11 @@
                     }
                     this.getSlice(0, 1, callback);
                 };
+            },
+
+            forcedLoad: function()
+            {
+              this.$.fileReaderElement._handleUploadClick();
             },
             // _onGraphChanged: function(n,o)
             // {
