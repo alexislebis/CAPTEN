@@ -13,27 +13,70 @@
     #separator{
       width: 100%;
       margin: 50px 0px;
-      border-bottom: 1px solid black;
+      /*border-bottom: 1px solid black;*/
     }
 
     #new{
       @apply(--layout-vertical);
       @apply(--layout-center);
-      margin-bottom: 50px;
+      margin-top: 20px;
+      margin-bottom: 20px;
     }
+
+    paper-button.custom {
+      --paper-button:{
+        font-size: 14px;
+      };
+    --paper-button-ink-color: var(--paper-green-a200);
+    /* These could also be individually defined for each of the
+      specific css classes, but we'll just do it once as an example */
+    --paper-button-flat-keyboard-focus: {
+      background-color: var(--paper-green-a200);
+      color: white !important;
+    };
+    --paper-button-raised-keyboard-focus: {
+      background-color: var(--paper-green-a200) !important;
+      color: white !important;
+    };
+  }
+  paper-button.custom:hover {
+    background-color: var(--paper-green-100);
+  }
+
+  paper-button.indigo {
+    background-color: #57bb8a;
+    color: white;
+    --paper-button-raised-keyboard-focus: {
+      background-color: var(--paper-green-a200) !important;
+      color: white !important;
+    };
+  }
+
+  .createIcon{
+    margin-right: 5px;
+  }
+
+  #headerIndex{
+    padding-top: 40px;
+    padding-bottom: 25px;
+    background-color: #FBFBFB;
+  }
 
     </style>
 
     <app-route route="{{route}}" pattern="/:itemValue" active="{{active}}" data="{{data}}" tail="{{tail}}"></app-route>
 
 <div id="divRoot">
-  <div hidden$="{{!index}}">
+  <div id="headerIndex" hidden$="{{!index}}">
     <h1 id="header"> CAPTEN </h1>
     <p id="subtitle">Prototype for the capitalisation of analysis processes</p>
     <div id="separator"></div>
   </div>
   <div id="new">
-    <paper-button raised on-click="_openNew">Create a new narrated analysis process</paper-button>
+    <paper-button class="custom indigo" raised on-click="_openNew">
+      <iron-icon class="createIcon" icon="communication:import-contacts"></iron-icon>
+      Create a new narrated analysis process
+    </paper-button>
   </div>
   <operation-search-element id="ose" unproposed="{{unproposed}}" to-stack="{{toStack}}" enable-use="{{enableUse}}" ></operation-search-element>
 
@@ -76,10 +119,10 @@
 
       _onRouteChanged: function(route)
       {
-        if(route.path != "/operation_search" && route.path != "/index")
+        if(route.prefix != "/operation_search" && route.prefix != "/index")
           return null;
 
-        if(route.path == "/index")
+        if(route.prefix == "/index")
           this.index = true;
         else
           this.index = false;

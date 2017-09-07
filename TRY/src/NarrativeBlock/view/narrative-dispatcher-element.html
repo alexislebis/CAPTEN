@@ -5,43 +5,93 @@
     <style>
 
     #divRoot{
+      width: 100%;
+      /*@apply(--layout-horizontal);
+      @apply(--layout-around-justified);*/
+    }
+
+    paper-card{
+      width: 100%;
+    }
+
+    .card-content{
+      min-height: 36px;
+    }
+    .card-actions{
+      color: var(--paper-pink-400);
       @apply(--layout-horizontal);
       @apply(--layout-around-justified);
     }
+
     #narrativeZone{
       @apply(--layout-horizontal);
       @apply(--layout-around-justified);
+      margin-top: -14px;
+    }
+
+    .shortText{
+      font-size: 15px;
+    }
+    .shortText{
+      font-style: italic;
     }
 
     .prop{
-      width: 20%;
+      margin-top: 18px;
+      margin-right: 8px;
     }
 
     .item{
-      width: 80%;
+      width: 100%;
     }
 
     .item2{
-      width: 20vw;
+      width: 100%;
+      margin-right: 5px;
+    }
+
+    .btn{
+      width: 38px;
+      /*--paper-icon-button{
+        width: 10px;
+        height: 10px;
+      };*/
     }
 
     </style>
 
     <app-location route="{{topLevelRoute}}" use-hash-as-path></app-location>
+<div id="divRoot">
 
+    <paper-card>
+      <div class="card-content">
+        <div id="narrativeZone">
 
-    <div id="divRoot">
-      <div id="narrativeZone">
-
-      </div>
-      <div id="managingZone">
-        <paper-icon-button id="launch" icon="launch" on-click="_openNarrativeElement"></paper-icon-button>
-        <paper-icon-button id="newNarrative" icon="communication:textsms" on-click="_openNewNarrative"></paper-icon-button>
-        <div hidden$='{{!isRecursive}}'>
-          <paper-icon-button id="subNarration" on-click='_subNarrationEvent' icon="icons:speaker-notes"></paper-icon-button>
         </div>
-        <paper-icon-button id="delete" icon="delete"></paper-icon-button>
       </div>
+      <div class="card-actions">
+        <div id="managingZone">
+          <paper-icon-button class="btn" id="launch" icon="launch" on-click="_openNarrativeElement"></paper-icon-button>
+          <paper-icon-button class="btn" id="newNarrative" icon="communication:textsms" on-click="_openNewNarrative"></paper-icon-button>
+          <div hidden$='{{!isRecursive}}'>
+            <paper-icon-button class="btn" id="subNarration" on-click='_subNarrationEvent' icon="icons:speaker-notes"></paper-icon-button>
+          </div>
+          <paper-icon-button class="btn" id="delete" disabled icon="delete"></paper-icon-button>
+        </div>
+      </div>
+    </paper-card>
+
+      <!-- <div id="managingZone">
+        <paper-icon-button class="btn" id="launch" icon="launch" on-click="_openNarrativeElement"></paper-icon-button>
+        <paper-icon-button class="btn" id="newNarrative" icon="communication:textsms" on-click="_openNewNarrative"></paper-icon-button>
+        <div hidden$='{{!isRecursive}}'>
+          <paper-icon-button class="btn" id="subNarration" on-click='_subNarrationEvent' icon="icons:speaker-notes"></paper-icon-button>
+        </div>
+        <paper-icon-button class="btn" id="delete" icon="delete"></paper-icon-button>
+      </div> -->
+      <!-- <div id="narrativeZone">
+
+      </div> -->
     </div>
 
     <paper-tooltip for="launch">Open this narrative element</paper-tooltip>
@@ -164,6 +214,8 @@
 
       var origin = null;
       var propNamer = new (this.prop.constructor).namerElement(this.prop);
+      propNamer.setAttribute('class', 'shortText');
+
       var elementNamer = new (this.element.constructor).namerElement(this.element);
       elementNamer.set('vocab', this.vocab);
       elementNamer.set('customcls', this.customcls);

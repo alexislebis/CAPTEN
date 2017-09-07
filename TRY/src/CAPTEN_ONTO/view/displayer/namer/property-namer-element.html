@@ -2,11 +2,16 @@
   <template>
     <style>
     :host {
-      display: block;
+    }
+
+    #prop{
+      display: inline-block;
+      white-space: nowrap;
+      /*background-color: red;*/
     }
     </style>
 
-    {{property.htmlify}}
+    <p id="prop">{{property.htmlify}}</p>
     <!-- PNE
 
     <template is="dom-if" if="{{_isJustifiedBy(property)}}" restamp="true">

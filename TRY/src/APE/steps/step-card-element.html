@@ -25,8 +25,17 @@
     iron-icon.star:last-of-type { color: var(--paper-grey-500); }
 
     .card-actions{
+      color: var(--paper-pink-400);
       @apply(--layout-horizontal);
       @apply(--layout-justified);
+    }
+
+    .green{
+      color: #57bb8a;
+    }
+
+    .shortText{
+      font-size: 14px;
     }
 
     </style>
@@ -37,8 +46,8 @@
   <paper-card id="main">
     <div class="card-content">
       <div class="step-header">
-        <span id="notComplete" hidden$="{{_isComputed(step)}}"><iron-icon icon="icons:error"></iron-icon></span>
-        <span id="complete" hidden$="{{!_isComputed(step)}}"><iron-icon icon="icons:check-circle"></iron-icon></span>
+        <span id="notComplete" hidden$="{{_isComputed(step)}}"><iron-icon class="green" icon="icons:error"></iron-icon></span>
+        <span id="complete" hidden$="{{!_isComputed(step)}}"><iron-icon class="green" icon="icons:check-circle"></iron-icon></span>
       [[_computeName(step)]]
           <paper-tooltip for="notComplete">This step has not been completed yet</paper-tooltip>
           <paper-tooltip for="complete">This step has been completed</paper-tooltip>
@@ -56,16 +65,16 @@
         </div>
       </div>
 
-      <p><span hidden$="{{!isStart}}"> <iron-icon icon="maps:my-location"></iron-icon> </span>A step <span hidden$="{{!belongsTo}}">of {{belongsTo}}</span></p>
+      <p class="shortText"><span hidden$="{{!isStart}}"> <iron-icon class="green" icon="maps:my-location"></iron-icon> </span>A step <span hidden$="{{!belongsTo}}">of {{belongsTo}}</span></p>
       <!-- TODO make dom repeat on objective inside a UL  -->
-      <p class="step-light">Objective#1: [[step.objective]]</p>
-      <p class="step-light">Other info#1: Lorem ipsum dolor sit aem.</p>
       <p class="step-light">Position: [[position]]</p>
+      <!-- <p class="step-light">Objective#1: [[step.objective]]</p> -->
+      <!-- <p class="step-light">Other info#1: Lorem ipsum dolor sit aem.</p> -->
     </div>
 
     <div class="card-actions">
-      <paper-icon-button icon="icons:delete"></paper-icon-button>
-      <paper-icon-button icon="favorite"></paper-icon-button>
+      <paper-icon-button disabled icon="icons:delete"></paper-icon-button>
+      <paper-icon-button disabled icon="favorite"></paper-icon-button>
       <paper-icon-button icon="launch" on-click="redirect"></paper-icon-button>
     </div>
     <!-- <div class="card-actions">

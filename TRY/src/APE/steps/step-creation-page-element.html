@@ -25,7 +25,7 @@
       #commonInfo{
         width: 70%;
         margin: 0 auto;
-        background-color: DodgerBlue;
+        /*background-color: DodgerBlue;*/
 
       }
 
@@ -35,11 +35,11 @@
         margin-bottom: 100px;
       }
 
-      #separator{
+      /*#separator{
         width: 95%;
         margin: 50px auto;
         border-bottom: 1px solid black;
-      }
+      }*/
 
       #configurationZone{
         width: 100%;
@@ -51,6 +51,7 @@
 
       #linkingZone
       {
+        margin-top: 50px;
         width: 100%;
         text-align: center;
       }
@@ -69,6 +70,29 @@
         margin: 0 auto -17px auto;
       }
 
+      .bolded{
+        font-weight: bold;
+      }
+
+      .shortText{
+        font-size: 14px;
+      }
+
+      #named{
+        @apply(--layout-horizontal);
+        @apply(--layout-around-justified);
+      }
+
+      #nameStep{
+        width: 100%;
+      }
+
+      #configurationZone{
+        margin-top: 40px;
+        border-top: 2px solid white;
+        background-color: #FBFBFB;
+        width: 100%;
+      }
 
     </style>
 <app-location route="{{routeTopLevel}}" use-hash-as-path></app-location>
@@ -86,13 +110,17 @@
 
   <div id="commonInfo">
     <header>
-      <h2> <span hidden$={{!isNew}}>New </span>Step <span hidden$={{!nap}}>of the {{nap.name}} analysis</span></h2> <!-- Have to be updated with the nap when name change with notify change -->
+      <h2> <span hidden$={{!isNew}}>New Step</span></h2> <!-- <span hidden$={{!nap}}>Step of the {{nap.name}} analysis</span></h2>--> <!-- Have to be updated with the nap when name change with notify change -->
+      <p id="subheader" hidden$={{!nap}} class="shortText"><span class="bolded shortText"><span hidden$={{!isNew}}>Will belongs </span><span hidden$={{isNew}}>Belongs</span> to:</span> {{napName}}'s analysis</p>
       <div id="paperFabs">
         <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
 
       </div>
       <!-- <paper-input id="nameNOP" label="Narrated operator name" value="{{stepName}}" char-counter required maxlength="100"></paper-input> -->
-      <extended-paper-input-element id="nameStep" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Step name" value="{{stepName}}" char-counter required maxlength="100"></extended-paper-input-element>
+      <div id="named">
+        <h4 style="width:auto;">Step: </h4>
+        <extended-paper-input-element id="nameStep" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Step name" value="{{stepName}}" char-counter required maxlength="100"></extended-paper-input-element>
+      </div>
     </header>
 
     <div id="narrativeInfo">
@@ -115,10 +143,10 @@
 
       <narrative-block-container-displayer-element id="nbcde" item="{{step}}" instance-to-filter="{{filter}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></narrative-block-container-displayer-element>
 
-      <div id="addNarrative">
+      <!-- <div id="addNarrative">
         <paper-fab icon="add" disabled="true"></paper-fab>
         <p>Add additional information related to the step</p>
-      </div>
+      </div> -->
     </div>
 
   </div>
@@ -130,7 +158,7 @@
 <!-- CONFIGURATION ZONE  -->
 
     <header>
-      <h4>Representation of its behavior<br/>(How it is supposed to work in a general way)</h4>
+      <h3>Representation of its behavior<br/><span class="shortText">(How it is supposed to work in a general way)</span></h3>
     </header>
 
     <!-- <div id="stepState">
@@ -160,7 +188,7 @@
 
     <div id="linkingZone">
       <paper-fab id="linkingFab" icon="icons:settings-input-component" active="[[relationModeI_NOP]]" disabled$="{{_isLinkingDisabled(input, operation)}}" on-click="_toggleRelationMode"></paper-fab>
-      <p hidden$="{{relationModeI_NOP}}">Bind your concepts with the input operator pattern</p>
+      <p hidden$="{{relationModeI_NOP}}">Use this button to start binding input patterns</p>
       <p hidden$="{{!relationModeI_NOP}}">Click on a node within your concept and on a node within the input operator pattern for binding them</p>
     </div>
 
@@ -169,7 +197,7 @@
     <vaadin-split-layout>
       <vaadin-split-layout>
         <div>
-          <h2>Input</h2>
+          <h3>Input</h3>
           <neon-animated-pages selected='{{inputSection}}'
                            attr-for-selected='name'
                            entry-animation='scale-up-animation'
@@ -187,7 +215,7 @@
 
         </div>
         <div id="vaadinOperation">
-          <h2>Operation</h2>
+          <h3>Operation</h3>
           <neon-animated-pages selected='{{operationSection}}'
                            attr-for-selected='name'
                            entry-animation='scale-up-animation'
@@ -204,7 +232,7 @@
         </div>
       </vaadin-split-layout>
         <div>
-          <h2>Output</h2>
+          <h3>Output</h3>
           <neon-animated-pages selected='{{outputSection}}'
                            attr-for-selected='name'
                            entry-animation='scale-up-animation'
@@ -326,6 +354,12 @@
           value: false,
         },
 
+        napName:
+        {
+          type: String,
+          notify: true,
+        },
+
         // === Graphs coloration
         inputsColor:
         {
@@ -420,7 +454,19 @@
         "_onNameChanged(stepName)",
         "_onInputChanged(input)",
         "_onCompositeElementChanged(compositeIOP)",
+        "_onNAPChanged(nap)",
       ],
+
+      _onNAPChanged: function(nap)
+      {
+        if(nap == null)
+        {
+          this.napName = "";
+          return;
+        }
+
+        this.napName = nap.getName();
+      },
 
       _onCompositeElementChanged: function(composite)
       {

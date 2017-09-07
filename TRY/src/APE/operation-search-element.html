@@ -26,6 +26,39 @@
       margin-bottom: 50px;
     }
 
+    paper-button.custom {
+      --paper-button:{
+        font-size: 14px;
+      };
+    --paper-button-ink-color: var(--paper-blue-a200);
+    /* These could also be individually defined for each of the
+      specific css classes, but we'll just do it once as an example */
+    --paper-button-flat-keyboard-focus: {
+      background-color: var(--paper-blue-a200);
+      color: white !important;
+    };
+    --paper-button-raised-keyboard-focus: {
+      background-color: var(--paper-blue-a200) !important;
+      color: white !important;
+    };
+  }
+  paper-button.custom:hover {
+    background-color: var(--paper-blue-100);
+  }
+
+  paper-button.indigo {
+    background-color: #7baaf7;
+    color: white;
+    --paper-button-raised-keyboard-focus: {
+      background-color: var(--paper-blue-a200) !important;
+      color: white !important;
+    };
+  }
+
+  .createIcon{
+    margin-right: 5px;
+  }
+
     </style>
 
     <app-location route="{{routeTopLevel}}" use-hash-as-path></app-location>
@@ -37,7 +70,10 @@
   </div>
 
   <div id="new">
-    <paper-button raised on-click="_openNew">Create a new narrated operator</paper-button>
+    <paper-button class="custom indigo" raised on-click="_openNew">
+      <iron-icon class="createIcon" icon="icons:content-paste"></iron-icon>
+      Create a new narrated operator
+    </paper-button>
   </div>
 
     <div id="searchZone" hidden="{{_computeHiddenAssumption(itemElmt)}}">

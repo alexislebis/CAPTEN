@@ -87,6 +87,10 @@
         };
       }
 
+      #tabs{
+        /*margin-bottom: 20px;*/
+      }
+
 
     </style>
 
@@ -129,7 +133,7 @@
 
     <!-- <history-displayer></history-displayer> -->
 
-    <paper-icon-button icon="save" on-click="export"></paper-icon-button>
+    <!-- <paper-icon-button icon="save" on-click="export"></paper-icon-button> -->
     <capten-loader-element id="loader" hidden vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></capten-loader-element>
 
     <neon-animated-pages selected='{{routeData.topLevel}}'
@@ -145,7 +149,7 @@
       <neon-animatable name='rgte_search'><rgte-search-element></rgte-search-element></neon-animatable>
       <neon-animatable name='rgte_similar'><rgte-find-similar-element></rgte-find-similar-element></neon-animatable>
       <neon-animatable name="nop"><operator-creation-page-element route-top-level="{{route}}" route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></operator-creation-page-element></neon-animatable>
-      <neon-animatable name="operation_search"><operation-search-page-element id="operation_search" route="{{route}}"></operation-search-page-element></neon-animatable>
+      <neon-animatable name="operation_search"><operation-search-page-element id="operation_search" route="{{tailTopLevel}}"></operation-search-page-element></neon-animatable>
       <neon-animatable name="step"><step-creation-page-element route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-creation-page-element></neon-animatable>
       <neon-animatable name="analysis"><analysis-creation-page route="{{tailTopLevel}}" nap="{{nap}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></analysis-creation-page></neon-animatable>
       <neon-animatable name="narration"><narrative-creation-page-element route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"><narrative-creation-page-element></neon-animatable>

@@ -10,21 +10,21 @@
 
     :host{
       --vis-element-height: 400px;
-      --rgte-common-width: 400px;
-    }
-
-    #commonInfo{
-      width: 60%;
-      margin: 0 auto;
-      background-color: DodgerBlue;
+      --rgte-common-width: 100%;
     }
 
     #commonInfo{
       width: 70%;
       margin: 0 auto;
-      background-color: DodgerBlue;
-
+      /*background-color: DodgerBlue;*/
     }
+
+    /*#commonInfo{
+      width: 70%;
+      margin: 0 auto;
+      /*background-color: DodgerBlue;*/
+
+    /*}*/
 
     #commonInfo > header{
       width: 100%;
@@ -32,11 +32,11 @@
       margin-bottom: 100px;
     }
 
-    #separator{
-      width: 95%;
-      margin: 50px auto;
-      border-bottom: 1px solid black;
-    }
+    /*#separator{
+      width: 100%;
+      /*margin: 50px auto;*/
+      /*border-bottom: 1px solid white;
+    }*/
 
     .miniSeparator{
       width: 20%;
@@ -45,6 +45,9 @@
     }
 
     #configurationZone{
+      margin-top: 40px;
+      border-top: 2px solid white;
+      background-color: #FBFBFB;
       width: 100%;
     }
 
@@ -53,20 +56,74 @@
     }
 
     .subConfigZone > h4{
-      text-align: center;
+      /*text-align: center;*/
+      margin-left: 10px;
       margin-bottom: 30px;
     }
 
     #sde{
 
-      width: 60%;
+      width: 70%;
       margin: 0 auto 50px auto;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
 
     #layoutConcept{
-      background-color: green;
+      width: 70%;
+      margin: 0 auto;
+      /*background-color: red;*/
+      /*background-color: green;*/
+      /*@apply(--layout-horizontal);
+      @apply(--layout-around-justified);*/
+    }
+
+    #rcae{
+      /*width: 70%;*/
+    }
+
+    #named{
       @apply(--layout-horizontal);
       @apply(--layout-around-justified);
+    }
+
+    #nameNAP{
+      width: 100%;
+    }
+
+    .shortText{
+      font-size: 14px;
+    }
+    .shortText{
+      /*font-style: italic;*/
+    }
+
+    .borderElement{
+      margin-top: -20px;
+      margin-left: 3px;
+      border-left: 7px solid;
+      padding: 25px 0px;
+    }
+
+    .blue{
+      border-color: #7baaf7;
+    }
+
+    .green{
+      border-color: #57bb8a;
+    }
+
+    .configHeader{
+      margin-top: 50px;
+    }
+
+    #rsei{
+      width: 70%;
+    }
+
+    #rwei{
+      /*background-color: red;*/
+      /*width: 70%;*/
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
 
     </style>
@@ -79,14 +136,16 @@
     <div id="divRoot">
       <div id="commonInfo">
         <header>
-          <h2> <span hidden$={{!isNew}}>New Analysis</span><span hidden$="{{isNew}}">Analysis: {{_computeNAPName(napName)}} </span></h2>
+          <h2> <span hidden$={{!isNew}}>New Analysis</span><!-- <span hidden$="{{isNew}}">Analysis: {{_computeNAPName(napName)}} </span>--></h2>
           <div id="paperFabs">
             <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
 
           </div>
           <!-- <paper-input id="nameNAP" label="Analysis name" value="{{napName}}" char-counter required maxlength="100"></paper-input> -->
-
-          <extended-paper-input-element id="nameNAP" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Analysis name" value="{{napName}}" char-counter required maxlength="100"></extended-paper-input-element>
+          <div id="named">
+            <h4 style="width:auto;">Analysis: </h4>
+            <extended-paper-input-element id="nameNAP" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="{{_computeLabel(isNew)}}" value="{{napName}}" char-counter required maxlength="100"></extended-paper-input-element>
+          </div>
         </header>
 
         <div id="narrativeInfo">
@@ -108,10 +167,10 @@
 
           <narrative-block-container-displayer-element id="nbcde" item="{{nap}}" instance-to-filter="{{filter}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></narrative-block-container-displayer-element>
 
-          <div id="addNarrative">
+          <!-- <div id="addNarrative">
             <paper-fab icon="add" disabled="true"></paper-fab>
             <p>Add additional information related to the step</p>
-          </div>
+          </div> -->
         </div>
 
       </div>
@@ -124,46 +183,52 @@
     <!-- CONFIGURATION ZONE  -->
 
         <header>
-          <h4>Detailed view<br/>(How the analysis is made and narrated)</h4>
+          <h3>Detailed view<br/><span class="shortText">(How the analysis is made and narrated)</span></h3>
         </header>
 
-        <div class="miniSeparator"></div>
+        <!-- <div class="miniSeparator"></div> -->
 
         <div id="conceptRequired" class="subConfigZone">
-          <h4>Initial concepts required</h4>
+          <h4 class="configHeader">Initial concepts required</h4>
 
-          <div id="layoutConcept">
-            <div hidden$="{{!_showConceptsComponents(stateRGTE,newState)}}">
-              <rgte-card-add-element id="rcae" text="Define the initial concepts available for the analysis"></rgte-card-add-element>
-            </div>
-            <div hidden$="{{!_showConceptsComponents(stateRGTE,searchState)}}">
-              <rgte-search-element id="rsei" enable-rewind="{{_computeRewindAuthorized(rgte)}}" enable-use="true" disable-steps-related-graph></rgte-search-element>
-            </div>
-            <!-- TODO : FOR LATER -->
-            <!-- <div hidden$="{{!_showConceptsComponents(stateRGTE,displayState)}}">
-              <rgte-narrative-info></rgte-narrative-info>
-            </div> -->
-            <div hidden$="{{!_showConceptsComponents(stateRGTE,displayState)}}">
-              <rgte-workzone-element id="rwei" rgte="{{rgte}}" colorization="{{inputsColor}}" disable-save-menu disable-bag-menu disable-edit disable-search disable-knowledge vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+          <div class="borderElement blue">
+            <div id="layoutConcept">
+              <div hidden$="{{!_showConceptsComponents(stateRGTE,newState)}}">
+                <rgte-card-add-element id="rcae" text="Define the initial concepts available for the analysis"></rgte-card-add-element>
+              </div>
+              <div hidden$="{{!_showConceptsComponents(stateRGTE,searchState)}}">
+                <rgte-search-element id="rsei" enable-rewind="{{_computeRewindAuthorized(rgte)}}" enable-use="true" disable-steps-related-graph></rgte-search-element>
+              </div>
+              <!-- TODO : FOR LATER -->
+              <!-- <div hidden$="{{!_showConceptsComponents(stateRGTE,displayState)}}">
+                <rgte-narrative-info></rgte-narrative-info>
+              </div> -->
+              <div hidden$="{{!_showConceptsComponents(stateRGTE,displayState)}}">
+                <rgte-workzone-element id="rwei" rgte="{{rgte}}" colorization="{{inputsColor}}" disable-save-menu disable-bag-menu disable-edit disable-search disable-knowledge vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="miniSeparator"></div>
+        <!-- <div class="miniSeparator"></div> -->
 
         <div id="stepOverview" class="subConfigZone">
-          <h4>Steps overview</h4>
+          <h4 class="configHeader">Steps overview</h4>
 
-          <steps-overview-element id="soe" nap="{{nap}}"></steps-overview-element>
+          <div class="borderElement green">
+            <steps-overview-element id="soe" nap="{{nap}}"></steps-overview-element>
+          </div>
 
         </div>
 
-        <div class="miniSeparator"></div>
+        <!-- <div class="miniSeparator"></div> -->
 
         <div id="analysisFlow" class="subConfigZone">
-          <h4>Analysis flow</h4>
+          <h4 class="configHeader">Analysis flow</h4>
 
-          <steps-displayer-element id="sde" steps="{{steps}}"></steps-displayer-element>
+          <div class="borderElement blue">
+            <steps-displayer-element id="sde" steps="{{steps}}"></steps-displayer-element>
+          </div>
 
         </div>
 
@@ -495,6 +560,11 @@
       _computeNAPName: function(name)
       {
         return name == null? '' : name.getString();
+      },
+
+      _computeLabel: function(isNew)
+      {
+        return isNew ? "Name your narrated analysis to save it" : "Named";
       },
 
 

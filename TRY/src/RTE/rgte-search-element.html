@@ -28,6 +28,39 @@
       margin-bottom: 50px;
     }
 
+    paper-button.custom {
+      --paper-button:{
+        font-size: 14px;
+      };
+    --paper-button-ink-color: var(--paper-red-a200);
+    /* These could also be individually defined for each of the
+      specific css classes, but we'll just do it once as an example */
+    --paper-button-flat-keyboard-focus: {
+      background-color: var(--paper-red-a200);
+      color: white !important;
+    };
+    --paper-button-raised-keyboard-focus: {
+      background-color: var(--paper-red-a200) !important;
+      color: white !important;
+    };
+  }
+  paper-button.custom:hover {
+    background-color: var(--paper-red-100);
+  }
+
+  paper-button.indigo {
+    background-color: var(--google-red-300);
+    color: white;
+    --paper-button-raised-keyboard-focus: {
+      background-color: var(--paper-red-a200) !important;
+      color: white !important;
+    };
+  }
+
+  .createIcon{
+    margin-right: 5px;
+  }
+
     </style>
 
     <app-location route="{{routeTopLevel}}" use-hash-as-path></app-location>
@@ -39,7 +72,10 @@
   </div>
 
   <div id="new">
-    <paper-button raised on-click="_openNew">Create a new relational graph of concepts</paper-button>
+    <paper-button class="custom indigo" raised on-click="_openNew">
+      <iron-icon class="createIcon" icon='social:share'></iron-icon>
+      Create a new relational graph of concepts
+    </paper-button>
   </div>
 
   <div id="accumulate" hidden$="{{!_isAccumulate(stackingArrayRGTE)}}">

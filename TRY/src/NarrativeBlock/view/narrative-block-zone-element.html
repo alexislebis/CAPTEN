@@ -3,13 +3,19 @@
 <dom-module id="narrative-block-zone-element">
   <template>
     <style>
+      .spacing{
+        margin-bottom: 10px;
+      }
     </style>
 
 <!-- Here a zone of narrative element belonging to a tag. If null : retrieve all untagged general. If All : retrieve all  -->
     <div id="divRoot">
       <div id="zone">
         <template id="repeater" is="dom-repeat" items="{{arrayToDisplay}}" as="elm" index-as="index" restamp>
-          <narrative-dispatcher-element vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" src="{{item}}" origin="{{_computeOrigin(isOriginMustBeDisplayed)}}" element="{{elm.element}}" prop="{{elm.property}}"></narrative-dispatcher-element>
+          <narrative-dispatcher-element class="nve" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" src="{{item}}" origin="{{_computeOrigin(isOriginMustBeDisplayed)}}" element="{{elm.element}}" prop="{{elm.property}}"></narrative-dispatcher-element>
+          <div class="spacing">
+
+          </div>
         </template>
 
       </div>
