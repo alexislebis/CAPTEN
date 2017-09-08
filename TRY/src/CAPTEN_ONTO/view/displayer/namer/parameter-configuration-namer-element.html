@@ -8,23 +8,24 @@
   <template>
     <style include="namer-style"></style>
     <style>
-    :host {
-      display: block;
+    #global{
+      width: 100%;
+      margin-bottom: 5px;
     }
-
-    paper-textarea{
-      /*width: 48vw;*/
+    paper-card{
+      width: 100%;
     }
     </style>
 
     <!-- {{entity.htmlify}} -->
     <div class="global">
-      <div class="entity">
+      <paper-card>
+        <div class="card-content">
         <!-- <paper-textarea label="Objective" value="{{content}}"></paper-textarea> -->
-        <multi-link-extended-paper-input-element id="ParameterConfiguration" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="{{entity.htmlify}}" value="{{content}}" char-counter required maxlength="100"></multi-link-extended-paper-input-element>
-
+          <multi-link-extended-paper-input-element id="ParameterConfiguration" rgtes="{{rgtes}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="{{entity.htmlify}}" value="{{content}}" char-counter required maxlength="100"></multi-link-extended-paper-input-element>
+        </div>
+      </paper-card>
         <!-- {{entity.htmlify}} -->
-      </div>
       <!-- <div class="cascader">
         <narrative-block-cascader-display-element entity="{{entity}}"></narrative-block-cascader-display-element>
       </div> -->

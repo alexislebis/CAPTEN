@@ -18,8 +18,14 @@
 
             #divRoot{
               width: var(--rgte-workzone-element-width, 100%);
-              background-color: MistyRose;
+              /*background-color: MistyRose;*/
+              box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 
+            }
+
+            #searchZone{
+              width: 60%;
+              margin: 0 auto 10px auto;
             }
 
             #searchZone paper-searchbox{
@@ -28,7 +34,7 @@
             }
 
             #rtelister{
-              background-color: MediumSpringGreen;
+              background-color: white;
               width: var(--rgte-common-width, 80%);
               margin: 0 auto;
             }
@@ -77,11 +83,11 @@
             }
 
             .item.selected .star {
-                color: var(--paper-blue-600);
+                color: var(--paper-blue-300);
             }
 
             .item .star {
-                color: var(--paper-blue-600);
+                color: var(--paper-blue-300);
             }
 
             .star {
@@ -90,7 +96,7 @@
             }
 
             .makeRelation {
-              color: var(--paper-green-500);
+              color: var(--paper-green-300);
             }
 
             /*.removeElmt {
@@ -105,7 +111,7 @@
             }
 
             .addToRTE{
-              color: var(--paper-blue-600);
+              color: var(--paper-blue-300);
               width: 24px;
               height: 24px;
               -webkit-transition: all 0.5s ease; /* For Safari 3.1 to 6.0 */
@@ -145,7 +151,7 @@
               background-color: #eee;
             }
             .oddRow{
-              background-color: #ddd;
+              background-color: white;
             }
 
             .subBlock{
@@ -175,7 +181,7 @@
 
               --paper-icon-button-hover: {
                 border-radius: 50%;
-                background: var(--paper-blue-600);
+                background: var(--paper-blue-300);
               }
             }
 
@@ -209,7 +215,7 @@
               };
             }
 
-            .isHiddenWAnim{
+            /*.isHiddenWAnim{
               opacity: 0;
               height: 0;
               overflow: hidden;
@@ -221,7 +227,7 @@
               opacity: 1;
               height: auto;
               transition: opacity 1s ease-out;
-            }
+            }*/
 
             #openFormElement{
               position: absolute;
@@ -229,8 +235,27 @@
               top: -43px;
             }
 
+            #menupt{
+              --paper-toolbar:{
+                /*left:50px;*/
+                background-color: white;
+                /*box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);*/
+                color: var(--paper-pink-400);
+              };
+            }
+
+            #menuic{
+              background-color: var(--paper-pink-400);
+              color: white;
+              border-radius: 20px;
+            }
+
             paper-dialog{
               padding: 0px 5px;
+            }
+
+            .shortText{
+              font-size: 14px;
             }
 
         </style>
@@ -277,19 +302,23 @@
         </div> -->
 
 
-        <paper-fab id="fabMenu" on-click="_activateMenuVoc" icon="more-horiz"></paper-fab>
+        <!-- <paper-fab id="fabMenu" on-click="_activateMenuVoc" icon="more-horiz"></paper-fab> -->
         <div id="menuTB" class="isHiddenWAnim">
-          <paper-toolbar>
-              <paper-icon-button icon="menu" on-click="_deactivateMenuVoc"></paper-icon-button>
+          <paper-toolbar id="menupt">
+              <!-- <paper-icon-button icon="menu" on-click="_deactivateMenuVoc"></paper-icon-button> -->
+              <paper-icon-button id="menuic" icon="menu"></paper-icon-button>
 
-              <paper-icon-button icon="add" on-click="_openFormAdd">+</paper-icon-button>
-              <paper-icon-button icon="icons:launch" on-click="_openVocabularyPage"></paper-icon-button>
+              <paper-icon-button icon="add" id="addic" on-click="_openFormAdd">+</paper-icon-button>
+              <paper-icon-button icon="icons:launch" id="launchvoc" on-click="_openVocabularyPage"></paper-icon-button>
 
           </paper-toolbar>
         </div>
 
+        <paper-tooltip for="addic">Quickly define a new vocabulary element</paper-tooltip>
+        <paper-tooltip for="launchvoc">Open the full vocabulary view</paper-tooltip>
+
       <header>
-        <h2>Vocabulary</h2>
+        <h3>Vocabulary</h3>
       </header>
 
       <div id="searchZone">
@@ -303,8 +332,8 @@
             <div class="elementBlock">
               <header class="headerSubSection">
                 <div on-click="_toggleCollapseCLS">
-                  <span><h4>Custom Classes</h4></span>
-                  <paper-icon-button id="CLSpib" icon="expand-more"></paper-icon-button>
+                  <span class="shortText"><h4>Custom Classes <paper-icon-button id="CLSpib" icon="expand-more"></paper-icon-button></h4></span>
+
                 </div>
               </header>
               <iron-collapse id="collapseCLS">
@@ -352,8 +381,8 @@
             <div class="elementBlock" >
               <header class="headerSubSection">
                 <div on-click="_toggleCollapseProp">
-                  <span><h4>Custom Properties</h4></span>
-                  <paper-icon-button id="Proppib" icon="expand-more"></paper-icon-button>
+                  <span class="shortText"><h4>Custom Properties <paper-icon-button id="Proppib" icon="expand-more"></paper-icon-button></h4></span>
+
                 </div>
               </header>
               <iron-collapse id="collapseProp">

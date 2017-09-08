@@ -60,7 +60,7 @@
       #divRoot{
         width: 100%;
         margin: 0 auto;
-        background-color: DodgerBlue;
+        /*background-color: DodgerBlue;*/
 
       }
 
@@ -103,7 +103,7 @@
       .headerSubSection{
         @apply(--layout-horizontal);
         @apply(--layout-justified);
-        width: 180px;
+        /*width: 180px;*/
         margin-bottom: 10px;
       }
 
@@ -119,7 +119,7 @@
     #configurationZone > header{
       display: block;
       margin: 0 auto;
-      background-color: red;
+      /*background-color: red;*/
       text-align: center;
     }
 
@@ -149,7 +149,7 @@
 
     #outputBehavior, #inputBehavior, #parameterBehavior, #relationBetweenElements{
       /*height: 25vw;*/
-      background-color: red;
+      /*background-color: red;*/
       margin-bottom: 10px;
     }
 
@@ -166,14 +166,17 @@
 
     #parameterBehavior{
       max-height: 300px;
-      width: 60%;
+      width: 90%;
       overflow: hidden;
       overflow-y: auto;
       margin: 16px auto 0 auto;
     }
 
     .paperFabSubSection{
-      margin-top: 5px;
+      margin-top: 15px;
+      margin-left: 5px;
+      margin-bottom: -5px;
+      margin-right: -20px;
       /*left: -38px;*/
       /*left: 90%;*/
       /*margin-bottom: -27px;*/
@@ -202,6 +205,16 @@
       margin : 32px auto 0 auto;
     }
 
+    .reverseColor{
+      color: var(--paper-pink-400);
+      background-color: white;
+    }
+
+    #paramRepeater{
+      /*width: 70%;*/
+      margin: -5px auto 0 auto;
+    }
+
     /*#inputBehavior{
       width: 300px;
       height: 300px;
@@ -216,10 +229,10 @@
 <div id="divRoot">
 
   <header id="mainHeader">
-    <h2> {{operationName}}</h2>
+    <h3> {{operationName}}</h3>
     <div id="paperFabs">
-      <paper-fab id="fab1" icon="icons:find-replace" on-click="_replaceOperation"></paper-fab>
-      <paper-fab id="fab2" icon="icons:launch" on-click="_openOperation"></paper-fab>
+      <paper-fab id="fab1" mini icon="icons:find-replace" on-click="_replaceOperation"></paper-fab>
+      <paper-fab id="fab2" mini icon="icons:launch" on-click="_openOperation"></paper-fab>
     </div>
   </header>
 
@@ -228,7 +241,7 @@
       <vaadin-split-layout>
         <div id="inputBehavior">
           <header class="headerSubSection">
-            <div><paper-fab class="paperFabSubSection" icon="launch" on-click="_openInputPattern"></paper-fab></div>
+            <div><paper-fab class="paperFabSubSection reverseColor" mini icon="launch" on-click="_openInputPattern"></paper-fab></div>
             <div><h4>Input behavior</h4> </div>
           </header>
 
@@ -262,7 +275,8 @@
 
           <div id="parameterBehavior">
             <header class="headerSubSection">
-              <div><span>Parameter configuration</span></div>
+              <!-- <div><span>Parameter configuration</span></div> -->
+              <h4>Parameter Configuration</h4>
             </header>
             <!-- <div class="center">
               <paper-fab id="fabParameter" disabled icon="add"></paper-fab>
@@ -279,10 +293,10 @@
           </div>
 
 
-          <div id="relationBetweenElements">
+          <!-- <div id="relationBetweenElements">
             <paper-fab icon="icons:settings-input-composite"></paper-fab>
             Array of narrative elements to do
-          </div>
+          </div> -->
 
         </div>
 
@@ -290,7 +304,7 @@
 
       <div id="outputBehavior">
         <header class="headerSubSection">
-          <div><paper-fab class="paperFabSubSection" icon="launch" on-click="_openOutputPattern"></paper-fab></div>
+          <div><paper-fab class="paperFabSubSection reverseColor" mini icon="launch" on-click="_openOutputPattern"></paper-fab></div>
           <div><h4>Output behavior</h4></div>
 
         </header>

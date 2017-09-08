@@ -6,23 +6,24 @@
   <template>
     <style include="namer-style"></style>
     <style>
-    :host {
-      display: block;
+    #global{
+      width: 100%;
     }
 
-    paper-textarea{
-      /*width: 48vw;*/
+    paper-card{
+      width: 100%;
     }
     </style>
 
     <!-- {{entity.htmlify}} -->
     <div class="global">
-      <div class="entity">
         <!-- <paper-textarea label="Objective" value="{{content}}"></paper-textarea> -->
-        <extended-paper-input-element id="ParameterPattern" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Parameter Pattern" value="{{content}}" char-counter required maxlength="100"></extended-paper-input-element>
 
-        <!-- {{entity.htmlify}} -->
-      </div>
+        <paper-card>
+          <div class="card-content">
+            <extended-paper-input-element id="ParameterPattern" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Parameter Pattern" value="{{content}}" char-counter required maxlength="100"></extended-paper-input-element>
+          </div>
+        </paper-card>
       <!-- <div class="cascader">
         <narrative-block-cascader-display-element entity="{{entity}}"></narrative-block-cascader-display-element>
       </div> -->

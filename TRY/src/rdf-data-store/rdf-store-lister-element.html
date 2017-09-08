@@ -18,7 +18,7 @@
             #rdflister{
               width: var(--rdf-store-lister-width, 100%);
               /*max-width: var(--rdf-store-lister-width, 100%);*/
-              background-color: PapayaWhip;
+              background-color: white;
               @apply(--layout-horizontal);
               @apply(--layout-justified);
             }
@@ -146,11 +146,15 @@
               overflow-y: hidden;
               overflow-x: auto;
             }
+
+            .shortText{
+              font-size: 14px;
+            }
         </style>
         <!-- @IMPORTANT Gérer les make_relations dans le composant dédiée aux vocabulaires -->
         <div id="rdflister">
             <div class="subBlock leftSubBlock" hidden$="{{disableClassesLister}}">
-                <h4>Available Classes</h4>
+                <h4 class="shortText">Available Classes</h4>
                 <!-- <ul id="rdfClasses"></ul> -->
                 <!-- <iron-collapse id="classRDFCollapse"> -->
                   <div class="elementBlock">
@@ -194,7 +198,7 @@
           </div>
 
           <div class="subBlock leftSubBlock" hidden$="{{disablePropertiesLister}}">
-            <h4>Availablle Properties</h4>
+            <h4 class="shortText">Availablle Properties</h4>
 
             <!-- <iron-collapse id="propRDFCollapse"> -->
               <div class="elementBlock">

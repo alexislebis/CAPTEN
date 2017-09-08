@@ -57,19 +57,26 @@
 
       /**/
       #divRoot{
-        width: 60%;
-        margin: 0 auto;
-        background-color: DodgerBlue;
+        /*width: 70%;*/
+        /*margin: 0 auto;*/
+        /*background-color: DodgerBlue;*/
 
       }
 
-      #divRoot > header{
+      #commonInfo{
+        width: 70%;
+        margin: 0 auto;
+      }
+
+
+
+      #commonInfo > header{
         width: 100%;
         text-align: center;
         margin-bottom: 100px;
       }
 
-      #divRoot > header > paper-input{
+      #commonInfo > header > paper-input{
         width: 50%;
         margin: 0 auto;
       }
@@ -93,9 +100,9 @@
       }
 
       #separator{
-        width: 100%;
+        /*width: 100%;
         margin: 50px 0px;
-        border-bottom: 1px solid black;
+        border-bottom: 1px solid black;*/
       }
 
       .headerSubSection{
@@ -113,10 +120,18 @@
             left: -40px;
           }
 
+
+          #configurationZone{
+            margin-top: 40px;
+            border-top: 2px solid white;
+            background-color: #FBFBFB;
+            width: 100%;
+          }
+
     #configurationZone > header{
       display: block;
       margin: 0 auto;
-      background-color: red;
+      /*background-color: red;*/
       text-align: center;
     }
 
@@ -127,7 +142,7 @@
 
     #behaviors{
       width: 45%;
-      background-color: PowderBlue;
+      /*background-color: PowderBlue;*/
     }
 
     #others{
@@ -135,13 +150,15 @@
     }
 
     #outputBehavior, #inputBehavior, #parameterBehavior, #relationBetweenElements{
-      height: 25vw;
-      background-color: red;
+      height: 26vw;
+      /*background-color: red;*/
       margin-bottom: 10px;
     }
 
     #outputPattern, #inputPattern{
       --rgte-common-width: 100%;
+      width: 70%;
+      margin: 0 auto;
     }
 
     #parameterBehavior{
@@ -158,10 +175,62 @@
       margin: 0 auto;
     }
 
-    /*#inputBehavior{
-      width: 300px;
-      height: 300px;
-    }*/
+    #named{
+      @apply(--layout-horizontal);
+      @apply(--layout-around-justified);
+    }
+
+    #nameNOP{
+      width: 100%;
+    }
+
+    .shortText{
+      font-size: 14px;
+    }
+
+    .subConfigZone > h4{
+      /*text-align: center;*/
+      margin-left: 10px;
+      margin-bottom: 30px;
+    }
+
+    .borderElement{
+      margin-top: -20px;
+      margin-left: 3px;
+      border-left: 7px solid;
+      padding: 25px 0px;
+    }
+
+    .blue{
+      border-color: #7baaf7;
+    }
+
+    .green{
+      border-color: #57bb8a;
+    }
+
+    .configHeader{
+      margin-top: 50px;
+    }
+
+    #inFab, #outFab{
+      z-index: 2;
+      margin-left: 85%;
+    }
+
+    #fabParameter{
+      margin-left: 5px;
+    }
+
+    #paramRepeater{
+      width: 70%;
+      margin : 0 auto 10px auto;
+    }
+
+    #paramPattern{
+      margin-bottom: 10px;
+    }
+
 
     </style>
 
@@ -171,8 +240,9 @@
 
 <div id="divRoot">
 
+<div id="commonInfo">
   <header>
-    <h2> <span hidden$={{!isNew}}>New </span>Operator</h2>
+    <h2> <span hidden$={{!isNew}}>New Operator</h2>
     <div id="paperFabs">
       <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab>
 
@@ -186,7 +256,10 @@
       <paper-fab id="visibilityOff" class="isHiddenWAnim" icon="icons:visibility-off" on-click="_makeUnvisible"></paper-fab> -->
     </div>
     <!-- <paper-input id="nameNOP" label="Narrated operator name" value="{{nopname}}" char-counter required maxlength="100"></paper-input> -->
-    <extended-paper-input-element id="nameNOP" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Narrated operator name" value="{{nopname}}" char-counter required maxlength="100"></extended-paper-input-element>
+    <div id="named">
+      <h4 style="width=auto;">Operator: </h4>
+      <extended-paper-input-element id="nameNOP" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Narrated operator name" value="{{nopname}}" char-counter required maxlength="100"></extended-paper-input-element>
+    </div>
   </header>
 
   <div id="narrativeInfo">
@@ -211,15 +284,47 @@
       </div> -->
     </div>
   </div>
+</div>
 
   <div id="separator"></div>
 
   <div id="configurationZone">
     <header>
-      <h4>Representation of its behavior<br/>(How it is supposed to work in a general way)</h4>
+      <h3>Behaviors configuration<br/><span class="shortText">(How it is supposed to work in a general way)</span></h3>
     </header>
 
-  <div id='forFlex'>
+  <div class='subConfigZone'>
+    <h4 class="configHeader">Input behavior</h4>
+
+    <div class="borderElement blue">
+      <paper-fab mini id="inFab" class="paperFabSubSection" disabled="{{!isPoolRegistered}}" icon="launch" on-click="_openInputPattern"></paper-fab>
+      <rgte-workzone-element id="inputPattern" hide-menu disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopinputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+    </div>
+  </div>
+
+  <div class='subConfigZone'>
+    <h4 class="configHeader">Output behavior</h4>
+
+    <div class="borderElement green">
+      <paper-fab mini id="outFab" class="paperFabSubSection" disabled="{{!isPoolRegistered}}" icon="launch" on-click="_openOutputPattern"></paper-fab>
+      <rgte-workzone-element id="outputPattern" hide-menu disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopoutputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
+    </div>
+  </div>
+
+  <div class="subConfigZone">
+    <h4 class="configHeader">Parameter pattern</h4>
+
+    <div class="borderElement blue">
+      <div id="paramRepeater">
+
+      </div>
+      <div class="center">
+        <paper-fab mini id="fabParameter" icon="add" on-click="_addParamsPattern"></paper-fab>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div id='forFlex'>
     <div id="behaviors">
       <div id="outputBehavior">
         <header class="headerSubSection">
@@ -236,9 +341,7 @@
           <div><span>Input behavior</span></div>
         </header>
 
-        <paper-fab class="paperFabSubSection" disabled="{{!isPoolRegistered}}" icon="launch" on-click="_openInputPattern"></paper-fab>
-        <rgte-workzone-element id="inputPattern" hide-menu disable-Save-Menu disable-Bag-Menu disable-Load-Menu rgte="{{nopinputrgte}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></rgte-workzone-element>
-      </div>
+              </div>
     </div>
 
     <div id="others">
@@ -261,7 +364,7 @@
       </div>
 
     </div>
-    </div>
+    </div> -->
   </div>
 </div>
 
@@ -1068,6 +1171,7 @@
                   return null;
 
                 var elementNamer = new (this.paramPatterns[i].constructor).namerElement(this.paramPatterns[i]);
+                elementNamer.set("class", "paramPattern");
                 elementNamer.set('vocab', this.vocab);
                 elementNamer.set('customcls', this.customcls);
                 elementNamer.set('customprops', this.customprops);
