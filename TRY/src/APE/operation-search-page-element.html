@@ -130,7 +130,8 @@
         this.$.ose.update();
 
         //Cleaning of the history manager to prevent any bad looping to it
-        HISTORY_MANAGER.reset();
+        // HISTORY_MANAGER.reset();
+        HISTORY_MANAGER.stack('/index');
       },
 
       update: function()

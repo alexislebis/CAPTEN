@@ -80,6 +80,7 @@
 
       .iconsNavig{
         width: 32px;
+        color: white;
 
         --paper-icon-button:
         {
@@ -89,6 +90,31 @@
 
       #tabs{
         /*margin-bottom: 20px;*/
+      }
+
+      .blue{
+        background-color: #7baaf7;
+      }
+
+      .green{
+        background-color: #57bb8a;
+      }
+
+      .red{
+        background-color: var(--google-red-300);
+      }
+
+      .purple{
+        background-color: var(--paper-purple-300);
+      }
+
+      .pink{
+        background-color: var(--paper-pink-400);
+      }
+
+      .disable{
+        background-color: var(--paper-grey-300);
+        color: var(--paper-grey-500);
       }
 
 
@@ -117,7 +143,7 @@
 
       <paper-tabs id="tabs" selected="{{routeData.topLevel}}" attr-for-selected="name">
         <!-- <iron-icon icon="arrow-back"></iron-icon> -->
-        <paper-icon-button disabled id="navigBack" class="iconsNavig" icon="arrow-back"></paper-icon-button>
+        <paper-icon-button disabled$="{{_computeDisability(previous)}}" id="navigBack" class$="{{_computeClass(previous)}}" on-click="_goBack" icon="arrow-back"></paper-icon-button>
 
         <paper-tab name="index">Index</paper-tab>
         <paper-tab name="operation_search">Operations</paper-tab>
@@ -125,7 +151,7 @@
         <paper-tab name="rgte_search">Graphs</paper-tab>
 
         <!-- <iron-icon icon="arrow-forward"></iron-icon> -->
-        <paper-icon-button disabled id="navigForward" class="iconsNavig" icon="arrow-forward"></paper-icon-button>
+        <paper-icon-button disabled$="{{_computeDisability(next)}}" id="navigForward" class$="{{_computeClass(next)}}" on-click="_goForward" icon="arrow-forward"></paper-icon-button>
       </paper-tabs>
 
       <paper-tooltip for="navigBack">Go to the previous page</paper-tooltip>
@@ -235,6 +261,20 @@
         narrativeentity:
         {
           type: Object,
+          notify: true,
+          value: null,
+        },
+
+        previous:
+        {
+          type: Boolean,
+          notify: true,
+          value: null,
+        },
+
+        next:
+        {
+          type: Boolean,
           notify: true,
           value: null,
         },
@@ -451,6 +491,7 @@
 
       attached: function()
       {
+        HISTORY_MANAGER.registerObserverCallbackOnChange(this, this._manageNavigation);
         HISTORY_MANAGER.registerObserverCallbackOnFail(this, this._openToastFailure);
         HISTORY_MANAGER.setVocabulary(this.vocab, this.customcls, this.customprops);
         CUSTOM_ENTITIES_HANDLER.setCustoms(this.customcls, this.customprops);
@@ -561,6 +602,47 @@
       _closeToast: function(e)
       {
         Polymer.dom(e).localTarget.parentElement.close();
+      },
+
+      _manageNavigation: function(previous, current, next)
+      {
+        this.previous = previous;
+        this.next = next;
+      },
+
+      _computeClass: function(bool)
+      {
+        var res = "iconsNavig ";
+        if(bool == null)
+          return res+"disable";
+        if(bool instanceof NarratedAnalysisProcess)
+          return res+"green";
+        if(bool instanceof NarratedOperator)
+          return res+"blue";
+        if(bool instanceof RGTE)
+          return res+"red";
+        if(bool instanceof Step)
+          return res+"purple";
+
+        return res+"pink";
+      },
+
+      _goBack: function()
+      {
+        proceedBack();
+      },
+
+      _goForward: function()
+      {
+        proceedForth();
+      },
+
+      _computeDisability: function(elmt)
+      {
+        if(elmt)
+          return false;
+
+        return true;
       },
 
     });

@@ -19,20 +19,26 @@ window.onkeydown = function (e) {
   }
   else if (TOOL_EVENT.isAltRightArrowClick(e))
   {
-    var url = HISTORY_MANAGER._getRedirectionURL(HISTORY_MANAGER.forward());
-
-    if(url != null)
-    {
-      window.location.href = HISTORY_MANAGER.route + url;
-    }
+    proceedForth(e);
 
   }
   // else NTD
 }
 
+function proceedForth(e)
+{
+  var url = HISTORY_MANAGER._getRedirectionURL(HISTORY_MANAGER.forward());
+
+  if(url != null)
+  {
+    window.location.href = HISTORY_MANAGER.route + url;
+  }
+}
+
 function proceedBack(e)
 {
-  e.preventDefault();
+  if(e)
+    e.preventDefault();
 
   var url = HISTORY_MANAGER._getRedirectionURL(HISTORY_MANAGER.back());
 
@@ -47,7 +53,8 @@ function proceedBack(e)
 
 function doNotProceedBack(e)
 {
-  e.preventDefault();
+  if(e)
+    e.preventDefault();
 }
 
 function PreviousManager()//Object to rename
@@ -56,10 +63,12 @@ function PreviousManager()//Object to rename
   this.index = -1;
 
   this.redirectState = false; //Boolean indicating that the redirection has been made and therefore the next stack invok should not be takeninto account
+  this.rewindState = false;
 
   this.route = (window.location.href).split("#")[0]+'#';
 
   this.observers = []; // For notification of failure
+  // this.observersNavigation = [];
 
   this.observersChange = [];
 
@@ -78,6 +87,18 @@ PreviousManager.prototype = {
       this.observers.push([objCallback,callback]);
   },
 
+  // registerObserverCallbackOnNavigation: function(objCallback, callback)
+  // {
+  //   if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersNavigation)
+  //     this.observersNavigation.push([objCallback]);
+  // }
+
+  registerObserverCallbackOnChange: function(objCallback, callback)
+  {
+    if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersChange))
+      this.observersChange.push([objCallback,callback]);
+  },
+
     // === NOTIFICATION
     notifyFailure: function()
     {
@@ -89,11 +110,15 @@ PreviousManager.prototype = {
       });
     },
 
-  registerObserverCallbackOnChange: function(objCallback, callback)
-  {
-    if(PREVENT_REDUDANCY_OBSERVATION(objCallback, this.observersChange))
-      this.observersChange.push([objCallback,callback]);
-  },
+    // notifyNavigation: function()
+    // {
+    //   this.observersNavigation.forEach(function(e)
+    //   {
+    //     if(typeof e[1] === "function"){
+    //       e[1].call(e[0], TODO);
+    //     }
+    //   })
+    // },
 
     // === NOTIFICATION
     notifyChange: function()
@@ -101,9 +126,12 @@ PreviousManager.prototype = {
       this.observersChange.forEach(function(e)
       {
           if (typeof e[1] === "function") {
-            e[1].call(e[0]);//e[0] define the `this` context for e[1]
+            var prev =  this.history[this.index-1];
+            var current = this.history[this.index];
+            var next = this.history[this.index+1];
+            e[1].call(e[0], prev, current, next);
           }
-      });
+      }.bind(this));
     },
   // ===================
 
@@ -117,6 +145,7 @@ PreviousManager.prototype = {
       if(this.history[this.index].id != null && item && item.id != this.history[this.index].id)
         this.history[this.index] = item; //update of the item because the pool created new element
       this.redirectState = false;
+      this.notifyChange();
       return;
     }
     // if(this.index != -1 && this.history.length > 0)
@@ -132,11 +161,21 @@ PreviousManager.prototype = {
 
     if(this.index == this.history.length-1)
     {
+      // if(this.rewindState)
+      //   this.rewindState = false;
+
       this.index++;
       this.history.push(item);
     }
     else {
-        this.index++
+        // if(this.rewindState)
+        // {
+        //   this.index += 2;
+        //   this.rewindState = false;
+        // }
+        // else
+          this.index++;
+
         this.history.splice(this.index);
         this.history.push(item);
       // this.history.push(item); // The item is supposed to be from where the new history is built
@@ -157,6 +196,7 @@ PreviousManager.prototype = {
 
     this.index--;
     this.redirectState = true;
+    this.rewindState = true;
     return this.history[this.index];
 
     // return res;
@@ -225,6 +265,8 @@ PreviousManager.prototype = {
       return '/narration/pathtodo';
     else if(item == "VOCABULARY")
       return "/vocabulary";
+    else if(item == "/index")
+      return item;
     else if(item.includes && item.includes("terminology") )
       return item;
   },

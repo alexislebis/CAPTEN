@@ -10,16 +10,16 @@
       --rgte-common-width: 400px;
     }
 
-    #commonInfo{
+    /*#commonInfo{
       width: 60%;
       margin: 0 auto;
-      background-color: DodgerBlue;
-    }
+      /*background-color: DodgerBlue;*/
+    /*}*/
 
     #commonInfo{
       width: 70%;
       margin: 0 auto;
-      background-color: DodgerBlue;
+      /*background-color: DodgerBlue;*/
 
     }
 
@@ -67,10 +67,14 @@
     }
 
     #concernedElements{
-      border: 1px solid black;
+      width: 100%;
+      /*border: 1px solid black;*/
     }
 
-
+    paper-card{
+      width: 100%;
+      margin: 0 auto;
+    }
 
     paper-checkbox.green {
       align-self: center;
@@ -93,6 +97,30 @@
       @apply(--layout-around-justified);
     }
 
+    .shortText{
+      font-size: 14px;
+    }
+
+    .bolded{
+      font-weight: bold;
+    }
+
+    .italic:{
+      font-style: italic;
+    }
+
+    .iccOpen{
+      color: var(--paper-pin-400);
+    }
+
+    #narrativeElement{
+      margin-top: 30px;
+    }
+
+    #icsave{
+      margin: 7px auto 20px auto;
+    }
+
     </style>
 
     <app-location route="{{topLevelRoute}}" use-hash-as-path></app-location>
@@ -103,7 +131,8 @@
     <div id="divRoot">
       <div id="commonInfo">
         <header>
-          <h2> <span hidden$={{!isNew}}>New Narrative element</span><span hidden$="{{isNew}}">Narrative element: {{napName}}</span> for {{_getElementName(elements)}}</h2>
+          <h2> <span hidden$={{!isNew}}>New Narrative Element</span><span hidden$="{{isNew}}">Narrative Element: {{napName}}</span></h2>
+          <p class="shortText"><span class="bolded">1<sup>st</sup> concerned element:</span> {{_getElementName(elements)}}</p>
           <div id="paperFabs">
             <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
 
@@ -112,23 +141,31 @@
 
 
         <div id="concernedElements">
-          <h4>The narration will concerned the following elements</h4>
-          <template id="repeaterElements" is="dom-repeat" items="[[elements]]" index-as="index">
-            [[_computeText(item)]] <paper-icon-button on-click="_openElement" icon="launch"></paper-icon-button>
-          </template>
+          <h4>The narration will concerned the following elements:</h4>
+          <paper-card>
+            <div class="card-content">
+              <template id="repeaterElements" is="dom-repeat" items="[[elements]]" index-as="index">
+                <p class="italic shortText">[[_computeText(item)]] <paper-icon-button class="iccOpen" on-click="_openElement" icon="launch"></paper-icon-button></p>
+              </template>
+            </div>
+          </paper-card>
         </div>
 
         <div id="narrativeElement">
-          <h4>Type of narrative element<paper-checkbox checked="{{checkedNarrative}}" disabled>Consider existing elements</paper-checkbox></h4>
+          <h4>Configuration</h4>
 
-          <paper-dropdown-menu label="Narrative element">
-            <paper-listbox id="listNarrativeElement" class="dropdown-content" selected="{{narrativeSelected}}">
-              <template is="dom-repeat" items="[[narrativeElements]]" index-as="index">
-                <paper-item>{{item.label}}</paper-item>
-              </template>
-            </paper-listbox>
-          </paper-dropdown-menu>
-
+          <paper-card>
+              <div class="card-content">
+                <h4>Type of narrative element<paper-checkbox checked="{{checkedNarrative}}" disabled>Consider existing elements</paper-checkbox></h4>
+                <paper-dropdown-menu label="Narrative element">
+                  <paper-listbox id="listNarrativeElement" class="dropdown-content" selected="{{narrativeSelected}}">
+                    <template is="dom-repeat" items="[[narrativeElements]]" index-as="index">
+                      <paper-item>{{item.label}}</paper-item>
+                    </template>
+                  </paper-listbox>
+                </paper-dropdown-menu>
+              </div>
+            </paper-card>
         </div>
 
         <div id="advanced">
@@ -155,14 +192,18 @@
         </div>
 
         <div id="configurerZone">
-          <h4>Configure your narrative element</h4>
-          <div id="narrativeNamer">
+          <paper-card>
+            <div class="card-content">
+              <h4>Configure your narrative element</h4>
+              <div id="narrativeNamer">
 
-          </div>
+              </div>
+            </div>
+          </paper-card>
         </div>
 
         <div id="save">
-          <paper-fab icon="icons:save" disabled="{{!isSaveable}}" on-click="_save"></paper-fab>
+          <paper-fab id="icsave" icon="icons:save" disabled="{{!isSaveable}}" on-click="_save"></paper-fab>
         </div>
 
       </div>
