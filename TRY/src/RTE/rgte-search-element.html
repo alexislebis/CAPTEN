@@ -97,8 +97,7 @@
         </div>
       </header>
       <iron-collapse id="collapseRG">
-        <div id="repeaterRelated2">
-        </div>
+        <div id="repeaterRelated2"></div>
         <!-- <template id="repeaterRelated" is="dom-repeat" items="{{rgteRelated}}" index-as="index" restamp>
             <rgte-inline-displayer-element enable-use="{{enableUse}}" rgte="{{item.rgte}}" specificity="{{item.specificity}}" from="{{item.producedIn}}" from-position="{{item.position}}"><rgte-inline-displayer-element>
         </template> -->
@@ -114,9 +113,7 @@
       </header>
   <!--  -->
       <iron-collapse id="collapseAR">
-        <div id="repeater2">
-
-        </div>
+        <div id="repeater2"></div>
         <!-- <template id="repeater" is="dom-repeat" items="{{rgteArray}}" filter="{{computeFilter(query)}}" index-as="index" restamp>
             <rgte-inline-displayer-element enable-use="{{enableUse}}" rgte="{{item}}"><rgte-inline-displayer-element>
         </template> -->
@@ -301,11 +298,16 @@
         var tmp = [];
         for(var i in rgteDisplayed)
           if( rgteDisplayed[i].getName() != "")
-            this.push("rgteArray", rgteDisplayed[i]);
+            this.rgteArray.push(rgteDisplayed[i]);
+            // this.push("rgteArray", rgteDisplayed[i]);
             // tmp.push(rgteDisplayed[i]);
 
-            this.$.collapseAR.opened = false;
-            this.$.collapseRG.opened = false;
+          // for(var i = 0, l = a.length; i < l; i++)
+          //   if(a[i].getName() != "")
+          //     this.rgteArray.push(a[i]);
+
+          this.$.collapseAR.opened = false;
+          this.$.collapseRG.opened = false;
         // this._updatedRelatedArray();
 
       },
@@ -346,7 +348,7 @@
         if(this.$.collapseAR.opened)
         {
           this.$.allRGTEpib.setAttribute('icon', 'icons:expand-less');
-
+          this.update();
           this._displayRGTEArray();
         }
         else
@@ -375,6 +377,7 @@
 
           this.$.toastRepeater2Loading.close();
           this.$.toastRepeater2Ok.open();
+          this.$.collapseAR.opened = true;
         },
 
         _resetDisplay: function(url)
@@ -394,6 +397,7 @@
         if(this.$.collapseRG.opened)
         {
           this.$.stepRGTEpib.setAttribute('icon', 'icons:expand-less');
+          this.update();
           this._updatedRelatedArray();
         }
         else
@@ -425,6 +429,7 @@
 
         this.$.toastRepeater2Loading.close();
         this.$.toastRepeater2Ok.open();
+        this.$.collapseRG.opened = true;
       },
 
       _onNAPChanged: function(nap)
