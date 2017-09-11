@@ -206,7 +206,7 @@
     </paper-toast>
 
     <!-- MODAL -->
-    <paper-dialog on-iron-overlay-closed="_confirmPrevious" id="modalConfirmationPrevious" modal>
+    <paper-dialog on-iron-overlay-opened="patchOverlay" on-iron-overlay-closed="_confirmPrevious" id="modalConfirmationPrevious" modal>
         <h2>Unsaved modification</h2>
         <p>Your modification will be lost if you go back. Do you still want to proceed?</p>
         <div class="buttons">
@@ -304,6 +304,12 @@
       [
         '_onRouteChanged(route)',
       ],
+
+      patchOverlay: function (e) {
+        if (e.target.withBackdrop) {
+          e.target.parentNode.insertBefore(e.target.backdropElement, e.target);
+        }
+      },
 
       _onRouteChanged: function(route) {
         // if (changeRecord.path === 'path') {
