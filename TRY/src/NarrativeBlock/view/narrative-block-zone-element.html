@@ -10,13 +10,16 @@
 
 <!-- Here a zone of narrative element belonging to a tag. If null : retrieve all untagged general. If All : retrieve all  -->
     <div id="divRoot">
-      <div id="zone">
-        <template id="repeater" is="dom-repeat" items="{{arrayToDisplay}}" as="elm" index-as="index" restamp>
+      <div id="zone" class="spacing">
+        <div id="repeater2">
+
+        </div>
+        <!-- <template id="repeater" is="dom-repeat" items="{{arrayToDisplay}}" as="elm" index-as="index" restamp>
           <narrative-dispatcher-element class="nve" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" src="{{item}}" origin="{{_computeOrigin(isOriginMustBeDisplayed)}}" element="{{elm.element}}" prop="{{elm.property}}"></narrative-dispatcher-element>
           <div class="spacing">
 
           </div>
-        </template>
+        </template> -->
 
       </div>
       <div id="subZone">
@@ -103,11 +106,46 @@
         this._resetDisplay();
 
         res = this._filter(res);
+        this.arrayToDisplay = res;
 
-        this.arrayToDisplay = null;
-        // this.$.repeater.render();
+        this._displayArray();
+        // this.arrayToDisplay = null;
+        // // this.$.repeater.render();
+        //
+        // this.set("arrayToDisplay", res);
+      },
 
-        this.set("arrayToDisplay", res);
+      _displayArray: function()
+      {
+        this._resetDisplayRepeater2();
+
+        for(var i = 0, l = this.arrayToDisplay.length; i < l; i++)
+        {
+          var element = document.createElement('narrative-dispatcher-element');
+          element.setAttribute('class', 'nve');
+          element.vocab = this.vocab;
+          element.customcls = this.customcls;
+          element.customprops = this.customprops;
+          element.src = this.item;
+          element.origin = this._computeOrigin(this.isOriginMustBeDisplayed);
+          element.element = this.arrayToDisplay[i].element;
+          element.prop = this.arrayToDisplay[i].property;
+
+          var div = document.createElement('div');
+          div.setAttribute('class', 'spacing');
+
+          this.$$('#repeater2').appendChild(element);
+          this.$$('#repeater2').appendChild(div);
+        }
+      },
+
+      _resetDisplayRepeater2: function()
+      {
+        var root = this.$$('#repeater2');
+
+        if(root)
+          while(root.firstChild)
+            root.removeChild(root.firstChild);
       },
 
       _filter: function(array)
