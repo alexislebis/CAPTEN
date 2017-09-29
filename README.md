@@ -30,7 +30,7 @@ This formalism is based on relational vocabularies and ontologies.
 See tutorials and examples for using CAPTEN-SEED for more information.
 
 ### Install
-Please make sure that **[python](https://www.python.org/)**, **[git](https://git-scm.com/)** and **[bower](https://bower.io/)** is installed on your computer. If not, you can **[install](https://www.npmjs.com/package/bower)** it with **[NPM](https://www.npmjs.com/)**.
+Please make sure that **[python](https://www.python.org/)**, **[git](https://git-scm.com/)** and **[bower](https://bower.io/)** are installed on your computer. If not, you can **[install](https://www.npmjs.com/package/bower)** it with **[NPM](https://www.npmjs.com/)**.
 
 
 1. Download the CAPTEN project:
@@ -60,3 +60,7 @@ Please make sure that **[python](https://www.python.org/)**, **[git](https://git
   ```  
 
 5. Finally, open your web-browser at `http://localhost:3000/` (assuming that 3000 was the port used during the python command line).
+
+
+### License
+<a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a><br />This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
