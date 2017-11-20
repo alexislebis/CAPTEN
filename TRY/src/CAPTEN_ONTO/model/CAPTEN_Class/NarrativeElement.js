@@ -7,7 +7,7 @@ function NarrativeElement()
 {
   CAPTENClass.call(this);
 
-  this.uri = "NAU#NarrativeElement";
+  this.uri = NARRATIVE_ELEMENT_URI;
 
   this.content = null;
   this.htmlify = " a narrative element";

@@ -4,8 +4,8 @@ function NarratedAnalysisProcess() {
 
   this.uri = ANALYSIS_URI;
 
-  this.expectedConcepts = null;
-
+  this.expectedConcepts = null; //A-BOX : this.expectedConcepts TYPE_URI INITIAL_RGTE_URI
+                                //A-BOX : this prop.requires this.expectedConcepts;
   //UPDATE 22/09/2016
   //this.operators = []; //Associative array : [RelationOrder]:[ListOfOperations]
   this.exploitableOutput = null;
