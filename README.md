@@ -29,9 +29,9 @@ This formalism is based on relational vocabularies and ontologies.
 It will be populated when the sub-part of TRY dealing with SEED will be judged stable and efficient.
 
 ### Documentation
-See tutorials and examples for using CAPTEN-TRY for more information.
+See tutorials and examples for using CAPTEN-TRY for more information (on their way!).
 
-### Install
+## Install
 We will work with CAPTEN-TRY for now.
 
 Please make sure that **[python](https://www.python.org/)**, **[git](https://git-scm.com/)** and **[bower](https://bower.io/)** are installed on your computer. If not, you can **[install](https://www.npmjs.com/package/bower)** them with **[NPM](https://www.npmjs.com/)**.
@@ -74,8 +74,8 @@ CAPTEN does not embed predefined narrated operator, narrated analysis processes 
 1. Populate it yourself manually;
 2. Import a previous CAPTEN export (generally a `CAPTEN_EXPORT.json` file), made by you or someone else (there is no guaranty about the retrocompatibility of versions).
 
-### License
+## License
 <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/80x15.png" /></a><br />This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
 
-### Disclaimer
+## Disclaimer
 This research prototype is still in its early phase of development and faced several theorical iterations. This includes code design, optimisation and documentation. Despite all the efforts of the researcher, code refactorings requires huge amount of time and are not being considered for the moment :)
