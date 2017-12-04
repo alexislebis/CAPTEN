@@ -4,6 +4,6 @@
  * this.ressources is an array of ressources.
  */
 function ResearchObject() {
-        this.uri = "http://purl.org/wf4ever/ro#ResearchObject";
+        this.uri = RESEARCH_OBJECT_URI;
         this.ressources = null;
 }

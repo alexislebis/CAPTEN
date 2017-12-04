@@ -2,6 +2,8 @@ function AnalysisTool()
 {
     CAPTENClass.call(this);
 
+    this.uri = ANALYSIS_TOOL_URI;
+
     this.version = null;
     this.toolName = null;
     this.implementedOperator = null;//A List

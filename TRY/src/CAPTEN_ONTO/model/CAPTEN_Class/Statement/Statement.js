@@ -3,6 +3,8 @@ function Statement()
   {
     NarrativeElement.call(this);
 
+    this.uri = STATEMENT_URI;
+
     this.inheritanceArray.push("CAPTENClass");
 
     this.name = "Statement";

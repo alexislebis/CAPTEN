@@ -2,7 +2,7 @@ function isJustifiedBy(from, to,additionalConstraints){
 
   ScientificHaecceity.call(this);
 
-  this.uri = "NAU";
+  this.uri = IS_JUSTIFIED_BY_URI;
   this.iName = "isJustifiedBy";
   this.name = this.iName;
 

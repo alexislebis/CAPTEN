@@ -9,6 +9,8 @@ function CAPTENClass(uri, label, properties)
     this.id = CAPTEN.ID++;
 
     this.uri = uri;
+    //SHOULD BE : this.uri = CAPTEN_CLASS_URI; However, requires to check retro compatibility
+    
     this.properties = properties; //[Property]
     if(this.properties == null)
       this.properties = [];

@@ -5,6 +5,7 @@ function ScientificHaecceity(from, to, additionalConstraints){
 
   Property.call(this);
 
+  this.uri = HAS_SCIENTIFIC_HAECCEITY_URI;
   this.iName = "hasScientificHaeccity";
   this.name = this.iName;
 

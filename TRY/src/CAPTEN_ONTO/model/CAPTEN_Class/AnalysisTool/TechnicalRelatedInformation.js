@@ -6,6 +6,8 @@
  function TechnicalRelatedInformation()
  {
    CAPTENClass.call(this);
+
+   this.uri = RELATED_INFORMATION_URI; //TODO confirm coherence
  }
 
  TechnicalRelatedInformation.prototype = Object.create(CAPTENClass.prototype);

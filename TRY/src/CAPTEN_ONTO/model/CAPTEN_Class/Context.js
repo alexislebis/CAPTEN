@@ -7,6 +7,8 @@
 {
   CAPTENClass.call(this);
 
+  this.uri = CONTEXT_URI;
+
   this.content = null;
   this.htmlify = "a context"
   this.addendum = []; //TODO Add addendum to context

@@ -2,10 +2,12 @@ function TreatmentType()
 {
   CAPTENClass.call(this);
 
+  this.uri = TREATMENT_TYPE_URI;
+
   this.subClasses = [
-    {subClasses:{}, name: 'Analysis', uri: 'NAU'},
-    {subClasses:{}, name: 'Preprocess', uri: 'NAU'},
-    {subClasses:{}, name: 'Postprocess', uri: 'NAU'},
+    {subClasses:{}, name: ANALYSIS_TREATMENT_URI, uri: 'NAU'},
+    {subClasses:{}, name: PRE_TREATMENT_URI, uri: 'NAU'},
+    {subClasses:{}, name: POST_TREATMENT_URI, uri: 'NAU'},
   ];
 }
 

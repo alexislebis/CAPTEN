@@ -32,6 +32,9 @@ var GENERATES_URI        = "http://www.w3.or/ns/prov#generates";
 var WAS_GENERATED_BY_URI = "http://www.w3.or/ns/prov#wasGeneratedBy";
 var HAS_AUTHOR_URI       = "http://xmlns.com/foaf/0.1/hasAgent";
 var NAME_URI             = "http://xmlns.com/foaf/0.1/name";
+var ANNOTATION_URI       = "https://www.w3.org/ns/oa#Annotation";
+var RESEARCH_OBJECT_URI  = "http://purl.org/wf4ever/ro#ResearchObject"
+
 
 // === CUSTOM IRI SECTION
   // BASED ON VERSION 0.2.5 & 0.3
@@ -41,6 +44,9 @@ var CUSTOM_PREFIX_URI = "http://www.CAPTEN.org/SEED/ontologies/custom/";
 var CAPTEN_ONTO_IRI = "http://www.CAPTEN.org/SEED/ontologies/"; //TODO handle subblock of step matching a concept
 var CAPTEN_VOCAB_IRI_PREFIX = "/vocabulary/"; //Used to identify the vocabulary elements created by the community. e.g: CAPTEN_ONTO_IRI + CAPTEN_VOCAB_IRI_PREFIX + Vocab.Class.name();
                                               //TODO Should be stored in an hashmap to prevent duplicata
+
+var CAPTEN_CLASS_URI  = CAPTEN_ONTO_IRI+"Thing";
+var CAPTEN_PROP_URI   = CAPTEN_ONTO_IRI+"haveAProperty";
 
 var CAPTEN_VOCAB_IRI = CAPTEN_ONTO_IRI + CAPTEN_VOCAB_IRI_PREFIX;
 // === CUSTOM PROPERTIES
@@ -123,7 +129,7 @@ var IS_AUTHORED_BY          = CAPTEN_ONTO_IRI+"isAuthoredBy";
     var ARBITRARY_URI         = CAPTEN_ONTO_IRI+"Arbitrary";
     var EMPIRICAL_URI         = CAPTEN_ONTO_IRI+"Empirical";
     var FORMAL_URI            = CAPTEN_ONTO_IRI+"Formal";
-  var RESEARCH_OBJECT_URI     = "wf4ever:RO";// TODO Comment this line and write the appropriate from wf4ever works.
+  // var RESEARCH_OBJECT_URI     = "wf4ever:RO";// TODO Comment this line and write the appropriate from wf4ever works.
 
   // === NAP  CLS
   var ANALYSIS_URI            = CAPTEN_ONTO_IRI+"NarratedAnalysisProcess";
@@ -151,14 +157,15 @@ var IS_AUTHORED_BY          = CAPTEN_ONTO_IRI+"isAuthoredBy";
     // RETROCOMPATIBILITY ONLY
     var AUTHOR_URI = HAS_AUTHOR_URI;
     // ==================
-    
-  var HYPOTHESIS_URI          = CAPTEN_ONTO_IRI+"Hypothesis";
+  var STATEMENT_URI           = CAPTEN_ONTO_IRI+"Statement";
+    var SCIENTIFIC_STATEMENT_URI  = STATEMENT_URI+"/ScientificStatement";
+      var HYPOTHESIS_URI          = CAPTEN_ONTO_IRI+"Hypothesis";
   var DESCRIPTION_URI         = CAPTEN_ONTO_IRI+"Description";
   var USE_CASE_URI            = CAPTEN_ONTO_IRI+"useCase";
   var OBJECTIVE_URI           = CAPTEN_ONTO_IRI+"Objective";
 
   // === KNOWLEDGE CLS
-  var KNOWLEDGE_URI           = CAPTEN_ONTO_IRI+"Knowledge";
+  var KNOWLEDGE_URI           = CAPTEN_ONTO_IRI+"Knowledge"; // EQUIVALENT TO ExploitableOutput
   var READING_INSTRUCTION_URI = CAPTEN_ONTO_IRI+"ReadingInstruction";
   var CONTEXT_VALIDITY_URI    = CAPTEN_ONTO_IRI+"ContextValidity";
   //var Example (#ALREADY DEFINED ABOVE)
@@ -168,7 +175,8 @@ var IS_AUTHORED_BY          = CAPTEN_ONTO_IRI+"isAuthoredBy";
   var EXPLOITATION_TYPE_URI   = CAPTEN_ONTO_IRI+"ExploitationType";
     var MODEL_URI             = CAPTEN_ONTO_IRI+"Model";
     var INDICATOR_URI         = CAPTEN_ONTO_IRI+"Indicator";
-  var VOCABULARY_ELEMENT_URI  = CAPTEN_ONTO_IRI+"VocabularyElement";
+  // var VOCABULARY_ELEMENT_URI  = CAPTEN_ONTO_IRI+"VocabularyElement";
+  var VOCABULARY_ELEMENT_URI  = CAPTEN_VOCAB_IRI; //Pointer to the element belongign to the voc
   var VOC_SUMMARY_URI         = CAPTEN_ONTO_IRI+"VocSummary";
   var EXPLOITABLE_OUTPUT_URI  = CAPTEN_ONTO_IRI+"ExploitableOutput";
 
@@ -182,6 +190,14 @@ var PARAMETER_PATTERN_URI   = CAPTEN_ONTO_IRI+"parameterPattern";
 var RGTE_URI                = CAPTEN_ONTO_IRI+"RGTE";
 var SuperRGTE_URI           = CAPTEN_ONTO_IRI+"SUPERRGTE";
 var PARAMETER_CONFIGURATION_URI = CAPTEN_ONTO_IRI+"parameterConfiguration";
+var ADDENDUM_URI            = CAPTEN_ONTO_IRI+"Addendum"; //TODO Add in onto
+var TAG_URI                 = CAPTEN_ONTO_IRI+"TAG";  // TODO Add in ontology
+var COMMENT_URI             = CAPTEN_ONTO_IRI+"Comment"; //TODO Add in ontology
+var ANALYSIS_STAGE_URI      = CAPTEN_ONTO_IRI+"Stage"; // TODO Add in ontology; Correspond to various pa type such as descripive
+  var DESCRIPTIVE_ANALYSIS_URI  = ANALYSIS_STAGE_URI+"#Descriptive"; // TODO Add/Complete in ontology
+  var DIAGNOSTIC_ANALYSIS_URI   = ANALYSIS_STAGE_URI+"#Diagnostic"; // TODO Add/Complete in ontology
+  var PREDICTIVE_ANALSYSIS_URI  = ANALYSIS_STAGE_URI+"#Predictive"; // TODO Add/Complete in ontology
+  var PRESCRIPTIVE_ANALYSIS_URI = ANALYSIS_STAGE_URI+"#Prescriptive"; // TODO Add/Complete in ontology
 
 // MARK: anchor-name
 //// Test

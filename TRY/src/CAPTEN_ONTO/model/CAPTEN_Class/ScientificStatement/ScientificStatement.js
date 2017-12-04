@@ -4,12 +4,14 @@ function ScientificStatement()
   {
     Statement.call(this);
 
+    this.uri = SCIENTIFIC_STATEMENT_URI;
+
     this.name = "ScientificStatement";
     this.content = null;//NOTE: Equivalent to description in CAPTEN-ONTO-After_REU_29/08/16
     this.researchObjects = null;
 
     this.subClasses = [
-      {subClasses:{}, name: "Hypothesis", uri: "NAU"},
+      {subClasses:{}, name: "Hypothesis", uri: HYPOTHESIS_URI},
       {subClasses:{}, name: "Proposition", uri: "NAU"},
       {subClasses:{}, name: "Theory", uri: "NAU"},
       {subClasses:{}, name: "Defintion", uri: "NAU"},

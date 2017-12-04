@@ -4,6 +4,7 @@
 function VocabularyElement()
 {
   CAPTENClass.call(this);
+  this.uri = VOCABULARY_ELEMENT_URI;
 }
 
 VocabularyElement.prototype = Object.create(CAPTENClass.prototype);

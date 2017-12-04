@@ -1,7 +1,7 @@
 function Addendum()
 {
   NarrativeElement.call(this);
-  this.uri = "NAU";
+  this.uri = ADDENDUM_URI;
 
   this.content = null;
   this.htmlify = 'an addendum';
@@ -39,7 +39,7 @@ Addendum.prototype.getContent = function()
 function Annotation()
 {
   CAPTENClass.call(this);
-  this.uri = "https://www.w3.org/ns/oa#Annotation";
+  this.uri = ANNOTATION_URI;
   this.content = null;
 }
 
@@ -175,21 +175,21 @@ Description.prototype.updateHTML = function(){
 
 function ReadingInstruction(){
     Annotation.call(this);
-    this.uri = "NAU";
+    this.uri = READING_INSTRUCTION_URI;
 }
 
 ReadingInstruction.prototype = Object.create(Annotation.prototype);
 
 function ExampleOfUse(){
   Annotation.call(this);
-  this.uri = "NAU";
+  this.uri = EXAMPLE_URI;
 }
 
 ExampleOfUse.prototype = Object.create(Annotation.prototype);
 
 function Tag(){ //@TODO Should be considered as an array
     Annotation.call(this);
-    this.uri = "NAU";
+    this.uri = TAG_URI;
 
     this.value = null;
 }
@@ -198,7 +198,7 @@ Tag.prototype = Object.create(Annotation.prototype);
 
 function Comment(){
   Annotation.call(this);
-  this.uri = "NAU";
+  this.uri = COMMENT_URI;
 
   this.value = null;
 }

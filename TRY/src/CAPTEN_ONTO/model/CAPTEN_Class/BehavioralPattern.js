@@ -2,6 +2,8 @@ function BehavioralPattern()
 {
   CAPTENClass.call(this);
 
+  this.uri = BEHAVIOURAL_RULE_URI;
+
   this.pattern = null; //The pattern of the element where it toggle. It can be seen as an ontologie
 
   this.influentSubPattern = null; //SubPattern used to influence other BehavoiralPattern.
@@ -42,6 +44,8 @@ function InputPattern()
 {
   BehavioralPattern.call(this);
 
+  this.uri = INPUT_PATTERN_URI;
+
 }
 
 
@@ -51,11 +55,14 @@ InputPattern.prototype = Object.create(BehavioralPattern.prototype);
 function OutputPattern()
 {
   BehavioralPattern.call(this);
+
+  this.uri = OUTPUT_PATTERN_URI;
 }
 OutputPattern.prototype = Object.create(BehavioralPattern.prototype);
 
 function SettingPattern()
 {
   BehavioralPattern.call(this);
+  this.uri = SETTING_PATTERN_URI;
 }
 SettingPattern.prototype = Object.create(BehavioralPattern.prototype);
