@@ -148,6 +148,10 @@ var IS_AUTHORED_BY          = CAPTEN_ONTO_IRI+"isAuthoredBy";
 
   // === SCIENTIFIC STATEMENTS CLS
   // var AUTHOR_URI              = CAPTEN_ONTO_IRI+"Author"; // ALREADY DEFINED ABOVE By xmlns
+    // RETROCOMPATIBILITY ONLY
+    var AUTHOR_URI = HAS_AUTHOR_URI;
+    // ==================
+    
   var HYPOTHESIS_URI          = CAPTEN_ONTO_IRI+"Hypothesis";
   var DESCRIPTION_URI         = CAPTEN_ONTO_IRI+"Description";
   var USE_CASE_URI            = CAPTEN_ONTO_IRI+"useCase";
