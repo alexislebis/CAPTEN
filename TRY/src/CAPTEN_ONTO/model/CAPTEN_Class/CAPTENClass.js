@@ -10,7 +10,7 @@ function CAPTENClass(uri, label, properties)
 
     this.uri = uri;
     //SHOULD BE : this.uri = CAPTEN_CLASS_URI; However, requires to check retro compatibility
-    
+
     this.properties = properties; //[Property]
     if(this.properties == null)
       this.properties = [];
@@ -478,6 +478,20 @@ CAPTENClass.prototype = {
         return false;
 
       return true;
+    },
+
+    // === ONTOLOGY EXPORT
+    //return the ID in the following format : <#OBJ.ID>
+    //It supposes that a @base <http://smth>. is used while exporting.
+    //Not is business to handle that
+    getN3ID: function()
+    {
+      return "<#"+this.id+">";
+    },
+
+    getPropertiesRelations: function()
+    {
+      console.error("WARNING! UNIMPLEMENTED! ABORT!");
     },
 
     // === PARSING

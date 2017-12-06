@@ -368,3 +368,14 @@ NarratedAnalysisProcess.prototype.mapNarrativeBlock= function(map)
   if(this.expectedConcepts)
     this.expectedConcepts.mapNarrativeBlock(map);
 }
+
+// === ONTOLOGY EXPORT
+// return <propertyX> rangeX
+NarratedAnalysisProcess.prototype.getPropertiesRelations = function()
+{
+  var PR = [];
+
+  PR.push([HAS_NAME_URI, this.getNameObject()]);
+
+  return PR;
+}
