@@ -118,17 +118,17 @@ var IS_AUTHORED_BY          = CAPTEN_ONTO_IRI+"isAuthoredBy";
   var ANALYSIS_TOOL_URI       = CAPTEN_ONTO_IRI+"AnalysisTool";
   var DATA_FORMAT_URI         = CAPTEN_ONTO_IRI+"DataFormat";
   var BEHAVIOURAL_RULE_URI    = CAPTEN_ONTO_IRI+"BehaviouralRule";
-    var INPUT_PATTERN_URI     = CAPTEN_ONTO_IRI+"InputPattern";
-    var OUTPUT_PATTERN_URI    = CAPTEN_ONTO_IRI+"OutputPattern";
-    var SETTING_PATTERN_URI   = CAPTEN_ONTO_IRI+"SettingPattern";
+    var INPUT_PATTERN_URI     = BEHAVIOURAL_RULE_URI+"/InputPattern";
+    var OUTPUT_PATTERN_URI    = BEHAVIOURAL_RULE_URI+"/OutputPattern";
+    var SETTING_PATTERN_URI   = BEHAVIOURAL_RULE_URI+"/SettingPattern";
   var SETTING_URI             = CAPTEN_ONTO_IRI+"Setting";
     var PARAMETER_URI         = CAPTEN_ONTO_IRI+"Parameter";
   var INPUT_URI               = CAPTEN_ONTO_IRI+"Input"; //WARNING : Only for operator. Potential conflict
   var VALUE_URI               = CAPTEN_ONTO_IRI+"Value";
   var SELECTION_METHOD_URI    = CAPTEN_ONTO_IRI+"SelectionMethod";
-    var ARBITRARY_URI         = CAPTEN_ONTO_IRI+"Arbitrary";
-    var EMPIRICAL_URI         = CAPTEN_ONTO_IRI+"Empirical";
-    var FORMAL_URI            = CAPTEN_ONTO_IRI+"Formal";
+    var ARBITRARY_URI         = SELECTION_METHOD_URI+"#Arbitrary";
+    var EMPIRICAL_URI         = SELECTION_METHOD_URI+"#Empirical";
+    var FORMAL_URI            = SELECTION_METHOD_URI+"#Formal";
   // var RESEARCH_OBJECT_URI     = "wf4ever:RO";// TODO Comment this line and write the appropriate from wf4ever works.
 
   // === NAP  CLS
@@ -145,9 +145,9 @@ var IS_AUTHORED_BY          = CAPTEN_ONTO_IRI+"isAuthoredBy";
   // === STEP  CLS
   var STEP_URI                = CAPTEN_ONTO_IRI+"Step";
   var TREATMENT_TYPE_URI      = CAPTEN_ONTO_IRI+"TreatmentType";
-    var POST_TREATMENT_URI    = CAPTEN_ONTO_IRI+"PostTreatment";
-    var PRE_TREATMENT_URI     = CAPTEN_ONTO_IRI+"PreTreatment";
-    var ANALYSIS_TREATMENT_URI= CAPTEN_ONTO_IRI+"AnalysisTreatment";
+    var POST_TREATMENT_URI    = TREATMENT_TYPE_URI+"#PostTreatment";
+    var PRE_TREATMENT_URI     = TREATMENT_TYPE_URI+"#PreTreatment";
+    var ANALYSIS_TREATMENT_URI= TREATMENT_TYPE_URI+"#AnalysisTreatment";
   var OPTIONALITY_URI         = CAPTEN_ONTO_IRI+"Optionality"; // TODO redo ontology in order to have a boolean on the property has OptionalityState ? Qui about the explanation of the optionality -> Class still needed ?
   // var CONTEXT_URI    //ALREADY DEFINED BELOW
   // var OPERATOR_URI   //ALREADY DEFINED ABOVE
@@ -173,8 +173,8 @@ var IS_AUTHORED_BY          = CAPTEN_ONTO_IRI+"isAuthoredBy";
   var MONITORING_URI          = CAPTEN_ONTO_IRI+"Monitoring";
   var ADAPTATION_URI          = CAPTEN_ONTO_IRI+"Adaptation";
   var EXPLOITATION_TYPE_URI   = CAPTEN_ONTO_IRI+"ExploitationType";
-    var MODEL_URI             = CAPTEN_ONTO_IRI+"Model";
-    var INDICATOR_URI         = CAPTEN_ONTO_IRI+"Indicator";
+    var MODEL_URI             = EXPLOITATION_TYPE_URI+"#Model";
+    var INDICATOR_URI         = EXPLOITATION_TYPE_URI+"#Indicator";
   // var VOCABULARY_ELEMENT_URI  = CAPTEN_ONTO_IRI+"VocabularyElement";
   var VOCABULARY_ELEMENT_URI  = CAPTEN_VOCAB_IRI; //Pointer to the element belongign to the voc
   var VOC_SUMMARY_URI         = CAPTEN_ONTO_IRI+"VocSummary";
