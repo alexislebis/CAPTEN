@@ -15,7 +15,12 @@
 // getPropertiesRelations return for each cell a property already matching the
 // onto and the range as an object
 
-var exportObjToN3Ready = function(obj)
+function N3Exporter()
+{
+
+}
+
+N3Exporter.prototype.exportObjToN3Ready = function(obj)//@ redo
 {
   if(!obj.getPropertiesRelations || !obj.getN3ID || obj.id == null)
     return null;
@@ -37,12 +42,32 @@ var exportObjToN3Ready = function(obj)
       else
         propsRel[1] = propsRel[1].getN3ID();
     // Otherwise, we don't try to transcript the element in propsRel[1] into smth like <#ID>
-    
+
     map[n3ID].push(propsRel);
   }
 
   return map;
 }
+
+//merge map2 into map1. Do not remove duplicata of entry for key
+N3Exporter.prototype.n3MapsMerger = function(map1, map2)
+{
+  for(var i in map2)
+  {
+    // for(var j in map2[i])
+    // {
+      if(map1[i] == null)
+      {
+        map1[i] = [];
+      }
+      map1[i].push(map2[i]);
+    // }
+  }
+}
+
+var N3_EXPORTER = new N3Exporter();
+
+
 
 // then must merge maps with the same key
 

@@ -370,12 +370,35 @@ NarratedAnalysisProcess.prototype.mapNarrativeBlock= function(map)
 }
 
 // === ONTOLOGY EXPORT
-// return <propertyX> rangeX
+NarratedAnalysisProcess.prototype.getN3Ready = function()
+{
+  var map = {};
+  map[this.getN3ID()] = [];
+
+  map[this.getN3ID()].push([HAS_NAME_URI, this.getNameObject()]);
+
+  var narrativeBlock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+
+  if(narrativeBlock)
+    N3_EXPORTER.n3MapsMerger(map, narrativeBlock.getN3Ready());
+
+  if(this.expectedConcepts)
+    map[this.getN3ID()].push([HAS_INPUT_BEHAVIOUR_URI, this.expectedConcepts]);
+
+  return map;
+}
+
+// return [] of <propertyX> rangeX
 NarratedAnalysisProcess.prototype.getPropertiesRelations = function()
 {
   var PR = [];
 
   PR.push([HAS_NAME_URI, this.getNameObject()]);
 
+  if(this.expectedConcepts)
+    PR.push([HAS_INPUT_BEHAVIOUR_URI, this.expectedConcepts]);
+
+
+  //Retrieve K by exploring step's graphs knowledge
   return PR;
 }

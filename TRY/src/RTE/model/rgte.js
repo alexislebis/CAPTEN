@@ -1512,4 +1512,71 @@ _rollbackRemove: function()
 
       this.x = false;
     },
+
+    // === ONTOLOGY EXPORT
+    //return the ID in the following format : <#OBJ.ID>
+    //It supposes that a @base <http://smth>. is used while exporting.
+    //Not is business to handle that
+    getN3ID: function()
+    {
+      return "<#"+this.id+">";
+    },
+
+    getN3Ready: function()
+    {
+      // if(caller!=null && caller.id != this.id)//caller can't be != of this since this is known
+      //   return null;
+
+      var map = {};
+      map[this.getN3ID()] = [];
+
+      for(var i in this.nodes)
+        map[this.getN3ID()].push([HAS_VARIABLE_URI, this.nodes[i]]);
+
+      var n3GraphStructure = this.getN3FromGraphStructure();
+
+      for(var i in n3GraphStructure)
+        map[i] = n3GraphStructure[i];
+
+      return map;
+    },
+
+    getPropertiesRelations: function()//DEPRECATED
+    {
+      var PR = [];
+
+      for(var i in this.nodes)
+      {
+        PR.push([HAS_VARIABLE_URI, this.nodes[i]]);
+      }
+
+      return PR;
+    },
+
+    //Here, return a graph where each nodes of the graph are serialized
+    // in n3 like <range> <prop> <domain>.
+    // getPropertiesRelations does not do this, it export only the n3 for the graph
+    // However, the structure of the graph is important to save
+    getN3FromGraphStructure: function()//DEPRECATED
+    {
+      if(this.nodes.length == 0)
+        return null;
+
+      var rangeMap = {};
+      var n3ID; var rangeNode;
+
+      for(var i in this.nodes)
+      {
+        n3ID = this.nodes[i].getN3ID();
+
+        for(var j in this.edges)
+        {
+          if(this.edges[j].from == this.nodes[i].id)
+            rangeMap[n3ID] = [this.edges[j].getURI(), this.getNodeById(this.edges[j].to)];
+        }
+
+      }
+
+      return rangeMap;
+    },
 };

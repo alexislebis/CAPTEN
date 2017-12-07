@@ -462,6 +462,13 @@ Property.prototype = {
   },
   // ===
 
+  // === ONTOLOGY EXPORT
+  getURI: function()
+  {
+    return this.uri;
+  },
+  // ===
+
   // === OVERRIDED METHODS
     retrieveUniqueIdentifier: function()
     {

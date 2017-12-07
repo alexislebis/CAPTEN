@@ -48,7 +48,9 @@ var CAPTEN_VOCAB_IRI_PREFIX = "/vocabulary/"; //Used to identify the vocabulary 
 var CAPTEN_CLASS_URI  = CAPTEN_ONTO_IRI+"Thing";
 var CAPTEN_PROP_URI   = CAPTEN_ONTO_IRI+"haveAProperty";
 
-var CAPTEN_VOCAB_IRI = CAPTEN_ONTO_IRI + CAPTEN_VOCAB_IRI_PREFIX;
+// var CAPTEN_VOCAB_IRI = CAPTEN_ONTO_IRI + CAPTEN_VOCAB_IRI_PREFIX;
+var CAPTEN_VOCAB_IRI = CUSTOM_PREFIX_URI;
+
 // === CUSTOM PROPERTIES
   // === OPERATOR PROPS
   var EQUIVALENT_OPERATION_TO_URI = CAPTEN_ONTO_IRI+"equivalentOperationTo";
@@ -69,10 +71,16 @@ var CAPTEN_VOCAB_IRI = CAPTEN_ONTO_IRI + CAPTEN_VOCAB_IRI_PREFIX;
   var CONSISTS_OF_URI             = CAPTEN_ONTO_IRI+"consistsOf";
   var HAS_OBJECTIVE_URI           = CAPTEN_ONTO_IRI+"hasObjective";
   var HAS_BEHAVIOUR_URI           = CAPTEN_ONTO_IRI+"hasBehaviour";
+    var HAS_INPUT_BEHAVIOUR_URI   = CAPTEN_ONTO_IRI+"hasInputBehaviour"; //TODO IMPORTANT child property of HAS_BEHAVIOUR_URI where domain is INPUT_PATTERN_URI
   var IS_CONFIGURED_BY_URI        = CAPTEN_ONTO_IRI+"isConfiguredBy";
   var DEPENDS_ON_URI              = CAPTEN_ONTO_IRI+"dependsOn";
   var HAS_INFLUENCE_URI           = CAPTEN_ONTO_IRI+"hasInfluence";
+  var HAS_INPUT_URI               = CAPTEN_ONTO_IRI+"hasInput";
+  var HAS_OUTPUT_URI              = CAPTEN_ONTO_IRI+"hasOutput";
 
+  var HAS_VARIABLE_URI            = CAPTEN_ONTO_IRI+"hasVariable"; // TODO Important GRAPHs (Input, Output...) have variables in onto
+  var HAS_CONTENT_URI             = CAPTEN_ONTO_IRI+"hasContent"; // TODO The content of an element, possibly only a narrative element
+  var CONTENT_URI                 = CAPTEN_ONTO_IRI+"Content"; //The content of smth, principally of a narrative element
 
   // === NAP PROPS
   // === STEP PROPS

@@ -105,6 +105,17 @@ NarrativeElement.prototype.selfBuildingWithJson = function(thisjson, alignements
   // }
 }
 
+NarrativeElement.prototype.getN3Ready = function(){
+  var map = {};
+
+  map[this.getN3ID()] = [];
+
+  if(this.content)
+    map[this.getN3ID()] = [HAS_CONTENT_URI, this.content];
+
+  return map;
+}
+
 
 var NARRATIVE_CATEGORY_UNKNOWN = "unkwon";
 var NARRATIVE_CATEGORY_WHAT = "what";

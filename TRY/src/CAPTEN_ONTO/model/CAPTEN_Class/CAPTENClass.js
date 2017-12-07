@@ -491,7 +491,7 @@ CAPTENClass.prototype = {
 
     getPropertiesRelations: function()
     {
-      console.error("WARNING! UNIMPLEMENTED! ABORT!");
+      //console.error("WARNING! UNIMPLEMENTED! ABORT!");
     },
 
     // === PARSING

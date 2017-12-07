@@ -357,6 +357,32 @@ NarrativeBlock.prototype = {
       this.propertyEntity.mapElementsUsed(map);
 
     this.x = false;
-  }
+  },
+
+  // === ONTOLOGY EXPORT
+
+  getN3Ready: function()
+  {
+    if(this.entity == null)
+      return null;
+
+    var map = {}; var subMap = {};
+    map[this.entity.getN3ID()] = [];
+
+    for(var i in this.elements) //create direct n3 relation with the range
+    {
+      map[this.entity.getN3ID()].push([PROPERTIES_POOL.getPropertiesByExtremities(this.entity.id, this.elements[i].id)[0].uri, this.elements[i]]);
+
+      if(this.elements[i].getN3Ready) //propagation of relation
+      {
+          subMap = this.elements[i].getN3Ready();
+          N3_EXPORTER.n3MapsMerger(map, subMap);
+      }
+      else
+        console.log(this.elements[i]+" is not N3Ready");
+    }
+
+    return map;
+  },
 
 };
