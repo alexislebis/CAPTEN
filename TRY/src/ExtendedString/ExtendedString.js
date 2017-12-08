@@ -60,6 +60,32 @@
       return res;
    },
 
+   //Return the string in chunks. A chunk is made when smth other than a string
+   // is found. A chunk is either made of only string or an obj
+   getChunks: function()
+   {
+     var chunks = [];
+     var chunkTMP = "";
+     for(var i in this.array)
+     {
+       if(typeof this.array[i] == "string")
+        chunkTMP += this.array[i];
+       else
+       {
+         if(chunkTMP != "")
+         {
+           chunks.push(chunkTMP);
+           chunkTMP = "";
+         }
+         chunks.push(this.array[i]);
+       }
+     }
+     if(chunkTMP != "")
+       chunks.push(chunkTMP);
+
+      return chunks;
+   },
+
    setString: function(str)
    {
      this.resetVerification();
@@ -329,6 +355,39 @@
    mapElementsUsed: function(map)
    {
      map[this.id] = this;
+   },
+
+   // === ONTOLOGY EXPORT
+   getN3ID: function()
+   {
+     return "<#"+this.id+">";
+   },
+
+   getN3Ready: function()
+   {
+     var map = {};
+     var chunks = this.getChunks();
+     var n3ID = this.getN3ID();
+
+     map[n3ID] = [];
+
+     // An ExString is a sequence of words/vocab (a word does not belong to the vocab)
+     map[n3ID].push([A_SEQUENCE_URI, SEQUENCE_URI]);
+
+     for(var i = 0; i < chunks.length; i++)
+     {
+        if(typeof chunks[i] == "string")
+          map[n3ID].push([ORDERED_LIST_URI, chunks[i]]);
+        else
+        {
+          if(chunks[i].getN3ID)
+            map[n3ID].push([ORDERED_LIST_URI, chunks[i].getN3ID()]);
+          else
+            map[n3ID].push([ORDERED_LIST_URI, chunks[i].id]);
+        }
+      }
+
+      return map;
    },
 
  };

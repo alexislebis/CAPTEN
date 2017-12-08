@@ -1535,8 +1535,7 @@ _rollbackRemove: function()
 
       var n3GraphStructure = this.getN3FromGraphStructure();
 
-      for(var i in n3GraphStructure)
-        map[i] = n3GraphStructure[i];
+      N3_EXPORTER.n3MapsMerger(map, n3GraphStructure);
 
       return map;
     },
@@ -1553,7 +1552,7 @@ _rollbackRemove: function()
       return PR;
     },
 
-    //Here, return a graph where each nodes of the graph are serialized
+    //Here, return a map where each nodes of the graph are serialized
     // in n3 like <range> <prop> <domain>.
     // getPropertiesRelations does not do this, it export only the n3 for the graph
     // However, the structure of the graph is important to save
@@ -1569,10 +1568,13 @@ _rollbackRemove: function()
       {
         n3ID = this.nodes[i].getN3ID();
 
+        if(!rangeMap[n3ID])
+          rangeMap[n3ID] = [];
+
         for(var j in this.edges)
         {
           if(this.edges[j].from == this.nodes[i].id)
-            rangeMap[n3ID] = [this.edges[j].getURI(), this.getNodeById(this.edges[j].to)];
+            rangeMap[n3ID].push([this.edges[j].getURI(), this.getNodeById(this.edges[j].to)]);
         }
 
       }

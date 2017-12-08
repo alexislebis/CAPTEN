@@ -489,6 +489,35 @@ CAPTENClass.prototype = {
       return "<#"+this.id+">";
     },
 
+    // DEFAULT behavior for N3Ready of class.
+    getN3Ready: function()
+    {
+      var map = {};
+      var typeRange = this.uri;
+
+      if(!this.uri)
+      {
+        console.error("NO URI. Using default name");
+
+        typeRange = this.name;
+        if(!this.name)
+        {
+          console.error("\t NO NAME! Using default id");
+          typeRange = this.id;
+        }
+      }
+
+      map[this.getN3ID()] = [];
+      map[this.getN3ID()].push([TYPE_URI, typeRange]);
+
+      var narrativeBlock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);
+
+      if(narrativeBlock)
+        N3_EXPORTER.n3MapsMerger(map, narrativeBlock.getN3Ready());
+
+      return map;
+    },
+
     getPropertiesRelations: function()
     {
       //console.error("WARNING! UNIMPLEMENTED! ABORT!");

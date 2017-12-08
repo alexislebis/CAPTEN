@@ -4,6 +4,7 @@ var RDF_SCHEMA_IRI  = "http://www.w3.org/2000/01/rdf-schema";
 // === RDF
 var TYPE_URI        = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 var SEQUENCE_URI    = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Seq";
+var ORDERED_LIST_URI= "http://www.w3.org/1999/02/22-rdf-syntax-ns#li";
 
 // === RDF SCHEMA
 var DOMAIN_URI            = RDF_SCHEMA_IRI+"#domain";
@@ -206,6 +207,8 @@ var ANALYSIS_STAGE_URI      = CAPTEN_ONTO_IRI+"Stage"; // TODO Add in ontology; 
   var DIAGNOSTIC_ANALYSIS_URI   = ANALYSIS_STAGE_URI+"#Diagnostic"; // TODO Add/Complete in ontology
   var PREDICTIVE_ANALSYSIS_URI  = ANALYSIS_STAGE_URI+"#Predictive"; // TODO Add/Complete in ontology
   var PRESCRIPTIVE_ANALYSIS_URI = ANALYSIS_STAGE_URI+"#Prescriptive"; // TODO Add/Complete in ontology
+
+var A_SEQUENCE_URI              = CAPTEN_ONTO_IRI+"a"; //TODO ? Used to represent smth a rdf:Seq
 
 // MARK: anchor-name
 //// Test

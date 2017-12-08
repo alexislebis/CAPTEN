@@ -375,6 +375,10 @@ NarratedAnalysisProcess.prototype.getN3Ready = function()
   var map = {};
   map[this.getN3ID()] = [];
 
+  // = TYPE DEF
+  map[this.getN3ID()].push([TYPE_URI, ANALYSIS_URI]);
+  // =
+
   map[this.getN3ID()].push([HAS_NAME_URI, this.getNameObject()]);
 
   var narrativeBlock = NARRATIVE_BLOCK_POOL.getNarrativeBlockForID(this.id);

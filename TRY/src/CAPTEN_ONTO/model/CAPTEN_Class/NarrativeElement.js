@@ -111,7 +111,7 @@ NarrativeElement.prototype.getN3Ready = function(){
   map[this.getN3ID()] = [];
 
   if(this.content)
-    map[this.getN3ID()] = [HAS_CONTENT_URI, this.content];
+    map[this.getN3ID()].push([HAS_CONTENT_URI, this.content]);
 
   return map;
 }
