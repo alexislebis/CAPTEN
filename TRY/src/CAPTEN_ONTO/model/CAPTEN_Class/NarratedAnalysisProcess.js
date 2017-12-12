@@ -389,6 +389,42 @@ NarratedAnalysisProcess.prototype.getN3Ready = function()
   if(this.expectedConcepts)
     map[this.getN3ID()].push([HAS_INPUT_BEHAVIOUR_URI, this.expectedConcepts]);
 
+    // = BEHAVIOURS
+    if(this.behaviors)
+    {
+      //If behaviors exist & exist in the pool, mean that it is not a default rgte
+      // which is useless. An opti can be to remove the check of each pool
+      if(this.behaviors['input'] && RGTE_POOL.getByID(this.behaviors['input']))
+        map[this.getN3ID()].push([HAS_INPUT_BEHAVIOUR_URI, this.behaviors['input']]);
+      if(this.behaviors['output'] && RGTE_POOL.getByID(this.behaviors['output']))
+        map[this.getN3ID()].push([HAS_OUTPUT_BEHAVIOUR_URI, this.behaviors['output']]);
+
+      for(var i in this.behaviors['parameters'])
+        map[this.getN3ID()].push([HAS_PARAMETER_BEHAVIOUR_URI, this.behaviors['parameters'][i]]);
+    }
+    // =
+
+    // = IMPLEMENTATION OF THE OPERATOR
+      if(this.implementedByOperation)
+        for(var i in this.implementedByOperation)
+          map[this.getN3ID()].push([IMPLEMENTED_OPERATOR_URI, this.implementedByOperation[i]]);
+    // =
+
+    // = CREATION DATE
+    map[this.getN3ID()].push([DATE_TIME_URI, this.creationDate]);
+    // =
+
+    // = STEP
+    if(this.steps.length > 0)
+    {
+      map[this.getN3ID()].push([HAS_STEPS_URI, SEQUENCE_URI]);
+      for(var i in this.steps)
+      {
+        map[this.getN3ID()].push([ORDERED_LIST_URI, this.steps[i]]);
+      }
+    }
+    // =
+
   return map;
 }
 

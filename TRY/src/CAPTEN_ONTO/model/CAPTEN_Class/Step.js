@@ -29,7 +29,7 @@ function Step() {
 
     //The union of Indep.Op.specificSettings with this.settings constitute the whole --isConfiguredBy-->Setting of the ontology
     this.operator = null;
-    this.inputs = null; //[RGTE]. It is actually see as a Union of the different inputs
+    this.inputs = null; //RGTE. It is actually see as a Union of the different inputs
     this.outputs = null;
     this.relationOrder = null; //Integer. Representing the place of this in the IAP.
     this.parameters = [];
@@ -1171,6 +1171,57 @@ Step.prototype.constructor = Step;
 
     this.notifyIOPCompositeRelationChange();
   },
+
+  // === ONTOLOGY EXPORT
+  Step.prototype.getN3Ready = function()
+  {
+    var map = {};
+    map[this.getN3ID()] = [];
+
+    // = TYPE DEF
+    map[this.getN3ID()].push([TYPE_URI, STEP_URI]);
+    // =
+
+    // = NAME
+    map[this.getN3ID()].push([HAS_NAME_URI, this.name.getNameObject()]);
+    // =
+
+    // = CREATION DATE
+    if(this.creationDate)
+      map[this.getN3ID()].push([DATE_TIME_URI, this.creationDate]);
+    // =
+
+    // = NARRATIVE BLOCK
+    if(this.narrativeBlock)
+      N3_EXPORTER.n3MapsMerger(map, this.narrativeBlock.getN3Ready());
+    // =
+
+    // = CONFIGURATION OF THE STEP
+      // = INPUT
+      if(this.inputs)
+        map[this.getN3ID()].push([HAS_INPUT_URI, this.inputs]);
+      // =
+
+      // = OUTPUT
+      if(this.outputs)
+        map[this.getN3ID()].push([HAS_OUTPUT_URI, this.outputs]);
+      // =
+
+      // = OPERATOR
+      if(this.operator)
+        map[this.getN3ID()].push([HAS_OPERATION_URI, this.operator.getN3ID()]); //AVOID cyclic reference by using directly n3ID
+      // =
+    // =
+
+
+
+    // TODO Other elements like context, treatmentType are not treated atm
+    // The proto in its crrent version (CAPTEN_ASTROLABE_27bba4e) does not use
+    // context
+
+    return map;
+
+  }
 
 // === POLYMER ELEMENTS
   // === NAMER ELEMENT

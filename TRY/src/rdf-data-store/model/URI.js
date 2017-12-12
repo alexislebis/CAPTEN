@@ -73,15 +73,19 @@ var CAPTEN_VOCAB_IRI = CUSTOM_PREFIX_URI;
   var HAS_OBJECTIVE_URI           = CAPTEN_ONTO_IRI+"hasObjective";
   var HAS_BEHAVIOUR_URI           = CAPTEN_ONTO_IRI+"hasBehaviour";
     var HAS_INPUT_BEHAVIOUR_URI   = CAPTEN_ONTO_IRI+"hasInputBehaviour"; //TODO IMPORTANT child property of HAS_BEHAVIOUR_URI where domain is INPUT_PATTERN_URI
+    var HAS_OUTPUT_BEHAVIOUR_URI  = CAPTEN_ONTO_IRI+"hasOutputBehaviour"; // TODO IMPORTANT child property of HAS_BEHAVIOUR_URI
+    var HAS_PARAMETER_BEHAVIOUR_URI = CAPTEN_ONTO_IRI+"hasParameterBehaviour"; // TODO IMPORTANT child
   var IS_CONFIGURED_BY_URI        = CAPTEN_ONTO_IRI+"isConfiguredBy";
   var DEPENDS_ON_URI              = CAPTEN_ONTO_IRI+"dependsOn";
   var HAS_INFLUENCE_URI           = CAPTEN_ONTO_IRI+"hasInfluence";
   var HAS_INPUT_URI               = CAPTEN_ONTO_IRI+"hasInput";
   var HAS_OUTPUT_URI              = CAPTEN_ONTO_IRI+"hasOutput";
+  var HAS_OPERATION_URI           = CAPTEN_ONTO_IRI+"hasOperation";
 
   var HAS_VARIABLE_URI            = CAPTEN_ONTO_IRI+"hasVariable"; // TODO Important GRAPHs (Input, Output...) have variables in onto
   var HAS_CONTENT_URI             = CAPTEN_ONTO_IRI+"hasContent"; // TODO The content of an element, possibly only a narrative element
   var CONTENT_URI                 = CAPTEN_ONTO_IRI+"Content"; //The content of smth, principally of a narrative element
+  var HAS_STEPS_URI               = CAPTEN_ONTO_IRI+"hasSteps"; //TODO add in the onto
 
   // === NAP PROPS
   // === STEP PROPS
