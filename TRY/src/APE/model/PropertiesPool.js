@@ -219,6 +219,18 @@ PropertiesPool.prototype = {
     }
   },
 
+  // === ASTROLABE ADD
+  updateHashedPool: function()
+  {
+    this._hashedPool = {};
+
+    for(var i in this.pool)
+    {
+      if(this.pool[i].from && this.pool[i].to)
+        this._hashedPool[this.pool[i].from+";"+this.pool[i].to] = this.pool[i];
+    }
+  },
+
 }
 
 var PROPERTIES_POOL = new PropertiesPool();
