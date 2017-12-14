@@ -5,6 +5,7 @@
 
 function PropertiesPool(){
   this.pool = [];
+  this._hashedPool = {}; //The hashed pool store properties in an indexed map of key <from.id;to.id>
 }
 
 PropertiesPool.POSITION = 0;
@@ -53,6 +54,9 @@ PropertiesPool.prototype = {
 
     this.pool.push(prop);
 
+    // = ADDING TO HASHED POOL
+    if(prop.from && prop.to)
+      this._hashedPool[prop.from+";"+prop.to] = prop;
   },
 
   _addingToPool: function(prop)
@@ -63,6 +67,10 @@ PropertiesPool.prototype = {
       this.pool.push(prop);
 
       this.pool[this.pool.length-1].position = PropertiesPool.POSITION++;
+
+      // = ADDING TO HASHED POOL
+      if(prop.from && prop.to)
+        this._hashedPool[prop.from+";"+prop.to] = prop;
 
       return this.pool[this.pool.length-1];
   },
@@ -152,15 +160,23 @@ PropertiesPool.prototype = {
 
   getPropertiesByExtremities: function(from, to)
   {
-    var related = [];
+    // var related = [];
+    //
+    // for(var i in this.pool)
+    // {
+    //   if(this.pool[i].from == from && this.pool[i].to == to)
+    //     related.push(this.pool[i]);
+    // }
+    //
+    // return related;
 
-    for(var i in this.pool)
-    {
-      if(this.pool[i].from == from && this.pool[i].to == to)
-        related.push(this.pool[i]);
-    }
+    if(!from || !to)
+      return [];
 
-    return related;
+    if(!this._hashedPool[from+";"+to])
+      return [];
+    else
+      return [this._hashedPool[from+";"+to]];
   },
 
   serializeToJSON: function()
