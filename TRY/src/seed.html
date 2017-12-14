@@ -476,6 +476,8 @@
       load: function()
       {
         this.$.loader.forcedLoad();
+
+        N3_EXPORTER.n3MainSerializer(this.vocab, this.customcls, this.customprops);
       },
 
       mapIdElementUsedIn: function(searchedArray, map)

@@ -377,7 +377,7 @@
      for(var i = 0; i < chunks.length; i++)
      {
         if(typeof chunks[i] == "string")
-          map[n3ID].push([ORDERED_LIST_URI, chunks[i]]);
+          map[n3ID].push([ORDERED_LIST_URI, '"'+chunks[i]+'"']);
         else
         {
           if(chunks[i].getN3ID)

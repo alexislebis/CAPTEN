@@ -212,8 +212,8 @@ var ANALYSIS_STAGE_URI      = CAPTEN_ONTO_IRI+"Stage"; // TODO Add in ontology; 
   var PREDICTIVE_ANALSYSIS_URI  = ANALYSIS_STAGE_URI+"#Predictive"; // TODO Add/Complete in ontology
   var PRESCRIPTIVE_ANALYSIS_URI = ANALYSIS_STAGE_URI+"#Prescriptive"; // TODO Add/Complete in ontology
 
-var A_SEQUENCE_URI              = CAPTEN_ONTO_IRI+"a"; //TODO ? Used to represent smth a rdf:Seq
-
+var A_SEQUENCE_URI              = A_URI; //TODO ? Used to represent smth a rdf:Seq
+var A_URI                       = "a";
 // MARK: anchor-name
 //// Test
 var URI_TO_LABEL = function(uri)

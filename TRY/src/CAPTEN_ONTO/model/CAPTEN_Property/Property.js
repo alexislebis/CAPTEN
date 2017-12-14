@@ -467,6 +467,22 @@ Property.prototype = {
   {
     return this.uri;
   },
+
+  getN3ID: function()
+  {
+    return '<#'+this.id+">";
+  },
+
+  getN3Ready: function()
+  {
+    var map = {};
+
+    map[this.getN3ID()] = [];
+
+    map[this.getN3ID()].push([A_URI, PROPERTY_URI]);
+
+    return map;
+  },
   // ===
 
   // === OVERRIDED METHODS
