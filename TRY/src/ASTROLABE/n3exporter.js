@@ -198,7 +198,7 @@ N3Exporter.prototype.dedicatedVocN3Readier = function(vocab, customcls, custompr
   {
     for(var j = 0; j < concatCls.length; j++)
     {
-      res = PROPERTIES_POOL.getPropertiesByExtremities(concatCls[i].id, concatCls[j].id);
+      res = PROPERTIES_POOL.getPropertiesByExtremitiesHashedPool(concatCls[i].id, concatCls[j].id);
       if(res && res.length > 0)
       {
         subMap[concatCls[i].getN3ID()] = [];
