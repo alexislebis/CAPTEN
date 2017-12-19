@@ -141,6 +141,17 @@ N3Exporter.prototype.n3MapSolver = function(map)
     }
   }
 
+  console.log("CLEANING GOSTH REFERENCING"); //Prevent to have a <d> <p> <r> where <r> is not defined anywher
+
+  for(var i in map)
+  {
+    for(var j = map[i].length-1; j >= 0; j--)
+    {
+      if(map[i][j][1].indexOf("<#") != -1 && !map[map[i][j][1]])
+        map[i].splice(j,1);
+    }
+  }
+
   return map;
 }
 
