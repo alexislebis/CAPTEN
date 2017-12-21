@@ -476,8 +476,6 @@
       load: function()
       {
         this.$.loader.forcedLoad();
-
-        N3_EXPORTER.n3MainSerializer(this.vocab, this.customcls, this.customprops);
       },
 
       mapIdElementUsedIn: function(searchedArray, map)
@@ -653,6 +651,13 @@
           return false;
 
         return true;
+      },
+
+      // === ONTOLOGY EXPORTER
+      ttlExport: function()
+      {
+        console.log("CAPTEN TURTLE! EXPORTING! Sōshin~~~!!!");
+        N3_EXPORTER.n3MainSerializer(this.vocab, this.customcls, this.customprops);
       },
 
     });
