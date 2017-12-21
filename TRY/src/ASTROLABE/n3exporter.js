@@ -237,11 +237,18 @@ N3Exporter.prototype.n3Formater = function(n3Map)
     for(var j = 0; j < n3Map[i].length; j++)
     {
       p = n3Map[i][j][0];
+      p = p.replace(/ /g, "_");
       if(p.charAt(0) != "<")
         p = "<"+p+">";
       r = n3Map[i][j][1];
+      r = r.replace(/ /g, "_");
       if(r.charAt(0) != "<")
-        r = "<"+r+">";
+        if(r.charAt(0) != "\"")
+          r = "<"+r+">";
+        else { //Replace all the " by \" restoring
+          r = r.replace(/"/g, "");
+          r = '"'+r+'"';
+        }
       tmpN3 += p+" "+r;
       if(j == n3Map[i].length-1)
         tmpN3 += " .\n";
