@@ -1556,7 +1556,7 @@ _rollbackRemove: function()
     // in n3 like <range> <prop> <domain>.
     // getPropertiesRelations does not do this, it export only the n3 for the graph
     // However, the structure of the graph is important to save
-    getN3FromGraphStructure: function()//DEPRECATED
+    getN3FromGraphStructure: function()
     {
       if(this.nodes.length == 0)
         return null;
@@ -1564,19 +1564,42 @@ _rollbackRemove: function()
       var rangeMap = {};
       var n3ID; var rangeNode;
 
-      for(var i in this.nodes)
+      // for(var i in this.nodes)
+      // {
+      //   n3ID = this.nodes[i].getN3ID();
+      //
+      //   if(!rangeMap[n3ID])
+      //     rangeMap[n3ID] = [];
+      //
+      //   for(var j in this.edges)
+      //   {
+      //     if(this.edges[j].from == this.nodes[i].id)
+      //       rangeMap[n3ID].push([this.edges[j].getURI(), this.getNodeById(this.edges[j].to)]);
+      //   }
+      //
+      // }
+
+      for(var i in this.edges)
       {
-        n3ID = this.nodes[i].getN3ID();
-
-        if(!rangeMap[n3ID])
-          rangeMap[n3ID] = [];
-
-        for(var j in this.edges)
+        var domain = null; var range = null;
+        for(var j in this.nodes)
         {
-          if(this.edges[j].from == this.nodes[i].id)
-            rangeMap[n3ID].push([this.edges[j].getURI(), this.getNodeById(this.edges[j].to)]);
+          if(domain != null & range != null)//stop looping if domain & range found
+            break;
+          if(this.nodes[j].id == this.edges[i].from)
+            domain = this.nodes[j];
+          if(this.nodes[j].id == this.edges[i].to) // not else if : handling circular this way
+            range = this.nodes[j];
         }
 
+        if(domain && range)
+        {
+          domain = domain.getIRI();
+          range = range.getIRI();
+          rangeMap[this.edges[i].getN3ID()] = [];
+          rangeMap[this.edges[i].getN3ID()].push([DOMAIN_URI, domain]);
+          rangeMap[this.edges[i].getN3ID()].push([RANGE_URI, range]);
+        }
       }
 
       return rangeMap;

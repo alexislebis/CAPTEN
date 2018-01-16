@@ -59,12 +59,15 @@ var CAPTEN_VOCAB_IRI = CUSTOM_PREFIX_URI;
   var IS_INSTANCIABLE_IN_URI      = CAPTEN_ONTO_IRI+"isInstanciableIn";
   var IS_DEPICTED_BY_URI          = CAPTEN_ONTO_IRI+"isDepictedBy";
   var INFORMATIVE_CONTENT_URI     = CAPTEN_ONTO_IRI+"informativeContent";
+  var IMPLEMENTATION_INFO_URI     = CAPTEN_ONTO_IRI+"implementationInformation";
   var TOOL_VERSION_URI            = CAPTEN_ONTO_IRI+"toolVersion";
   var TOOL_NAME_URI               = CAPTEN_ONTO_IRI+"toolName";
   var IS_CONSTRAINED_BY_URI       = CAPTEN_ONTO_IRI+"isConstrainedBy";
+  var HAS_DATA_CONSTRAINTS        = CAPTEN_ONTO_IRI+"hasDataConstraints"; // @NEW : ADDED ASTOLABE 0.0.3 ONTO
   // var WAS_GENERATED_BY_URI   // ALREADY DEFINED ABOVE
   var MODIFIES_URI                = CAPTEN_ONTO_IRI+"modifies";
   var SUB_PART_OF_URI             = CAPTEN_ONTO_IRI+"subPartOf";
+  var SUB_VARIABLES_OF            = CAPTEN_ONTO_IRI+"subVariablesOf"; // @NEW : ADDED ASTROLABE 0.0.3 ONTO
   var IS_CONCEPTUALIZED_BY_URI    = CAPTEN_ONTO_IRI+"isConceptualizedBy";
   var IS_VALUABLE_URI             = CAPTEN_ONTO_IRI+"isValuable";
   var HAS_SELECTION_METHOD_URI    = CAPTEN_ONTO_IRI+"hasSelectionMethod";
@@ -76,7 +79,11 @@ var CAPTEN_VOCAB_IRI = CUSTOM_PREFIX_URI;
     var HAS_OUTPUT_BEHAVIOUR_URI  = CAPTEN_ONTO_IRI+"hasOutputBehaviour"; // TODO IMPORTANT child property of HAS_BEHAVIOUR_URI
     var HAS_PARAMETER_BEHAVIOUR_URI = CAPTEN_ONTO_IRI+"hasParameterBehaviour"; // TODO IMPORTANT child
   var IS_CONFIGURED_BY_URI        = CAPTEN_ONTO_IRI+"isConfiguredBy";
-  var DEPENDS_ON_URI              = CAPTEN_ONTO_IRI+"dependsOn";
+  var DEPENDANCES_URI             = CAPTEN_ONTO_IRI+"dependances"; // @NEW : ADDEDE ASTROLABE 0.0.3 ONTO
+    var DEPENDS_ON_URI            = CAPTEN_ONTO_IRI+"dependsOn";
+    var UTILISATION_RESTRIC_URI   = CAPTEN_ONTO_IRI+"utilisationRestrictions"; // @NEW ; ADDED ASTROLABE 0.0.3 ONTO
+  var IS_SPECIALIZED_BY_URI       = CAPTEN_ONTO_IRI+"isSpecializedBy"; // @NEW : ADDED ASTROLABE 0.0.3 ONTO
+    var SPECIALIZE_UTILISATION_URI= CAPTEN_ONTO_IRI+"specializeUtilisation"; // @NEW : ADDED ASTROLABE 0.0.3 ONTO
   var HAS_INFLUENCE_URI           = CAPTEN_ONTO_IRI+"hasInfluence";
   var HAS_INPUT_URI               = CAPTEN_ONTO_IRI+"hasInput";
   var HAS_OUTPUT_URI              = CAPTEN_ONTO_IRI+"hasOutput";
@@ -86,6 +93,8 @@ var CAPTEN_VOCAB_IRI = CUSTOM_PREFIX_URI;
   var HAS_CONTENT_URI             = CAPTEN_ONTO_IRI+"hasContent"; // TODO The content of an element, possibly only a narrative element
   var CONTENT_URI                 = CAPTEN_ONTO_IRI+"Content"; //The content of smth, principally of a narrative element
   var HAS_STEPS_URI               = CAPTEN_ONTO_IRI+"hasSteps"; //TODO add in the onto
+
+    var K_GENERATED_BY_URI        = CAPTEN_VOCAB_IRI+"knowledgeGeneratedBy"; // @NEW : ADDEDE ASTROLABE 0.0.3 ONTO
 
   // === NAP PROPS
   // === STEP PROPS
@@ -113,8 +122,10 @@ var USED_AS                 = CAPTEN_ONTO_IRI+"usedAs";//TODO add it to the onto
 var INFLUENCES_URI          = CAPTEN_ONTO_IRI+"influences";//TODO add it to the ontology OR locate it
 var FOLLOWED_BY_URI         = CAPTEN_ONTO_IRI+"followedBy";
 var IS_DESCRIBED_BY_URI     = CAPTEN_ONTO_IRI+"isDescribedBy";
+  var OPERATION_DESCRIB_URI = CAPTEN_ONTO_IRI+"operationDescribedBy"; // @NEW : ADDED ASTROLABE 0.0.3 ONTO
+  var STATEMENT_DESCR_URI   = CAPTEN_ONTO_IRI+"statementDescription"; // @NEW : ADDED ASTROLABE 0.0.3 ONTO
 var HAS_NAME_URI            = CAPTEN_ONTO_IRI+"hasName";
-var HAS_CONTEXT_URI         = CAPTEN_ONTO_IRI+"hasContext";
+var HAS_CONTEXT_URI         = CAPTEN_ONTO_IRI+"isContextualizedBy";
 var HAS_OBJECTIVE_URI       = CAPTEN_ONTO_IRI+"hasObjective";
 var HAS_HYPOTHESIS_URI      = CAPTEN_ONTO_IRI+"hasHypothesis";
 var HAS_DESCRIPTION_URI     = CAPTEN_ONTO_IRI+"description";
@@ -161,7 +172,7 @@ var IS_AUTHORED_BY          = CAPTEN_ONTO_IRI+"isAuthoredBy";
     var POST_TREATMENT_URI    = TREATMENT_TYPE_URI+"#PostTreatment";
     var PRE_TREATMENT_URI     = TREATMENT_TYPE_URI+"#PreTreatment";
     var ANALYSIS_TREATMENT_URI= TREATMENT_TYPE_URI+"#AnalysisTreatment";
-  var OPTIONALITY_URI         = CAPTEN_ONTO_IRI+"Optionality"; // TODO redo ontology in order to have a boolean on the property has OptionalityState ? Qui about the explanation of the optionality -> Class still needed ?
+  var OPTIONALITY_URI         = CAPTEN_ONTO_IRI+"OptionalState"; // Optional + prop hasOption for describing
   // var CONTEXT_URI    //ALREADY DEFINED BELOW
   // var OPERATOR_URI   //ALREADY DEFINED ABOVE
 

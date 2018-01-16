@@ -493,19 +493,7 @@ CAPTENClass.prototype = {
     getN3Ready: function()
     {
       var map = {};
-      var typeRange = this.uri;
-
-      if(!this.uri)
-      {
-        console.error("NO URI. Using default name");
-
-        typeRange = this.name;
-        if(!this.name)
-        {
-          console.error("\t NO NAME! Using default id");
-          typeRange = this.id;
-        }
-      }
+      var typeRange = this.getIRI();
 
       map[this.getN3ID()] = [];
       map[this.getN3ID()].push([TYPE_URI, typeRange]);
@@ -516,6 +504,24 @@ CAPTENClass.prototype = {
         N3_EXPORTER.n3MapsMerger(map, narrativeBlock.getN3Ready());
 
       return map;
+    },
+
+    getIRI: function()
+    {
+      var iri = this.uri;
+      if(!this.uri)
+      {
+        console.error("NO URI. Using default name");
+
+        iri = this.name;
+        if(!this.name)
+        {
+          console.error("\t NO NAME! Using default id");
+          iri = this.id;
+        }
+      }
+
+      return iri;
     },
 
     getPropertiesRelations: function()

@@ -260,6 +260,9 @@ N3Exporter.prototype.n3Formater = function(n3Map)
     tmpN3 = "";
   }
 
+  console.log("HARD CLEANING <a>"); //@HardFix to prevent the chevrons < & > around 'a'
+  n3String = n3String.replace(/<a>/g, "a");
+
   return n3String;
 }
 

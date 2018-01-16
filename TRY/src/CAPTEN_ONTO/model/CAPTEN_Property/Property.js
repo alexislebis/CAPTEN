@@ -470,7 +470,8 @@ Property.prototype = {
 
   getN3ID: function()
   {
-    return '<#'+this.id+">";
+    // return '<#'+this.id+">";
+    return '<'+this.uri.replace(/ /g, "")+">"; // @WARNING : Quick fix for IRI display for properties. It can be some side effects
   },
 
   getN3Ready: function()
