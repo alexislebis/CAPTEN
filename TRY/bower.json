@@ -56,7 +56,8 @@
     "paper-swatch-picker": "PolymerElements/paper-swatch-picker#^2.0.0",
     "brainy-table": "OWOX/brainy-table#^1.7.3",
     "paper-checkbox": "PolymerElements/paper-checkbox#^1.4.2",
-    "paper-progress": "PolymerElements/paper-progress#^2.0.1"
+    "paper-progress": "PolymerElements/paper-progress#^2.0.1",
+    "hylar": "^1.8.3"
   },
   "resolutions": {
     "app-layout": "^0.10.7"

@@ -196,6 +196,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <paper-fab class="fab" id="save" mini icon="save"></paper-fab>
         <paper-fab class="fab" id="ttlExport" mini icon="hardware:device-hub"></paper-fab>
         <div spacer title id="headTlt">CAPTEN</div>
+        <paper-fab class="fab" id="ontoload" mini icon="icons:cloud-upload"></paper-fab>
         <paper-fab class="fab" id="load" mini icon="file-upload"></paper-fab>
       </app-toolbar>
     </app-header>
@@ -253,6 +254,10 @@ document.getElementById('save').addEventListener('click', function(){
 
 document.getElementById('load').addEventListener('click', function(){
   seed.load();
+});
+
+document.getElementById('ontoload').addEventListener('click', function(){
+  seed.loadOntology();
 });
 /*tabs.addEventListener('iron-select', function() {
     pages.selected = tabs.selected;

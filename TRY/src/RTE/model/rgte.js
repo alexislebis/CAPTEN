@@ -1519,7 +1519,7 @@ _rollbackRemove: function()
     //Not is business to handle that
     getN3ID: function()
     {
-      return "<#"+this.id+">";
+      return "<"+CAPTEN_ONTO_IDENTIFIER_IRI+"#"+this.id+">";
     },
 
     getN3Ready: function()
@@ -1529,6 +1529,8 @@ _rollbackRemove: function()
 
       var map = {};
       map[this.getN3ID()] = [];
+
+      map[this.getN3ID()].push([TYPE_URI, RGTE_URI]);
 
       for(var i in this.nodes)
         map[this.getN3ID()].push([HAS_VARIABLE_URI, this.nodes[i]]);
@@ -1594,11 +1596,18 @@ _rollbackRemove: function()
 
         if(domain && range)
         {
-          domain = domain.getIRI();
-          range = range.getIRI();
-          rangeMap[this.edges[i].getN3ID()] = [];
-          rangeMap[this.edges[i].getN3ID()].push([DOMAIN_URI, domain]);
-          rangeMap[this.edges[i].getN3ID()].push([RANGE_URI, range]);
+          // ENRICH THE ONTOLOGY BY PUTTING NEW PROP RELATION DOMAIN & RANGE
+          // these lines create a lot of complexity and alter the reasoning. The benefice of
+          // taking into account new onto is currently not enough.
+          // = UNCOMMENT TO ENRICH ONTO
+            // domainIRI = domain.getIRI();
+            // rangeIRI = range.getIRI();
+            // rangeMap[this.edges[i].getN3ID()] = [];
+            // rangeMap[this.edges[i].getN3ID()].push([DOMAIN_URI, domainIRI]);
+            // rangeMap[this.edges[i].getN3ID()].push([RANGE_URI, rangeIRI]);
+          // = END
+          rangeMap[domain.getN3ID()] = [];
+          rangeMap[domain.getN3ID()].push([this.edges[i].getN3ID(), range]);
         }
       }
 

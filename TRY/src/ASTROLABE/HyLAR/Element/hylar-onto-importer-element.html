@@ -1,0 +1,158 @@
+<link rel="import" href="../../../../bower_components/file-reader/file-reader.html">
+<link rel="import" href="../../../../bower_components/paper-input/paper-input.html">
+
+<dom-module id="hylar-onto-importer-element">
+    <template>
+      <style include="toasty-style"></style>
+        <style>
+            :host {
+                display: block;
+            }
+            h2 {
+                text-align: center;
+            }
+        </style>
+
+    <div hidden="{{hidden}}">
+        <div>
+          <h3>Load ontology </h3>
+          <file-reader file-slice-size="1000000000" id="fileReaderElement">CAPTEN.owl</file-reader>
+        </div>
+    </div>
+
+        <!-- <input id="inp" type="file">
+        <button id="myBtn">Try it</button>
+        <pre id="file"></pre> -->
+
+        <paper-toast id="toastBeingLoaded" text="The CAPTEN ontology is being imported; Please wait">
+          <paper-button on-click="_closeToast" class="toastButton">UNDO</paper-button>
+        </paper-toast>
+
+        <paper-toast id="toastLoadOk" text="CAPTEN ontology successfully imported">
+          <paper-button on-click="_closeToast" class="toastButton">UNDO</paper-button>
+        </paper-toast>
+
+
+    </template>
+    <script>
+        Polymer(
+        {
+            is: 'hylar-onto-importer-element',
+            properties:
+            {
+              ontology:
+              {
+                type: Object,
+                notify: true,
+              },
+
+              hidden:
+              {
+                type: Boolean,
+                notify: true,
+              },
+
+              mime:
+              {
+                type: String,
+                value: "text/turtle",
+                notify: true,
+              },
+
+              kOV://Keep old values
+              {
+                type: Boolean,
+                value: false,
+                notify: true,
+              }
+            },
+            // Used for two-ways binding debug
+              // observers: [
+              //   '_onGraphChanged(graphuri)'
+              // ],
+
+            attached: function()
+            {
+
+            },
+
+              _closeToast: function(e)
+              {
+                Polymer.dom(e).localTarget.parentElement.close();
+              },
+
+            ready: function()
+            {
+                var that = this;
+                this.$.fileReaderElement.returnFunction = function()
+                {
+                    var body;
+                    var callback = {
+                        onload: function(e)
+                        {
+                          // console.log(e.target.result);
+                            HYLAR_HANDLER.loadOntology(e.target.result, that.mime, that.kOV);
+
+                          // TEST ONLY
+                          // DELETE
+                          // console.log("Starting to wait for test");
+                          // setTimeout(function(){
+                          //   console.log("end waiting");
+                          //   var query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/custom/hasPosts> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?t .}";
+                          //   // var query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/custom/hasPosts> ?e .}";
+                          //   // var query = "SELECT * WHERE { <http://www.CAPTEN.org/SEED/identifier/#25635> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?e .}";
+                          //   // var query = "SELECT * WHERE { ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.CAPTEN.org/SEED/ontologies/NarratedAnalysisProcess>. ?s  <http://www.CAPTEN.org/SEED/ontologies/hasObjective> ?o .}"
+                          //   HYLAR_HANDLER.queryOnto(query);
+                          // }, 75000);
+                          // // END DELETE
+                        },
+                        onprogress: function() {},
+                        onerror: function() {}
+                    }
+                    this.getSlice(0, 1, callback);
+                };
+            },
+
+            forcedLoad: function()
+            {
+              this.$.toastBeingLoaded.open();
+              this.$.fileReaderElement._handleUploadClick();
+            },
+
+            loadCAPTEN: function(fileContent)
+            {
+
+
+              // var reader = new FileReader();
+              // reader.addEventListener("loadend", function() {
+              //    console.log(reader.result);
+              // });
+              // reader.readAsText(fileContent);
+
+              // var parsedJSON = JSON.parse(fileContent);
+              //
+              // CAPTEN_LOADER.import(parsedJSON, this.vocab, this.customcls, this.customprops, this, this._resultImport);
+              // // // console.log(jO.nodes[0].subClassOf[0].uri);
+              //
+              // this.rgte.parseJSON(jO, this.vocab);
+              // var dispArray = this.rgte.vocabularyDispersion(this.vocab);
+              //
+              // var cust = this.customcls;
+              // for(var i in dispArray['classes'])
+              //   cust.push(dispArray['classes'][i]);
+              //
+              // var pro = this.customprops;
+              // for(var i in dispArray['properties'])
+              //   pro.push(dispArray['properties'][i]);
+              //
+              // this.customcls = [];
+              // this.customprops = [];
+              //
+              // this.customcls = cust;
+              // this.customprops = pro;
+              //
+              // this.$.toastLoadOk.open();
+            },
+        });
+    </script>
+</dom-module>

@@ -43,6 +43,7 @@ var CUSTOM_PREFIX_URI = "http://www.CAPTEN.org/SEED/ontologies/custom/";
 
 // === CUSTOM IRI PREFIX
 var CAPTEN_ONTO_IRI = "http://www.CAPTEN.org/SEED/ontologies/"; //TODO handle subblock of step matching a concept
+var CAPTEN_ONTO_IDENTIFIER_IRI  = "http://www.CAPTEN.org/SEED/identifier/";
 var CAPTEN_VOCAB_IRI_PREFIX = "/vocabulary/"; //Used to identify the vocabulary elements created by the community. e.g: CAPTEN_ONTO_IRI + CAPTEN_VOCAB_IRI_PREFIX + Vocab.Class.name();
                                               //TODO Should be stored in an hashmap to prevent duplicata
 

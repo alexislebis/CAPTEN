@@ -486,7 +486,7 @@ CAPTENClass.prototype = {
     //Not is business to handle that
     getN3ID: function()
     {
-      return "<#"+this.id+">";
+      return "<"+CAPTEN_ONTO_IDENTIFIER_IRI+"#"+this.id+">";
     },
 
     // DEFAULT behavior for N3Ready of class.

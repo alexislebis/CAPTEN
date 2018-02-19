@@ -54,7 +54,7 @@
      var res = [];
 
      for(var i in this.array)
-      if(!this.array[i] instanceof String)
+      if(!(typeof this.array[i] ==  "string"))
         res.push(this.array[i]);
 
       return res;
@@ -360,7 +360,7 @@
    // === ONTOLOGY EXPORT
    getN3ID: function()
    {
-     return "<#"+this.id+">";
+     return "<"+CAPTEN_ONTO_IDENTIFIER_IRI+"#"+this.id+">";
    },
 
    getN3Ready: function()

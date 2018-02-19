@@ -1,0 +1,190 @@
+<dom-module id="searching-according-need-element">
+  <template>
+    <style>
+
+    </style>
+
+    Dim = [Objectif,Need,Context]
+    Describe Need <extended-paper-input-element id="need" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}" label="Need description, N = (t1, t2,...,tn)" value="{{need}}" char-counter required></extended-paper-input-element>
+
+
+      <p>degree validity by user</p>
+
+      <template is="dom-if" if="{{fuzzyChecked}}" restamp="true">
+        modificator
+        <paper-dropdown-menu label="fuzzyModification" name="fuzzyModification" required>
+            <paper-menu class="dropdown-content" id="fuzzyDropdown">
+                <paper-item value="">No modificator</paper-item>
+                <paper-item value="">Extremely</paper-item>
+                <paper-item value="">Very</paper-item>
+                <paper-item value="">Pretty</paper-item>
+                <paper-item value="">Somewhat</paper-item>
+                <paper-item value="">Badly</paper-item>
+                <paper-item value="">Not</paper-item>
+            </paper-menu>
+        </paper-dropdown-menu>
+
+        <paper-dropdown-menu label="typeOfSimilarity" name="typeOfSimilarity" required>
+            <paper-menu class="dropdown-content" id="similarityDropdown">
+                <paper-item value="">Similar</paper-item>
+                <paper-item value="">Assimilable</paper-item>
+                <paper-item value="">Approximating</paper-item>
+                <paper-item value="">Alike</paper-item>
+                <paper-item value="">Equivalent</paper-item>
+                <paper-item value="">Identical</paper-item>
+                <paper-item value="">Nearby</paper-item>
+                <paper-item value="">Different</paper-item>
+            </paper-menu>
+        </paper-dropdown-menu>
+
+        to my need description.
+
+      </template>
+
+    <h3>Matching behaviors</h3>
+      <paper-checkbox checked="{{semanticChecked}}">Semantic matching</paper-checkbox>
+      <paper-checkbox checked="{{fuzzyChecked}}">Fuzzy matching</paper-checkbox>
+
+
+    <paper-button raised on-click="_startSearch">Let's match</paper-button>
+
+    <h3>Result display</h3>
+      <p>new components designed to handle result</p>
+  </template>
+  <script>
+    Polymer({
+      is: "searching-according-need-element",
+
+      properties:
+      {
+        fuzzyChecked:
+        {
+          type: Boolean,
+          value: true,
+          notify: true,
+        },
+
+        semanticChecked:
+        {
+          type: Boolean,
+          value: true,
+          notify: true,
+        },
+        vocab:
+        {
+          type: Object,
+        },
+        customcls://used for file-reader
+        {
+            type: Array,
+            notify: true,
+        },
+        customprops:
+        {
+            type: Array,
+            notify: true,
+        },
+        need:
+        {
+          type: Object,//ExtendedString
+          notify: true,
+        }
+      },
+
+      observers:
+      [
+
+      ],
+
+
+      _startSearch: function()
+      {
+        var mapDimTerms = [];
+
+        if(!HYLAR_HANDLER.isReady())
+          return;
+
+        if(this.need && this.need.getString().length > 0)
+        {
+          mapDimTerms["need"] = this.need.getSpecialElements();
+        }
+
+        var result = this._defaultSearchBehavior(mapDimTerms);
+      },
+
+      _defaultSearchBehavior: function(mapDimTerms)
+      {
+        if(mapDimTerms["need"])
+          this._searchNeed(mapDimTerms["need"]);
+      },
+
+      // == NEED SEARCHING
+        _searchNeed: async function(needTerms)
+        {
+          console.log("looking for : "+needTerms[0]);
+          //Looking into name elements
+          // query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
+          query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
+
+          // HYLAR_HANDLER.queryOnto(query, [this, this._afterNeedQueries]);
+          var elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
+
+          var sortedRes = this._sortingByType(elm, "s");
+
+        },
+
+        _afterNeedQueries: function(queriesResults)
+        {
+          console.log(queriesResults);
+          this._sortingByType(queriesResults, "s");
+        },
+
+      // == == == ==
+
+      // sort by looking type. Result array is the result from a querry handled
+      //by HYLAR_HANDLER.query and sourceID represent what has to be tested (such as ?source ).
+      _sortingByType: async function(resultArray, sourceID)
+      {
+        if(!resultArray || resultArray.length <= 0)
+          return;
+
+        var headQuery = "SELECT ?type WHERE {<";
+        var tailQuery = "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .}";
+        var queries = [];
+        var results = [];
+
+        for(var i in resultArray)
+        {
+          if(resultArray[i][sourceID])
+          {
+            var tmp = await HYLAR_HANDLER.promiseToQueryOnto(headQuery+resultArray[i][sourceID].value+tailQuery);
+
+            for(var j in tmp)
+            {
+              tmp[j][sourceID] = resultArray[i][sourceID];
+              results.push(tmp[j]);
+            }
+          }
+            // queries.push(headQuery+resultArray[i][sourceID].value+tailQuery);
+        }
+
+        // var results = await HYLAR_HANDLER.promiseToQueriesOnto(queries, []);
+        //
+        // for(let j in results)
+        // {
+        //   testRes
+        // }
+        console.log(results);
+        // HYLAR_HANDLER.cascadingQueryOnto(queries, [], [this, this._testCascading]);
+        return results;
+      },
+
+      _testCascading: function(r)
+      {
+        console.log(r);
+      },
+
+
+    });
+  </script>
+</dom-module>

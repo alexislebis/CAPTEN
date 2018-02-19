@@ -35,6 +35,10 @@
 
 <link rel="import" href="import/astrolabe-import.html">
 
+<link rel="import" href="./wrapper/hylar-element.html">
+<link rel="import" href="./ASTROLABE/HyLAR/Element/hylar-onto-importer-element.html">
+
+<link rel="import" href="./ASTROLABE/ZEBRA/view/searching-according-need-element.html">
 
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/iron-pages/iron-pages.html">
@@ -164,6 +168,8 @@
     <!-- <paper-icon-button icon="save" on-click="export"></paper-icon-button> -->
     <capten-loader-element id="loader" hidden vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></capten-loader-element>
 
+    <hylar-onto-importer-element id="ontoLoader" hidden></hylar-onto-importer-element>
+
     <neon-animated-pages selected='{{routeData.topLevel}}'
                      attr-for-selected='name'
                      entry-animation='scale-up-animation'
@@ -181,6 +187,7 @@
       <neon-animatable name="step"><step-creation-page-element route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></step-creation-page-element></neon-animatable>
       <neon-animatable name="analysis"><analysis-creation-page route="{{tailTopLevel}}" nap="{{nap}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></analysis-creation-page></neon-animatable>
       <neon-animatable name="narration"><narrative-creation-page-element route="{{tailTopLevel}}" vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"><narrative-creation-page-element></neon-animatable>
+      <neon-animatable name="needSearch"><searching-according-need-element vocab="{{vocab}}" customcls="{{customcls}}" customprops="{{customprops}}"></searching-according-need-element>
     </neon-animated-pages>
 
     <paper-progress id="progress" disabled="{{progressState}}" indeterminate class="slow blue"></paper-progress>
@@ -476,6 +483,11 @@
       load: function()
       {
         this.$.loader.forcedLoad();
+      },
+
+      loadOntology: function()
+      {
+        this.$.ontoLoader.forcedLoad();
       },
 
       mapIdElementUsedIn: function(searchedArray, map)
