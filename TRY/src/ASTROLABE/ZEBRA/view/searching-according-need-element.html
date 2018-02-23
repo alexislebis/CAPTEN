@@ -122,61 +122,145 @@
         _searchNeed: async function(needTerms)
         {
           console.log("looking for : "+needTerms[0]);
-          //Looking into name elements
-          // query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
-          query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
 
-          // HYLAR_HANDLER.queryOnto(query, [this, this._afterNeedQueries]);
-          var elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
+          var resultOrganizer = [];
+          // = = = Looking into name elements
+            // query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
+            var query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
 
-          var sortedRes = this._sortingByType(elm, "s");
+            // HYLAR_HANDLER.queryOnto(query, [this, this._afterNeedQueries]);
+            var elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
+
+            var sortedRes = await this._sortingByType(elm, "s");
+
+            resultOrganizer[NAME_URI] = elm;
+            resultOrganizer[NAME_URI] = sortedRes[0];
+            resultOrganizer[NAME_URI] = "NAME_WEIGHTING";
+          // = = =
+
+          // = = = SEARCHING INTO OBJECTIVE
+            query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
+
+            elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
+            sortedRes = await this._sortingByType(elm, "s");
+
+            resultOrganizer[OBJECTIVE_URI] = elm;
+            resultOrganizer[OBJECTIVE_URI] = sortedRes[0];
+            resultOrganizer[OBJECTIVE_URI] = "weight";
+          // = = =
+          // = = = SEARCHING INTO GRAPHS
+            // Warning ; consider the case of node reported to a G1 to G2 automatically, the creation step, etc..
+            query = "SELECT * WHERE { ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.CAPTEN.org/SEED/ontologies/RGTE>. ?s <http://www.CAPTEN.org/SEED/ontologies/hasVariable> ?v . ?v <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
+
+            elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
+            sortedRes = await this._sortingByType(elm, "s");
+
+            resultOrganizer[RGTE_URI] = elm;
+            resultOrganizer[RGTE_URI] = sortedRes[0];
+            resultOrganizer[RGTE_URI] = "weigth";
+          // = = =
+
+          // = = = SEARCHING INTO ADDENDUM (using subsumption prop to retrieve any descr.)
+            query = "SELECT * WHERE { ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.CAPTEN.org/SEED/ontologies/Addendum> . ?s <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
+            elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
+            sortedRes = await this._sortingByType(elm, "s");
+
+            resultOrganizer[ADDENDUM_URI] = elm;
+            resultOrganizer[ADDENDUM_URI] = sortedRes[0];
+            resultOrganizer[ADDENDUM_URI] = "weight";
+          // = = =
+
+          // = = = SEARCHING INTO K
+            query = "SELECT * WHERE { ?a <http://www.CAPTEN.org/SEED/ontologies/custom/knowledgeGeneratedBy> ?k . ?k <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
+            elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
+            //No need to sort (the data struc is ok)
+            // sortedRes = await this._sortingByType(elm, )
+
+            resultOrganizer[KNOWLEDGE_URI] = elm;
+            resultOrganizer[KNOWLEDGE_URI] = ["NO NEED TO SORT"];
+            resultOrganizer[KNOWLEDGE_URI] = "weight";
+          // = = =
+
+          console.log(sortedRes);
+          console.log("REMINDER| Improve queries by using similar property. ?x similar ?y. ?s ?p ?o. ?o type ?x OR ?y.");
 
         },
 
         _afterNeedQueries: function(queriesResults)
         {
           console.log(queriesResults);
-          this._sortingByType(queriesResults, "s");
+          // this._sortingByType(queriesResults, "s");
         },
 
       // == == == ==
 
       // sort by looking type. Result array is the result from a querry handled
       //by HYLAR_HANDLER.query and sourceID represent what has to be tested (such as ?source ).
+      //return an array containing two array: one a mapped sorting of result according to sourceID, other the direct results
       _sortingByType: async function(resultArray, sourceID)
       {
-        if(!resultArray || resultArray.length <= 0)
-          return;
-
-        var headQuery = "SELECT ?type WHERE {<";
-        var tailQuery = "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .}";
-        var queries = [];
-        var results = [];
-
-        for(var i in resultArray)
-        {
-          if(resultArray[i][sourceID])
+        return new Promise(
+          async function(resolve, reject)
           {
-            var tmp = await HYLAR_HANDLER.promiseToQueryOnto(headQuery+resultArray[i][sourceID].value+tailQuery);
-
-            for(var j in tmp)
+            if(!resultArray || resultArray.length <= 0)
             {
-              tmp[j][sourceID] = resultArray[i][sourceID];
-              results.push(tmp[j]);
+              let a = []; a.push([]); a.push([]);
+              resolve(a);
             }
-          }
-            // queries.push(headQuery+resultArray[i][sourceID].value+tailQuery);
-        }
 
-        // var results = await HYLAR_HANDLER.promiseToQueriesOnto(queries, []);
-        //
-        // for(let j in results)
-        // {
-        //   testRes
-        // }
-        console.log(results);
-        // HYLAR_HANDLER.cascadingQueryOnto(queries, [], [this, this._testCascading]);
-        return results;
+            var headQuery = "SELECT ?type WHERE {<";
+            var tailQuery = "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .}";
+            var queries = [];
+            var results = [];
+
+            for(var i in resultArray)
+            {
+              if(resultArray[i][sourceID])
+              {
+                var tmp = await HYLAR_HANDLER.promiseToQueryOnto(headQuery+resultArray[i][sourceID].value+tailQuery);
+
+                for(var j in tmp)
+                {
+                  tmp[j][sourceID] = resultArray[i][sourceID];
+                  results.push(tmp[j]);
+                }
+              }
+                // queries.push(headQuery+resultArray[i][sourceID].value+tailQuery);
+            }
+
+            // MAPPING
+            var map = [];
+            for(var i in results)
+            {
+              if(!map[results[i][sourceID].value])
+                map[results[i][sourceID].value] = [];
+
+              for(var j in results[i])
+              {
+                if(results[i][j].value != results[i][sourceID].value)
+                {
+                  //Prevent duplicata during insertion
+                  var alreadyExist = false;
+                  for(var k in map[results[i][sourceID].value])
+                  {
+                    if(map[results[i][sourceID].value][k] == results[i][j].value)
+                      alreadyExist = true;
+
+                    if(alreadyExist)
+                      break;
+                  }
+                  if(!alreadyExist)
+                    map[results[i][sourceID].value].push(results[i][j].value);
+                }
+              }
+            }
+
+            var endResults = []; endResults.push(map); endResults.push(results);
+
+            // HYLAR_HANDLER.cascadingQueryOnto(queries, [], [this, this._testCascading]);
+            resolve(endResults);
+          }
+        )
       },
 
       _testCascading: function(r)
