@@ -425,6 +425,21 @@ NarratedAnalysisProcess.prototype.getN3Ready = function()
     }
     // =
 
+    // = = = KNOWLEDGE
+    var knowledgeToExport = [];
+
+    for(var i in this.steps)
+    {
+      if(this.steps[i].getOutputs())
+      {
+        tmp = this.steps[i].getOutputs().getKnowledges();
+        if(tmp != null && tmp.length > 0)
+          for(var j in tmp)
+            map[this.getN3ID()].push([K_GENERATED_BY_URI, tmp[j]]);
+      }
+    }
+    // = = =
+
   return map;
 }
 
