@@ -422,6 +422,21 @@ NarratedAnalysisProcess.prototype.getN3Ready = function()
       {
         map[this.getN3ID()].push([ORDERED_LIST_URI, this.steps[i]]);
       }
+
+      //COMPUTING PREVIOUS STEP
+      for(var i in this.steps)
+      {
+        for(var j in this.steps)
+        {
+          if(this.steps[i].getInputs() && this.steps[j].getOutputs() && this.steps[j].getOutputs().id == this.steps[i].getInputs().id)
+          {
+            if(!map[this.steps[i].getN3ID()])
+              map[this.steps[i].getN3ID()] = [];
+              
+            map[this.steps[i].getN3ID()].push([HAS_PREVIOUS_STEP, this.steps[j]]);
+          }
+        }
+      }
     }
     // =
 

@@ -95,6 +95,8 @@ var CAPTEN_VOCAB_IRI = CUSTOM_PREFIX_URI;
   var CONTENT_URI                 = CAPTEN_ONTO_IRI+"Content"; //The content of smth, principally of a narrative element
   var HAS_STEPS_URI               = CAPTEN_ONTO_IRI+"hasSteps"; //TODO add in the onto
 
+  var HAS_PREVIOUS_STEP           = CAPTEN_ONTO_IRI+"hasPreviousStep";
+
     var K_GENERATED_BY_URI        = CAPTEN_VOCAB_IRI+"knowledgeGeneratedBy"; // @NEW : ADDEDE ASTROLABE 0.0.3 ONTO
 
   // === NAP PROPS
