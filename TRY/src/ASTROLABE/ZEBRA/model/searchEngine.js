@@ -102,4 +102,7 @@ searchEngine.prototype._sortingByType = async function(resultArray, sourceID)
   )
 }
 
+
+searchEngine.prototype.queryPatternBuilder = new sparqlQueryCommonBehaviorBuilder();
+
 var SEARCH_ENGINE = new searchEngine();
