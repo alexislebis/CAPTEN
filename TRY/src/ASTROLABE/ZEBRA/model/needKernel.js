@@ -33,7 +33,7 @@ needKernel.prototype._searchNeed = async function(needTerms)
       // = = = Looking into name elements
         // query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
         var query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
-
+        
         // HYLAR_HANDLER.queryOnto(query, [this, this._afterNeedQueries]);
         var elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
 
@@ -47,7 +47,7 @@ needKernel.prototype._searchNeed = async function(needTerms)
       // = = =
 
       // = = = SEARCHING INTO OBJECTIVE
-        query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
+        query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasObjective> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
 
         elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
         sortedRes = await SEARCH_ENGINE._sortingByType(elm, "s");
