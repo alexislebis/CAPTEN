@@ -1600,17 +1600,41 @@ _rollbackRemove: function()
           // these lines create a lot of complexity and alter the reasoning. The benefice of
           // taking into account new onto is currently not enough.
           // = UNCOMMENT TO ENRICH ONTO
-            // domainIRI = domain.getIRI();
-            // rangeIRI = range.getIRI();
-            // rangeMap[this.edges[i].getN3ID()] = [];
-            // rangeMap[this.edges[i].getN3ID()].push([DOMAIN_URI, domainIRI]);
-            // rangeMap[this.edges[i].getN3ID()].push([RANGE_URI, rangeIRI]);
+            domainIRI = domain.getIRI();
+            rangeIRI = range.getIRI();
+
+            rangeMap[this.edges[i].getN3ID()] = [];
+            rangeMap[this.edges[i].getN3ID()].push([DOMAIN_URI, domainIRI]);
+            rangeMap[this.edges[i].getN3ID()].push([RANGE_URI, rangeIRI]);
+
+            // = SPECIFIC BEHAVIORS
+              //this.specificBehavior_IS_A(rangeMap,this.edges[i], domain, range);
+
           // = END
-          rangeMap[domain.getN3ID()] = [];
+          if(!rangeMap[domain.getN3ID()])
+            rangeMap[domain.getN3ID()] = [];
           rangeMap[domain.getN3ID()].push([this.edges[i].getN3ID(), range]);
         }
       }
 
       return rangeMap;
+    },
+
+    //Treate specific situation while exporting the onto, mostly to perform an intelligent addition to the ontology
+    specificBehavior_IS_A: function(rangeMap, edge, domain, range)
+    {
+      //If a user state a isA relation, then we have to enrich the onto accordingly
+      if( edge.name === "isA" ||
+          edge.name === "<http://www.CAPTEN.org/SEED/ontologies/custom/isA>" ||
+          edge.label === "isA" ||
+          edge.label === "<http://www.CAPTEN.org/SEED/ontologies/custom/isA>" )
+      {
+
+        rangeMap[edge.getN3ID()].push([EQUIV_PROP_URI, SUBCLASS_URI]);
+
+        return true; //a specific behavior occurs
+      }
+
+      return false;
     },
 };
