@@ -137,6 +137,7 @@ var COMES_FROM_URI          = CAPTEN_ONTO_IRI+"comesFrom";//TODO Subclass of "ht
 var IS_AUTHORED_BY          = CAPTEN_ONTO_IRI+"isAuthoredBy";
 
 // === CUSTOM CLASSES
+  var OPERATION_URI           = CAPTEN_ONTO_IRI+"NarratedOperation";
   // === OPERATOR CLS
   var OPERATOR_URI            = CAPTEN_ONTO_IRI+"NarratedOperator";
   var IMPLEMENTED_OPERATOR_URI= CAPTEN_ONTO_IRI+"ImplementedOperator";
