@@ -326,9 +326,9 @@ NarratedOperator.prototype.constructor = NarratedOperator;
       {
         //If behaviors exist & exist in the pool, mean that it is not a default rgte
         // which is useless. An opti can be to remove the check of each pool
-        if(this.behaviors['input'] && RGTE_POOL.getByID(this.behaviors['input']))
+        if(this.behaviors['input'] && RGTE_POOL.getByID(this.behaviors['input'].id))
           map[this.getN3ID()].push([HAS_INPUT_BEHAVIOUR_URI, this.behaviors['input']]);
-        if(this.behaviors['output'] && RGTE_POOL.getByID(this.behaviors['output']))
+        if(this.behaviors['output'] && RGTE_POOL.getByID(this.behaviors['output'].id))
           map[this.getN3ID()].push([HAS_OUTPUT_BEHAVIOUR_URI, this.behaviors['output']]);
 
         for(var i in this.behaviors['parameters'])
