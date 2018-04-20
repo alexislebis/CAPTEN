@@ -51,7 +51,9 @@
     <paper-button raised on-click="_startSearch">Let's match</paper-button>
 
     <h3>Result display</h3>
-      <p>new components designed to handle result</p>
+      <div id="result">
+
+      </div>
   </template>
   <script>
     Polymer({
@@ -107,7 +109,12 @@
           mapDimTerms["need"] = this.need.getSpecialElements();
         }
 
-        SEARCH_ENGINE.execute(mapDimTerms);
+        SEARCH_ENGINE.execute(mapDimTerms).then(
+          function(resolve)
+          {
+            this._updateHTML(resolve);
+          }.bind(this)
+        );
 
         // if(!HYLAR_HANDLER.isReady())
         //   return;
@@ -118,6 +125,175 @@
         // }
         //
         // var result = this._defaultSearchBehavior(mapDimTerms);
+      },
+
+      _updateHTML: function(resultOfParentRelevancy)
+      {
+        var html = "<ul>";
+        var tmpHtml = "";
+        var otherReason = false;
+
+        for(var id in resultOfParentRelevancy)
+        {
+          tmpHtml = "";
+          // if(resultOfParentRelevancy[id].type == ANALYSIS_URI)
+          // {
+            tmpHtml += id +"(a "+resultOfParentRelevancy[id].type+") can be a solution because it solves exactly "+this._howManyTokensAnswered(resultOfParentRelevancy[id]).nb+" tokens ("+this._howManyTokensAnswered(resultOfParentRelevancy[id]).tokensID+") of your described need. ";
+            tmpHtml += "<ul>";
+            for(var token in resultOfParentRelevancy[id])
+            {
+              if(token != "nbTokenAnswered" && token != "type")
+              {
+                tmpHtml += "<li>The token ("+token+") has been found:"
+                if(resultOfParentRelevancy[id][token]["perfectMatching"])
+                {
+                  tmpHtml += "<ul>";
+                  for(var symbol in resultOfParentRelevancy[id][token]["perfectMatching"])
+                  {
+                    tmpHtml += "<li>";
+                    if(symbol == "S")
+                      tmpHtml += this._constructHtmlOfStep(resultOfParentRelevancy, resultOfParentRelevancy[id][token]["perfectMatching"][symbol], token, "perfectMatching");
+                    else
+                    {
+                      for(var element in resultOfParentRelevancy[id][token]["perfectMatching"][symbol])
+                      {
+                        if(otherReason)
+                          tmpHtml += ", but also ";
+
+                        tmpHtml += " in the "+this._symbolTrad(symbol)+" of "+id+" via "+resultOfParentRelevancy[id][token]["perfectMatching"][symbol][element].current;
+                        otherReason = true;
+                      }
+                    }
+
+                    otherReason = false;
+                    tmpHtml += "</li>";
+                  }
+                  tmpHtml += "</ul>";
+                }
+                // tmpHtml += "The token (0) has been found in the (knowledge) of "+id+"(, but also in its (name))".
+                // tmpHtml += "The token 2 has been found in the (step) of "+id+", because in it, one graph contains the token".
+                tmpHtml += "</li>";
+              }
+            }
+
+            tmpHtml += "</ul>";
+            html += "<li>"+tmpHtml+"</li>"; //TODO a décaler pour boucler sur les autres éléments
+          // }
+
+
+        }
+
+        html += "</ul>";
+        var div = document.createElement('div');
+        div.innerHTML = html;
+        this.$$('#result').appendChild(div);
+        // return html;
+      },
+
+      _symbolTrad: function(symbol)
+      {
+        switch (symbol) {
+          case "K":
+            return "knowledge";
+          case "O":
+            return "objective";
+          case "N":
+            return "name";
+          case "A":
+            return "addendum";
+          case "G":
+            return "graph of concept";
+          case "B":
+            return "behaviour of the operation";
+          default:
+            return "unknown element";
+        }
+      },
+
+      _constructHtmlOfStep : function(parents, stepCurrent, token, matching)
+      {
+        var tmpHtml = " in the steps: <ul>";
+        var parent;
+        var otherReason = false;
+
+        for(var stepID in stepCurrent)
+        {
+          tmpHtml += "<li>"+stepCurrent[stepID].current+" because in it:<ul>";
+
+          parent = parents[stepCurrent[stepID].current];
+
+          if(parent)
+          {
+            for(var token in parent)
+            {
+              if(token != "nbTokenAnswered" && token != "type")
+              {
+                tmpHtml += "<li>the token ("+token+") has been found:"
+                if(parent[token]["perfectMatching"])
+                {
+                  tmpHtml += "<ul>";
+                  for(var symbol in parent[token]["perfectMatching"])
+                  {
+                    tmpHtml += "<li>";
+                    for(var element in parent[token]["perfectMatching"][symbol])
+                    {
+                      if(otherReason)
+                        tmpHtml += ", but also ";
+
+                      tmpHtml += " in the "+this._symbolTrad(symbol)+" of "+stepCurrent[stepID].current+" via "+parent[token]["perfectMatching"][symbol][element].current;
+                      otherReason = true;
+                    }
+                    otherReason = false;
+                    tmpHtml += "</li>";
+                  }
+                  tmpHtml += "</ul>";
+                }
+                // tmpHtml += "The token (0) has been found in the (knowledge) of "+id+"(, but also in its (name))".
+                // tmpHtml += "The token 2 has been found in the (step) of "+id+", because in it, one graph contains the token".
+                tmpHtml += "</li>";
+              }
+            }
+          }
+
+          tmpHtml += "</ul></li>";
+
+          // for(var cur in stepCurrent[stepID])
+          // {
+          //     tmpHtml += "The token ("+token+") has been found"
+          //     if(stepCurrent[stepID][token][matching])
+          //     {
+          //       for(var symbol in stepCurrent[stepID][token][matching])
+          //       {
+          //         for(var element in stepCurrent[stepID][token][matching][symbol])
+          //         {
+          //           if(otherReason)
+          //             tmpHtml += ", but also ";
+          //
+          //           tmpHtml += "in the "+symbol+" of "+id+" via "+stepCurrent[stepID][token][matching][symbol][element].current;
+          //         }
+          //       }
+          //     }
+          }
+
+          tmpHtml+= "</ul>";
+
+        return tmpHtml
+      },
+
+      _howManyTokensAnswered : function(aParent)
+      {
+        var list = {nb:0, tokens: [], tokensID: []};
+        for(var i in aParent)
+        {
+          if(i != "type" && i != "nbTokenAnswered")
+          {
+            list.nb++;
+            list.tokens.push(aParent[i].token);
+            list.tokensID.push(aParent[i].token.token.id);
+          }
+        }
+
+        return list;
       },
 
       // _defaultSearchBehavior: function(mapDimTerms)

@@ -432,7 +432,7 @@ NarratedAnalysisProcess.prototype.getN3Ready = function()
           {
             if(!map[this.steps[i].getN3ID()])
               map[this.steps[i].getN3ID()] = [];
-              
+
             map[this.steps[i].getN3ID()].push([HAS_PREVIOUS_STEP, this.steps[j]]);
           }
         }
@@ -449,8 +449,13 @@ NarratedAnalysisProcess.prototype.getN3Ready = function()
       {
         tmp = this.steps[i].getOutputs().getKnowledges();
         if(tmp != null && tmp.length > 0)
+        {
+          if(!map[this.steps[i].getOutputs().getN3ID()])
+            map[this.steps[i].getOutputs().getN3ID()] = [];
+          map[this.steps[i].getOutputs().getN3ID()].push([TYPE_URI, KNOWLEDGE_URI]);
           for(var j in tmp)
             map[this.getN3ID()].push([K_GENERATED_BY_URI, tmp[j]]);
+        }
       }
     }
     // = = =

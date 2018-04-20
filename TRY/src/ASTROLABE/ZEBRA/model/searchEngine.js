@@ -11,7 +11,7 @@ searchEngine.prototype.execute = function(dimensions)
   return new Promise(
     async function(resolve, reject)
     {
-
+      console.error("Important info: OWL:equivalentProperty not handled currently");
       if(this.mutex)
         return;
 
@@ -22,13 +22,15 @@ searchEngine.prototype.execute = function(dimensions)
 
       this.dimensions = dimensions;
 
+      var needRes;
+
       //Below all access is mutexed. No double call can be made
       if(this.dimensions && this.dimensions['need'])
-        this.NEED.search(this.dimensions['need']);
+        needRes = this.NEED.search(this.dimensions['need']);
 
       this.mutex = false;
 
-      resolve("OWARI~~");//TODO remplace avec data
+      resolve(needRes);//TODO remplace avec data
     }.bind(this)
   );
 }
@@ -102,7 +104,175 @@ searchEngine.prototype._sortingByType = async function(resultArray, sourceID)
   )
 }
 
+// === SEARCH
+  //token is either a term or a prop
+  //iif a relation (i.e. property). range determine which patterns should be executed
+  searchEngine.prototype._searchKernel = async function(elmtSearched, token, range)
+  {
+    return new Promise(
+      async function(resolve, reject)
+      {
+        var res = [];
+
+        if(!elmtSearched)
+        { console.error("unknown element"); resolve(res);}
+        if(!token)
+        { console.error("token is null"); resolve(res);}
+
+        var specificOntologicalDeferencerFunc = null;
+
+        switch (elmtSearched) {
+          case OBJECTIVE_URI:
+            specificOntologicalDeferencerFunc = SEARCH_ENGINE.ontologicalDeferencing.objective;
+            break;
+          case NAME_URI:
+            specificOntologicalDeferencerFunc = SEARCH_ENGINE.ontologicalDeferencing.name;
+            break;
+          case RGTE_URI:
+            specificOntologicalDeferencerFunc = SEARCH_ENGINE.ontologicalDeferencing.graph;
+            break;
+          case ADDENDUM_URI:
+            specificOntologicalDeferencerFunc = SEARCH_ENGINE.ontologicalDeferencing.addendum;
+            break;
+          case KNOWLEDGE_URI:
+            specificOntologicalDeferencerFunc = SEARCH_ENGINE.ontologicalDeferencing.knowledge;
+            break;
+          case K_GENERATED_BY_URI:
+            specificOntologicalDeferencerFunc = SEARCH_ENGINE.ontologicalDeferencing.generatedKnowledge;
+            break;
+          case OUTPUT_PATTERN_URI:
+            specificOntologicalDeferencerFunc = SEARCH_ENGINE.ontologicalDeferencing.outputPattern;
+            break;
+          default:
+            console.error("unknown element");
+            resolve(res);
+        }
+
+        if(token instanceof CAPTENClass)
+        {
+          var query = SEARCH_ENGINE.queryPatternBuilder.term.perfectMatching(token.getIRI(), "x", specificOntologicalDeferencerFunc.termReady());
+          var tmp = await HYLAR_HANDLER.promiseToQueryOnto(query);
+          res.push({set: "term", pattern: "perfectMatching", query: query, answer: tmp, symbols: specificOntologicalDeferencerFunc.getCorrespondance()});
+        }
+        else if(token instanceof Property)
+        {
+          var query;
+          var tmp;
+          var specificBuilderPattern;
+          var pattern;
+
+          // == checking if range exist
+          if(!range || range.length == 0)
+            {range = []; range.push(0);}
+
+          for(var i = 0; i < range.length; i++)
+          {
+            switch (range[i]) {
+              case 0://Perfect matching
+                specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.perfectMatching;
+                pattern = "perfectMatching";
+                break;
+              case 1:
+                specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.prefixMatching;
+                pattern = "prefixMatching";
+                break;
+              case 2:
+                specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.reversePrefixMatching;
+                pattern = "reversePrefixMatching";
+                break;
+              case 3:
+                specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.sufixMatching;
+                pattern = "sufixMatching";
+                break;
+              case 4:
+                specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.reverseSufixMatching;
+                pattern = "reverseSufixMatching";
+                break;
+              case 5:
+                specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.looseMatching;
+                pattern = "looseMatching";
+                break;
+              case 6:
+                specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.doubleTermMatching;
+                pattern = "doubleTermMatching";
+                break;
+              case 7:
+                specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.monoPrefixMatching;
+                pattern = "monoPrefixMatching";
+                break;
+              case 8:
+                specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.monoSufixMatching;
+                pattern = "monoSufixMatching";
+                break;
+              default:
+                console.error("range unknown, aborting the whole procedure");
+                resolve(res);
+            }
+
+            query = specificBuilderPattern(token.getURI(), token.from, token.to, "x", "y", specificOntologicalDeferencerFunc.relationReady());
+            tmp = await HYLAR_HANDLER.promiseToQueryOnto(query);
+            res.push({set: "relation", pattern: pattern, query: query, answer: tmp, symbols: specificOntologicalDeferencerFunc.getCorrespondance()});
+          }
+        }
+        else
+        {
+          console.error("unrecognized token");
+          resolve(res);
+        }
+        resolve(res);
+      });
+  }
+
+  searchEngine.prototype.computeScore = function(toDEFINE)
+  {
+    //For each dimension
+    /*
+    *  for each token
+    *    getMatrix
+    *    getTokenPonderation
+    *    getMatrixPonderationDimension
+    */
+  }
+
+  searchEngine.prototype.searchObjective = function(token, range)
+  {
+    return this._searchKernel(OBJECTIVE_URI, token, range);
+  }
+
+  searchEngine.prototype.searchName = function(token, range)
+  {
+    return this._searchKernel(NAME_URI, token, range);
+  }
+
+  searchEngine.prototype.searchRgte = function(token, range)
+  {
+    return this._searchKernel(RGTE_URI, token, range);
+  }
+
+  searchEngine.prototype.searchAddendum = function(token, range)
+  {
+    return this._searchKernel(ADDENDUM_URI, token,range);
+  }
+
+  searchEngine.prototype.searchKnowledge = function(token, range)
+  {
+    return this._searchKernel(KNOWLEDGE_URI, token, range);
+  }
+
+  searchEngine.prototype.searchOnlyProducedKnowledge = function(token, range)
+  {
+    return this._searchKernel(K_GENERATED_BY_URI, token, range);
+  }
+
+  searchEngine.prototype.searchOutputBehavior = function(token, range)
+  {
+    return this._searchKernel(OUTPUT_PATTERN_URI, token, range);
+  }
+
+// === RGTE Search
+
 
 searchEngine.prototype.queryPatternBuilder = new sparqlQueryCommonBehaviorBuilder();
+searchEngine.prototype.ontologicalDeferencing = new ontologicalDeferencing();
 
 var SEARCH_ENGINE = new searchEngine();
