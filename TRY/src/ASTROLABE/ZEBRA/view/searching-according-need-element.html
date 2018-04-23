@@ -132,6 +132,8 @@
         var html = "<ul>";
         var tmpHtml = "";
         var otherReason = false;
+        var analysisHTML = "";
+        var otherHTML = "";
 
         for(var id in resultOfParentRelevancy)
         {
@@ -177,13 +179,17 @@
             }
 
             tmpHtml += "</ul>";
-            html += "<li>"+tmpHtml+"</li>"; //TODO a décaler pour boucler sur les autres éléments
+
+            if(resultOfParentRelevancy[id].type == ANALYSIS_URI)
+              analysisHTML += "<li>"+tmpHtml+"</li>";
+            else
+              otherHTML += "<li>"+tmpHtml+"</li>";
           // }
 
 
         }
 
-        html += "</ul>";
+        html += "<h4>ANALYSIS</h4>"+ analysisHTML +"<h4>OTHER ELEMENTS</h4>"+ otherHTML + "</ul>";
         var div = document.createElement('div');
         div.innerHTML = html;
         this.$$('#result').appendChild(div);
