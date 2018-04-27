@@ -1,6 +1,8 @@
 // SEARCH KERNEL (like this one) should not be called alone, but always with
 // a searchEngine call.
 
+// needKernel STAND FOR Objetive kernel after name revision of v0.0.4
+
 function needKernel()
 {
   this.currentNeed = null;//extstring ?
@@ -27,32 +29,24 @@ needKernel.prototype._searchNeed2 = async function(need)
   return new Promise(
     async function(resolve, reject)
     {
+      // ===============================================================
+      // ==================         TEST        ========================
+      // ===============================================================
       // var rel1 = new Property();
       // rel1.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/writing";
       // rel1.from = "http://www.CAPTEN.org/SEED/ontologies/custom/Etudiant";
       // rel1.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Exercice";
-      var cl = new CAPTENClass();
-      cl.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/Etudiant";
-      console.log("==TEST");
-      console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { <http://www.CAPTEN.org/SEED/identifier/#55883> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?t .}"));
-      console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { <http://www.CAPTEN.org/SEED/identifier/#88888> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?t .}"));
-      console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { <http://www.CAPTEN.org/SEED/identifier/#49885> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?t .}"));
-      console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasObjective> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?x . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?y . ?x <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.CAPTEN.org/SEED/ontologies/NarratedAnalysisProcess> .}"));
-      console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasObjective> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?x . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?y . ?x <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.CAPTEN.org/SEED/ontologies/NarratedAnalysisProcess> . ?y <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.CAPTEN.org/SEED/ontologies/custom/Apprenant> .}"));
-      console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { ?x <http://www.CAPTEN.org/SEED/ontologies/custom/classify> ?t .}"));
-      console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { ?x <http://www.CAPTEN.org/SEED/ontologies/custom/categorise> ?t .}"));
+
+      // console.log("==TEST");
+      // console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { <http://www.CAPTEN.org/SEED/identifier/#55883> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?t .}"));
+      // console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { <http://www.CAPTEN.org/SEED/identifier/#88888> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?t .}"));
+      // console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { <http://www.CAPTEN.org/SEED/identifier/#49885> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?t .}"));
+      // console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasObjective> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?x . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?y . ?x <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.CAPTEN.org/SEED/ontologies/NarratedAnalysisProcess> .}"));
+      // console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasObjective> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?x . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?y . ?x <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.CAPTEN.org/SEED/ontologies/NarratedAnalysisProcess> . ?y <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.CAPTEN.org/SEED/ontologies/custom/Apprenant> .}"));
+      // console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { ?x <http://www.CAPTEN.org/SEED/ontologies/custom/classify> ?t .}"));
+      // console.log(await HYLAR_HANDLER.promiseToQueryOnto("SELECT * WHERE { ?x <http://www.CAPTEN.org/SEED/ontologies/custom/categorise> ?t .}"));
 
 
-      var rel2 = new Property();
-      rel2.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/categorise";
-      rel2.from = ANALYSIS_URI;
-      rel2.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Apprenant";
-
-      need = [];
-      need.push(cl);
-      need.push(rel2);
-      // need.push(cl);
-      console.log("==END TEST");
 
       if(!need)
         return null;
@@ -86,12 +80,13 @@ needKernel.prototype._searchNeed2 = async function(need)
       console.log("Querying onto for each token...");
       for(var i = 0; i < need.length; i++)
       {
+        console.log("TOKEN:"+i);
         token = need[i];
         res[i] = [{token: token}];
         console.log("INFORMATION: Only perfect search for the moment");
-        res[i]["K"] = await SEARCH_ENGINE.searchKnowledge(need[i]);//, [0,1,5]));
+        res[i]["K"] = await SEARCH_ENGINE.searchKnowledge(need[i]);//, [0,3]);//, [0,1,5]));
         res[i]["O"] = await SEARCH_ENGINE.searchObjective(need[i]);//, [0,1,5]));
-        res[i]["N"] = await SEARCH_ENGINE.searchName(need[i]);//, [0,1,5]));
+        res[i]["N"] = await SEARCH_ENGINE.searchName(need[i]);//, [0,3]);//, [0,1,5]));
         res[i]["B"] = await SEARCH_ENGINE.searchOutputBehavior(need[i]);//, [0,1,5]));
         res[i]["A"] = await SEARCH_ENGINE.searchAddendum(need[i]);//, [0,1,5]));
         res[i]["G"] = await SEARCH_ENGINE.searchRgte(need[i]);//, [0,1,5]));

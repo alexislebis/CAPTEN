@@ -1,4 +1,6 @@
 <link rel="import" href="../../../import/zebra-import.html">
+<!-- <link rel="import" href="../../../../../bower_components/iron-data-table/iron-data-table.html"> -->
+<link rel="import" href="../../../../../bower_components/brainy-table/brainy-table.html">
 
 <dom-module id="searching-according-need-element">
   <template>
@@ -54,6 +56,36 @@
       <div id="result">
 
       </div>
+
+        <!-- <iron-data-table items="[[resultArray]]">
+          <data-table-column name="Token Answered" sort-by="item.nbTokenAns">
+            <template>
+              [[item.nbTokenAns]]/[[nbMaxToken]]
+            </template>
+          </data-table-column>
+          <data-table-column name="ID">
+            <template>[[item.id]]</template>
+          </data-table-column>
+          <data-table-column name="Type" filter-by="item.type">
+            <template>[[item.type]]</template>
+          </data-table-column>
+        </iron-data-table> -->
+
+      <!-- <template id="bTable" is="dom-bind" result-array="{{resultArray}}" max-token="{{nbMaxToken}}"> -->
+        <brainy-table id="a" items="[[resultArray]]" page-size="7" details-enabled>
+          <brainy-table-column name="Token Answered" filter-by="nbTokenAns" sort-by="nbTokenAns">
+            <template>[[item.nbTokenAns]]</template>
+          </brainy-table-column>
+          <brainy-table-column name="ID" filter-by="id" sort-by="id">
+            <template>[[item.id]]</template>
+          </brainy-table-column>
+          <brainy-table-column name="Type" filter-by="type" sort-by="type">
+            <template>[[item.type]]</template>
+          </brainy-table-column>
+          <div no-results>No results found. Click here</div>
+        </brainy-table>
+      <!-- </template> -->
+
   </template>
   <script>
     Polymer({
@@ -92,13 +124,29 @@
         {
           type: Object,//ExtendedString
           notify: true,
+        },
+        resultArray:
+        {
+          type: Array,
+          notify: true,
+        },
+        nbMaxToken:
+        {
+          type: Number,
+          notify: true,
+          value: 0,
         }
       },
 
       observers:
       [
-
+        "_onChangedResultArray(resultArray)"
       ],
+
+      _onChangedResultArray: function(rA)
+      {
+        console.log("Changed"+this.resultArray);
+      },
 
 
       _startSearch: function()
@@ -129,11 +177,15 @@
 
       _updateHTML: function(resultOfParentRelevancy)
       {
-        var html = "<ul>";
+        var html = SEARCH_ENGINE.TMP_SIMILARITY_INFO_REDO + "<ul>";
         var tmpHtml = "";
         var otherReason = false;
         var analysisHTML = "";
         var otherHTML = "";
+        var tmpNbToken = 0;
+
+        this._resetResultArray();
+        this.nbMaxToken = 0;
 
         for(var id in resultOfParentRelevancy)
         {
@@ -142,41 +194,52 @@
           // {
             tmpHtml += id +"(a "+resultOfParentRelevancy[id].type+") can be a solution because it solves exactly "+this._howManyTokensAnswered(resultOfParentRelevancy[id]).nb+" tokens ("+this._howManyTokensAnswered(resultOfParentRelevancy[id]).tokensID+") of your described need. ";
             tmpHtml += "<ul>";
+
+            tmpNbToken = 0;
             for(var token in resultOfParentRelevancy[id])
             {
               if(token != "nbTokenAnswered" && token != "type")
               {
+                tmpNbToken++;
+                this.nbMaxToken++;
+
                 tmpHtml += "<li>The token ("+token+") has been found:"
-                if(resultOfParentRelevancy[id][token]["perfectMatching"])
+                for(var typeMatching in resultOfParentRelevancy[id][token])
                 {
-                  tmpHtml += "<ul>";
-                  for(var symbol in resultOfParentRelevancy[id][token]["perfectMatching"])
+                  if(typeMatching != "token")
                   {
-                    tmpHtml += "<li>";
-                    if(symbol == "S")
-                      tmpHtml += this._constructHtmlOfStep(resultOfParentRelevancy, resultOfParentRelevancy[id][token]["perfectMatching"][symbol], token, "perfectMatching");
-                    else
+                    tmpHtml += '<p>With a '+typeMatching+' matching:</p>';
+                    tmpHtml += "<ul>";
+                    for(var symbol in resultOfParentRelevancy[id][token][typeMatching])
                     {
-                      for(var element in resultOfParentRelevancy[id][token]["perfectMatching"][symbol])
+                      tmpHtml += "<li>";
+                      if(symbol == "S")
+                        tmpHtml += this._constructHtmlOfStep(resultOfParentRelevancy, resultOfParentRelevancy[id][token][typeMatching][symbol], token, typeMatching);
+                      else
                       {
-                        if(otherReason)
-                          tmpHtml += ", but also ";
+                        for(var element in resultOfParentRelevancy[id][token][typeMatching][symbol])
+                        {
+                          if(otherReason)
+                            tmpHtml += ", but also ";
 
-                        tmpHtml += " in the "+this._symbolTrad(symbol)+" of "+id+" via "+resultOfParentRelevancy[id][token]["perfectMatching"][symbol][element].current;
-                        otherReason = true;
+                          tmpHtml += " in the "+this._symbolTrad(symbol)+" of "+id+" via "+resultOfParentRelevancy[id][token][typeMatching][symbol][element].current;
+                          otherReason = true;
+                        }
                       }
-                    }
 
-                    otherReason = false;
-                    tmpHtml += "</li>";
+                      otherReason = false;
+                      tmpHtml += "</li>";
+                    }
+                    tmpHtml += "</ul>";
                   }
-                  tmpHtml += "</ul>";
                 }
                 // tmpHtml += "The token (0) has been found in the (knowledge) of "+id+"(, but also in its (name))".
                 // tmpHtml += "The token 2 has been found in the (step) of "+id+", because in it, one graph contains the token".
                 tmpHtml += "</li>";
               }
             }
+
+            this._updateResultArray(tmpNbToken, id, resultOfParentRelevancy[id].type);
 
             tmpHtml += "</ul>";
 
@@ -194,6 +257,18 @@
         div.innerHTML = html;
         this.$$('#result').appendChild(div);
         // return html;
+      },
+
+      _resetResultArray: function()
+      {
+        this.resultArray = [];
+      },
+      _updateResultArray: function(nbToken, id, type)
+      {
+        this.push('resultArray', {"nbTokenAns"  : nbToken, "id": id.split("#")[1], "type": type.split("/")[type.split("/").length-1]});
+        // var arr = this.resultArray;
+        // this.resultArray = [];
+        // this.resultArray = arr;
       },
 
       _symbolTrad: function(symbol)
@@ -235,18 +310,18 @@
               if(token != "nbTokenAnswered" && token != "type")
               {
                 tmpHtml += "<li>the token ("+token+") has been found:"
-                if(parent[token]["perfectMatching"])
+                if(parent[token][matching])
                 {
                   tmpHtml += "<ul>";
-                  for(var symbol in parent[token]["perfectMatching"])
+                  for(var symbol in parent[token][matching])
                   {
                     tmpHtml += "<li>";
-                    for(var element in parent[token]["perfectMatching"][symbol])
+                    for(var element in parent[token][matching][symbol])
                     {
                       if(otherReason)
                         tmpHtml += ", but also ";
 
-                      tmpHtml += " in the "+this._symbolTrad(symbol)+" of "+stepCurrent[stepID].current+" via "+parent[token]["perfectMatching"][symbol][element].current;
+                      tmpHtml += " in the "+this._symbolTrad(symbol)+" of "+stepCurrent[stepID].current+" via "+parent[token][matching][symbol][element].current;
                       otherReason = true;
                     }
                     otherReason = false;
