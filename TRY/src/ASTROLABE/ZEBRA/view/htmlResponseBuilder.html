@@ -1,0 +1,214 @@
+<dom-module id="html-response-builder">
+  <template>
+    <style>
+
+    </style>
+
+    <div id="resultDetail">
+
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: "html-response-builder",
+
+      properties:
+      {
+        item:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        parent:
+        {
+          type: Object,
+          notify: true,
+        }
+
+      },
+
+      attached: function()
+      {
+        if(this.item)
+          this._updateHTMLForOneID(this.item.trueID);
+      },
+
+      _updateHTMLForOneID: function(id)
+      {
+        var html = SEARCH_ENGINE.TMP_SIMILARITY_INFO_REDO + "<ul>";
+        var tmpHtml = "";
+        var otherReason = false;
+        var analysisHTML = "";
+        var otherHTML = "";
+        var tmpNbToken = 0;
+
+        if(this.parent[id])
+        {
+          tmpHtml = "";
+          // if(parent[id].type == ANALYSIS_URI)
+          // {
+            tmpHtml += id +"(a "+this.parent[id].type+") can be a solution because it solves exactly "+this._howManyTokensAnswered(this.parent[id]).nb+" tokens ("+this._howManyTokensAnswered(this.parent[id]).tokensID+") of your described need. ";
+            tmpHtml += "<ul>";
+
+            tmpNbToken = 0;
+            for(var token in this.parent[id])
+            {
+              if(token != "nbTokenAnswered" && token != "type")
+              {
+                tmpNbToken++;
+
+                tmpHtml += "<li>The token ("+token+") has been found:"
+                for(var typeMatching in this.parent[id][token])
+                {
+                  if(typeMatching != "token")
+                  {
+                    tmpHtml += '<p>With a '+typeMatching+' matching:</p>';
+                    tmpHtml += "<ul>";
+                    for(var symbol in this.parent[id][token][typeMatching])
+                    {
+                      tmpHtml += "<li>";
+                      if(symbol == "S")
+                        tmpHtml += this._constructHtmlOfStep(this.parent, this.parent[id][token][typeMatching][symbol], token, typeMatching);
+                      else
+                      {
+                        for(var element in this.parent[id][token][typeMatching][symbol])
+                        {
+                          if(otherReason)
+                            tmpHtml += ", but also ";
+
+                          tmpHtml += " in the "+this._symbolTrad(symbol)+" of "+id+" via "+this.parent[id][token][typeMatching][symbol][element].current;
+                          otherReason = true;
+                        }
+                      }
+
+                      otherReason = false;
+                      tmpHtml += "</li>";
+                    }
+                    tmpHtml += "</ul>";
+                  }
+                }
+                // tmpHtml += "The token (0) has been found in the (knowledge) of "+id+"(, but also in its (name))".
+                // tmpHtml += "The token 2 has been found in the (step) of "+id+", because in it, one graph contains the token".
+                tmpHtml += "</li>";
+              }
+            }
+
+            tmpHtml += "</ul>";
+
+            if(this.parent[id].type == ANALYSIS_URI)
+              analysisHTML += "<li>"+tmpHtml+"</li>";
+            else
+              otherHTML += "<li>"+tmpHtml+"</li>";
+        }
+
+          html += "<h4>ANALYSIS</h4>"+ analysisHTML +"<h4>OTHER ELEMENTS</h4>"+ otherHTML + "</ul>";
+          var div = document.createElement('div');
+          div.innerHTML = html;
+          this._resetResultDetail();
+          this.$$("#resultDetail").appendChild(div);
+      },
+
+      _resetResultDetail:function()
+      {
+        var myNode = this.$$("#resultDetail");
+
+        if(myNode)
+          while (myNode.firstChild)
+              myNode.removeChild(myNode.firstChild);
+      },
+
+
+      _howManyTokensAnswered : function(aParent)
+      {
+        var list = {nb:0, tokens: [], tokensID: []};
+        for(var i in aParent)
+        {
+          if(i != "type" && i != "nbTokenAnswered")
+          {
+            list.nb++;
+            list.tokens.push(aParent[i].token);
+            list.tokensID.push(aParent[i].token.token.id);
+          }
+        }
+
+        return list;
+      },
+
+      _constructHtmlOfStep : function(parents, stepCurrent, token, matching)
+      {
+        var tmpHtml = " in the steps: <ul>";
+        var parent;
+        var otherReason = false;
+
+        for(var stepID in stepCurrent)
+        {
+          tmpHtml += "<li>"+stepCurrent[stepID].current+" because in it:<ul>";
+
+          parent = parents[stepCurrent[stepID].current];
+
+          if(parent)
+          {
+            for(var token in parent)
+            {
+              if(token != "nbTokenAnswered" && token != "type")
+              {
+                tmpHtml += "<li>the token ("+token+") has been found:"
+                if(parent[token][matching])
+                {
+                  tmpHtml += "<ul>";
+                  for(var symbol in parent[token][matching])
+                  {
+                    tmpHtml += "<li>";
+                    for(var element in parent[token][matching][symbol])
+                    {
+                      if(otherReason)
+                        tmpHtml += ", but also ";
+
+                      tmpHtml += " in the "+this._symbolTrad(symbol)+" of "+stepCurrent[stepID].current+" via "+parent[token][matching][symbol][element].current;
+                      otherReason = true;
+                    }
+                    otherReason = false;
+                    tmpHtml += "</li>";
+                  }
+                  tmpHtml += "</ul>";
+                }
+                // tmpHtml += "The token (0) has been found in the (knowledge) of "+id+"(, but also in its (name))".
+                // tmpHtml += "The token 2 has been found in the (step) of "+id+", because in it, one graph contains the token".
+                tmpHtml += "</li>";
+              }
+            }
+          }
+
+          tmpHtml += "</ul></li>";
+
+          }
+
+          tmpHtml+= "</ul>";
+
+        return tmpHtml
+      },
+
+      _symbolTrad: function(symbol)
+      {
+        switch (symbol) {
+          case "K":
+            return "knowledge";
+          case "O":
+            return "objective";
+          case "N":
+            return "name";
+          case "A":
+            return "addendum";
+          case "G":
+            return "graph of concept";
+          case "B":
+            return "behaviour of the operation";
+          default:
+            return "unknown element";
+        }
+      },
+
+    });
+  </script>
+</dom-module>

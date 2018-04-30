@@ -22,7 +22,7 @@ searchEngine.prototype.execute = function(dimensions)
 
       this.dimensions = dimensions;
 
-      var needRes;
+      var needRes = [];
 
       // ===============================================================
       // ==================         TEST        ========================
@@ -86,9 +86,11 @@ searchEngine.prototype.execute = function(dimensions)
 
       //Below all access is mutexed. No double call can be made
       if(this.dimensions && this.dimensions['need'])
-        needRes = this.NEED.search(this.dimensions['need']);
-
-
+      {
+        needRes['dimensions'] = []; needRes['dimensions']['objective'] = [];
+        needRes['dimensions']['objective']['result'] = await this.NEED.search(this.dimensions['need']);
+        needRes['dimensions']['objective']['tokens'] = this.dimensions['need'];
+      }
 
       // == END OF MUTEX
       this.mutex = false;

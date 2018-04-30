@@ -1,0 +1,151 @@
+<link rel="import" href="../../../../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../../../../../bower_components/paper-toggle-button/paper-toggle-button.html">
+
+<dom-module id="tokens-displayer">
+  <template>
+    <style>
+
+    </style>
+
+    <div id="dimension">
+      <ul>
+        <paper-toggle-button id="togglePrio" checked="{{isPrio}}" >Token priority option</paper-toggle-button>
+        <paper-toggle-button id="toggleRelax" checked="{{isRelax}}">Token matching option</paper-toggle-button>
+
+        <em>Tokens:</em>
+        <template is="dom-repeat" id="menu" items="{{dimension.tokens}}">
+          <li>
+            <template is="dom-if" if="{{isPrio}}">
+              <paper-dropdown-menu label="Token Priority" name="tokenPrio" required on-iron-select="_prioSelected">
+                  <paper-menu class="dropdown-content" id="tokenPrio" item="{{item}}" selected="2">
+                      <paper-item value="4">Very High</paper-item>
+                      <paper-item value="3">High</paper-item>
+                      <paper-item selected value="2">Normal</paper-item>
+                      <paper-item value="1">Low</paper-item>
+                      <paper-item value="0">Very Low</paper-item>
+                  </paper-menu>
+              </paper-dropdown-menu>
+            </template>
+
+            {{_displayToken(item)}}
+
+
+              <!-- <paper-dropdown-menu label="tokenRelax" name="tokenRelax" required>
+                  <paper-menu class="dropdown-content" id="tokenRelax">
+
+                  </paper-menu>
+                </paper-dropdown-menu> -->
+
+            <template is="dom-if" if="{{isRelax}}">
+              <paper-dropdown-menu label="tokenRelax" name="tokenRelax" required on-iron-select="_relaxSelected">
+                  <paper-menu class="dropdown-content" id="tokenRelax" item={{item}} selected="0">
+                    <paper-item value="0">Perfect matching</paper-item>
+                    <template is="dom-if" if="{{_isRelation(item)}}">
+                      <paper-item value="1">Prefix matching : r(t1,_)</paper-item>
+                      <paper-item value="2">Reverse Prefix matching : r(_,t1)</paper-item>
+                      <paper-item value="4">Suffix matching : r(_,t2)</paper-item>
+                      <paper-item value="5">Reverse Sufix matching : r(t2,_)</paper-item>
+                      <paper-item value="6">Loose matching : r(_,_)</paper-item>
+                      <paper-item value="7">Double terms matching : t1,t2</paper-item>
+                      <paper-item value="8">Prefix term matching : t1</paper-item>
+                      <paper-item value="9">Suffix term matching : t2</paper-item>
+                      <paper-item value="10">Break relation into triples : r(t1,t2)->tr,t1,t2</paper-item>
+                    </template>
+                  </paper-menu>
+              </paper-dropdown-menu>
+            </template>
+          </li>
+        </template>
+      </ul>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: "tokens-displayer",
+
+      properties:
+      {
+        dimension:
+        {
+          type: Object,
+          notify: true,
+        },
+
+        tokens:
+        {
+          type: Array,
+          notify: true,
+        }
+      },
+
+      observers:
+      [
+        "_onDimensionChange(dimension)",
+      ],
+
+      _onDimensionChange: function(dim)
+      {
+        console.log(dim);
+      },
+
+      attached: function()
+      {
+        var tmp = this.dimension;
+        this.dimension = null;
+        this.dimension = tmp;
+      },
+
+      // update: function()
+      // {
+      //   var tmp = this.dimension;
+      //   this.dimension = null;
+      //   this.dimension = tmp;
+      // },
+
+      _isRelation: function(tok)
+      {
+        return (tok instanceof Property);
+      },
+
+      _displayToken: function(tok)
+      {
+        if(tok instanceof CAPTENClass)
+        {
+          return tok.uri.split("/")[tok.uri.split("/").length-1];
+        }
+        else if(tok instanceof Property)
+        {
+          return tok.uri.split("/")[tok.uri.split("/").length-1]+"("+tok.from.split("/")[tok.from.split("/").length-1]+","+tok.to.split("/")[tok.to.split("/").length-1]+")";
+        }
+        else
+          return "Unknown token";
+      },
+
+      _prioSelected: function(e)
+      {
+        var selectedItem = e.item;
+        var selectedPrioElmt = e.target.selectedItem;
+        var selectedPrio = selectedPrioElmt.attributes.value.nodeValue;
+
+        if(!selectedItem || selectedPrioElmt)
+          return;
+
+        console.log("PRIO"+selectedItem);
+      },
+
+      _relaxSelected: function(e)
+      {
+        var selectedItem = e.item;
+        var selectedRelaxElmt = e.target.selectedItem;
+        var selectedRelax = selectedRelaxElmt.attributes.value.nodeValue;
+
+        if(!selectedItem || selectedRelaxElmt)
+          return;
+
+        console.log("Relax"+selectedItem);
+      },
+
+    });
+  </script>
+</dom-module>
