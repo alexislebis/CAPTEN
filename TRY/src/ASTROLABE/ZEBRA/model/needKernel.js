@@ -74,6 +74,7 @@ needKernel.prototype._searchNeed2 = async function(need)
          * 6) RGTE in general
          */
       var token;
+      var pattern;
       var res = [];
       var tmp;
 
@@ -81,15 +82,16 @@ needKernel.prototype._searchNeed2 = async function(need)
       for(var i = 0; i < need.length; i++)
       {
         console.log("TOKEN:"+i);
-        token = need[i];
+        token = need[i].token;
+        pattern = need[i].queryPattern;
         res[i] = [{token: token}];
         console.log("INFORMATION: Only perfect search for the moment");
-        res[i]["K"] = await SEARCH_ENGINE.searchKnowledge(need[i]);//, [0,3]);//, [0,1,5]));
-        res[i]["O"] = await SEARCH_ENGINE.searchObjective(need[i]);//, [0,1,5]));
-        res[i]["N"] = await SEARCH_ENGINE.searchName(need[i]);//, [0,3]);//, [0,1,5]));
-        res[i]["B"] = await SEARCH_ENGINE.searchOutputBehavior(need[i]);//, [0,1,5]));
-        res[i]["A"] = await SEARCH_ENGINE.searchAddendum(need[i]);//, [0,1,5]));
-        res[i]["G"] = await SEARCH_ENGINE.searchRgte(need[i]);//, [0,1,5]));
+        res[i]["K"] = await SEARCH_ENGINE.searchKnowledge(token,[pattern]);//, [0,3]);//, [0,1,5]));
+        res[i]["O"] = await SEARCH_ENGINE.searchObjective(token,[pattern]);//, [0,1,5]));
+        res[i]["N"] = await SEARCH_ENGINE.searchName(token,[pattern]);//, [0,3]);//, [0,1,5]));
+        res[i]["B"] = await SEARCH_ENGINE.searchOutputBehavior(token,[pattern]);//, [0,1,5]));
+        res[i]["A"] = await SEARCH_ENGINE.searchAddendum(token,[pattern]);//, [0,1,5]));
+        res[i]["G"] = await SEARCH_ENGINE.searchRgte(token,[pattern]);//, [0,1,5]));
       }
       console.log("...done.");
 

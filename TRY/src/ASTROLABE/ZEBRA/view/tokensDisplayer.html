@@ -18,18 +18,17 @@
           <li>
             <template is="dom-if" if="{{isPrio}}">
               <paper-dropdown-menu label="Token Priority" name="tokenPrio" required on-iron-select="_prioSelected">
-                  <paper-menu class="dropdown-content" id="tokenPrio" item="{{item}}" selected="2">
-                      <paper-item value="4">Very High</paper-item>
-                      <paper-item value="3">High</paper-item>
-                      <paper-item selected value="2">Normal</paper-item>
-                      <paper-item value="1">Low</paper-item>
-                      <paper-item value="0">Very Low</paper-item>
+                  <paper-menu class="dropdown-content" id="tokenPrio" selected="{{_computeSelectedPrio(item)}}">
+                      <paper-item itemID$="{{item.id}}" prio$="{{TPV.VERY_HIGH}}">Very High</paper-item>
+                      <paper-item itemID$="{{item.id}}" prio$="{{TPV.HIGH}}">High</paper-item>
+                      <paper-item itemID$="{{item.id}}" prio$="{{TPV.NORMAL}}">Normal</paper-item>
+                      <paper-item itemID$="{{item.id}}" prio$="{{TPV.LOW}}">Low</paper-item>
+                      <paper-item itemID$="{{item.id}}" prio$="{{TPV.VERY_LOW}}">Very Low</paper-item>
                   </paper-menu>
               </paper-dropdown-menu>
             </template>
 
             {{_displayToken(item)}}
-
 
               <!-- <paper-dropdown-menu label="tokenRelax" name="tokenRelax" required>
                   <paper-menu class="dropdown-content" id="tokenRelax">
@@ -39,22 +38,24 @@
 
             <template is="dom-if" if="{{isRelax}}">
               <paper-dropdown-menu label="tokenRelax" name="tokenRelax" required on-iron-select="_relaxSelected">
-                  <paper-menu class="dropdown-content" id="tokenRelax" item={{item}} selected="0">
-                    <paper-item value="0">Perfect matching</paper-item>
+                  <paper-menu class="dropdown-content" id="tokenRelax" selected="{{_computeSelectedPattern(item)}}">
+                    <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.PERFECT}}">Perfect matching</paper-item>
                     <template is="dom-if" if="{{_isRelation(item)}}">
-                      <paper-item value="1">Prefix matching : r(t1,_)</paper-item>
-                      <paper-item value="2">Reverse Prefix matching : r(_,t1)</paper-item>
-                      <paper-item value="4">Suffix matching : r(_,t2)</paper-item>
-                      <paper-item value="5">Reverse Sufix matching : r(t2,_)</paper-item>
-                      <paper-item value="6">Loose matching : r(_,_)</paper-item>
-                      <paper-item value="7">Double terms matching : t1,t2</paper-item>
-                      <paper-item value="8">Prefix term matching : t1</paper-item>
-                      <paper-item value="9">Suffix term matching : t2</paper-item>
-                      <paper-item value="10">Break relation into triples : r(t1,t2)->tr,t1,t2</paper-item>
+                      <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.PREFIX}}">Prefix matching : r(t1,_)</paper-item>
+                      <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.REVERSE_PREFIX}}">Reverse Prefix matching : r(_,t1)</paper-item>
+                      <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.SUFIX}}">Suffix matching : r(_,t2)</paper-item>
+                      <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.REVERSE_SUFIX}}">Reverse Sufix matching : r(t2,_)</paper-item>
+                      <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.LOOSE}}">Loose matching : r(_,_)</paper-item>
+                      <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.DBL_TERMS}}">Double terms matching : t1,t2</paper-item>
+                      <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.MONO_PREFIX}}">Prefix term matching : t1</paper-item>
+                      <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.MONO_SUFIX}}">Suffix term matching : t2</paper-item>
+                      <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.PERFECT}}">Break relation into triples : r(t1,t2)->tr,t1,t2</paper-item>
                     </template>
                   </paper-menu>
               </paper-dropdown-menu>
             </template>
+
+            <paper-icon-button icon="icons:clear" itemID$={{item.id}} on-click="_removeItem"></paper-icon-button>
           </li>
         </template>
       </ul>
@@ -76,7 +77,19 @@
         {
           type: Array,
           notify: true,
-        }
+        },
+
+        TQPV:
+        {
+          type: Object,
+          value: function(){return TOKEN_QUERY_PATTERN_VALUE;},
+        },
+
+        TPV:
+        {
+          type: Object,
+          value: function(){return TOKEN_PRIORITY;},
+        },
       },
 
       observers:
@@ -105,45 +118,115 @@
 
       _isRelation: function(tok)
       {
-        return (tok instanceof Property);
+        return (tok.token instanceof Property);
       },
 
       _displayToken: function(tok)
       {
-        if(tok instanceof CAPTENClass)
+        if(tok.token instanceof CAPTENClass)
         {
-          return tok.uri.split("/")[tok.uri.split("/").length-1];
+          return tok.token.uri.split("/")[tok.token.uri.split("/").length-1];
         }
-        else if(tok instanceof Property)
+        else if(tok.token instanceof Property)
         {
-          return tok.uri.split("/")[tok.uri.split("/").length-1]+"("+tok.from.split("/")[tok.from.split("/").length-1]+","+tok.to.split("/")[tok.to.split("/").length-1]+")";
+          return tok.token.uri.split("/")[tok.token.uri.split("/").length-1]+"("+tok.token.from.split("/")[tok.token.from.split("/").length-1]+","+tok.token.to.split("/")[tok.token.to.split("/").length-1]+")";
         }
         else
           return "Unknown token";
       },
 
+      _removeItem: function(e)
+      {
+        var delItem = e.target.getAttribute('itemID');
+
+        for(var i in this.dimension.tokens)
+        {
+          if(this.dimension.tokens[i].id == delItem)
+          {
+            this.splice('dimension.tokens', i, 1);
+            return;
+          }
+        }
+      },
+
       _prioSelected: function(e)
       {
-        var selectedItem = e.item;
+        // var selectedItem = e.item;
         var selectedPrioElmt = e.target.selectedItem;
-        var selectedPrio = selectedPrioElmt.attributes.value.nodeValue;
+        var selectedPrio = selectedPrioElmt.getAttribute("prio");
+        var selectedItemID = selectedPrioElmt.getAttribute("itemID");
 
-        if(!selectedItem || selectedPrioElmt)
+        if(!selectedPrio || !selectedItemID)
           return;
 
-        console.log("PRIO"+selectedItem);
+        for(var i in this.dimension.tokens)
+          if(this.dimension.tokens[i].id == selectedItemID)
+            this.dimension.tokens[i].priority = Number(selectedPrio);
       },
 
       _relaxSelected: function(e)
       {
-        var selectedItem = e.item;
         var selectedRelaxElmt = e.target.selectedItem;
-        var selectedRelax = selectedRelaxElmt.attributes.value.nodeValue;
+        var selectedRelax = selectedRelaxElmt.getAttribute("pattern");
+        var selectedItemID = selectedRelaxElmt.getAttribute("itemID")
 
-        if(!selectedItem || selectedRelaxElmt)
+        if(!selectedItemID || !selectedRelax)
           return;
 
-        console.log("Relax"+selectedItem);
+        for(var i in this.dimension.tokens)
+          if(this.dimension.tokens[i].id == selectedItemID)
+            this.dimension.tokens[i].queryPattern = Number(selectedRelax);
+      },
+
+      _computeSelectedPrio: function(item)
+      {
+        if(!item)
+          return 2;//ID of normal in the dropdown-menu
+
+        switch (item.priority) {
+          case TOKEN_PRIORITY.NORMAL:
+            return 2;
+          case TOKEN_PRIORITY.VERY_HIGH:
+            return 0;
+          case TOKEN_PRIORITY.HIGH:
+            return 1;
+          case TOKEN_PRIORITY.LOW:
+            return 3;
+          case TOKEN_PRIORITY.VERY_LOW:
+            return 4;
+          default:
+            return 2;
+        }
+
+      },
+
+      _computeSelectedPattern: function(item)
+      {
+        if(!item)
+          return 0;
+
+        switch (item.queryPattern) {
+          case TOKEN_QUERY_PATTERN_VALUE.PERFECT:
+            return 0;
+          case TOKEN_QUERY_PATTERN_VALUE.PREFIX:
+            return 1;
+          case TOKEN_QUERY_PATTERN_VALUE.REVERSE_PREFIX:
+            return 2;
+          case TOKEN_QUERY_PATTERN_VALUE.SUFIX:
+            return 3;
+          case TOKEN_QUERY_PATTERN_VALUE.REVERSE_SUFIX:
+            return 4;
+          case TOKEN_QUERY_PATTERN_VALUE.LOOSE:
+            return 5;
+          case TOKEN_QUERY_PATTERN_VALUE.DBL_TERMS:
+            return 6;
+          case TOKEN_QUERY_PATTERN_VALUE.MONO_PREFIX:
+            return 7;
+          case TOKEN_QUERY_PATTERN_VALUE.MONO_SUFIX:
+            return 8;
+          default:
+            return 0;
+        }
       },
 
     });

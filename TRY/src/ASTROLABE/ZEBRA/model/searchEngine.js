@@ -24,65 +24,6 @@ searchEngine.prototype.execute = function(dimensions)
 
       var needRes = [];
 
-      // ===============================================================
-      // ==================         TEST        ========================
-      // ===============================================================
-
-      var need = [];
-
-      // === TEST 1 : find smth working on Question Defaillante
-        // var t1c1 = new CAPTENClass();
-        // var t1c2 = new CAPTENClass();
-        // t1c1.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/Proportion_de_Succes";
-        // t1c2.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/QCM";
-        //
-        // need.push(t1c1);
-        // need.push(t1c2);
-
-      // === TEST 2 : Find an NarratedAnalysisProcess aiming to categorise a Apprenant (student)
-        var cl = new CAPTENClass();
-        cl.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/Etudiant";
-        var rel2 = new Property();
-        rel2.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/categorise";
-        rel2.from = ANALYSIS_URI;
-        rel2.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Etudiant";
-        need.push(cl);
-        need.push(rel2);
-
-      // === TEST 3 : Find a NarratedAnalysisProcess aiming to discover parcours made by students, where the parcours is supposed to be a pattern
-        // var t3r1 = new Property();
-        // var t3r2 = new Property();
-        // var t3r3 = new Property();
-        //
-        // t3r1.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/decouvre";
-        // t3r2.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/faitPar";
-        // t3r3.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/assimilableA";
-        //
-        // t3r1.from = ANALYSIS_URI;
-        // t3r2.from = "http://www.CAPTEN.org/SEED/ontologies/custom/Parcours";
-        // t3r3.from = "http://www.CAPTEN.org/SEED/ontologies/custom/Parcours";
-        //
-        // t3r1.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Parcours";
-        // t3r2.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Apprenant";
-        // t3r3.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Pattern";
-        //
-        // SEARCH_ENGINE.TMP_SIMILARITY_INFO_REDO = "The property: http://www.CAPTEN.org/SEED/ontologies/custom/assimilableA is a special one. It implies similarity check between "+t3r3.from+" and "+t3r3.to + "<br/> Adding a property : ANALYSIS_URI http://www.CAPTEN.org/SEED/ontologies/custom/decouvre http://www.CAPTEN.org/SEED/ontologies/custom/Pattern" ;
-        // console.log("The property: <http://www.CAPTEN.org/SEED/ontologies/custom/assimilableA> is a special one. It implies similarity check between "+t3r3.from+" and "+t3r3.to);
-        // console.log("Adding a property : ANALYSIS_URI http://www.CAPTEN.org/SEED/ontologies/custom/decouvre http://www.CAPTEN.org/SEED/ontologies/custom/Pattern");
-        // t3r4 = new Property();
-        // t3r4.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/decouvre";
-        // t3r4.from = ANALYSIS_URI;
-        // t3r4.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Pattern";
-        //
-        // need.push(t3r1); need.push(t3r2); need.push(t3r3); need.push(t3r4);
-
-        this.dimensions['need'] = need;
-      console.log("==END TEST");
-
-      // ===============================================================
-      // ==============         END TEST        ========================
-      // ===============================================================
-
 
       //Below all access is mutexed. No double call can be made
       if(this.dimensions && this.dimensions['need'])
@@ -233,39 +174,39 @@ searchEngine.prototype._sortingByType = async function(resultArray, sourceID)
           for(var i = 0; i < range.length; i++)
           {
             switch (range[i]) {
-              case 0://Perfect matching
+              case TOKEN_QUERY_PATTERN_VALUE.PERFECT://Perfect matching
                 specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.perfectMatching;
                 pattern = "perfectMatching";
                 break;
-              case 1:
+              case TOKEN_QUERY_PATTERN_VALUE.PREFIX:
                 specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.prefixMatching;
                 pattern = "prefixMatching";
                 break;
-              case 2:
+              case TOKEN_QUERY_PATTERN_VALUE.REVERSE_PREFIX:
                 specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.reversePrefixMatching;
                 pattern = "reversePrefixMatching";
                 break;
-              case 3:
+              case TOKEN_QUERY_PATTERN_VALUE.SUFIX:
                 specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.sufixMatching;
                 pattern = "sufixMatching";
                 break;
-              case 4:
+              case TOKEN_QUERY_PATTERN_VALUE.REVERSE_SUFIX:
                 specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.reverseSufixMatching;
                 pattern = "reverseSufixMatching";
                 break;
-              case 5:
+              case TOKEN_QUERY_PATTERN_VALUE.LOOSE:
                 specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.looseMatching;
                 pattern = "looseMatching";
                 break;
-              case 6:
+              case TOKEN_QUERY_PATTERN_VALUE.DBL_TERMS:
                 specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.doubleTermMatching;
                 pattern = "doubleTermMatching";
                 break;
-              case 7:
+              case TOKEN_QUERY_PATTERN_VALUE.MONO_PREFIX:
                 specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.monoPrefixMatching;
                 pattern = "monoPrefixMatching";
                 break;
-              case 8:
+              case TOKEN_QUERY_PATTERN_VALUE.MONO_SUFIX:
                 specificBuilderPattern = SEARCH_ENGINE.queryPatternBuilder.relation.monoSufixMatching;
                 pattern = "monoSufixMatching";
                 break;
