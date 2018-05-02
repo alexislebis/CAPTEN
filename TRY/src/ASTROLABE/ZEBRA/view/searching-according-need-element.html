@@ -3,6 +3,7 @@
 <link rel="import" href="../../../../../bower_components/brainy-table/brainy-table.html">
 <link rel="import" href="./htmlResponseBuilder.html">
 <link rel="import" href="./tokensDisplayer.html">
+<link rel="import" href="./dimensionDisplayer.html">
 
 <dom-module id="searching-according-need-element">
   <template>
@@ -55,7 +56,7 @@
     <paper-button raised on-click="_startSearch">Let's match</paper-button>
 
     <h3>Result display</h3>
-      <tokens-displayer id="tokenDisplayer" dimension={{tokensOfResult}}></tokens-displayer>
+
       <div id="result">
 
       </div>
@@ -74,13 +75,16 @@
           </data-table-column>
         </iron-data-table> -->
 
+        <dimension-displayer id="objectiveDisplayer" name="Objective" result-array="{{objectiveRA}}" tokens-of-result="{{objectiveTOR}}" parent="{{objectiveRPR}}"></dimension-displayer>
+        <dimension-displayer id="contextDisplayer" name="Context" result-array="{{contextRA}}" tokens-of-result="{{contextTOR}}" parent="{{contextRPR}}"></dimension-displayer>
+
       <!-- <template id="bTable" is="dom-bind" result-array="{{resultArray}}" max-token="{{nbMaxToken}}"> -->
-        <brainy-table id="a" items="[[resultArray]]" page-size="7" details-enabled>
+
+        <!-- <brainy-table id="a" items="[[resultArray]]" page-size="7" details-enabled>
           <brainy-table-column name="Priority Score" filter-by="priorityScore" sort-by="priorityScore">
             <template>[[item.priorityScore]]</template>
           </brainy-table-column>
           <brainy-table-column name="Token coverage (#)" filter-by="nbTokenAns" sort-by="nbTokenAns">
-            <!-- <template>[[_computeTokenCoverage(item.nbTokenAns)]]</template> -->
             <template>[[item.nbTokenAns]]</template>
           </brainy-table-column>
           <brainy-table-column name="ID" filter-by="id" sort-by="id">
@@ -103,13 +107,13 @@
             <div>
               <div id="resultDetail">
                 <html-response-builder item="{{item}}" parent="{{resultOfParentRelevancy}}"></html-response-builder>
-              <!-- [[_updateHTMLForOneID(item.trueID)]] [[item.id]], [[item.id]], [[item.id]] -->
               </div>
               <paper-button raised on-click="_testClick">CLICK TO REQUERY</paper-button>
             </div>
           </template>
           <div no-results>No results found. Click here</div>
-        </brainy-table>
+        </brainy-table> -->
+
       <!-- </template> -->
 
   </template>
@@ -151,22 +155,51 @@
           type: Object,//ExtendedString
           notify: true,
         },
-        resultArray:
-        {
-          type: Array,
-          notify: true,
-        },
+        // resultArray:
+        // {
+        //   type: Array,
+        //   notify: true,
+        // },
         nbMaxToken:
         {
           type: Number,
           notify: true,
           value: 0,
         },
-        resultOfParentRelevancy:
-        {
-          type: Object,
-          notify: true,
-        },
+
+            objectiveRPR://old :resultOfParentRelevancy
+            {
+              type: Object,
+              notify: true,
+            },
+            objectiveTOR: //old : tokensOfResult
+            {
+              type: Object,
+              notify: true,
+            },
+            objectiveRA: //old: resultArray
+            {
+              type: Array,
+              notify: true,
+            },
+
+            contextRPR://old :resultOfParentRelevancy
+            {
+              type: Object,
+              notify: true,
+            },
+            contextTOR: //old : tokensOfResult
+            {
+              type: Object,
+              notify: true,
+            },
+            contextRA: //old: resultArray
+            {
+              type: Array,
+              notify: true,
+            },
+
+
         expanded:
         {
           type: Boolean,
@@ -187,8 +220,17 @@
 
       attached: function()
       {
-        this.$.tokenDisplayer.addEventListener(TOKEN_PRIORITY_CHANGE_ID, function(e){
-          this._updateHTML(this.resultOfParentRelevancy);
+        this.$.objectiveDisplayer.addEventListener(DIMENSION_DISPLAYER_REQUIRE_UPDATE_SIGNAL_ID, function(e){
+          if(e.detail.DIM == "Objective")
+          {
+            this._updateHTML("objectiveRPR", "objectiveTOR", "objectiveRA");
+            this.updateObjectiveDimension();
+          }
+          else if(e.detail.DIM == "Context")
+          {
+            this._updateHTML("contextRPR", "contextTOR", "contextRA");
+            this.updateContextDimension();
+          }
         }.bind(this));
       },
 
@@ -202,19 +244,33 @@
         // }
 
         //TEST! ONLY FOR THE DIMENSION OBJECTIVE HERE
-        if(!this.tokensOfResult)
+        if(!this.objectiveTOR)
           mapDimTerms["need"] = this._boostrapObjective();
         else
-          mapDimTerms["need"] = this.tokensOfResult.tokens;
+          mapDimTerms["need"] = this.objectiveTOR.tokens;
+
+        if(!this.contextTOR)
+          mapDimTerms["context"] = this._boostrapObjective();
+        else
+          mapDimTerms["context"] = this.contextTOR.tokens;
+        // =======
 
         SEARCH_ENGINE.execute(mapDimTerms).then(
           function(resolve)
           {
             this.engineResult = resolve;
-            this.resultOfParentRelevancy = this.engineResult['dimensions']["objective"]["result"];//TODO despécialiser pour gérer toutes les dimensions
-            this.tokensOfResult = this.engineResult['dimensions']['objective'];
+            this.objectiveRPR = this.engineResult['dimensions']["objective"]["result"];
+            this.objectiveTOR = this.engineResult['dimensions']['objective'];
+            this.objectiveRA  = [];
+
+            this.contextRPR = this.engineResult['dimensions']['context']['result'];
+            this.contextTOR = this.engineResult['dimensions']['context'];
+            this.contextRA = [];
             // this.$.tokenDisplayer.update();
-            this._updateHTML(this.resultOfParentRelevancy);
+            this._updateHTML("objectiveRPR", "objectiveTOR", "objectiveRA");
+            this._updateHTML("contextRPR", "contextTOR", "contextRA");
+
+            this.updateDimensions();
           }.bind(this)
         );
 
@@ -295,7 +351,7 @@
         // ===============================================================
       },
 
-      _updateHTML: function(resultOfParentRelevancy)
+      _updateHTML: function(resultOfParentRelevancy, tokenOfResults, resultArray)
       {
         var html = SEARCH_ENGINE.TMP_SIMILARITY_INFO_REDO + "<ul>";
         var tmpHtml = "";
@@ -305,10 +361,11 @@
         var tmpNbToken = 0;
         var priorityScore = 0;
 
-        this._resetResultArray();
+        // this._resetResultArray(resultArray);
+        this[resultArray] = [];
         this.nbMaxToken = 0;
 
-        for(var id in resultOfParentRelevancy)
+        for(var id in this[resultOfParentRelevancy])
         {
           // tmpHtml = "";
           // // if(resultOfParentRelevancy[id].type == ANALYSIS_URI)
@@ -318,14 +375,14 @@
           //
             tmpNbToken = 0;
             priorityScore = 0;
-            for(var token in resultOfParentRelevancy[id])
+            for(var token in this[resultOfParentRelevancy][id])
             {
               if(token != "nbTokenAnswered" && token != "type")
               {
                 tmpNbToken++;
-                this.nbMaxToken++;
+                this.nbMaxToken++; console.error("TO HANDLE CORRECTLY");
 
-                priorityScore += this._getPriorityTokenScore(resultOfParentRelevancy[id][token]);
+                priorityScore += this._getPriorityTokenScore(this[resultOfParentRelevancy][id][token], this[tokenOfResults]);
 
                 // tmpHtml += "<li>The token ("+token+") has been found:"
                 // for(var typeMatching in resultOfParentRelevancy[id][token])
@@ -363,7 +420,7 @@
               }
             }
 
-            this._updateResultArray(tmpNbToken, id, resultOfParentRelevancy[id].type, priorityScore);
+            this._updateResultArray(this[resultArray], tmpNbToken, id, this[resultOfParentRelevancy][id].type, priorityScore);
 
           //   tmpHtml += "</ul>";
           //
@@ -381,18 +438,43 @@
         // div.innerHTML = html;
         // this.$$('#result').appendChild(div);
         // return html;
+
+        // Hard notif
+        // var tmp = resultArray;
+        // resultArray = null;
+        // resultArray = tmp;
       },
 
-      _getPriorityTokenScore: function(token)//oldtokenRepresentation
+      updateDimensions: function()
+      {
+        this.updateObjectiveDimension();
+        this.updateContextDimension();
+      },
+
+      updateObjectiveDimension: function()
+      {
+        var tmpObj = this.objectiveRA;
+        this.objectiveRA = null;
+        this.objectiveRA = tmpObj;
+      },
+
+      updateContextDimension: function()
+      {
+        var tmpCtx = this.contextRA;
+        this.contextRA = null;
+        this.contextRA = tmpCtx;
+      },
+
+      _getPriorityTokenScore: function(token, tokenOfResults)//oldtokenRepresentation
       {
         var tokenTokenID = token.token.token.id;
 
         var prio = 0;
         var nbElm = 0;
 
-        for(var i in this.tokensOfResult.tokens)
-          if(this.tokensOfResult.tokens[i].token.id == tokenTokenID)
-            prio = this.tokensOfResult.tokens[i].priority;
+        for(var i in tokenOfResults.tokens)
+          if(tokenOfResults.tokens[i].token.id == tokenTokenID)
+            prio = tokenOfResults.tokens[i].priority;
 
         for(var i in token)
         {
@@ -413,99 +495,16 @@
         return nbToken/this.tokensOfResult.length;
       },
 
-      // _updateHTMLForOneID: function(id)
-      // {
-      //   var html = SEARCH_ENGINE.TMP_SIMILARITY_INFO_REDO + "<ul>";
-      //   var tmpHtml = "";
-      //   var otherReason = false;
-      //   var analysisHTML = "";
-      //   var otherHTML = "";
-      //   var tmpNbToken = 0;
-      //
-      //   if(this.resultOfParentRelevancy[id])
-      //   {
-      //     tmpHtml = "";
-      //     // if(resultOfParentRelevancy[id].type == ANALYSIS_URI)
-      //     // {
-      //       tmpHtml += id +"(a "+this.resultOfParentRelevancy[id].type+") can be a solution because it solves exactly "+this._howManyTokensAnswered(this.resultOfParentRelevancy[id]).nb+" tokens ("+this._howManyTokensAnswered(this.resultOfParentRelevancy[id]).tokensID+") of your described need. ";
-      //       tmpHtml += "<ul>";
-      //
-      //       tmpNbToken = 0;
-      //       for(var token in this.resultOfParentRelevancy[id])
-      //       {
-      //         if(token != "nbTokenAnswered" && token != "type")
-      //         {
-      //           tmpNbToken++;
-      //
-      //           tmpHtml += "<li>The token ("+token+") has been found:"
-      //           for(var typeMatching in this.resultOfParentRelevancy[id][token])
-      //           {
-      //             if(typeMatching != "token")
-      //             {
-      //               tmpHtml += '<p>With a '+typeMatching+' matching:</p>';
-      //               tmpHtml += "<ul>";
-      //               for(var symbol in this.resultOfParentRelevancy[id][token][typeMatching])
-      //               {
-      //                 tmpHtml += "<li>";
-      //                 if(symbol == "S")
-      //                   tmpHtml += this._constructHtmlOfStep(this.resultOfParentRelevancy, this.resultOfParentRelevancy[id][token][typeMatching][symbol], token, typeMatching);
-      //                 else
-      //                 {
-      //                   for(var element in this.resultOfParentRelevancy[id][token][typeMatching][symbol])
-      //                   {
-      //                     if(otherReason)
-      //                       tmpHtml += ", but also ";
-      //
-      //                     tmpHtml += " in the "+this._symbolTrad(symbol)+" of "+id+" via "+this.resultOfParentRelevancy[id][token][typeMatching][symbol][element].current;
-      //                     otherReason = true;
-      //                   }
-      //                 }
-      //
-      //                 otherReason = false;
-      //                 tmpHtml += "</li>";
-      //               }
-      //               tmpHtml += "</ul>";
-      //             }
-      //           }
-      //           // tmpHtml += "The token (0) has been found in the (knowledge) of "+id+"(, but also in its (name))".
-      //           // tmpHtml += "The token 2 has been found in the (step) of "+id+", because in it, one graph contains the token".
-      //           tmpHtml += "</li>";
-      //         }
-      //       }
-      //
-      //       tmpHtml += "</ul>";
-      //
-      //       if(this.resultOfParentRelevancy[id].type == ANALYSIS_URI)
-      //         analysisHTML += "<li>"+tmpHtml+"</li>";
-      //       else
-      //         otherHTML += "<li>"+tmpHtml+"</li>";
-      //   }
-      //
-      //   window.setTimeout(function(){
-      //     html += "<h4>ANALYSIS</h4>"+ analysisHTML +"<h4>OTHER ELEMENTS</h4>"+ otherHTML + "</ul>";
-      //     var div = document.createElement('div');
-      //     div.innerHTML = html;
-      //     this._resetResultDetail();
-      //     this.$$("#resultDetail").appendChild(div);
-      //   }.bind(this), 500);
-      // },
-      //
-      // _resetResultDetail:function()
-      // {
-      //   var myNode = this.$$("#resultDetail");
-      //
-      //   if(myNode)
-      //     while (myNode.firstChild)
-      //         myNode.removeChild(myNode.firstChild);
-      // },
-
-      _resetResultArray: function()
+      _resetResultArray: function(array)
       {
-        this.resultArray = [];
+        array = null;
+        array = [];
       },
-      _updateResultArray: function(nbToken, id, type, priorityScore)
+      _updateResultArray: function(resultArray, nbToken, id, type, priorityScore)
       {
-        this.push('resultArray', {"nbTokenAns"  : nbToken, "priorityScore": priorityScore,"id": id.split("#")[1], "trueID": id, "type": type.split("/")[type.split("/").length-1]});
+        // this.push('resultArray', {"nbTokenAns"  : nbToken, "priorityScore": priorityScore,"id": id.split("#")[1], "trueID": id, "type": type.split("/")[type.split("/").length-1]});
+        resultArray.push({"nbTokenAns"  : nbToken, "priorityScore": priorityScore,"id": id.split("#")[1], "trueID": id, "type": type.split("/")[type.split("/").length-1]});
+
         // var arr = this.resultArray;
         // this.resultArray = [];
         // this.resultArray = arr;
@@ -526,6 +525,12 @@
             return "graph of concept";
           case "B":
             return "behaviour of the operation";
+          case "I":
+            return "input";
+          case "IB":
+            return "input of the operation";
+          case "C":
+            return "context";
           default:
             return "unknown element";
         }
@@ -578,22 +583,6 @@
 
           tmpHtml += "</ul></li>";
 
-          // for(var cur in stepCurrent[stepID])
-          // {
-          //     tmpHtml += "The token ("+token+") has been found"
-          //     if(stepCurrent[stepID][token][matching])
-          //     {
-          //       for(var symbol in stepCurrent[stepID][token][matching])
-          //       {
-          //         for(var element in stepCurrent[stepID][token][matching][symbol])
-          //         {
-          //           if(otherReason)
-          //             tmpHtml += ", but also ";
-          //
-          //           tmpHtml += "in the "+symbol+" of "+id+" via "+stepCurrent[stepID][token][matching][symbol][element].current;
-          //         }
-          //       }
-          //     }
           }
 
           tmpHtml+= "</ul>";
@@ -616,157 +605,6 @@
 
         return list;
       },
-
-      // _defaultSearchBehavior: function(mapDimTerms)
-      // {
-      //   if(mapDimTerms["need"])
-      //     this._searchNeed(mapDimTerms["need"]);
-      // },
-      //
-      // // == NEED SEARCHING
-      //   _searchNeed: async function(needTerms)
-      //   {
-      //     console.log("looking for : "+needTerms[0]);
-      //
-      //     var resultOrganizer = [];
-      //     // = = = Looking into name elements
-      //       // query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
-      //       var query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
-      //
-      //       // HYLAR_HANDLER.queryOnto(query, [this, this._afterNeedQueries]);
-      //       var elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
-      //
-      //       var sortedRes = await this._sortingByType(elm, "s");
-      //
-      //       resultOrganizer[NAME_URI] = elm;
-      //       resultOrganizer[NAME_URI] = sortedRes[0];
-      //       resultOrganizer[NAME_URI] = "NAME_WEIGHTING";
-      //     // = = =
-      //
-      //     // = = = SEARCHING INTO OBJECTIVE
-      //       query = "SELECT * WHERE { ?s <http://www.CAPTEN.org/SEED/ontologies/hasName> ?obj . ?obj <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
-      //
-      //       elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
-      //       sortedRes = await this._sortingByType(elm, "s");
-      //
-      //       resultOrganizer[OBJECTIVE_URI] = elm;
-      //       resultOrganizer[OBJECTIVE_URI] = sortedRes[0];
-      //       resultOrganizer[OBJECTIVE_URI] = "weight";
-      //     // = = =
-      //     // = = = SEARCHING INTO GRAPHS
-      //       // Warning ; consider the case of node reported to a G1 to G2 automatically, the creation step, etc..
-      //       query = "SELECT * WHERE { ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.CAPTEN.org/SEED/ontologies/RGTE>. ?s <http://www.CAPTEN.org/SEED/ontologies/hasVariable> ?v . ?v <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
-      //
-      //       elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
-      //       sortedRes = await this._sortingByType(elm, "s");
-      //
-      //       resultOrganizer[RGTE_URI] = elm;
-      //       resultOrganizer[RGTE_URI] = sortedRes[0];
-      //       resultOrganizer[RGTE_URI] = "weigth";
-      //     // = = =
-      //
-      //     // = = = SEARCHING INTO ADDENDUM (using subsumption prop to retrieve any descr.)
-      //       query = "SELECT * WHERE { ?s <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.CAPTEN.org/SEED/ontologies/Addendum> . ?s <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?e . ?e <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
-      //       elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
-      //       sortedRes = await this._sortingByType(elm, "s");
-      //
-      //       resultOrganizer[ADDENDUM_URI] = elm;
-      //       resultOrganizer[ADDENDUM_URI] = sortedRes[0];
-      //       resultOrganizer[ADDENDUM_URI] = "weight";
-      //     // = = =
-      //
-      //     // = = = SEARCHING INTO K
-      //       query = "SELECT * WHERE { ?a <http://www.CAPTEN.org/SEED/ontologies/custom/knowledgeGeneratedBy> ?k . ?k <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <"+needTerms[0].getIRI()+"> .}";
-      //       elm = await HYLAR_HANDLER.promiseToQueryOnto(query);
-      //       //No need to sort (the data struc is ok)
-      //       // sortedRes = await this._sortingByType(elm, )
-      //
-      //       resultOrganizer[KNOWLEDGE_URI] = elm;
-      //       resultOrganizer[KNOWLEDGE_URI] = ["NO NEED TO SORT"];
-      //       resultOrganizer[KNOWLEDGE_URI] = "weight";
-      //     // = = =
-      //
-      //     console.log(sortedRes);
-      //     console.log("REMINDER| Improve queries by using similar property. ?x similar ?y. ?s ?p ?o. ?o type ?x OR ?y.");
-      //
-      //   },
-      //
-      //   _afterNeedQueries: function(queriesResults)
-      //   {
-      //     console.log(queriesResults);
-      //     // this._sortingByType(queriesResults, "s");
-      //   },
-      //
-      // // == == == ==
-      //
-      // // sort by looking type. Result array is the result from a querry handled
-      // //by HYLAR_HANDLER.query and sourceID represent what has to be tested (such as ?source ).
-      // //return an array containing two array: one a mapped sorting of result according to sourceID, other the direct results
-      // _sortingByType: async function(resultArray, sourceID)
-      // {
-      //   return new Promise(
-      //     async function(resolve, reject)
-      //     {
-      //       if(!resultArray || resultArray.length <= 0)
-      //       {
-      //         let a = []; a.push([]); a.push([]);
-      //         resolve(a);
-      //       }
-      //
-      //       var headQuery = "SELECT ?type WHERE {<";
-      //       var tailQuery = "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type .}";
-      //       var queries = [];
-      //       var results = [];
-      //
-      //       for(var i in resultArray)
-      //       {
-      //         if(resultArray[i][sourceID])
-      //         {
-      //           var tmp = await HYLAR_HANDLER.promiseToQueryOnto(headQuery+resultArray[i][sourceID].value+tailQuery);
-      //
-      //           for(var j in tmp)
-      //           {
-      //             tmp[j][sourceID] = resultArray[i][sourceID];
-      //             results.push(tmp[j]);
-      //           }
-      //         }
-      //           // queries.push(headQuery+resultArray[i][sourceID].value+tailQuery);
-      //       }
-      //
-      //       // MAPPING
-      //       var map = [];
-      //       for(var i in results)
-      //       {
-      //         if(!map[results[i][sourceID].value])
-      //           map[results[i][sourceID].value] = [];
-      //
-      //         for(var j in results[i])
-      //         {
-      //           if(results[i][j].value != results[i][sourceID].value)
-      //           {
-      //             //Prevent duplicata during insertion
-      //             var alreadyExist = false;
-      //             for(var k in map[results[i][sourceID].value])
-      //             {
-      //               if(map[results[i][sourceID].value][k] == results[i][j].value)
-      //                 alreadyExist = true;
-      //
-      //               if(alreadyExist)
-      //                 break;
-      //             }
-      //             if(!alreadyExist)
-      //               map[results[i][sourceID].value].push(results[i][j].value);
-      //           }
-      //         }
-      //       }
-      //
-      //       var endResults = []; endResults.push(map); endResults.push(results);
-      //
-      //       // HYLAR_HANDLER.cascadingQueryOnto(queries, [], [this, this._testCascading]);
-      //       resolve(endResults);
-      //     }
-      //   )
-      // },
 
       _testCascading: function(r)
       {

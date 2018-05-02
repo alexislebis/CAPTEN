@@ -1,6 +1,7 @@
 function searchEngine(dimensions)
 {
   this.NEED = NEED_KERNEL;
+  this.CONTEXT = CONTEXT_KERNEL;
 
   this.dimensions = dimensions;
   this.mutex = false;
@@ -29,8 +30,20 @@ searchEngine.prototype.execute = function(dimensions)
       if(this.dimensions && this.dimensions['need'])
       {
         needRes['dimensions'] = []; needRes['dimensions']['objective'] = [];
+        // needRes['dimensions']['objective']['result'] = await this.NEED.search(this.dimensions['need']);
         needRes['dimensions']['objective']['result'] = await this.NEED.search(this.dimensions['need']);
         needRes['dimensions']['objective']['tokens'] = this.dimensions['need'];
+      }
+
+      if(this.dimensions && this.dimensions['context'])
+      {
+        if(!needRes['dimensions'])
+          needRes['dimensions'] = [];
+
+        needRes['dimensions']['context'] = [];
+
+        needRes['dimensions']['context']['result'] = await this.CONTEXT.search(this.dimensions['context']);
+        needRes['dimensions']['context']['tokens'] = this.dimensions['context'];
       }
 
       // == END OF MUTEX
@@ -148,6 +161,15 @@ searchEngine.prototype._sortingByType = async function(resultArray, sourceID)
             break;
           case OUTPUT_PATTERN_URI:
             specificOntologicalDeferencerFunc = SEARCH_ENGINE.ontologicalDeferencing.outputPattern;
+            break;
+          case CONTEXT_URI:
+            specificOntologicalDeferencerFunc = SEARCH_ENGINE.ontologicalDeferencing.context;
+            break;
+          case INPUT_URI:
+            specificOntologicalDeferencerFunc = SEARCH_ENGINE.ontologicalDeferencing.input;
+            break;
+          case INPUT_PATTERN_URI:
+            specificOntologicalDeferencerFunc = SEARCH_ENGINE.ontologicalDeferencing.inputPattern;
             break;
           default:
             console.error("unknown element");
@@ -273,6 +295,21 @@ searchEngine.prototype._sortingByType = async function(resultArray, sourceID)
   searchEngine.prototype.searchOutputBehavior = function(token, range)
   {
     return this._searchKernel(OUTPUT_PATTERN_URI, token, range);
+  }
+
+  searchEngine.prototype.searchContext = function(token, range)
+  {
+      return this._searchKernel(CONTEXT_URI, token, range);
+  }
+
+  searchEngine.prototype.searchInput = function(token, range)
+  {
+    return this._searchKernel(INPUT_URI, token, range);
+  }
+
+  searchEngine.prototype.searchInputBehavior = function(token, range)
+  {
+    return this._searchKernel(INPUT_PATTERN_URI, token, range);
   }
 
 // === RGTE Search

@@ -231,6 +231,86 @@
             return rgteDeferencing.prototype._resolveRelationOrigin(oneQueryResult);
       }
 
+    // === INPUT GRAPH
+      function inputGraphDeferencing()
+      {}
+
+      inputGraphDeferencing.prototype.relationReady = function()
+      {
+        return "?e <http://www.CAPTEN.org/SEED/ontologies/hasInput> ?g . ?g  <http://www.CAPTEN.org/SEED/ontologies/hasVariable> ?x . ?g  <http://www.CAPTEN.org/SEED/ontologies/hasVariable> ?y .";
+      }
+
+      inputGraphDeferencing.prototype.termReady = function()
+      {
+          return "?e <http://www.CAPTEN.org/SEED/ontologies/hasInput> ?g . ?g <http://www.CAPTEN.org/SEED/ontologies/hasVariable> ?x .";
+      }
+
+      inputGraphDeferencing.prototype.getCorrespondance = function()
+      {
+        return {e: CAPTEN_CLASS_URI, g: RGTE_URI, x: CAPTEN_CLASS_URI, y: CAPTEN_CLASS_URI};
+      }
+
+      inputGraphDeferencing.prototype.resolveOrigin = async function(oneQueryResult)
+      {
+        return new Promise(
+          async function(resolve, reject)
+          {
+            resolve(await __RESOLVE_ORIGIN(oneQueryResult, this));
+          }.bind(this)
+        );
+      }
+
+        inputGraphDeferencing.prototype._resolveRelationOrigin = async function(oneQueryResult)
+        {
+          return new Promise(
+            async function(resolve, reject)
+            {
+              var res = [];
+
+              if(!oneQueryResult)
+                resolve(res);
+
+              var query = "SELECT * WHERE { <"+oneQueryResult["e"].value+"> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?t .}";
+              var tmp = await HYLAR_HANDLER.promiseToQueryOnto(query);
+
+              if(!tmp)
+              {
+                console.log("tmp should not be null...");
+                resolve(tmp);
+                return;
+              }
+
+              var filteredTmp = [];
+
+              for(var i in tmp)
+              {
+                switch (tmp[i]["t"].value) {
+                  case ANALYSIS_URI:
+                    filteredTmp.push({tmp: tmp[i], type: ANALYSIS_URI});
+                    break;
+                  case OPERATOR_URI:
+                    filteredTmp.push({tmp: tmp[i], type: OPERATOR_URI});
+                    break;
+                  case STEP_URI:
+                    filteredTmp.push({tmp: tmp[i], type: STEP_URI});
+                    break;
+                  default:
+                    //NTD discard of elements
+                }
+              }
+
+              for(var i in filteredTmp)
+                res.push({parent: oneQueryResult["e"].value, parentType : filteredTmp[i].type, current: oneQueryResult["g"].value, currentType: OUTPUT_PATTERN_URI});
+
+              resolve(res);
+            }
+          );
+        }
+        inputGraphDeferencing.prototype._resolveTermOrigin = async function(oneQueryResult)
+        {
+          return inputGraphDeferencing.prototype._resolveRelationOrigin(oneQueryResult);
+        }
+
   // == KNOWLEDGE
     function knowledgeDeferencing()
     {}
@@ -305,6 +385,88 @@
           }
         );
       }
+
+  // === CONTEXT DEFERENCING
+    function contextDeferencing()
+    {}
+
+    contextDeferencing.prototype.relationReady = function()
+    {
+      return "?s <http://www.CAPTEN.org/SEED/ontologies/hasContext> ?c . ?c <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?x . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?y .";
+    }
+
+    contextDeferencing.prototype.termReady = function()
+    {
+      return "?s <http://www.CAPTEN.org/SEED/ontologies/hasContext> ?c . ?c <http://www.CAPTEN.org/SEED/ontologies/hasContent> ?content . ?content <http://www.w3.org/1999/02/22-rdf-syntax-ns#li> ?x .";
+    }
+
+    contextDeferencing.prototype.getCorrespondance = function()
+    {
+      return {s: CAPTEN_CLASS_URI, c: CONTEXT_URI, content: EXTENDED_STRING_URI, x: CAPTEN_CLASS_URI, y: CAPTEN_CLASS_URI};
+    }
+
+    contextDeferencing.prototype.resolveOrigin = async function(oneQueryResult)
+    {
+      return new Promise(
+        async function(resolve, reject)
+        {
+          resolve(await __RESOLVE_ORIGIN(oneQueryResult, this));
+        }.bind(this)
+      );
+    }
+
+    contextDeferencing.prototype._resolveRelationOrigin = async function(oneQueryResult)
+    {
+      return new Promise(
+        async function(resolve, reject)
+        {
+          var res = [];
+
+          if(!oneQueryResult)
+            resolve(res);
+
+          var query = "SELECT * WHERE { <"+oneQueryResult["s"].value+"> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?t .}";
+          var tmp = await HYLAR_HANDLER.promiseToQueryOnto(query);
+
+          if(!tmp)
+          {
+            console.log("tmp should not be null...");
+            resolve(tmp);
+            return;
+          }
+
+          var filteredTmp = [];
+
+          for(var i in tmp)
+          {
+            switch (tmp[i]["t"].value) {
+              case ANALYSIS_URI:
+                filteredTmp.push({tmp: tmp[i], type: ANALYSIS_URI});
+                break;
+              case OPERATOR_URI:
+                filteredTmp.push({tmp: tmp[i], type: OPERATOR_URI});
+                break;
+              case STEP_URI:
+                filteredTmp.push({tmp: tmp[i], type: STEP_URI});
+                break;
+              default:
+                //NTD discard of elements
+            }
+          }
+
+          for(var i in filteredTmp)
+            res.push({parent: oneQueryResult["s"].value, parentType : filteredTmp[i].type, current: oneQueryResult["c"].value, currentType: OBJECTIVE_URI});
+
+          resolve(res);
+        }
+      );
+    }
+
+    contextDeferencing.prototype._resolveTermOrigin = async function(oneQueryResult)
+    {
+      //Same behavior than _resolveRelationOrigin
+      return contextDeferencing.prototype._resolveRelationOrigin(oneQueryResult);//dry
+    }
 
   // === OBJECTIVE DEFERENCING
     function objectiveDeferencing()
@@ -610,6 +772,87 @@
           return outputBehaviourDeferencing.prototype._resolveRelationOrigin(oneQueryResult);
         }
 
+    // == OUTPUT BEHAVIOR
+      function inputBehaviourDeferencing()
+      {}
+
+      inputBehaviourDeferencing.prototype.relationReady = function()
+      {
+        return "?o <http://www.CAPTEN.org/SEED/ontologies/hasInputBehaviour> ?g . ?g <http://www.CAPTEN.org/SEED/ontologies/hasVariable> ?x . ?g <http://www.CAPTEN.org/SEED/ontologies/hasVariable> ?y ."
+      }
+
+      inputBehaviourDeferencing.prototype.termReady = function()
+      {
+        return "?o <http://www.CAPTEN.org/SEED/ontologies/hasInputBehaviour> ?g . ?g <http://www.CAPTEN.org/SEED/ontologies/hasVariable> ?x .";
+      }
+
+      inputBehaviourDeferencing.prototype.getCorrespondance = function()
+      {
+        return {o: OPERATION_URI, g: RGTE_URI, x: CAPTEN_CLASS_URI, y: CAPTEN_CLASS_URI};
+      }
+
+      inputBehaviourDeferencing.prototype.resolveOrigin = async function(oneQueryResult)
+      {
+        return new Promise(
+          async function(resolve, reject)
+          {
+            resolve(await __RESOLVE_ORIGIN(oneQueryResult, this));
+          }.bind(this)
+        );
+      }
+
+        inputBehaviourDeferencing.prototype._resolveRelationOrigin = async function(oneQueryResult)
+        {
+          return new Promise(
+            async function(resolve, reject)
+            {
+              var res = [];
+
+              if(!oneQueryResult)
+                resolve(res);
+
+              var query = "SELECT * WHERE { <"+oneQueryResult["o"].value+"> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?t .}";
+              var tmp = await HYLAR_HANDLER.promiseToQueryOnto(query);
+
+              if(!tmp)
+              {
+                console.log("tmp should not be null...");
+                resolve(tmp);
+                return;
+              }
+
+              var filteredTmp = [];
+
+              for(var i in tmp)
+              {
+                switch (tmp[i]["t"].value) {
+                  case ANALYSIS_URI:
+                    filteredTmp.push({tmp: tmp[i], type: ANALYSIS_URI});
+                    break;
+                  case OPERATOR_URI:
+                    filteredTmp.push({tmp: tmp[i], type: OPERATOR_URI});
+                    break;
+                  case STEP_URI:
+                    filteredTmp.push({tmp: tmp[i], type: STEP_URI});
+                    break;
+                  default:
+                    //NTD discard of elements
+                }
+              }
+
+              for(var i in filteredTmp)
+                res.push({parent: oneQueryResult["o"].value, parentType : filteredTmp[i].type, current: oneQueryResult["g"].value, currentType: OUTPUT_PATTERN_URI});
+
+              resolve(res);
+            }
+          );
+        }
+
+        inputBehaviourDeferencing.prototype._resolveTermOrigin = async function(oneQueryResult)
+        {
+          return inputBehaviourDeferencing.prototype._resolveRelationOrigin(oneQueryResult);
+        }
+
 // === STEP
 function stepDeferencing()
 {}
@@ -651,3 +894,7 @@ ontologicalDeferencing.prototype.addendum = new addendumDeferencing();
 ontologicalDeferencing.prototype.generatedKnowledge = new generatedKnowledgeDeferencing();
 ontologicalDeferencing.prototype.outputPattern = new outputBehaviourDeferencing();
 ontologicalDeferencing.prototype.step = new stepDeferencing();
+
+ontologicalDeferencing.prototype.context = new contextDeferencing();
+ontologicalDeferencing.prototype.input = new inputGraphDeferencing();
+ontologicalDeferencing.prototype.inputPattern = new inputBehaviourDeferencing();
