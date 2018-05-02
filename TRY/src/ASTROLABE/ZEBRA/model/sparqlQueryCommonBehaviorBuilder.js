@@ -93,7 +93,8 @@ function relation()
 
  relation.prototype.monoSufixMatching = function(relation, t1, t2, t1Symbol, t2Symbol, specificPart)//dry
  {
-   return this.monoPrefixMatching(t2, t2Symbol, specificPart);
+   var commonBehavior = "?"+t2Symbol+" <"+TYPE_URI+"> <"+t2+"> .";
+   return __RELATION_QUERY_BUILDER(specificPart, commonBehavior);
  }
 
  var __RELATION_QUERY_BUILDER = function(specificClause, commonClause, header)
