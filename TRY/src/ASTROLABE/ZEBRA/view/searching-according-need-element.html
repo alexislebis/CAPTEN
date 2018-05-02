@@ -75,9 +75,85 @@
           </data-table-column>
         </iron-data-table> -->
 
-        <dimension-displayer id="objectiveDisplayer" name="Objective" result-array="{{objectiveRA}}" tokens-of-result="{{objectiveTOR}}" parent="{{objectiveRPR}}"></dimension-displayer>
-        <dimension-displayer id="contextDisplayer" name="Context" result-array="{{contextRA}}" tokens-of-result="{{contextTOR}}" parent="{{contextRPR}}"></dimension-displayer>
+        <paper-toggle-button id="togglePrio" checked="{{isPrio}}">Dimension priority option</paper-toggle-button>
 
+        <ul>
+          <template is="dom-if" if="{{isPrio}}">
+            <li>
+              <paper-dropdown-menu label="Token Priority" name="tokenPrio" required on-iron-select="_prioSelected">
+                  <paper-menu class="dropdown-content" id="tokenPrio" selected="{{_computeSelectedPrio(item)}}">
+                      <paper-item itemID="objective" prio$="{{TPV.VERY_HIGH}}">Very High</paper-item>
+                      <paper-item itemID="objective" prio$="{{TPV.HIGH}}">High</paper-item>
+                      <paper-item itemID="objective" prio$="{{TPV.NORMAL}}">Normal</paper-item>
+                      <paper-item itemID="objective" prio$="{{TPV.LOW}}">Low</paper-item>
+                      <paper-item itemID="objective" prio$="{{TPV.VERY_LOW}}">Very Low</paper-item>
+                  </paper-menu>
+              </paper-dropdown-menu>
+              Objective
+            </li>
+          </template>
+
+          <template is="dom-if" if="{{isPrio}}">
+            <li>
+              <paper-dropdown-menu label="Token Priority" name="tokenPrio" required on-iron-select="_prioSelected">
+                  <paper-menu class="dropdown-content" id="tokenPrio" selected="{{_computeSelectedPrio(item)}}">
+                      <paper-item itemID="context" prio$="{{TPV.VERY_HIGH}}">Very High</paper-item>
+                      <paper-item itemID="context" prio$="{{TPV.HIGH}}">High</paper-item>
+                      <paper-item itemID="context" prio$="{{TPV.NORMAL}}">Normal</paper-item>
+                      <paper-item itemID="context" prio$="{{TPV.LOW}}">Low</paper-item>
+                      <paper-item itemID="context" prio$="{{TPV.VERY_LOW}}">Very Low</paper-item>
+                  </paper-menu>
+              </paper-dropdown-menu>
+              Context
+            </li>
+          </template>
+        </ul>
+
+        Full dimensions results
+        <brainy-table id="a" items="[[combinedArray]]" page-size="7" details-enabled>
+          <brainy-table-column name="Priority Score" filter-by="priorityScore" sort-by="priorityScore">
+            <template>[[item.priorityScore]]</template>
+          </brainy-table-column>
+          <brainy-table-column name="Token coverage (#)" filter-by="nbTokenAns" sort-by="nbTokenAns">
+            <!-- <template>[[_computeTokenCoverage(item.nbTokenAns)]]</template> -->
+            <template>[[item.nbTokenAns]]</template>
+          </brainy-table-column>
+          <brainy-table-column name="ID" filter-by="id" sort-by="id">
+            <template>[[item.id]]</template>
+          </brainy-table-column>
+          <brainy-table-column name="Type" filter-by="type" sort-by="type">
+            <template>[[item.type]]</template>
+          </brainy-table-column>
+          <!-- <brainy-table-column width="30px" align-right flex="0">
+            <template>
+              <template is="dom-if" if="[[!expanded]]">
+                <iron-icon icon="icons:expand-more"></iron-icon>
+              </template>
+              <template is="dom-if" if="[[expanded]]">
+                <iron-icon icon="icons:expand-less"></iron-icon>
+              </template>
+            </template>
+          </brainy-table-column>
+          <template is="row-detail" bind="_testAttached">
+            <div>
+              <div id="resultDetail">
+                <html-response-builder item="{{item}}" parent="{{parent}}"></html-response-builder>
+              </div>
+              <paper-button raised on-click="_testClick">CLICK TO REQUERY</paper-button>
+            </div>
+          </template> -->
+          <div no-results>No results found. Click here</div>
+        </brainy-table>
+
+        <br/>
+        <paper-toggle-button id="toggleDetail" checked="{{isShowDetail}}">Show details</paper-toggle-button>
+        <br/>
+        <br/>
+        
+        <div hidden$="{{!isShowDetail}}">
+          <dimension-displayer id="objectiveDisplayer" name="Objective" result-array="{{objectiveRA}}" tokens-of-result="{{objectiveTOR}}" parent="{{objectiveRPR}}"></dimension-displayer>
+          <dimension-displayer id="contextDisplayer" name="Context" result-array="{{contextRA}}" tokens-of-result="{{contextTOR}}" parent="{{contextRPR}}"></dimension-displayer>
+        </div>
       <!-- <template id="bTable" is="dom-bind" result-array="{{resultArray}}" max-token="{{nbMaxToken}}"> -->
 
         <!-- <brainy-table id="a" items="[[resultArray]]" page-size="7" details-enabled>
@@ -215,22 +291,47 @@
         {
           type: Object,
           notify: true,
-        }
+        },
+        TPV:
+        {
+          type: Object,
+          notify: true,
+          value: function(){return DIMENSION_PRIORITY;},
+        },
+        combinedArray:
+        {
+          type: Array,
+          notify: true,
+        },
+      },
+
+      observers:
+      [
+        "_combinedArrayOnChange(combinedArray)",
+      ],
+
+      _combinedArrayOnChange: function(combinedArray)
+      {
+        console.log(combinedArray);
       },
 
       attached: function()
       {
         this.$.objectiveDisplayer.addEventListener(DIMENSION_DISPLAYER_REQUIRE_UPDATE_SIGNAL_ID, function(e){
-          if(e.detail.DIM == "Objective")
-          {
+          // if(e.detail.DIM == "Objective")
+          // {
             this._updateHTML("objectiveRPR", "objectiveTOR", "objectiveRA");
             this.updateObjectiveDimension();
-          }
-          else if(e.detail.DIM == "Context")
-          {
-            this._updateHTML("contextRPR", "contextTOR", "contextRA");
-            this.updateContextDimension();
-          }
+          // }
+          // else if(e.detail.DIM == "Context")
+          // {
+
+          // }
+        }.bind(this));
+
+        this.$.contextDisplayer.addEventListener(DIMENSION_DISPLAYER_REQUIRE_UPDATE_SIGNAL_ID, function(e){
+          this._updateHTML("contextRPR", "contextTOR", "contextRA");
+          this.updateContextDimension();
         }.bind(this));
       },
 
@@ -283,6 +384,23 @@
         // }
         //
         // var result = this._defaultSearchBehavior(mapDimTerms);
+      },
+
+      _prioSelected: function(e)
+      {
+        var selectedPrioElmt = e.target.selectedItem;
+        var selectedPrio = selectedPrioElmt.getAttribute("prio");
+        var selectedItemID = selectedPrioElmt.getAttribute("itemID");
+
+        if(!selectedPrio || !selectedItemID)
+          return;
+
+        if(selectedItemID == "objective")
+          this.objectivePriority = selectedPrio;
+        else if(selectedItemID == "context")
+          this.contextPriority = selectedPrio;
+
+        this._computeCombinedArray();
       },
 
       _boostrapObjective: function()
@@ -456,6 +574,8 @@
         var tmpObj = this.objectiveRA;
         this.objectiveRA = null;
         this.objectiveRA = tmpObj;
+
+        this._computeCombinedArray();
       },
 
       updateContextDimension: function()
@@ -463,6 +583,39 @@
         var tmpCtx = this.contextRA;
         this.contextRA = null;
         this.contextRA = tmpCtx;
+
+        this._computeCombinedArray();
+      },
+
+      _computeCombinedArray: function()
+      {
+          var newArray = []; //Array of nbTokensAns, priorityScore,  id, trueId, type
+
+          for(var i in this.objectiveRA)
+          {
+            newArray.push({nbTokenAns: this.objectiveRA[i].nbTokenAns, priorityScore: this.objectiveRA[i].priorityScore, id: this.objectiveRA[i].id, trueID: this.objectiveRA[i].trueID, type: this.objectiveRA[i].type});
+
+            if(this.objectivePriority)
+              newArray[newArray.length-1].priorityScore *= this.objectivePriority;
+            else
+              newArray[newArray.length-1].priorityScore *= DIMENSION_PRIORITY.NORMAL;
+
+            for(var j in this.contextRA)
+            {
+              if(this.contextRA[j].id == this.objectiveRA[i].id)
+              {
+                newArray[newArray.length-1].nbTokenAns += this.contextRA[j].nbTokenAns;
+
+                if(this.contextPriority)
+                  newArray[newArray.length-1].priorityScore += this.contextRA[j].priorityScore * this.contextPriority;
+                else
+                  newArray[newArray.length-1].priorityScore += this.contextRA[j].priorityScore * DIMENSION_PRIORITY.NORMAL;
+              }
+            }
+          }
+
+          this.combinedArray = [];
+          this.combinedArray = newArray;
       },
 
       _getPriorityTokenScore: function(token, tokenOfResults)//oldtokenRepresentation
