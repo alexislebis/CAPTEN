@@ -50,3 +50,10 @@
 
     // === LOADING
       var LOADING_DONE_SIGNAL_ID = "-PIO3RH_U83hnfejfeuIU83àIJe";
+
+    // === TOKENS
+      // === TK PRIORITY
+        var TOKEN_PRIORITY_CHANGE_ID = "-IZJFNFD5578S5QKEUUEU5e8fe";
+
+      // === TK PATTERN
+        var TOKEN_QUERY_PATTERN_CHANGE_ID = "-IIIZOEJNFJEBBs4FE4e5gz5fec";

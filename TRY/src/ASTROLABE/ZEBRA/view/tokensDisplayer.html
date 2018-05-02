@@ -162,6 +162,8 @@
         for(var i in this.dimension.tokens)
           if(this.dimension.tokens[i].id == selectedItemID)
             this.dimension.tokens[i].priority = Number(selectedPrio);
+
+        this.fire(TOKEN_PRIORITY_CHANGE_ID);
       },
 
       _relaxSelected: function(e)

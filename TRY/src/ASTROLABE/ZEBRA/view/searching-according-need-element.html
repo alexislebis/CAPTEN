@@ -185,6 +185,13 @@
         }
       },
 
+      attached: function()
+      {
+        this.$.tokenDisplayer.addEventListener(TOKEN_PRIORITY_CHANGE_ID, function(e){
+          this._updateHTML(this.resultOfParentRelevancy);
+        }.bind(this));
+      },
+
 
       _startSearch: function()
       {
@@ -380,10 +387,25 @@
       {
         var tokenTokenID = token.token.token.id;
 
+        var prio = 0;
+        var nbElm = 0;
+
         for(var i in this.tokensOfResult.tokens)
           if(this.tokensOfResult.tokens[i].token.id == tokenTokenID)
-            return this.tokensOfResult.tokens[i].priority;
+            prio = this.tokensOfResult.tokens[i].priority;
 
+        for(var i in token)
+        {
+          if(i != "token")
+          {
+            for(var j in token[i])
+            {
+              nbElm++;
+            }
+          }
+        }
+
+        return prio*nbElm;
       },
 
       _computeTokenCoverage: function(nbToken)
