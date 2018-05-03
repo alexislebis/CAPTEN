@@ -1,0 +1,77 @@
+<dom-module id="token-lister">
+  <template>
+    <style>
+
+    </style>
+
+    <div id="dimension">
+      {{dimname}}:
+      <ul>
+        <template is="dom-repeat" items="[[tokInDim]]" index-as="index">
+          <li>[[_displayTokenName(item)]] answered</li>
+        </template>
+      </ul>
+
+    </div>
+  </template>
+  <script>
+    Polymer({
+      is: "token-lister",
+
+      properties:
+      {
+        tok:
+        {
+          type: Array,
+          notify: true,
+        },
+
+        tokInDim:
+        {
+          type: Array,
+          notify: true,
+        },
+      },
+
+      observers:
+      [
+        "_onTokChange(tok)",
+      ],
+
+      _onTokChange: function(tok)
+      {
+        if(!this.dimname)
+          return;
+
+        if(this.dimname == "Objective")
+          this.tokInDim = tok.nbTokenByDim.objective;
+        if(this.dimname == "Context")
+          this.tokInDim = tok.nbTokenByDim.context;
+      },
+
+      _updateDisplay: function()
+      {
+        var tmp = this.tokInDim;
+        this.tokInDim = [];
+        this.tokInDim = tmp;
+      },
+
+      _displayTokenName: function(token)
+      {
+        if(token instanceof CAPTENClass)
+        {
+          return token.uri.split("/")[token.uri.split("/").length-1];
+        }
+        else if(token instanceof Property)
+        {
+          return token.uri.split("/")[token.uri.split("/").length-1]+"("+token.from.split("/")[token.from.split("/").length-1]+","+token.to.split("/")[token.to.split("/").length-1]+")";
+        }
+        else
+          return "Unknown token";
+
+      },
+
+    }
+  );
+  </script>
+</dom-module>
