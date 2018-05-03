@@ -122,6 +122,9 @@
           <brainy-table-column name="ID" filter-by="id" sort-by="id">
             <template>[[item.id]]</template>
           </brainy-table-column>
+          <brainy-table-column name="Name" filter-by="type" sort-by="type">
+            <template>[[_computeName(item)]]</template>
+          </brainy-table-column>
           <brainy-table-column name="Type" filter-by="type" sort-by="type">
             <template>[[item.type]]</template>
           </brainy-table-column>
@@ -317,12 +320,12 @@
 
       _combinedArrayOnChange: function(combinedArray)
       {
-        console.log(combinedArray);
+
       },
 
       _testNBDim: function(item)
       {
-        console.log(item);
+
       },
 
       attached: function()
@@ -431,45 +434,50 @@
           // need.push(t1c2);
 
         // === TEST 2 : Find an NarratedAnalysisProcess aiming to categorise a Apprenant (student)
-          var cl = new CAPTENClass();
-          cl.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/Etudiant";
-          var rel2 = new Property();
-          rel2.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/categorise";
-          rel2.from = ANALYSIS_URI;
-          rel2.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Etudiant";
-
-          var token1 = new Token(cl);
-          var token2 = new Token(rel2);
-
-          need.push(token1);need.push(token2);
+          // var cl = new CAPTENClass();
+          // cl.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/Etudiant";
+          // var rel2 = new Property();
+          // rel2.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/categorise";
+          // rel2.from = ANALYSIS_URI;
+          // rel2.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Etudiant";
+          //
+          // var token1 = new Token(cl);
+          // var token2 = new Token(rel2);
+          //
+          // need.push(token1);need.push(token2);
           // need.push(cl);
           // need.push(rel2);
 
         // === TEST 3 : Find a NarratedAnalysisProcess aiming to discover parcours made by students, where the parcours is supposed to be a pattern
-          // var t3r1 = new Property();
-          // var t3r2 = new Property();
-          // var t3r3 = new Property();
-          //
-          // t3r1.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/decouvre";
-          // t3r2.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/faitPar";
-          // t3r3.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/assimilableA";
-          //
-          // t3r1.from = ANALYSIS_URI;
-          // t3r2.from = "http://www.CAPTEN.org/SEED/ontologies/custom/Parcours";
-          // t3r3.from = "http://www.CAPTEN.org/SEED/ontologies/custom/Parcours";
-          //
-          // t3r1.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Parcours";
-          // t3r2.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Apprenant";
-          // t3r3.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Pattern";
-          //
-          // SEARCH_ENGINE.TMP_SIMILARITY_INFO_REDO = "The property: http://www.CAPTEN.org/SEED/ontologies/custom/assimilableA is a special one. It implies similarity check between "+t3r3.from+" and "+t3r3.to + "<br/> Adding a property : ANALYSIS_URI http://www.CAPTEN.org/SEED/ontologies/custom/decouvre http://www.CAPTEN.org/SEED/ontologies/custom/Pattern" ;
-          // console.log("The property: <http://www.CAPTEN.org/SEED/ontologies/custom/assimilableA> is a special one. It implies similarity check between "+t3r3.from+" and "+t3r3.to);
-          // console.log("Adding a property : ANALYSIS_URI http://www.CAPTEN.org/SEED/ontologies/custom/decouvre http://www.CAPTEN.org/SEED/ontologies/custom/Pattern");
-          // t3r4 = new Property();
-          // t3r4.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/decouvre";
-          // t3r4.from = ANALYSIS_URI;
-          // t3r4.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Pattern";
-          //
+          var t3r1 = new Property();
+          var t3r2 = new Property();
+          var t3r3 = new Property();
+
+          t3r1.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/decouvre";
+          t3r2.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/faitPar";
+          t3r3.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/assimilableA";
+
+          t3r1.from = ANALYSIS_URI;
+          t3r2.from = "http://www.CAPTEN.org/SEED/ontologies/custom/Parcours";
+          t3r3.from = "http://www.CAPTEN.org/SEED/ontologies/custom/Parcours";
+
+          t3r1.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Parcours";
+          t3r2.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Apprenant";
+          t3r3.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Pattern";
+
+          SEARCH_ENGINE.TMP_SIMILARITY_INFO_REDO = "The property: http://www.CAPTEN.org/SEED/ontologies/custom/assimilableA is a special one. It implies similarity check between "+t3r3.from+" and "+t3r3.to + "<br/> Adding a property : ANALYSIS_URI http://www.CAPTEN.org/SEED/ontologies/custom/decouvre http://www.CAPTEN.org/SEED/ontologies/custom/Pattern" ;
+          console.log("The property: <http://www.CAPTEN.org/SEED/ontologies/custom/assimilableA> is a special one. It implies similarity check between "+t3r3.from+" and "+t3r3.to);
+          console.log("Adding a property : ANALYSIS_URI http://www.CAPTEN.org/SEED/ontologies/custom/decouvre http://www.CAPTEN.org/SEED/ontologies/custom/Pattern");
+          t3r4 = new Property();
+          t3r4.uri = "http://www.CAPTEN.org/SEED/ontologies/custom/decouvre";
+          t3r4.from = ANALYSIS_URI;
+          t3r4.to = "http://www.CAPTEN.org/SEED/ontologies/custom/Pattern";
+
+          var token1 = new Token(t3r1);
+          var token2 = new Token(t3r2);
+          var token3 = new Token(t3r3);
+          var token4 = new Token(t3r4);
+          need.push(token1);need.push(token2);need.push(token3);need.push(token4);
           // need.push(t3r1); need.push(t3r2); need.push(t3r3); need.push(t3r4);
 
           return need;
@@ -597,6 +605,13 @@
         this._computeCombinedArray();
       },
 
+      _computeName: function(item)
+      {
+        if(!item || !ID_CORRESPONDANCE[item.id])
+          return "/";
+        return ID_CORRESPONDANCE[item.id]+"";
+      },
+
       _computeCombinedArray: function()
       {
           var newArray = []; //Array of nbTokensAns, priorityScore,  id, trueId, type
@@ -611,21 +626,47 @@
               newArray[newArray.length-1].priorityScore *= DIMENSION_PRIORITY.NORMAL;
 
             newArray[newArray.length-1]["nbTokenByDim"]["objective"] = this._searchTokensAnsweredForInDim(newArray[newArray.length-1].trueID, this.objectiveRPR);
+          }
 
-            for(var j in this.contextRA)
+          var add = [];
+          var found = false;
+          for(var j in this.contextRA)
+          {
+            found = false;
+            for(var i in newArray)
             {
-              if(this.contextRA[j].id == this.objectiveRA[i].id)
+              if(this.contextRA[j].id == newArray[i].id)
               {
-                newArray[newArray.length-1].nbTokenAns += this.contextRA[j].nbTokenAns;
+                newArray[i].nbTokenAns += this.contextRA[j].nbTokenAns;
 
                 if(this.contextPriority)
-                  newArray[newArray.length-1].priorityScore += this.contextRA[j].priorityScore * this.contextPriority;
+                  newArray[i].priorityScore += this.contextRA[j].priorityScore * this.contextPriority;
                 else
-                  newArray[newArray.length-1].priorityScore += this.contextRA[j].priorityScore * DIMENSION_PRIORITY.NORMAL;
+                  newArray[i].priorityScore += this.contextRA[j].priorityScore * DIMENSION_PRIORITY.NORMAL;
 
-                newArray[newArray.length-1]["nbTokenByDim"]["context"]= this._searchTokensAnsweredForInDim(newArray[newArray.length-1].trueID, this.contextRPR);
+                newArray[i]["nbTokenByDim"]["context"]= this._searchTokensAnsweredForInDim(newArray[i].trueID, this.contextRPR);
+
+                found = true;
+                break;
               }
             }
+
+            if(!found)
+            {
+              add.push({nbTokenAns: this.contextRA[j].nbTokenAns, nbTokenByDim: [], priorityScore: this.contextRA[j].priorityScore, id: this.contextRA[j].id, trueID: this.contextRA[j].trueID, type: this.contextRA[j].type});
+
+              if(this.contextPriority)
+                add[add.length-1].priorityScore *= this.contextPriority;
+              else
+                add[add.length-1].priorityScore *= DIMENSION_PRIORITY.NORMAL;
+
+              add[add.length-1]["nbTokenByDim"]["context"] = this._searchTokensAnsweredForInDim(add[add.length-1].trueID, this.contextRPR);
+            }
+          }
+
+          for(var i in add)
+          {
+            newArray.push(add[i]);
           }
 
           this.combinedArray = [];

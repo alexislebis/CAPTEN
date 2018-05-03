@@ -14,7 +14,7 @@
         <paper-toggle-button id="toggleRelax" checked="{{isRelax}}">Token matching option</paper-toggle-button>
 
         <em>Tokens:</em>
-        <template is="dom-repeat" id="menu" items="{{dimension.tokens}}">
+        <template is="dom-repeat" id="menu" items="{{dimension.tokens}}" restamp>
           <li>
             <template is="dom-if" if="{{isPrio}}">
               <paper-dropdown-menu label="Token Priority" name="tokenPrio" required on-iron-select="_prioSelected">
@@ -49,7 +49,7 @@
                       <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.DBL_TERMS}}">Double terms matching : t1,t2</paper-item>
                       <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.MONO_PREFIX}}">Prefix term matching : t1</paper-item>
                       <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.MONO_SUFIX}}">Suffix term matching : t2</paper-item>
-                      <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.PERFECT}}">Break relation into triples : r(t1,t2)->tr,t1,t2</paper-item>
+                      <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.BREAK_RELATION}}">Break relation into triples : r(t1,t2)->tr,t1,t2</paper-item>
                     </template>
                   </paper-menu>
               </paper-dropdown-menu>
@@ -118,11 +118,16 @@
 
       _isRelation: function(tok)
       {
+        if(!tok)
+          return false;
         return (tok.token instanceof Property);
       },
 
       _displayToken: function(tok)
       {
+        if(!tok)
+          return "";
+
         if(tok.token instanceof CAPTENClass)
         {
           return tok.token.uri.split("/")[tok.token.uri.split("/").length-1];
@@ -175,9 +180,35 @@
         if(!selectedItemID || !selectedRelax)
           return;
 
-        for(var i in this.dimension.tokens)
-          if(this.dimension.tokens[i].id == selectedItemID)
-            this.dimension.tokens[i].queryPattern = Number(selectedRelax);
+        if(selectedRelax == TOKEN_QUERY_PATTERN_VALUE.BREAK_RELATION)
+        {
+          var idToSplice; var oldRel;
+
+          for(var i in this.dimension.tokens)
+            if(this.dimension.tokens[i].id == selectedItemID)
+              idToSplice = i;
+
+          oldRel = this.dimension.tokens[idToSplice];
+          // this.dimension.tokens.splice(idToSplice,1);
+          this.splice('dimension.tokens', idToSplice, 1);
+
+          var cl1 = new CAPTENClass();
+          var cl2 = new CAPTENClass();
+          var cl3 = new CAPTENClass();
+          cl1.uri = oldRel.token.from;
+          cl2.uri = oldRel.token.to;
+          cl3.uri = oldRel.token.uri;
+
+          this.push('dimension.tokens',new Token(cl1));
+          this.push('dimension.tokens',new Token(cl2));
+          this.push('dimension.tokens',new Token(cl3));
+        }
+        else
+        {
+          for(var i in this.dimension.tokens)
+            if(this.dimension.tokens[i].id == selectedItemID)
+              this.dimension.tokens[i].queryPattern = Number(selectedRelax);
+        }
       },
 
       _computeSelectedPrio: function(item)
@@ -200,6 +231,13 @@
             return 2;
         }
 
+      },
+
+      _update: function()
+      {
+        var tmp = this.dimension.tokens;
+        this.set('dimension.tokens', []);
+        this.set('dimension.tokens', tmp);
       },
 
       _computeSelectedPattern: function(item)
