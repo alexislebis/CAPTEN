@@ -369,6 +369,10 @@
           mapDimTerms["context"] = this.contextTOR.tokens;
         // =======
 
+        // SIMILARITY ADAPTATION
+        mapDimTerms = this._replaceWithSimilarities(mapDimTerms);
+        // ======
+
         SEARCH_ENGINE.execute(mapDimTerms).then(
           function(resolve)
           {
@@ -397,6 +401,40 @@
         // }
         //
         // var result = this._defaultSearchBehavior(mapDimTerms);
+      },
+
+      _replaceWithSimilarities: function(array)
+      {
+        var tmpTokToAdd = [];
+        for(var i = array["context"].length-1; i >= 0 ; i--)
+        {
+          if(array["context"][i].queryPattern == TOKEN_QUERY_PATTERN_VALUE.SIMILARITY)
+          {
+            tmpTokToAdd.push(array["context"][i].getSimilarities());
+            array["context"].splice(i,1);
+          }
+        }
+
+        for(var i in tmpTokToAdd)
+          for(var j in tmpTokToAdd[i])
+            array["context"].push(tmpTokToAdd[i][j][0]);
+
+        tmpTokToAdd = [];
+
+        for(var i = array["need"].length-1; i >= 0 ; i--)
+        {
+          if(array["need"][i].queryPattern == TOKEN_QUERY_PATTERN_VALUE.SIMILARITY)
+          {
+            tmpTokToAdd.push(array["need"][i].getSimilarities());
+            array["need"].splice(i,1);
+          }
+        }
+
+        for(var i in tmpTokToAdd)
+          for(var j in tmpTokToAdd[i])
+            array["need"].push(tmpTokToAdd[i][j][0]);
+
+        return array;
       },
 
       _prioSelected: function(e)
@@ -594,6 +632,8 @@
         this.objectiveRA = tmpObj;
 
         this._computeCombinedArray();
+
+        this.$.objectiveDisplayer.update();
       },
 
       updateContextDimension: function()
@@ -603,6 +643,8 @@
         this.contextRA = tmpCtx;
 
         this._computeCombinedArray();
+
+        this.$.contextDisplayer.update();
       },
 
       _computeName: function(item)

@@ -17,7 +17,7 @@
 
         <em>Tokens:</em>
         <!-- <paper-icon-button icon="icons:refresh" on-click="_update"></paper-icon-button> -->
-        <template is="dom-repeat" id="menu" items="{{dimension.tokens}}" restamp>
+        <template is="dom-repeat" id="repeater" items="{{dimension.tokens}}" restamp>
           <li>
             <template is="dom-if" if="{{isPrio}}">
               <paper-dropdown-menu label="Token Priority" name="tokenPrio" required on-iron-select="_prioSelected">
@@ -59,7 +59,9 @@
               </paper-dropdown-menu>
             </template>
 
-            <template is="dom-if" if="{{_computeSimilarityOn(item)}}">
+            <similar-displayer id$="{{_computeItemId(item.id)}}" dimension="{{dimension}}" token="{{item}}"></similar-displayer>
+
+            <!-- <template is="dom-if" if="{{_computeSimilarityOn(item)}}">
               Choose the degree of similarity expected (>=):
               <paper-dropdown-menu label="Token Similarity" name="tokenSimi" required on-iron-select="_simiSelected">
                   <paper-menu class="dropdown-content" id="tokenSimi" selected="{{_computeSelectedSimi(item)}}">
@@ -69,11 +71,9 @@
                       <paper-item itemID$="{{item.id}}" simi$="{{SV.LOW}}">Low</paper-item>
                       <paper-item itemID$="{{item.id}}" simi$="{{SV.VERY_LOW}}">Very Low</paper-item>
                   </paper-menu>
-              </paper-dropdown-menu>
+              </paper-dropdown-menu> -->
 
-              <similar-displayer similars="{{_computeSimilarityArray(item)}}"></similar-displayer>
-
-            </template>
+            <!-- </template> -->
 
             <paper-icon-button icon="icons:clear" itemID$={{item.id}} on-click="_removeItem"></paper-icon-button>
           </li>
@@ -255,34 +255,54 @@
           cl2.uri = oldRel.token.to;
           cl3.uri = oldRel.token.uri;
 
+
+          // this.shadowRoot.querySelector('#similarity' + this.dimension.tokens[idToSplice].id).update(null, false);
+          if(this.$.dimension.querySelector('#similarity' + this.dimension.tokens[idToSplice].id))
+            this.$.dimension.querySelector('#similarity' + this.dimension.tokens[idToSplice].id).update(null, false);
+          else
+            console.log(selectedItemID);
+
           this.push('dimension.tokens',new Token(cl1));
           this.push('dimension.tokens',new Token(cl2));
           this.push('dimension.tokens',new Token(cl3));
         }
         else if(selectedRelax == TOKEN_QUERY_PATTERN_VALUE.SIMILARITY)
         {
-          var id; var tmp;
+          var tokIndex;
           for(var i in this.dimension.tokens)
           {
             if(this.dimension.tokens[i].id == selectedItemID)
             {
-              id = i;
-              this.dimension.tokens[i].queryPattern = Number(selectedRelax);
-              tmp =this.dimension.tokens[i];
+              tokIndex = i;
             }
           }
 
-          this.splice('dimension.tokens', id, 1);
-          this.push('dimension.tokens', tmp);
+          if(!tokIndex)
+            return;
 
+          this.dimension.tokens[tokIndex].queryPattern = Number(selectedRelax);
+          // this.shadowRoot.querySelector('#similarity' + this.dimension.tokens[tokIndex].id).update(this.dimension.tokens[tokIndex].getSimilarities(), true);
+          if(this.$.dimension.querySelector('#similarity' + this.dimension.tokens[tokIndex].id))
+            this.$.dimension.querySelector('#similarity' + this.dimension.tokens[tokIndex].id).update(this.dimension.tokens[tokIndex].getSimilarities(), true);
+          else
+            console.log(selectedItemID);
         }
         else
         {
           this.similarityON = false;
 
           for(var i in this.dimension.tokens)
+          {
             if(this.dimension.tokens[i].id == selectedItemID)
+            {
               this.dimension.tokens[i].queryPattern = Number(selectedRelax);
+              // this.shadowRoot.querySelector('#similarity' + this.dimension.tokens[i].id).update(null, false);
+              if(this.$.dimension.querySelector('#similarity' + this.dimension.tokens[i].id))
+                this.$.dimension.querySelector('#similarity' + this.dimension.tokens[i].id).update(null, false);
+              else
+                console.log(selectedItemID);
+            }
+          }
         }
       },
 
@@ -306,6 +326,11 @@
             return 2;
         }
 
+      },
+
+      _computeItemId: function(id)
+      {
+        return "similarity"+id;
       },
 
       _computeSelectedSimi: function(item)
@@ -333,7 +358,17 @@
       {
         var tmp = this.dimension.tokens;
         this.set('dimension.tokens', []);
-        this.set('dimension.tokens', tmp);
+
+        for(var i in tmp)
+          this.push('dimension.tokens', tmp[i]);
+      },
+
+      update: function()
+      {
+        var tmp = this.dimension;
+        this.dimension = null;
+        this.dimension = tmp;
+        this._update();
       },
 
       _computeSelectedPattern: function(item)

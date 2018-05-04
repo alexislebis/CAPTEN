@@ -104,6 +104,8 @@
         var tmp = this.resultArray;
         this.resultArray = null;
         this.resultArray = tmp;
+
+        this.$.tokenDisplayer.update();
       },
 
       _refire: function()

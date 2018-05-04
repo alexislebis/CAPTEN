@@ -7,7 +7,18 @@
     </style>
 
     <!-- <template is="dom-if" if="{{_computeSimilarityOn(item)}}"> -->
+    <div hidden$={{!isDisplayed}}>
       Choose the degree of similarity expected (>=):
+      <paper-dropdown-menu label="Token Similarity" name="tokenSimi" required on-iron-select="_simiSelected">
+          <paper-menu class="dropdown-content" id="tokenSimi" selected="{{_computeSelectedSimi(token)}}">
+              <paper-item itemID$="{{token.id}}" simi$="{{SV.VERY_HIGH}}">Very High</paper-item>
+              <paper-item itemID$="{{token.id}}" simi$="{{SV.HIGH}}">High</paper-item>
+              <paper-item itemID$="{{token.id}}" simi$="{{SV.NORMAL}}">Normal</paper-item>
+              <paper-item itemID$="{{token.id}}" simi$="{{SV.LOW}}">Low</paper-item>
+              <paper-item itemID$="{{token.id}}" simi$="{{SV.VERY_LOW}}">Very Low</paper-item>
+          </paper-menu>
+      </paper-dropdown-menu>
+
       <brainy-table id="a" items="[[similars]]" page-size="5" details-enabled>
         <brainy-table-column name="Similar Token">
           <template>[[_displaySimilarItem(item)]]</template>
@@ -17,6 +28,8 @@
         </brainy-table-column>
         <div no-results>No similarity with the selected value.</div>
       </brainy-table>
+
+    </div>
     <!-- </template> -->
 
   </template>
@@ -26,21 +39,53 @@
 
       properties:
       {
+        token:
+        {
+          type: Object,
+          notify: true,
+        },
         similars:
         {
           type: Array,
           notify: true,
+        },
+
+        isDisplayed:
+        {
+          type: Boolean,
+          notify: true,
+          value: false,
+        },
+        dimension:
+        {
+          type: Object,
+          notify: true,
+        },
+        SV:
+        {
+          type: Object,
+          value: function(){return SIMILARITY_VALUE;},
         },
       },
 
       observers:
       [
         "_onSimilarsChange(similars)",
+        "_onIsDisplayedChange(isDisplayed)",
       ],
 
-      _onSimilarsChange: function()
+      attached: function()
+      {
+        this.isDisplayed = false;
+      },
+
+      _onSimilarsChange: function(similars)
       {
         console.log(this.similars);
+      },
+      _onIsDisplayedChange: function(isDisplayed)
+      {
+        console.log(this.isDisplayed);
       },
 
       _displaySimilarItem: function(item)
@@ -60,6 +105,62 @@
       {
         return item[1];
       },
+
+      update: function(similars, display)
+      {
+        this.isDisplayed = display;
+
+        if(similars)
+          tmp = similars;
+        else
+          tmp = this.similars;
+        this.similars = [];
+        this.similars = tmp;
+      },
+
+      _simiSelected: function(e)
+      {
+        var selectedSimiElmt = e.target.selectedItem;
+        var selectedSimi = selectedSimiElmt.getAttribute("simi");
+        var selectedItemID = selectedSimiElmt.getAttribute("itemID");
+
+        var elemPosInDimTok;
+        var index;
+
+        for(var i in this.dimension.tokens)
+          if(this.dimension.tokens[i].id == selectedItemID)
+            index = i;
+
+        if(!index)
+          return;
+
+        this.dimension.tokens[index].similarityMatch = Number(selectedSimi);
+
+        this.similars = [];
+        this.similars = this.dimension.tokens[index].getSimilarities();
+      },
+
+      _computeSelectedSimi: function(item)
+      {
+        if(!item)
+          return 2;//ID of normal in the dropdown-menu
+
+        switch (item.priority) {
+          case TOKEN_PRIORITY.NORMAL:
+            return 2;
+          case TOKEN_PRIORITY.VERY_HIGH:
+            return 0;
+          case TOKEN_PRIORITY.HIGH:
+            return 1;
+          case TOKEN_PRIORITY.LOW:
+            return 3;
+          case TOKEN_PRIORITY.VERY_LOW:
+            return 4;
+          default:
+            return TOKEN_PRIORITY.VERY_HIGH;
+        }
+      },
+
     });
   </script>
 <dom-module>
