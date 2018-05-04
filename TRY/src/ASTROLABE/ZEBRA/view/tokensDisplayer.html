@@ -1,6 +1,8 @@
 <link rel="import" href="../../../../../bower_components/paper-menu/paper-menu.html">
 <link rel="import" href="../../../../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 <link rel="import" href="../../../../../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../../../../../bower_components/brainy-table/brainy-table.html">
+<link rel="import" href="./similarDisplayer.html">
 
 <dom-module id="tokens-displayer">
   <template>
@@ -14,6 +16,7 @@
         <paper-toggle-button id="toggleRelax" checked="{{isRelax}}">Token matching option</paper-toggle-button>
 
         <em>Tokens:</em>
+        <!-- <paper-icon-button icon="icons:refresh" on-click="_update"></paper-icon-button> -->
         <template is="dom-repeat" id="menu" items="{{dimension.tokens}}" restamp>
           <li>
             <template is="dom-if" if="{{isPrio}}">
@@ -40,6 +43,7 @@
               <paper-dropdown-menu label="tokenRelax" name="tokenRelax" required on-iron-select="_relaxSelected">
                   <paper-menu class="dropdown-content" id="tokenRelax" selected="{{_computeSelectedPattern(item)}}">
                     <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.PERFECT}}">Perfect matching</paper-item>
+                    <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.SIMILARITY}}">Similarity</paper-item>
                     <template is="dom-if" if="{{_isRelation(item)}}">
                       <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.PREFIX}}">Prefix matching : r(t1,_)</paper-item>
                       <paper-item itemID$="{{item.id}}" pattern$="{{TQPV.REVERSE_PREFIX}}">Reverse Prefix matching : r(_,t1)</paper-item>
@@ -53,6 +57,22 @@
                     </template>
                   </paper-menu>
               </paper-dropdown-menu>
+            </template>
+
+            <template is="dom-if" if="{{_computeSimilarityOn(item)}}">
+              Choose the degree of similarity expected (>=):
+              <paper-dropdown-menu label="Token Similarity" name="tokenSimi" required on-iron-select="_simiSelected">
+                  <paper-menu class="dropdown-content" id="tokenSimi" selected="{{_computeSelectedSimi(item)}}">
+                      <paper-item itemID$="{{item.id}}" simi$="{{SV.VERY_HIGH}}">Very High</paper-item>
+                      <paper-item itemID$="{{item.id}}" simi$="{{SV.HIGH}}">High</paper-item>
+                      <paper-item itemID$="{{item.id}}" simi$="{{SV.NORMAL}}">Normal</paper-item>
+                      <paper-item itemID$="{{item.id}}" simi$="{{SV.LOW}}">Low</paper-item>
+                      <paper-item itemID$="{{item.id}}" simi$="{{SV.VERY_LOW}}">Very Low</paper-item>
+                  </paper-menu>
+              </paper-dropdown-menu>
+
+              <similar-displayer similars="{{_computeSimilarityArray(item)}}"></similar-displayer>
+
             </template>
 
             <paper-icon-button icon="icons:clear" itemID$={{item.id}} on-click="_removeItem"></paper-icon-button>
@@ -89,6 +109,17 @@
         {
           type: Object,
           value: function(){return TOKEN_PRIORITY;},
+        },
+        SV:
+        {
+          type: Object,
+          value: function(){return SIMILARITY_VALUE;},
+        },
+        similarityON:
+        {
+          type: Boolean,
+          value: false,
+          notify: true,
         },
       },
 
@@ -171,6 +202,29 @@
         this.fire(TOKEN_PRIORITY_CHANGE_ID);
       },
 
+      _computeSimilarityArray: function(token)
+      {
+        return token.getSimilarities();
+      },
+
+      _computeSimilarityOn: function(item)
+      {
+        return item.queryPattern == TOKEN_QUERY_PATTERN_VALUE.SIMILARITY;
+      },
+
+      _simiSelected: function(e)
+      {
+        var selectedSimiElmt = e.target.selectedItem;
+        var selectedSimi = selectedSimiElmt.getAttribute("simi");
+        var selectedItemID = selectedSimiElmt.getAttribute("itemID");
+
+        var elemPosInDimTok;
+
+        for(var i in this.dimension.tokens)
+          if(this.dimension.tokens[i].id == selectedItemID)
+            this.dimension.tokens[i].similarityMatch = Number(selectedSimi);
+      },
+
       _relaxSelected: function(e)
       {
         var selectedRelaxElmt = e.target.selectedItem;
@@ -183,6 +237,8 @@
         if(selectedRelax == TOKEN_QUERY_PATTERN_VALUE.BREAK_RELATION)
         {
           var idToSplice; var oldRel;
+
+          this.similarityON = false;
 
           for(var i in this.dimension.tokens)
             if(this.dimension.tokens[i].id == selectedItemID)
@@ -203,8 +259,27 @@
           this.push('dimension.tokens',new Token(cl2));
           this.push('dimension.tokens',new Token(cl3));
         }
+        else if(selectedRelax == TOKEN_QUERY_PATTERN_VALUE.SIMILARITY)
+        {
+          var id; var tmp;
+          for(var i in this.dimension.tokens)
+          {
+            if(this.dimension.tokens[i].id == selectedItemID)
+            {
+              id = i;
+              this.dimension.tokens[i].queryPattern = Number(selectedRelax);
+              tmp =this.dimension.tokens[i];
+            }
+          }
+
+          this.splice('dimension.tokens', id, 1);
+          this.push('dimension.tokens', tmp);
+
+        }
         else
         {
+          this.similarityON = false;
+
           for(var i in this.dimension.tokens)
             if(this.dimension.tokens[i].id == selectedItemID)
               this.dimension.tokens[i].queryPattern = Number(selectedRelax);
@@ -231,6 +306,27 @@
             return 2;
         }
 
+      },
+
+      _computeSelectedSimi: function(item)
+      {
+        if(!item)
+          return 2;//ID of normal in the dropdown-menu
+
+        switch (item.priority) {
+          case TOKEN_PRIORITY.NORMAL:
+            return 2;
+          case TOKEN_PRIORITY.VERY_HIGH:
+            return 0;
+          case TOKEN_PRIORITY.HIGH:
+            return 1;
+          case TOKEN_PRIORITY.LOW:
+            return 3;
+          case TOKEN_PRIORITY.VERY_LOW:
+            return 4;
+          default:
+            return 2;
+        }
       },
 
       _update: function()

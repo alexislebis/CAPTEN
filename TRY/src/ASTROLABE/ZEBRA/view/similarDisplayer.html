@@ -1,0 +1,65 @@
+<link rel="import" href="../../../../../bower_components/brainy-table/brainy-table.html">
+
+<dom-module id="similar-displayer">
+  <template>
+    <style>
+
+    </style>
+
+    <!-- <template is="dom-if" if="{{_computeSimilarityOn(item)}}"> -->
+      Choose the degree of similarity expected (>=):
+      <brainy-table id="a" items="[[similars]]" page-size="5" details-enabled>
+        <brainy-table-column name="Similar Token">
+          <template>[[_displaySimilarItem(item)]]</template>
+        </brainy-table-column>
+        <brainy-table-column name="Similarity value" width="30px">
+          <template>[[_displaySimilarValue(item)]]</template>
+        </brainy-table-column>
+        <div no-results>No similarity with the selected value.</div>
+      </brainy-table>
+    <!-- </template> -->
+
+  </template>
+  <script>
+    Polymer({
+      is: "similar-displayer",
+
+      properties:
+      {
+        similars:
+        {
+          type: Array,
+          notify: true,
+        },
+      },
+
+      observers:
+      [
+        "_onSimilarsChange(similars)",
+      ],
+
+      _onSimilarsChange: function()
+      {
+        console.log(this.similars);
+      },
+
+      _displaySimilarItem: function(item)
+      {
+        if(!item)
+          return "NA";
+
+        if(item[0].token instanceof CAPTENClass)
+          return item[0].token.uri;
+        else if(item[0].token instanceof Property)
+          return item[0].token.uri+"("+item[0].token.from+","+item[0].token.to+")";
+        else
+          return "WRONG TOKEN";
+      },
+
+      _displaySimilarValue: function(item)
+      {
+        return item[1];
+      },
+    });
+  </script>
+<dom-module>

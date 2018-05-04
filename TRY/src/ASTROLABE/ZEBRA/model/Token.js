@@ -1,5 +1,6 @@
 function Token(tok, prio, patt) // REDO old class declaration
 {
+  this.SIMILARITY_KERNEL = SIMILARITY_KERNEL;
   this.id = TOKEN_ID++;
 
   if(prio)
@@ -11,6 +12,8 @@ function Token(tok, prio, patt) // REDO old class declaration
     this.queryPattern = patt;
   else
     this.queryPattern = TOKEN_DEFAULT_QUERY_PATTERN_VALUE;
+
+  this.similarityMatch = 5; //should be used only when queryPattern is set to TOKEN_QUERY_PATTERN_VALUE.SIMILARITY
 
   if(tok)
     this.token = tok;
@@ -37,6 +40,16 @@ Token.prototype.setToken = function(tok, prio, patt)
 
 Token.prototype.getToken = function() {return this.token;}
 
+Token.prototype.getSimilarities = function()
+{
+  if(this.queryPattern != TOKEN_QUERY_PATTERN_VALUE.SIMILARITY)
+    return [];
+
+  var sim = [];
+
+  return SIMILARITY_KERNEL.retrieveSimilarities(this, this.similarityMatch);
+}
+
 var TOKEN_PRIORITY = [];
 TOKEN_PRIORITY.NORMAL = 3;
 TOKEN_PRIORITY.LOW = 2;
@@ -54,6 +67,7 @@ DIMENSION_PRIORITY.VERY_HIGH = 5;
 var TOKEN_ID = 0;
 var TOKEN_DEFAULT_PRIORITY_VALUE = TOKEN_PRIORITY.NORMAL;
 var TOKEN_DEFAULT_QUERY_PATTERN_VALUE = TOKEN_QUERY_PATTERN_VALUE.PERFECT;
+// var TOKEN_DEFAULT_SIMILARITY_VALUE = SIMILARITY_VALUE.VERY_HIGH;
 
 
 Token.prototype.constructor = Token;
