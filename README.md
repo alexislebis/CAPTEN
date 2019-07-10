@@ -79,3 +79,7 @@ CAPTEN does not embed predefined narrated operator, narrated analysis processes 
 
 ## Disclaimer
 This research prototype is still in its early phase of development and faced several theorical iterations. This includes code design, optimisation and documentation. Despite all the efforts of the researcher, code refactorings requires huge amount of time and are not being considered for the moment :)
+
+## Information
+The master is not merged yet.
+The last working branch of the project is the **[QRCodeHandler](https://github.com/alexislebis/CAPTEN/tree/qrcodeHandler)**.
