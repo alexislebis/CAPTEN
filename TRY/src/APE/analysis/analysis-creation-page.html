@@ -2,6 +2,7 @@
 <link rel="import" href="../../NarrativeBlock/view/narrative-block-displayer-element.html">
 <link rel="import" href="../../ExtendedPaperInput/extended-paper-input-element.html">
 <link rel="import" href="../../ExtendedPaperInput/multi-link-extended-paper-input-element.html">
+<link rel="import" href="../../QRCodeHandler/view/qrcode-handler-element.html">
 
 <dom-module id="analysis-creation-page">
   <template>
@@ -126,6 +127,12 @@
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
 
+    #qrcode{
+      margin-left: auto;
+      margin-right: auto;
+      width: 64px;
+    }
+
     </style>
 
     <app-location route="{{topLevelRoute}}" use-hash-as-path></app-location>
@@ -136,6 +143,7 @@
     <div id="divRoot">
       <div id="commonInfo">
         <header>
+          <qrcode-handler-element id="qrcode" type="analysis" item="{{nap}}"></qrcode-handler-element>
           <h2> <span hidden$={{!isNew}}>New Analysis</span><!-- <span hidden$="{{isNew}}">Analysis: {{_computeNAPName(napName)}} </span>--></h2>
           <div id="paperFabs">
             <!-- <paper-fab icon="av:fiber-new" disabled="{{isNew}}" on-click="_openVocabularyNewItemPage"></paper-fab> -->
@@ -449,6 +457,8 @@
         this._attachListenersNAP();
         this.steps = nap.steps;
         this.napName = nap.getNameObject();
+
+        this.$.qrcode.reset();
       },
 
       _attachListenersNAP: function()

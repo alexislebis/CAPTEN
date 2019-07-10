@@ -58,7 +58,8 @@
     "paper-checkbox": "PolymerElements/paper-checkbox#^1.4.2",
     "paper-progress": "PolymerElements/paper-progress#^2.0.1",
     "hylar": "^1.8.3",
-    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.2.1"
+    "paper-toggle-button": "PolymerElements/paper-toggle-button#^1.2.1",
+    "qrcode.js": "https://github.com/davidshimjs/qrcodejs.git"
   },
   "resolutions": {
     "app-layout": "^0.10.7"

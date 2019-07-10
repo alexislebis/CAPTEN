@@ -1,0 +1,74 @@
+<link rel="import" href="../../import/qrcode-handler.html">
+
+<dom-module id="qrcode-handler-element">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+    </style>
+
+    <div id="main">
+      <div id="sub">
+        <paper-button id="generate" class="custom indigo" raised on-click="_generate">Generate <iron-icon icon="apps"></iron-icon></paper-icon-button>
+      </div>
+      <div id="qrPosition"></div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: 'qrcode-handler-element',
+
+      properties:
+      {
+        type:
+        {
+          type: String,
+          notify: true,
+        },
+
+        item:
+        {
+          type: Object,
+          notify: true,
+        },
+      },
+
+        attached: function()
+        {
+          //new QRCode(this.$.qrPosition, "http://localhost:3000/#/"+this.type+"/"+this.idTarget+"/"+this.target);
+        },
+
+        _generate: function()
+        {
+          // this.$.generate.style.visibility = "hidden";
+          this.$.sub.style.display = "none";
+          this.$.qrPosition.style.display = "";
+          new QRCode(this.$.qrPosition, {
+                                        	text: "http://localhost:3000/#/"+this.type+"/"+this.item.id,
+                                        	width: 64,
+                                        	height: 64,
+                                        	colorDark : "#000000",
+                                        	colorLight : "#ffffff",
+                                        	correctLevel : QRCode.CorrectLevel.H
+                                        });
+        },
+
+        reset: function()
+        {
+          // this.$.qrPosition.remove();
+          // var qrc = document.createElement("div"); qrc.id = "qrPosition";
+          // this.$.main.appendChild(qrc);
+          var root = this.$$('#qrPosition');
+
+          if(root)
+            while(root.firstChild)
+              root.removeChild(root.firstChild);
+          this.$.qrPosition.style.display = "none";
+          this.$.sub.style.display = "";
+        },
+    });
+  </script>
+</dom-module>
