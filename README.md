@@ -82,4 +82,4 @@ This research prototype is still in its early phase of development and faced sev
 
 ## Information
 The master is not merged yet.
-The last working branch of the project is the **[QRCodeHandler](https://github.com/alexislebis/CAPTEN/tree/qrcodeHandler)**.
+The last working branch of the project is the **[QRCodeHandler](https://github.com/alexislebis/CAPTEN/tree/qrcodeHandler)** based on the unmerged **[ASTROLABE](https://github.com/alexislebis/CAPTEN/tree/astrolabe)** branch too.
